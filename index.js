@@ -37,6 +37,28 @@ const amountOfLevels = (msg) => {
     });
 }
 
+const reachableKm = (msg) => {
+    const replyMarkup = bot.keyboard([
+        [
+            buttons['reachableKm10'].label,
+            buttons['reachableKm20'].label,
+            buttons['reachableKm30'].label
+        ],
+        [
+
+            buttons['reachableKm40'].label,
+            buttons['reachableKm50'].label,
+            buttons['reachableKm60'].label
+        ]
+    ], {
+        resize: true
+    });
+
+    return bot.sendMessage(msg.from.id, 'До какого км ходишь?', {
+        replyMarkup
+    });
+}
+
 
 
 const seedSession = id => {
@@ -94,6 +116,30 @@ const buttons = {
         amountOfLevelsFourty: {
             label: '40',
             command: '/upgradeFourty'
+        },
+        reachableKm10: {
+            label: '10км',
+            command: '/reachableKm'
+        },
+        reachableKm20: {
+            label: '20км',
+            command: '/reachableKm'
+        },
+        reachableKm30: {
+            label: '30км',
+            command: '/reachableKm'
+        },
+        reachableKm40: {
+            label: '40км',
+            command: '/reachableKm'
+        },
+        reachableKm50: {
+            label: '50км',
+            command: '/reachableKm'
+        },
+        reachableKm60: {
+            label: '60км',
+            command: '/reachableKm'
         }
 };
 
@@ -184,8 +230,18 @@ bot.on([
 ], msg => {
     sessions[msg.from.id].upgradeSkill = msg.text;
 
+
+    reachableKm(msg)
+});
+
+bot.on('/reachableKm', msg => {
+    sessions[msg.from.id].reachableKm = msg.text;
+
     amountOfLevels(msg);
 });
+
+
+
 
 bot.on([
     '/upgradeTen',

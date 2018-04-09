@@ -164,11 +164,13 @@ const calculateAmountSpentOnCharisma = (
 const calculateUpgrade = ({
     pip,
     upgradeSkill,
-    amountToUpgrade
+    amountToUpgrade,
+    reachableKm
 }) => {
     const currentSkillLevel = pip[skillMap[upgradeSkill]];
     const upgradeTo = Number(currentSkillLevel) + Number(amountToUpgrade);
     const charismaLevel = Number(pip.parsedCharisma);
+    const reachableDistance = Number(reachableKm.replace('км', ''));
 
     const calculations = {
         amountOfSavedFunds: calculatePerkDiscount(charismaLevel),
@@ -178,7 +180,7 @@ const calculateUpgrade = ({
             upgradeTo
         ),
         raidsInfo: calculateAmountOfRaids(
-            20,
+            reachableDistance,
             charismaLevel,
             currentSkillLevel,
             upgradeTo
@@ -193,7 +195,7 @@ const calculateUpgrade = ({
     Необходимо потратить ${calculations.amountToSpend} крышек для прокачки скила от ${currentSkillLevel} уровня до ${upgradeTo} уровня
 
 
-    При самом удачном стечении обсоятельств тебе необходимо сделать примерно {raidsInfo.bestCaseScenario.amountOfRaids} ходок:
+    При самом удачном стечении обсоятельств тебе необходимо сделать примерно ${calculations.raidsInfo.bestCaseScenario.amountOfRaids} ходок:
     Ты получишь примерно:
     - ${calculations.raidsInfo.bestCaseScenario.caps} крышек
     - ${calculations.raidsInfo.bestCaseScenario.res} материалов
