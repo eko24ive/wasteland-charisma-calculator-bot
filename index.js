@@ -7,7 +7,11 @@ const config = require('./package.json');
 
 const sessions = {};
 
-const PIP_ENTERED = 'PIP_ENTERED';
+const PIP_FORWARDED = 'PIP_FORWARDED';
+const SKILL_SELECTED = 'SKILL_SELECTED';
+const DISTANCE_ENTERED = 'DISTANCE_ENTERED';
+const LEVELS_ENTERED = 'LEVELS_ENTERED';
+const EFFOR_RESPONDED = 'EFFOR_RESPONDED';
 
 const sessionAbort = (msg) => {
     const replyMarkup = bot.keyboard([
@@ -70,7 +74,7 @@ const seedSession = id => {
 };
 
 const states = {
-    PIP_ENTERED
+    PIP_FORWARDED
 };
 
 const buttons = {
@@ -162,7 +166,7 @@ bot.on('/start', (msg) => {
         return bot.sendMessage(
             msg.from.id, 'Пожалуйста, перешли мне свой пип-бой :3', { replyMarkup: 'hide' }
         );
-    // } else if (sessions[msg.from.id].state = states.PIP_ENTERED) {
+    // } else if (sessions[msg.from.id].state = states.PIP_FORWARDED) {
     //     sessionAbort(msg);
     // }
 });
@@ -197,7 +201,7 @@ bot.on('forward', (msg) => {
 
     if (typeof pip === 'object') {
         sessions[msg.from.id].pip = pip;
-        sessions[msg.from.id].state = states.PIP_ENTERED;
+        sessions[msg.from.id].state = states.PIP_FORWARDED;
 
         const replyMarkup = bot.keyboard([
             [buttons.skillSelectStrength.label,buttons.skillSelectAccuracy.label,buttons.skillSelectAgility.label],
