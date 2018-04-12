@@ -3,6 +3,7 @@ const TeleBot = require('telebot');
 
 const parsePip = require('./src/parsePip');
 const calculateUpgrade = require('./src/calculateUpgrade');
+const config = require('./package.json');
 
 const sessions = {};
 
@@ -82,23 +83,23 @@ const buttons = {
             command: '/resetSessionAbort'
         },
         skillSelectHealth: {
-            label: 'Здоровье',
+            label: '❤ Живучесть',
             command: '/levelUpHealth'
         },
         skillSelectStrength: {
-            label: 'Сила',
+            label: '💪 Сила',
             command: '/levelUpStrength'
         },
         skillSelectAccuracy: {
-            label: 'Меткость',
+            label: '🔫 Меткость',
             command: '/levelUpAccuracy'
         },
         skillSelectCharisma: {
-            label: 'Харизма',
+            label: '🗣 Харизма',
             command: '/levelUpCharisma'
         },
         skillSelectAgility: {
-            label: 'Ловкость',
+            label: '🤸🏽‍ Ловкость',
             command: '/levelUpAgility'
         },
         amountOfLevelsTen: {
@@ -184,6 +185,10 @@ bot.on('/resetSessionAbort', (msg) => {
 });
 
 bot.on('forward', (msg) => {
+    if(msg.from.is_bot) {
+        return;
+    }
+
     if (sessions[msg.from.id] === undefined) {
         seedSession(msg.from.id);
     }
@@ -195,11 +200,8 @@ bot.on('forward', (msg) => {
         sessions[msg.from.id].state = states.PIP_ENTERED;
 
         const replyMarkup = bot.keyboard([
-            [buttons.skillSelectHealth.label],
-            [buttons.skillSelectStrength.label],
-            [buttons.skillSelectAccuracy.label],
-            [buttons.skillSelectCharisma.label],
-            [buttons.skillSelectAgility.label]
+            [buttons.skillSelectStrength.label,buttons.skillSelectAccuracy.label,buttons.skillSelectAgility.label],
+            [buttons.skillSelectHealth.label, buttons.skillSelectCharisma.label]
         ], {
             resize: true
         });
@@ -249,12 +251,28 @@ bot.on([
 
     const effort = calculateUpgrade(sessions[msg.from.id]);
 
-    bot.sendMessage(
-        msg.from.id, effort, { replyMarkup: 'hide' }
-    );
+    effort.map(info => bot.sendMessage(
+        msg.from.id, info, { replyMarkup: 'hide' }
+    ));
+
 
     sessions[msg.from.id].state = null;
 });
+
+bot.on('/version', msg => msg.reply.text(config.version))
+
+bot.on('/debug', msg => {
+    const replyMarkup = bot.keyboard([
+        [buttons.skillSelectStrength.label,buttons.skillSelectAccuracy.label,buttons.skillSelectAgility.label],
+        [buttons.skillSelectHealth.label, buttons.skillSelectCharisma.label]
+    ], {
+        resize: true
+    });
+
+    return bot.sendMessage(msg.from.id, 'Что качать будешь?', {
+        replyMarkup
+    });
+})
 
 
 bot.start();
