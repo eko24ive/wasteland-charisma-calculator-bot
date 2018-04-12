@@ -11,7 +11,7 @@ const PIP_FORWARDED = 'PIP_FORWARDED';
 const SKILL_SELECTED = 'SKILL_SELECTED';
 const DISTANCE_ENTERED = 'DISTANCE_ENTERED';
 const LEVELS_ENTERED = 'LEVELS_ENTERED';
-const EFFOR_RESPONDED = 'EFFOR_RESPONDED';
+const EFFORT_RESPONDED = 'EFFORT_RESPONDED';
 
 const sessionAbort = (msg) => {
     const replyMarkup = bot.keyboard([
@@ -64,8 +64,6 @@ const reachableKm = (msg) => {
     });
 }
 
-
-
 const seedSession = id => {
     sessions[id] = {
         pip: null,
@@ -74,78 +72,82 @@ const seedSession = id => {
 };
 
 const states = {
-    PIP_FORWARDED
+    PIP_FORWARDED,
+    SKILL_SELECTED,
+    DISTANCE_ENTERED,
+    LEVELS_ENTERED,
+    EFFORT_RESPONDED
 };
 
 const buttons = {
-        sessionAbortYes: {
-            label: 'Да',
-            command: '/resetSession'
-        },
-        sessionAbortNo: {
-            label: 'Нет',
-            command: '/resetSessionAbort'
-        },
-        skillSelectHealth: {
-            label: '❤ Живучесть',
-            command: '/levelUpHealth'
-        },
-        skillSelectStrength: {
-            label: '💪 Сила',
-            command: '/levelUpStrength'
-        },
-        skillSelectAccuracy: {
-            label: '🔫 Меткость',
-            command: '/levelUpAccuracy'
-        },
-        skillSelectCharisma: {
-            label: '🗣 Харизма',
-            command: '/levelUpCharisma'
-        },
-        skillSelectAgility: {
-            label: '🤸🏽‍ Ловкость',
-            command: '/levelUpAgility'
-        },
-        amountOfLevelsTen: {
-            label: '10',
-            command: '/upgradeTen'
-        },
-        amountOfLevelsTwenty: {
-            label: '20',
-            command: '/upgradeTwenty'
-        },
-        amountOfLevelsThirty: {
-            label: '30',
-            command: '/upgradeThirty'
-        },
-        amountOfLevelsFourty: {
-            label: '40',
-            command: '/upgradeFourty'
-        },
-        reachableKm10: {
-            label: '10км',
-            command: '/reachableKm'
-        },
-        reachableKm20: {
-            label: '20км',
-            command: '/reachableKm'
-        },
-        reachableKm30: {
-            label: '30км',
-            command: '/reachableKm'
-        },
-        reachableKm40: {
-            label: '40км',
-            command: '/reachableKm'
-        },
-        reachableKm50: {
-            label: '50км',
-            command: '/reachableKm'
-        },
-        reachableKm60: {
-            label: '60км',
-            command: '/reachableKm'
-        }
+    sessionAbortYes: {
+        label: 'Да',
+        command: '/resetSession'
+    },
+    sessionAbortNo: {
+        label: 'Нет',
+        command: '/resetSessionAbort'
+    },
+    skillSelectHealth: {
+        label: '❤ Живучесть',
+        command: '/levelUpHealth'
+    },
+    skillSelectStrength: {
+        label: '💪 Сила',
+        command: '/levelUpStrength'
+    },
+    skillSelectAccuracy: {
+        label: '🔫 Меткость',
+        command: '/levelUpAccuracy'
+    },
+    skillSelectCharisma: {
+        label: '🗣 Харизма',
+        command: '/levelUpCharisma'
+    },
+    skillSelectAgility: {
+        label: '🤸🏽‍ Ловкость',
+        command: '/levelUpAgility'
+    },
+    amountOfLevelsTen: {
+        label: '10',
+        command: '/upgradeTen'
+    },
+    amountOfLevelsTwenty: {
+        label: '20',
+        command: '/upgradeTwenty'
+    },
+    amountOfLevelsThirty: {
+        label: '30',
+        command: '/upgradeThirty'
+    },
+    amountOfLevelsFourty: {
+        label: '40',
+        command: '/upgradeFourty'
+    },
+    reachableKm10: {
+        label: '10км',
+        command: '/reachableKm'
+    },
+    reachableKm20: {
+        label: '20км',
+        command: '/reachableKm'
+    },
+    reachableKm30: {
+        label: '30км',
+        command: '/reachableKm'
+    },
+    reachableKm40: {
+        label: '40км',
+        command: '/reachableKm'
+    },
+    reachableKm50: {
+        label: '50км',
+        command: '/reachableKm'
+    },
+    reachableKm60: {
+        label: '60км',
+        command: '/reachableKm'
+    }
 };
 
 const bot = new TeleBot({
@@ -160,15 +162,13 @@ const bot = new TeleBot({
 
 
 bot.on('/start', (msg) => {
-    // if (sessions[msg.from.id] === undefined) {
+    if (sessions[msg.from.id] === undefined) {
         seedSession(msg.from.id);
+    }
 
-        return bot.sendMessage(
-            msg.from.id, 'Пожалуйста, перешли мне свой пип-бой :3', { replyMarkup: 'hide' }
-        );
-    // } else if (sessions[msg.from.id].state = states.PIP_FORWARDED) {
-    //     sessionAbort(msg);
-    // }
+    return bot.sendMessage(
+        msg.from.id, 'Пожалуйста, перешли мне свой пип-бой :3', { replyMarkup: 'hide' }
+    );
 });
 
 bot.on('/resetSession', (msg) => {
@@ -189,6 +189,8 @@ bot.on('/resetSessionAbort', (msg) => {
 });
 
 bot.on('forward', (msg) => {
+    console.log(msg.text);
+    
     if(msg.from.is_bot) {
         return;
     }
