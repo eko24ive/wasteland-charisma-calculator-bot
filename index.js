@@ -155,15 +155,15 @@ const bot = new TeleBot({
 
 
 bot.on('/start', (msg) => {
-    if (sessions[msg.from.id] === undefined) {
+    // if (sessions[msg.from.id] === undefined) {
         seedSession(msg.from.id);
 
         return bot.sendMessage(
             msg.from.id, 'Пожалуйста, перешли мне свой пип-бой :3', { replyMarkup: 'hide' }
         );
-    } else if (sessions[msg.from.id].state = states.PIP_ENTERED) {
-        sessionAbort(msg);
-    }
+    // } else if (sessions[msg.from.id].state = states.PIP_ENTERED) {
+    //     sessionAbort(msg);
+    // }
 });
 
 bot.on('/resetSession', (msg) => {
@@ -187,13 +187,13 @@ bot.on('forward', (msg) => {
     if (sessions[msg.from.id] === undefined) {
         seedSession(msg.from.id);
     }
-    
+
     const pip = parsePip(msg.text);
 
     if (typeof pip === 'object') {
         sessions[msg.from.id].pip = pip;
         sessions[msg.from.id].state = states.PIP_ENTERED;
-        
+
         const replyMarkup = bot.keyboard([
             [buttons.skillSelectHealth.label],
             [buttons.skillSelectStrength.label],
@@ -230,8 +230,7 @@ bot.on([
 ], msg => {
     sessions[msg.from.id].upgradeSkill = msg.text;
 
-
-    reachableKm(msg)
+    reachableKm(msg);
 });
 
 bot.on('/reachableKm', msg => {
@@ -239,9 +238,6 @@ bot.on('/reachableKm', msg => {
 
     amountOfLevels(msg);
 });
-
-
-
 
 bot.on([
     '/upgradeTen',
