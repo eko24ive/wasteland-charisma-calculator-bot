@@ -2,8 +2,6 @@ const parsePip = msg => {
     try {
         msg = msg.split('\n').join('');
 
-
-
         const pipVersionRegExp = /📟Пип-бой 3000 v(\d*.\d*)/g;
         const factionRegExp = /👥Фракция: (.*)❤️/g;
         const charismaAgilityRegExp = /🗣Харизма: ([\d]*).🤸🏽‍♂️Ловкость: ([\d]*)/g;
@@ -21,8 +19,6 @@ const parsePip = msg => {
         const [, healthNow, healthMax] = healthRegExp.exec(msg);
         const [, parsedFaction] = factionRegExp.exec(msg);
         const [, pipVersion] = pipVersionRegExp.exec(msg);
-
-
 
         return {
             pipVersion,
@@ -42,7 +38,41 @@ const parsePip = msg => {
             }
         };
     } catch (e) {
-        return false;
+        try {
+            msg = msg.split("\n").join("");
+
+            var charismaRegExp = /🗣(\d*)/g;
+            var agilityRegExp = /🤸🏽‍♂️(\d*)/g;
+            var dexterityRegExp = /🔫(\d*)/g;
+            var strengthRegExp = /💪(\d*)/g;
+            var enduranceRegExp = /🔋(\d*)\/(\d*)/g;
+            var hungerRegExp = /🍗(\d*)%/g;
+            var healthRegExp = /❤️(\d*)\/(\d*)/g;
+
+            var [, parsedCharisma] = charismaRegExp.exec(msg);
+            var [, parsedAgility] = agilityRegExp.exec(msg);
+            var [, parsedStrength] = strengthRegExp.exec(msg);
+            var [, enduranceNow, enduranceMax] = enduranceRegExp.exec(msg);
+            var [, parsedDexterity] = dexterityRegExp.exec(msg);
+            var [, parsedHunger] = hungerRegExp.exec(msg);
+            var [, healthNow, healthMax] = healthRegExp.exec(msg);
+
+            return {
+                healthNow,
+                healthMax,
+                parsedHunger,
+                parsedStrength,
+                parsedDexterity,
+                parsedCharisma,
+                parsedAgility,
+                endurance: {
+                    enduranceNow,
+                    enduranceMax
+                }
+            };
+        } catch (e) {
+            return false;
+        }
     }
 }
 
