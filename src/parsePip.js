@@ -1,37 +1,31 @@
 const parsePip = msg => {
     try {
-        const splited = msg.split('\n');
-        const [
-            pipVersion, ,
-            name,
-            faction,
-            health,
-            hunger,
-            damageArmor, ,
-            strenthDexterity,
-            charismaAgility, ,
-            endurance
-        ] = splited;
+        msg = msg.split('\n').join('');
 
 
+
+        const pipVersionRegExp = /📟Пип-бой 3000 v(\d*.\d*)/g;
+        const factionRegExp = /👥Фракция: (.*)❤️/g;
         const charismaAgilityRegExp = /🗣Харизма: ([\d]*).🤸🏽‍♂️Ловкость: ([\d]*)/g;
         const damageArmorRegExp = /⚔️Урон: ([\d]*) 🛡Броня: ([\d]*)/g;
         const strengthDexterityRegExp = /💪Сила: ([\d]*) 🔫Меткость: ([\d]*)/g;
         const enduranceRegExp = /🔋Выносливость: ([\d]+)\/([\d]+)/g;
         const hungerRegExp = /🍗Голод: ([\d]*)%/g;
-        const healthRegExp = /❤️Здоровье: (\d*)\/(\d*)/g
+        const healthRegExp = /❤️Здоровье: (\d*)\/(\d*)/g;
 
-        const [, parsedCharisma, parsedAgility] = charismaAgilityRegExp.exec(charismaAgility);
-        const [, parsedDamage, parsedArmor] = damageArmorRegExp.exec(damageArmor);
-        const [, parsedStrength, parsedDexterity] = strengthDexterityRegExp.exec(strenthDexterity);
-        const [, enduranceNow, enduranceMax] = enduranceRegExp.exec(endurance);
-        const [, parsedHunger] = hungerRegExp.exec(hunger);
-        const [, healthNow, healthMax] = healthRegExp.exec(health);
-        const parsedFaction = faction.replace('👥Фракция: ', '');
+        const [, parsedCharisma, parsedAgility] = charismaAgilityRegExp.exec(msg);
+        const [, parsedDamage, parsedArmor] = damageArmorRegExp.exec(msg);
+        const [, parsedStrength, parsedDexterity] = strengthDexterityRegExp.exec(msg);
+        const [, enduranceNow, enduranceMax] = enduranceRegExp.exec(msg);
+        const [, parsedHunger] = hungerRegExp.exec(msg);
+        const [, healthNow, healthMax] = healthRegExp.exec(msg);
+        const [, parsedFaction] = factionRegExp.exec(msg);
+        const [, pipVersion] = pipVersionRegExp.exec(msg);
+
+
 
         return {
             pipVersion,
-            name,
             parsedFaction,
             healthNow,
             healthMax,
@@ -46,7 +40,7 @@ const parsePip = msg => {
                 enduranceNow,
                 enduranceMax
             }
-        }
+        };
     } catch (e) {
         return false;
     }
