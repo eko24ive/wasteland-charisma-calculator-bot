@@ -80,74 +80,74 @@ const states = {
 };
 
 const buttons = {
-    sessionAbortYes: {
-        label: 'Да',
-        command: '/resetSession'
-    },
-    sessionAbortNo: {
-        label: 'Нет',
-        command: '/resetSessionAbort'
-    },
-    skillSelectHealth: {
-        label: '❤ Живучесть',
-        command: '/levelUpHealth'
-    },
-    skillSelectStrength: {
-        label: '💪 Сила',
-        command: '/levelUpStrength'
-    },
-    skillSelectAccuracy: {
-        label: '🔫 Меткость',
-        command: '/levelUpAccuracy'
-    },
-    skillSelectCharisma: {
-        label: '🗣 Харизма',
-        command: '/levelUpCharisma'
-    },
-    skillSelectAgility: {
-        label: '🤸🏽‍ Ловкость',
-        command: '/levelUpAgility'
-    },
-    amountOfLevelsTen: {
-        label: '10',
-        command: '/upgradeTen'
-    },
-    amountOfLevelsTwenty: {
-        label: '20',
-        command: '/upgradeTwenty'
-    },
-    amountOfLevelsThirty: {
-        label: '30',
-        command: '/upgradeThirty'
-    },
-    amountOfLevelsFourty: {
-        label: '40',
-        command: '/upgradeFourty'
-    },
-    reachableKm10: {
-        label: '10км',
-        command: '/reachableKm'
-    },
-    reachableKm20: {
-        label: '20км',
-        command: '/reachableKm'
-    },
-    reachableKm30: {
-        label: '30км',
-        command: '/reachableKm'
-    },
-    reachableKm40: {
-        label: '40км',
-        command: '/reachableKm'
-    },
-    reachableKm50: {
-        label: '50км',
-        command: '/reachableKm'
-    },
-    reachableKm60: {
-        label: '60км',
-        command: '/reachableKm'
-    }
+  sessionAbortYes: {
+    label: "Да",
+    command: "/resetSession"
+  },
+  sessionAbortNo: {
+    label: "Нет",
+    command: "/resetSessionAbort"
+  },
+  skillSelectHealth: {
+    label: "❤ Живучесть",
+    command: "/levelUpHealth"
+  },
+  skillSelectStrength: {
+    label: "💪 Сила",
+    command: "/levelUpStrength"
+  },
+  skillSelectAccuracy: {
+    label: "🔫 Меткость",
+    command: "/levelUpAccuracy"
+  },
+  skillSelectCharisma: {
+    label: "🗣 Харизма",
+    command: "/levelUpCharisma"
+  },
+  skillSelectAgility: {
+    label: "🤸‍♀️ Ловкость",
+    command: "/levelUpAgility"
+  },
+  amountOfLevelsTen: {
+    label: "10",
+    command: "/upgradeTen"
+  },
+  amountOfLevelsTwenty: {
+    label: "20",
+    command: "/upgradeTwenty"
+  },
+  amountOfLevelsThirty: {
+    label: "30",
+    command: "/upgradeThirty"
+  },
+  amountOfLevelsFourty: {
+    label: "40",
+    command: "/upgradeFourty"
+  },
+  reachableKm10: {
+    label: "10км",
+    command: "/reachableKm"
+  },
+  reachableKm20: {
+    label: "20км",
+    command: "/reachableKm"
+  },
+  reachableKm30: {
+    label: "30км",
+    command: "/reachableKm"
+  },
+  reachableKm40: {
+    label: "40км",
+    command: "/reachableKm"
+  },
+  reachableKm50: {
+    label: "50км",
+    command: "/reachableKm"
+  },
+  reachableKm60: {
+    label: "60км",
+    command: "/reachableKm"
+  }
 };
 
 const bot = new TeleBot({
@@ -256,13 +256,10 @@ bot.on([
     sessions[msg.from.id].amountToUpgrade = msg.text;
 
     const effort = calculateUpgrade(sessions[msg.from.id]);
-
-    effort.map(info => bot.sendMessage(
-        msg.from.id, info, { replyMarkup: 'hide' }
-    ));
-
-
     sessions[msg.from.id].state = null;
+
+    return Promise.all(effort.map(info => msg.reply.text(info)));
+
 });
 
 bot.on('/version', msg => msg.reply.text(config.version))

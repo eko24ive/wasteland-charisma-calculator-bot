@@ -5,12 +5,12 @@ const mobs = require('./constants/mobs');
 const mobsRanges = require('./constants/mobsRanges');
 
 const skillMap = {
-    '❤ Живучесть': 'healthMax',
-    '💪 Сила': 'parsedStrength',
-    '🔫 Меткость': 'parsedDexterity',
-    '🗣 Харизма': 'parsedCharisma',
-    '🤸🏽‍ Ловкость': 'parsedAgility'
-}
+  "❤ Живучесть": "healthMax",
+  "💪 Сила": "parsedStrength",
+  "🔫 Меткость": "parsedDexterity",
+  "🗣 Харизма": "parsedCharisma",
+  "🤸‍♀️ Ловкость": "parsedAgility"
+};
 
 const calculatePerkDiscount = (charismaLevel) => {
     if (charismaLevel >= 2) {
@@ -211,7 +211,7 @@ const calculateUpgrade = ({
 - ${calculations.raidsInfo.worstCaseScenario.res} 📦 материалов
 
 Если сбагрить материалы в ломбарде то всего будет ${(calculations.raidsInfo.worstCaseScenario.convertedCaps + calculations.raidsInfo.worstCaseScenario.caps) * calculations.raidsInfo.worstCaseScenario.amountOfRaids} 🕳 крышек`,
-`За инфу о мобах, благодаря которой эта логика стала возможной огромное спасибо создателю @Wasteland Wars Helper - @radueff`
+`За инфу о мобах, благодаря которой эта логика стала возможной огромное спасибо создателю @WastelandWarsHelper - @radueff`
 ];
 
     return res;
