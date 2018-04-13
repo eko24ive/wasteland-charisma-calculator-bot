@@ -41,21 +41,21 @@ const parsePip = msg => {
         try {
             msg = msg.split("\n").join("");
 
-            var charismaRegExp = /🗣(\d*)/g;
-            var agilityRegExp = /🤸🏽‍♂️(\d*)/g;
-            var dexterityRegExp = /🔫(\d*)/g;
-            var strengthRegExp = /💪(\d*)/g;
-            var enduranceRegExp = /🔋(\d*)\/(\d*)/g;
-            var hungerRegExp = /🍗(\d*)%/g;
-            var healthRegExp = /❤️(\d*)\/(\d*)/g;
+            const charismaRegExp = /🗣(\d*)/g;
+            const agilityRegExp = /🤸🏽‍♂️(\d*)/g;
+            const dexterityRegExp = /🔫(\d*)/g;
+            const strengthRegExp = /💪(\d*)/g;
+            const enduranceRegExp = /🔋(\d*)\/(\d*)/g;
+            const hungerRegExp = /🍗(\d*)%/g;
+            const healthRegExp = /❤️(\d*)\/(\d*)/g;
 
-            var [, parsedCharisma] = charismaRegExp.exec(msg);
-            var [, parsedAgility] = agilityRegExp.exec(msg);
-            var [, parsedStrength] = strengthRegExp.exec(msg);
-            var [, enduranceNow, enduranceMax] = enduranceRegExp.exec(msg);
-            var [, parsedDexterity] = dexterityRegExp.exec(msg);
-            var [, parsedHunger] = hungerRegExp.exec(msg);
-            var [, healthNow, healthMax] = healthRegExp.exec(msg);
+            const [, parsedCharisma] = charismaRegExp.exec(msg);
+            const [, parsedAgility] = agilityRegExp.exec(msg);
+            const [, parsedStrength] = strengthRegExp.exec(msg);
+            const [, enduranceNow, enduranceMax] = enduranceRegExp.exec(msg);
+            const [, parsedDexterity] = dexterityRegExp.exec(msg);
+            const [, parsedHunger] = hungerRegExp.exec(msg);
+            const [, healthNow, healthMax] = healthRegExp.exec(msg);
 
             return {
                 healthNow,
