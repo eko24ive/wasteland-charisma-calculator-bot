@@ -204,7 +204,7 @@ const calculateUpgrade = ({
 - ${calculations.raidsInfo.bestCaseScenario.caps} 🕳 крышек
 - ${calculations.raidsInfo.bestCaseScenario.res} 📦 материалов
 
-Если сбагрить материалы в ломбарде то всего будет ${(calculations.raidsInfo.bestCaseScenario.convertedCaps + calculations.raidsInfo.bestCaseScenario.caps) * calculations.raidsInfo.bestCaseScenario.amountOfRaids} 🕳 крышек
+Если сбагрить материалы в ломбарде то суммарная выручка за ${calculations.raidsInfo.bestCaseScenario.amountOfRaids} ходки с учётом крышек будет ${(calculations.raidsInfo.bestCaseScenario.convertedCaps + calculations.raidsInfo.bestCaseScenario.caps) * calculations.raidsInfo.bestCaseScenario.amountOfRaids} 🕳 крышек
 
 
 При самом хуёвом стечении обсоятельств тебе необходимо сделать примерно ${calculations.raidsInfo.worstCaseScenario.amountOfRaids} 👣 ходок:
@@ -212,7 +212,7 @@ const calculateUpgrade = ({
 - ${calculations.raidsInfo.worstCaseScenario.caps} 🕳 крышек
 - ${calculations.raidsInfo.worstCaseScenario.res} 📦 материалов
 
-Если сбагрить материалы в ломбарде то всего будет ${(calculations.raidsInfo.worstCaseScenario.convertedCaps + calculations.raidsInfo.worstCaseScenario.caps) * calculations.raidsInfo.worstCaseScenario.amountOfRaids} 🕳 крышек
+Если сбагрить материалы в ломбарде то суммарная выручка за ${calculations.raidsInfo.worstCaseScenario.amountOfRaids} ходки с учётом крышек будет ${(calculations.raidsInfo.worstCaseScenario.convertedCaps + calculations.raidsInfo.worstCaseScenario.caps) * calculations.raidsInfo.worstCaseScenario.amountOfRaids} 🕳 крышек
 
 
 За инфу о мобах, благодаря которой эта логика стала возможной огромное спасибо создателю @WastelandWarsHelper - @radueff
