@@ -194,25 +194,29 @@ const calculateUpgrade = ({
         amountSpentOnCharisma: calculateAmountSpentOnCharisma(charismaLevel)
     };
 
-    console.log(calculations);
+    const res = `
+Поздравляю, ты потратил на харизму ${calculations.amountSpentOnCharisma} 🕳 крышек
 
-    const res = [
-`Поздравляю, ты потратил на харизму ${calculations.amountSpentOnCharisma} 🕳 крышек`,
-`Необходимо потратить ${calculations.amountToSpend} 🕳 крышек для прокачки скила от ${currentSkillLevel} уровня до ${upgradeTo} уровня`,
-`При самом удачном стечении обсоятельств тебе необходимо сделать примерно ${calculations.raidsInfo.bestCaseScenario.amountOfRaids} 👣 ходок:
+Необходимо потратить ${calculations.amountToSpend} 🕳 крышек для прокачки скила от ${currentSkillLevel} уровня до ${upgradeTo} уровня
+
+При самом удачном стечении обсоятельств тебе необходимо сделать примерно ${calculations.raidsInfo.bestCaseScenario.amountOfRaids} 👣 ходок:
 За одну ходку ты получишь примерно:
 - ${calculations.raidsInfo.bestCaseScenario.caps} 🕳 крышек
 - ${calculations.raidsInfo.bestCaseScenario.res} 📦 материалов
 
-Если сбагрить материалы в ломбарде то всего будет ${(calculations.raidsInfo.bestCaseScenario.convertedCaps + calculations.raidsInfo.bestCaseScenario.caps) * calculations.raidsInfo.bestCaseScenario.amountOfRaids} 🕳 крышек`,
-`При самом хуёвом стечении обсоятельств тебе необходимо сделать примерно ${calculations.raidsInfo.worstCaseScenario.amountOfRaids} 👣 ходок:
+Если сбагрить материалы в ломбарде то всего будет ${(calculations.raidsInfo.bestCaseScenario.convertedCaps + calculations.raidsInfo.bestCaseScenario.caps) * calculations.raidsInfo.bestCaseScenario.amountOfRaids} 🕳 крышек
+
+
+При самом хуёвом стечении обсоятельств тебе необходимо сделать примерно ${calculations.raidsInfo.worstCaseScenario.amountOfRaids} 👣 ходок:
 За одну ходку ты получишь примерно:
 - ${calculations.raidsInfo.worstCaseScenario.caps} 🕳 крышек
 - ${calculations.raidsInfo.worstCaseScenario.res} 📦 материалов
 
-Если сбагрить материалы в ломбарде то всего будет ${(calculations.raidsInfo.worstCaseScenario.convertedCaps + calculations.raidsInfo.worstCaseScenario.caps) * calculations.raidsInfo.worstCaseScenario.amountOfRaids} 🕳 крышек`,
-`За инфу о мобах, благодаря которой эта логика стала возможной огромное спасибо создателю @WastelandWarsHelper - @radueff`
-];
+Если сбагрить материалы в ломбарде то всего будет ${(calculations.raidsInfo.worstCaseScenario.convertedCaps + calculations.raidsInfo.worstCaseScenario.caps) * calculations.raidsInfo.worstCaseScenario.amountOfRaids} 🕳 крышек
+
+
+За инфу о мобах, благодаря которой эта логика стала возможной огромное спасибо создателю @WastelandWarsHelper - @radueff
+`;
 
     return res;
 };

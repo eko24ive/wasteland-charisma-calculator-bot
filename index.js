@@ -160,7 +160,6 @@ const bot = new TeleBot({
     }
 });
 
-
 bot.on('/start', (msg) => {
     if (sessions[msg.from.id] === undefined) {
         seedSession(msg.from.id);
@@ -189,8 +188,6 @@ bot.on('/resetSessionAbort', (msg) => {
 });
 
 bot.on('forward', (msg) => {
-    console.log(msg.text);
-    
     if(msg.from.is_bot) {
         return;
     }
@@ -237,12 +234,14 @@ bot.on([
     '/levelUpAgility'
 ], msg => {
     sessions[msg.from.id].upgradeSkill = msg.text;
-
+    sessions[msg.from.id].state = states.SKILL_SELECTED;
+    
     reachableKm(msg);
 });
 
 bot.on('/reachableKm', msg => {
     sessions[msg.from.id].reachableKm = msg.text;
+    sessions[msg.from.id].state = states.DISTANCE_ENTERED;
 
     amountOfLevels(msg);
 });
@@ -253,13 +252,19 @@ bot.on([
     '/upgradeThirty',
     '/upgradeFourty'
 ], msg => {
+    if (sessions[msg.from.id].state == states.EFFORT_RESPONDED) {
+        return false;
+    }
+
+    sessions[msg.from.id].state = states.LEVELS_ENTERED;
+    
     sessions[msg.from.id].amountToUpgrade = msg.text;
 
     const effort = calculateUpgrade(sessions[msg.from.id]);
-    sessions[msg.from.id].state = null;
 
-    return Promise.all(effort.map(info => msg.reply.text(info)));
+    bot.sendMessage(msg.from.id, effort, { replyMarkup: "hide" });
 
+    sessions[msg.from.id].state = EFFORT_RESPONDED;
 });
 
 bot.on('/version', msg => msg.reply.text(config.version))
@@ -277,5 +282,30 @@ bot.on('/debug', msg => {
     });
 })
 
+bot.on(/\d/g, msg => {
+    /* console.log(sessions[msg.from.id].state);
+    
+    switch (sessions[msg.from.id].state) {
+        case states.SKILL_SELECTED:
+                sessions[msg.from.id].reachableKm = msg.text;
+                sessions[msg.from.id].state = states.DISTANCE_ENTERED;
+
+                amountOfLevels(msg);
+            break;
+        case states.DISTANCE_ENTERED:
+            sessions[msg.from.id].state = states.LEVELS_ENTERED;
+
+            sessions[msg.from.id].amountToUpgrade = msg.text;
+
+            const effort = calculateUpgrade(sessions[msg.from.id]);
+
+            effort.map(info => msg.reply.text(info));
+
+            sessions[msg.from.id].state = states.EFFORT_RESPONDED;
+            break;
+        default:
+            break;
+    } */
+})
 
 bot.start();
