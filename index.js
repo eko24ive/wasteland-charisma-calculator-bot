@@ -196,7 +196,7 @@ bot.on('forward', (msg) => {
         seedSession(msg.from.id);
     }
 
-    const pip = parsePip(msg.text);
+    const pip = parsePip(msg);
 
     if (typeof pip === 'object') {
         sessions[msg.from.id].pip = pip;
