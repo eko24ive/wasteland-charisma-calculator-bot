@@ -5,11 +5,11 @@ const mobs = require('./constants/mobs');
 const mobsRanges = require('./constants/mobsRanges');
 
 const skillMap = {
-  "❤ Живучесть": "healthMax",
-  "💪 Сила": "parsedStrength",
-  "🔫 Меткость": "parsedDexterity",
-  "🗣 Харизма": "parsedCharisma",
-  "🤸‍♀️ Ловкость": "parsedAgility"
+  "❤ Живучесть": "health",
+  "💪 Сила": "strength",
+  "🔫 Меткость": "precision",
+  "🗣 Харизма": "charisma",
+  "🤸‍♀️ Ловкость": "agility"
 };
 
 const calculatePerkDiscount = (charismaLevel) => {
@@ -175,7 +175,7 @@ const calculateUpgrade = ({
     });
     const currentSkillLevel = pip[skillMap[upgradeSkill]];
     const upgradeTo = Number(currentSkillLevel) + Number(amountToUpgrade);
-    const charismaLevel = Number(pip.parsedCharisma);
+    const charismaLevel = Number(pip.charisma);
     const reachableDistance = Number(reachableKm.replace('км', ''));
 
     const calculations = {
