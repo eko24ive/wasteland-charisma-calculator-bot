@@ -1,4 +1,6 @@
 const parsePip = ({ text }) => {
+    let error;
+
     try {
         const nameRegExp = /(.*)\n👥Фракция/g;
         const versionRegExp = /📟Пип-бой 3000 v(\d*.\d*)/g;
@@ -49,7 +51,7 @@ const parsePip = ({ text }) => {
 
         return data;
     } catch (e) {
-        // console.log(e);
+        error = e;
     }
 
     try {
@@ -95,8 +97,14 @@ const parsePip = ({ text }) => {
 
         return data;
     } catch (e) {
-        console.log(e);
+        error = e;
     };
+
+    console.log(`
+===============================
+[ERROR]
+${error}
+`);
 
     return false;
 }
