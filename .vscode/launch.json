@@ -7,7 +7,19 @@
         {
             "type": "node",
             "request": "launch",
-            "name": "Launch Program",
+            "name": "Prod",
+            "args": [
+                "-P"
+            ],
+            "program": "${workspaceFolder}\\index.js"
+        },
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "Dev",
+            "args": [
+                "-D"
+            ],
             "program": "${workspaceFolder}\\index.js"
         }
     ]
