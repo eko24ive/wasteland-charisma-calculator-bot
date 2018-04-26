@@ -167,16 +167,10 @@ const calculateUpgrade = ({
     amountToUpgrade,
     reachableKm
 }) => {
-    console.log({
-        pip,
-    upgradeSkill,
-    amountToUpgrade,
-    reachableKm
-    });
     const currentSkillLevel = pip[skillMap[upgradeSkill]];
     const upgradeTo = Number(currentSkillLevel) + Number(amountToUpgrade);
     const charismaLevel = Number(pip.charisma);
-    const reachableDistance = Number(reachableKm.replace('км', ''));
+    const reachableDistance = Number(/\d*/.exec(reachableKm).pop());
 
     const calculations = {
         amountOfSavedFunds: calculatePerkDiscount(charismaLevel),
