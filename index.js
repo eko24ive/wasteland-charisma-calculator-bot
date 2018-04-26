@@ -1,10 +1,17 @@
-require('dotenv').config()
+require('dotenv').config();
 const TeleBot = require('telebot');
+const program = require('commander');
 
 const parsePip = require('./src/parsePip');
 const calculateUpgrade = require('./src/calculateUpgrade');
 const config = require('./package.json');
 
+program
+    .version('0.1.0')
+    .option('-D, --dev', 'Running bot with test token')
+    .option('-P, --prod', 'Running bot with produciton token')
+    .parse(process.argv);
+    
 const sessions = {};
 
 const PIP_FORWARDED = 'PIP_FORWARDED';
@@ -45,15 +52,15 @@ const amountOfLevels = (msg) => {
 const reachableKm = (msg) => {
     const replyMarkup = bot.keyboard([
         [
-            buttons['reachableKm10'].label,
             buttons['reachableKm20'].label,
-            buttons['reachableKm30'].label
+            buttons['reachableKm30'].label,
+            buttons['reachableKm40'].label
         ],
         [
 
-            buttons['reachableKm40'].label,
             buttons['reachableKm50'].label,
-            buttons['reachableKm60'].label
+            buttons['reachableKm60'].label,
+            buttons['reachableKm70'].label
         ]
     ], {
         resize: true
@@ -110,23 +117,19 @@ const buttons = {
   },
   amountOfLevelsTen: {
     label: "10",
-    command: "/upgradeTen"
+    command: "/upgradeSkill"
   },
   amountOfLevelsTwenty: {
     label: "20",
-    command: "/upgradeTwenty"
+    command: "/upgradeSkill"
   },
   amountOfLevelsThirty: {
     label: "30",
-    command: "/upgradeThirty"
+    command: "/upgradeSkill"
   },
   amountOfLevelsFourty: {
     label: "40",
-    command: "/upgradeFourty"
-  },
-  reachableKm10: {
-    label: "10км",
-    command: "/reachableKm"
+    command: "/upgradeSkill"
   },
   reachableKm20: {
     label: "20км",
@@ -147,11 +150,27 @@ const buttons = {
   reachableKm60: {
     label: "60км",
     command: "/reachableKm"
-  }
+  },
+  reachableKm70: {
+    label: "70+ км",
+    command: "/reachableKm"
+  },
+};
+
+const getToken = () => {
+    if (program.dev) {
+        console.log('RUNNING IN TEST MODE');
+        return process.env.BOT_TOKEN_TEST;
+    } else if (program.prod) {
+        console.log('RUNNING IN PRODUCTION MODE');
+        return process.env.BOT_TOKEN;
+    }
+    
+    throw new Error('Please, specify bot token mode "--dev" for deveolpment and "--prod" production');
 };
 
 const bot = new TeleBot({
-    token: process.env.BOT_TOKEN,
+    token: getToken(),
     usePlugins: ['namedButtons'],
     pluginConfig: {
         namedButtons: {
@@ -246,12 +265,7 @@ bot.on('/reachableKm', msg => {
     amountOfLevels(msg);
 });
 
-bot.on([
-    '/upgradeTen',
-    '/upgradeTwenty',
-    '/upgradeThirty',
-    '/upgradeFourty'
-], msg => {
+bot.on('/upgradeSkill', msg => {
     if (sessions[msg.from.id].state == states.EFFORT_RESPONDED) {
         return false;
     }
@@ -263,6 +277,14 @@ bot.on([
     const effort = calculateUpgrade(sessions[msg.from.id]);
 
     bot.sendMessage(msg.from.id, effort, { replyMarkup: "hide" });
+
+    console.log(`
+------------------------------------------
+[REPLY]
+User: ${sessions[msg.from.id].pip.name} | ${sessions[msg.from.id].pip.faction}
+Reachable distance: ${sessions[msg.from.id].reachableKm}
+Amout to upgrade: ${sessions[msg.from.id].amountToUpgrade}
+`);
 
     sessions[msg.from.id].state = EFFORT_RESPONDED;
 });
@@ -282,8 +304,9 @@ bot.on('/debug', msg => {
     });
 })
 
+/*
 bot.on(/\d/g, msg => {
-    /* console.log(sessions[msg.from.id].state);
+     console.log(sessions[msg.from.id].state);
     
     switch (sessions[msg.from.id].state) {
         case states.SKILL_SELECTED:
@@ -305,7 +328,7 @@ bot.on(/\d/g, msg => {
             break;
         default:
             break;
-    } */
-})
+    } 
+})*/
 
 bot.start();
