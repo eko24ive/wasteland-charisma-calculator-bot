@@ -4,6 +4,9 @@ const program = require('commander');
 
 const parsePip = require('./src/parsePip');
 const calculateUpgrade = require('./src/calculateUpgrade');
+
+const upgradeAmountValidation = require('./src/utils/upgradeAmountValidation');
+
 const config = require('./package.json');
 
 program
@@ -45,15 +48,26 @@ const askAmountOfLevels = (msg) => {
         [
             buttons.amountOfLevelsTen.label,
             buttons.amountOfLevelsTwenty.label,
-            buttons.amountOfLevelsThirty.label,
-            buttons.amountOfLevelsFourty.label
+            buttons.amountOfLevelsThirty.label
+        ],
+        [
+            buttons.amountOfLevelsFourty.label,
+            buttons.amountOfLevelsFifty.label,
+            buttons.amountOfLevelsSixty.label
+        ],
+        [
+            buttons.amountOfLevelsMAX.label
         ]
     ], {
         resize: true
     });
 
-    return bot.sendMessage(msg.from.id, 'На сколько уровней хочешь прокачать?', {
-        replyMarkup
+    return bot.sendMessage(msg.from.id, `
+Выбери на сколько уровней ты хочешь прокачать *${sessions[msg.from.id].upgradeSkill}*
+\`Либо напиши своё количество (например: 17)\`
+`, {
+        replyMarkup,
+        parseMode: 'markdown'
     });
 }
 
@@ -74,8 +88,10 @@ const askReachableKm = (msg) => {
         resize: true
     });
 
-    return bot.sendMessage(msg.from.id, 'До какого км ходишь?', {
-        replyMarkup
+    return bot.sendMessage(msg.from.id, "Выбери до какого километра ты ходишь (при этом оставаясь в живих)?\n"+
+"`Либо напиши своё количество (например: 28)`", {
+        replyMarkup,
+        parseMode: 'markdown'
     });
 }
 
@@ -91,7 +107,8 @@ const getEffort = (msg, bot) => {
     const effort = calculateUpgrade(sessions[msg.from.id]);
 
     bot.sendMessage(msg.from.id, effort, {
-        replyMarkup: "hide"
+        replyMarkup: "hide",
+        parseMode: 'markdown'
     });
 
     console.log(`
@@ -142,19 +159,31 @@ const buttons = {
         command: "/levelUpAgility"
     },
     amountOfLevelsTen: {
-        label: "10",
+        label: "+10",
         command: "/upgradeSkill"
     },
     amountOfLevelsTwenty: {
-        label: "20",
+        label: "+20",
         command: "/upgradeSkill"
     },
     amountOfLevelsThirty: {
-        label: "30",
+        label: "+20",
         command: "/upgradeSkill"
     },
     amountOfLevelsFourty: {
-        label: "40",
+        label: "+40",
+        command: "/upgradeSkill"
+    },
+    amountOfLevelsFifty: {
+        label: "+50",
+        command: "/upgradeSkill"
+    },
+    amountOfLevelsSixty: {
+        label: "+60",
+        command: "/upgradeSkill"
+    },
+    amountOfLevelsMAX: {
+        label: "МАКСИМАЛОЧКА",
         command: "/upgradeSkill"
     },
     reachableKm20: {
@@ -192,12 +221,32 @@ const getToken = () => {
         return process.env.BOT_TOKEN;
     }
 
-    throw new Error('Please, specify bot token mode "--dev" for deveolpment and "--prod" production');
+    throw new Error('Please, specify bot token mode "--dev" for development and "--prod" production');
 };
+
+const levelsToMax = (pip, skillToUpgrade, cap) => {
+    const skillMap = {
+        "❤ Живучесть": "health",
+        "💪 Сила": "strength",
+        "🔫 Меткость": "precision",
+        "🗣 Харизма": "charisma",
+        "🤸‍♀️ Ловкость": "agility"
+    };
+
+    const currentSkillLevel = pip[skillMap[skillToUpgrade]];
+    const amountToUpgrade = cap - currentSkillLevel;
+
+    return amountToUpgrade;
+}
 
 const bot = new TeleBot({
     token: getToken(),
     usePlugins: ['namedButtons'],
+    polling: {
+        interval: 100, // How often check updates (in ms).
+        limit: 500, // Limits the number of updates to be retrieved.
+        retryTimeout: 1000 // Reconne   cting timeout (in ms).
+    },
     pluginConfig: {
         namedButtons: {
             buttons
@@ -270,8 +319,8 @@ bot.on('forward', (msg) => {
 
 bot.on('/help', (msg) => {
     msg.reply.text(`
-        Я буду помогать тебе считать сколько тебе нужно усилий потратить для прокачки навыка.
-        Что бы начать со мной роботу - перешли мне свой пип-бой!
+Я буду помогать тебе считать сколько тебе нужно усилий потратить для прокачки навыка.
+Что бы начать со мной роботу - перешли мне свой пип-бой!
     `, {
         replyMarkup: 'hide'
     });
@@ -298,39 +347,57 @@ bot.on('/reachableKm', msg => {
 });
 
 bot.on('/upgradeSkill', msg => {
+    if(msg.text === 'МАКСИМАЛОЧКА') {
+        const pip = sessions[msg.from.id].pip;
+        const skillToUpgrade = sessions[msg.from.id].upgradeSkill;
+
+        const newText = levelsToMax(pip, skillToUpgrade, 1100);
+        msg.text = newText;
+
+        getEffort(msg, bot);
+    }
+
     getEffort(msg, bot);
 });
 
 bot.on('/version', msg => msg.reply.text(config.version))
 
 bot.on('/debug', msg => {
-    const replyMarkup = bot.keyboard([
-        [buttons.skillSelectStrength.label, buttons.skillSelectAccuracy.label, buttons.skillSelectAgility.label],
-        [buttons.skillSelectHealth.label, buttons.skillSelectCharisma.label]
-    ], {
-        resize: true
-    });
-
-    return bot.sendMessage(msg.from.id, 'Что качать будешь?', {
-        replyMarkup
+    return bot.sendMessage(msg.from.id, `
+    _За инфу о мобах, благодаря которой эта логика стала возможной огромное спасибо создателю @WastelandWarsHelper - @radueff_
+`, {
+    parseMode: 'markdown'
     });
 })
 
-
-bot.on(/\d/g, msg => {
-    console.log(sessions[msg.from.id].state);
-
+bot.on(/^\d+$/, msg => {
     switch (sessions[msg.from.id].state) {
-        case states.WAIT_FOR_LEVELS:
-                sessions[msg.from.id].reachableKm = msg.text;
-                sessions[msg.from.id].state = states.DISTANCE_ENTERED;
+        case states.WAIT_FOR_DISTANCE:
+            const reachableKm = Number(msg.text);
+
+            if(reachableKm > 100) {
+                msg.reply.text('Бля, ну не гони - давай чуть более реалистичней, окей ?)')
+            } else if (reachableKm <= 100) {
+                sessions[msg.from.id].reachableKm = reachableKm;
+                sessions[msg.from.id].state = states.WAIT_FOR_LEVELS;
 
                 askAmountOfLevels(msg);
+            }
+
             break;
-        case states.WAIT_FOR_RESPONSE:
-            getEffort(msg, bot);
+        case states.WAIT_FOR_LEVELS:
+            const upgradeAmount = Number(msg.text);
+            const pip = sessions[msg.from.id].pip;
+            const skillToUpgrade = sessions[msg.from.id].upgradeSkill;
+
+            if (upgradeAmountValidation(pip, skillToUpgrade, upgradeAmount, 1100)) {
+                getEffort(msg, bot);
+            } else {
+                msg.reply.text('Чёто дохуя получилось, попробуй число поменьше.')
+            }
+
             break;
-    } 
+    }
 })
 
 bot.start();
