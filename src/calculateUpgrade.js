@@ -1,3 +1,5 @@
+const numeral = require('numeral');
+
 const constants = require('./constants/constants');
 const defaultSkillCost = require('./constants/defaultSkillCost');
 const defaultCharismaCost = require('./constants/defaultCharismaCost');
@@ -11,6 +13,12 @@ const skillMap = {
   "🗣 Харизма": "charisma",
   "🤸‍♀️ Ловкость": "agility"
 };
+
+const formatNubmer = number => {
+    const floored = Math.floor(number);
+
+    return numeral(floored).format('0,0');
+}
 
 const calculatePerkDiscount = (charismaLevel) => {
     if (charismaLevel >= 2) {
@@ -139,12 +147,12 @@ var calculateAmountOfRaids = (
         bestCaseScenario: {
             ...bestCaseScenario,
             convertedCaps: bestCaseScenario.res / 10,
-            amountOfRaids: Math.ceil(totalSpend / (bestCaseScenario.res / 10 + bestCaseScenario.caps))
+            amountOfRaids: totalSpend / (bestCaseScenario.res / 10 + bestCaseScenario.caps)
         },
         worstCaseScenario: {
             ...worstCaseScenario,
             convertedCaps: worstCaseScenario.res / 10,
-            amountOfRaids: Math.ceil(totalSpend / (worstCaseScenario.res / 10 + worstCaseScenario.caps))
+            amountOfRaids: totalSpend / (worstCaseScenario.res / 10 + worstCaseScenario.caps)
         }
     }
 };
@@ -156,9 +164,11 @@ const calculateAmountSpentOnCharisma = (
         return null;
     }
 
-    return defaultCharismaCost.filter(c => c.level <= charismaLevel)
+    const spentAmount = defaultCharismaCost.filter(c => c.level <= charismaLevel)
         .map(c => c.caps)
         .reduce((a, b) => a + b);
+
+    return spentAmount;
 }
 
 const calculateUpgrade = ({
@@ -188,28 +198,30 @@ const calculateUpgrade = ({
         amountSpentOnCharisma: calculateAmountSpentOnCharisma(charismaLevel)
     };
 
+    /*
+    При самом удачном стечении обсоятельств тебе необходимо сделать примерно ${Math.ceil(calculations.raidsInfo.bestCaseScenario.amountOfRaids)} 👣 ходок:
+За одну ходку ты получишь примерно:
+- ${formatNubmer(calculations.raidsInfo.bestCaseScenario.caps)} 🕳 крышек
+- ${formatNubmer(calculations.raidsInfo.bestCaseScenario.res)} 📦 материалов
+
+Если сбагрить материалы в ломбарде то суммарная выручка за ${Math.floor(calculations.raidsInfo.bestCaseScenario.amountOfRaids)} ходки с учётом крышек будет ${formatNubmer((calculations.raidsInfo.bestCaseScenario.convertedCaps + calculations.raidsInfo.bestCaseScenario.caps) * calculations.raidsInfo.bestCaseScenario.amountOfRaids)} 🕳 крышек
+
+*/
+
     const res = `
-Поздравляю, ты потратил на харизму ${calculations.amountSpentOnCharisma} 🕳 крышек
+Поздравляю, ты потратил на харизму ${formatNubmer(calculations.amountSpentOnCharisma)} 🕳 крышек
 
-Необходимо потратить ${calculations.amountToSpend} 🕳 крышек для прокачки скила от ${currentSkillLevel} уровня до ${upgradeTo} уровня
+Необходимо потратить ${formatNubmer(calculations.amountToSpend)} 🕳 крышек для прокачки скила от ${currentSkillLevel} уровня до ${upgradeTo} уровня
 
-При самом удачном стечении обсоятельств тебе необходимо сделать примерно ${calculations.raidsInfo.bestCaseScenario.amountOfRaids} 👣 ходок:
+При самом хуёвом стечении обсоятельств тебе необходимо сделать примерно *${Math.floor(calculations.raidsInfo.worstCaseScenario.amountOfRaids) + 5} 👣 ходок*:
 За одну ходку ты получишь примерно:
-- ${calculations.raidsInfo.bestCaseScenario.caps} 🕳 крышек
-- ${calculations.raidsInfo.bestCaseScenario.res} 📦 материалов
+- ${formatNubmer(calculations.raidsInfo.worstCaseScenario.caps)} 🕳 крышек
+- ${formatNubmer(calculations.raidsInfo.worstCaseScenario.res)} 📦 материалов
 
-Если сбагрить материалы в ломбарде то суммарная выручка за ${calculations.raidsInfo.bestCaseScenario.amountOfRaids} ходки с учётом крышек будет ${(calculations.raidsInfo.bestCaseScenario.convertedCaps + calculations.raidsInfo.bestCaseScenario.caps) * calculations.raidsInfo.bestCaseScenario.amountOfRaids} 🕳 крышек
-
-
-При самом хуёвом стечении обсоятельств тебе необходимо сделать примерно ${calculations.raidsInfo.worstCaseScenario.amountOfRaids} 👣 ходок:
-За одну ходку ты получишь примерно:
-- ${calculations.raidsInfo.worstCaseScenario.caps} 🕳 крышек
-- ${calculations.raidsInfo.worstCaseScenario.res} 📦 материалов
-
-Если сбагрить материалы в ломбарде то суммарная выручка за ${calculations.raidsInfo.worstCaseScenario.amountOfRaids} ходки с учётом крышек будет ${(calculations.raidsInfo.worstCaseScenario.convertedCaps + calculations.raidsInfo.worstCaseScenario.caps) * calculations.raidsInfo.worstCaseScenario.amountOfRaids} 🕳 крышек
+Если сбагрить материалы в ломбарде то суммарная выручка за ${Math.floor(calculations.raidsInfo.worstCaseScenario.amountOfRaids)} ходки с учётом крышек будет *${formatNubmer((calculations.raidsInfo.worstCaseScenario.convertedCaps + calculations.raidsInfo.worstCaseScenario.caps) * calculations.raidsInfo.worstCaseScenario.amountOfRaids)} 🕳 крышек*
 
 
-За инфу о мобах, благодаря которой эта логика стала возможной огромное спасибо создателю @WastelandWarsHelper - @radueff
+_За инфу о мобах, благодаря которой эта логика стала возможной огромное спасибо создателю_ @WastelandWarsHelper - @radueff
 `;
 
     return res;
