@@ -213,7 +213,7 @@ _Поздравляю, ты потратил на харизму ${formatNubmer(
 
 Необходимо потратить ${formatNubmer(calculations.amountToSpend)} 🕳 крышек для прокачки "${upgradeSkill}" от ${currentSkillLevel} уровня до ${upgradeTo} уровня
 
-При самом хуёвом стечении обсоятельств тебе необходимо сделать примерно *${Math.floor(calculations.raidsInfo.worstCaseScenario.amountOfRaids) + 5} 👣 ходок*:
+Тебе необходимо сделать примерно *${Math.floor(calculations.raidsInfo.worstCaseScenario.amountOfRaids) + 2} 👣 ходок*:
 За одну ходку ты получишь примерно:
 - ${formatNubmer(calculations.raidsInfo.worstCaseScenario.caps)} 🕳 крышек
 - ${formatNubmer(calculations.raidsInfo.worstCaseScenario.res)} 📦 материалов
