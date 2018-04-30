@@ -209,9 +209,9 @@ const calculateUpgrade = ({
 */
 
     const res = `
-Поздравляю, ты потратил на харизму ${formatNubmer(calculations.amountSpentOnCharisma)} 🕳 крышек
+_Поздравляю, ты потратил на харизму ${formatNubmer(calculations.amountSpentOnCharisma)} 🕳 крышек_
 
-Необходимо потратить ${formatNubmer(calculations.amountToSpend)} 🕳 крышек для прокачки скила от ${currentSkillLevel} уровня до ${upgradeTo} уровня
+Необходимо потратить ${formatNubmer(calculations.amountToSpend)} 🕳 крышек для прокачки "${upgradeSkill}" от ${currentSkillLevel} уровня до ${upgradeTo} уровня
 
 При самом хуёвом стечении обсоятельств тебе необходимо сделать примерно *${Math.floor(calculations.raidsInfo.worstCaseScenario.amountOfRaids) + 5} 👣 ходок*:
 За одну ходку ты получишь примерно:
@@ -221,7 +221,7 @@ const calculateUpgrade = ({
 Если сбагрить материалы в ломбарде то суммарная выручка за ${Math.floor(calculations.raidsInfo.worstCaseScenario.amountOfRaids)} ходки с учётом крышек будет *${formatNubmer((calculations.raidsInfo.worstCaseScenario.convertedCaps + calculations.raidsInfo.worstCaseScenario.caps) * calculations.raidsInfo.worstCaseScenario.amountOfRaids)} 🕳 крышек*
 
 
-_За инфу о мобах, благодаря которой эта логика стала возможной огромное спасибо создателю_ @WastelandWarsHelper - @radueff
+_За инфу о мобах, благодаря которой эта логика о ходках стала возможной - огромное спасибо создателю_ @WastelandWarsHelper, @radueff
 `;
 
     return res;
