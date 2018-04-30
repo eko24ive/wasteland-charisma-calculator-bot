@@ -114,7 +114,7 @@ const getEffort = (msg, bot) => {
     console.log(`
 ------------------------------------------
 [REPLY]
-User: ${sessions[msg.from.id].pip.name} | ${sessions[msg.from.id].pip.faction}
+User: ${sessions[msg.from.id].pip.name} | ${sessions[msg.from.id].pip.faction} | ${msg.from.username}
 Reachable distance: ${sessions[msg.from.id].reachableKm}
 Amout to upgrade: ${sessions[msg.from.id].amountToUpgrade}
 `);
