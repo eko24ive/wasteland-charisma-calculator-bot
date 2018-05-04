@@ -368,6 +368,18 @@ bot.on('/upgradeSkill', msg => {
 
 bot.on('/version', msg => msg.reply.text(config.version))
 
+bot.on('/iwillforward', msg => {
+    console.log(`
+    ------------------------------------------
+    [IWILLFORWARD]
+    User: ${msg.from.username} | ${msg.from.id}
+    `);
+
+    return msg.reply.text('Спасибо, твой голос учтён!', {
+        asReply: true
+    })
+})
+
 bot.on('/debug', msg => {
     return bot.sendMessage(msg.from.id, `
     _За инфу о мобах, благодаря которой эта логика стала возможной огромное спасибо создателю @WastelandWarsHelper - @radueff_
