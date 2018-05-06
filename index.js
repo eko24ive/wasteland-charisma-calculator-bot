@@ -268,9 +268,9 @@ bot.on('/start', (msg) => {
 
 Если хочешь как «только так сразу»™ получать информацию о моих обновлениях - милости прошу на канал https://t.me/wwCharismaCalculator
 
-Есть желание посоветовать крутой функицонал или сообщить о баге - залетай в уютный(не очень) чат https://t.me/wwCharismaCalculatorChat
+Есть желание посоветовать крутой функционал или сообщить о баге - залетай в уютный(не очень) чат https://t.me/wwCharismaCalculatorChat
 
-_Учти что я ещё нахожусь в бета-режиме, и ты можешь наткнуться на большие и маленькие баги.
+_Учти, что я ещё нахожусь в бета-режиме, и ты можешь наткнуться на большие и маленькие баги.
 Но, не переживай - они будут пофикшены_
         `
         , {
@@ -357,7 +357,7 @@ bot.on('/upgradeSkill', msg => {
         const pip = sessions[msg.from.id].pip;
         const skillToUpgrade = sessions[msg.from.id].upgradeSkill;
 
-        const newText = levelsToMax(pip, skillToUpgrade, 1000);
+        const newText = levelsToMax(pip, skillToUpgrade, 1200);
         msg.text = newText;
 
         getEffort(msg, bot);
