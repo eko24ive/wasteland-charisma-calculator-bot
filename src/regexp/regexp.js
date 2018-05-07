@@ -5,8 +5,8 @@ const staminaRegExp = /🔋\d+\/\d+/;
 const campDistanceRegExp = /👣(\d+)км от лагеря/;
 const receivedCapsRegExp = /Ты заработал: 🕳(\d+)/;
 const receivedMaterialsRegExp = /Получено: 📦(\d+)/;
-const receivedItemRegExp = /Получено: (?!📦)(.+)/g;
-const receivedBonusItemRegExp = /Бонус: (.+)/g;
+const receivedItemRegExp = /Получено: (?!📦)(.+)/;
+const receivedBonusItemRegExp = /Бонус: (.+)/;
 const injuryRegExp = /Ты ранен: 💔-(\d+)/;
 const capsLostRegExp = /Ты потерял: 🕳(\d+)/;
 const materialsLostRegExp = /Проебано: 📦(\d+)/;
@@ -15,9 +15,9 @@ const actionReceivedCapsRegExp = /Получено крышек: 🕳(\d+)/;
 const actionReceivedMaterialsRegExp = /Получено материалов: 📦(\d+)/;
 
 const beastNameRegExp = /Сражение с (.+)/;
-const beastAttackRegExp = /(.+) .+ 💔-(\d+)/g;
-const beastStunRegExp = /(.+) оглушен ударом 💫/g;
-const playerBeastAttackRegExp = /👤Ты .+ 💥(\d+)/g;
+const beastAttackRegExp = /.+ 💔-(\d+)/;
+const beastStunRegExp = /(.+) оглушен ударом 💫/;
+const playerBeastAttackRegExp = /👤Ты .+ 💥(\d+)/;
 const dungeonBeastAppeared = /(.+) перегородил тебе путь/;
 const beastDefeatRegExp = /Тебя буквально размазали/;
 const beastVictoryRegExp = /Ты одержал победу!/;
@@ -37,7 +37,6 @@ const location = {
     conditional: [
         receivedCapsRegExp,
         receivedMaterialsRegExp,
-        receivedItemRegExp,
         receivedBonusItemRegExp,
         injuryRegExp,
         capsLostRegExp,
@@ -57,6 +56,7 @@ const regularBeast = {
         playerBeastAttackRegExp,
         beastDefeatRegExp,
         beastVictoryRegExp,
+        receivedItemRegExp,
         beastDefeatCapsLostRegExp,
         beastDefeatMaterialsLostRegExp,
         actionReceivedCapsRegExp,
