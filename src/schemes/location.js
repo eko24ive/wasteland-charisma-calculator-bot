@@ -5,6 +5,7 @@ const locationScheme = new Schema({
     distance: Number,
     name: String,
     type: String,
+    isRaid: Boolean,
     effects: [String],
     capsReceived: [Number],
     materialsReceived: [Number],
