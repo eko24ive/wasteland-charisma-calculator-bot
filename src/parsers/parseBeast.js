@@ -6,7 +6,7 @@ const {
 const parseRegularBeast = beast => {
     const splitted = beast.split('\n');
 
-    let capsReceived, materialsReceived, receivedItems;
+    let capsReceived, materialsReceived, receivedItems, fightResult;
 
     const isDungeon = false;
     const [, distance] = regexps.campDistanceRegExp.exec(beast);
@@ -21,11 +21,17 @@ const parseRegularBeast = beast => {
     if(regexps.receivedItemRegExp.test(beast)) {
         [, receivedItems] = regexps.receivedItemRegExp.exec(beast);
     }
-    
+
+    if(regexps.beastVictoryRegExp.test(beast)) {
+        fightResult = 'win';
+    } else if(regexps.beastDefeatMaterialsLostRegExp.test(beast)) {
+        fightResult = 'lose';
+    }
+
     const damageReceived = splitted.map(row => {
         if(regexps.beastAttackRegExp.test(row)) {
             var [, dmg] = regexps.beastAttackRegExp.exec(row);
-            
+
             return dmg;
         }
 
@@ -35,7 +41,7 @@ const parseRegularBeast = beast => {
     const damagesGiven = splitted.map(row => {
         if(regexps.playerBeastAttackRegExp.test(row)) {
             var [, dmg] = regexps.playerBeastAttackRegExp.exec(row);
-            
+
             return dmg;
         }
 
@@ -59,6 +65,7 @@ const parseRegularBeast = beast => {
         receivedItems,
         damageReceived,
         damagesGiven,
+        fightResult,
         amountOfConcussions
     }
 };
@@ -73,21 +80,21 @@ const parseDungeonBeast = beast => {
     const damageReceived = splitted.map(row => {
         if(regexps.beastAttackRegExp.test(row)) {
             var [, dmg] = regexps.beastAttackRegExp.exec(row);
-            
+
             return dmg;
         }
 
-        return false
+        return false;
     }).filter(dmg => dmg !== false);
 
     const damagesGiven = splitted.map(row => {
         if(regexps.playerBeastAttackRegExp.test(row)) {
             var [, dmg] = regexps.playerBeastAttackRegExp.exec(row);
-            
+
             return dmg;
         }
 
-        return false
+        return false;
     }).filter(dmg => dmg !== false);
 
     const amountOfConcussions = splitted.map(row => {
@@ -95,7 +102,7 @@ const parseDungeonBeast = beast => {
             return true;
         }
 
-        return false
+        return false;
     }).filter(dmg => dmg !== false);
 
     return {
