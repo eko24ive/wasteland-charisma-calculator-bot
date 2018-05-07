@@ -4,6 +4,8 @@ const program = require('commander');
 const moment = require('moment');
 
 const parsePip = require('./src/parsePip');
+const beastParser = require('./src/utils/parseBeast');
+
 const calculateUpgrade = require('./src/calculateUpgrade');
 
 const upgradeAmountValidation = require('./src/utils/upgradeAmountValidation');
@@ -352,6 +354,25 @@ bot.on('/resetSessionAbort', (msg) => {
 }); */
 
 bot.on('forward', (msg) => {
+    const isLocation = regExpSetMatcher(msg.text, {
+        regexpSet: regexps.location
+    });
+    
+    const isRegularBeast = regExpSetMatcher(msg.text, {
+        regexpSet: regexps.regularBeast
+    });
+    
+    const isDungeonBeast = regExpSetMatcher(msg.text, {
+        regexpSet: regexps.dungeonBeast
+    });
+
+    if (isDungeonBeast) {
+        return msg.reply.text(JSON.stringify(beastParser.parseDungeonBeast(msg.text)), {asReply: true});
+    } else if (isRegularBeast) {
+        return msg.reply.text(JSON.stringify(beastParser.parseRegularBeast(msg.text)), {asReply: true});
+    } else if(isLocation) {
+        return msg.reply.text('location', {asReply: true});
+    } 
     if (sessions[msg.from.id] === undefined) {
         seedSession(msg.from.id);
     }
@@ -369,13 +390,7 @@ bot.on('forward', (msg) => {
             regexpSet: regexps.dungeonBeast
         });
     
-        /* if (isDungeonBeast) {
-            return msg.reply.text('dungeon beast', {asReply: true});
-        } else if (isRegularBeast) {
-            return msg.reply.text('regular beast', {asReply: true});
-        } else if(isLocation) {
-            return msg.reply.text('location', {asReply: true});
-        }  */
+       
 
         if (isDungeonBeast || isRegularBeast || isLocation) {
             sessions[msg.from.id].data.push(msg.forward_date);
