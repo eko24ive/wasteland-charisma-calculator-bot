@@ -1,4 +1,5 @@
 const locationNameRegExp = /^(.+)\n❤️/;
+const locationRaidPostfixRegExp = / \(.+\)/;
 const healthRegExp = /❤️(-|)\d+\/\d+/;
 const hungerRegExp = /🍗\d+\%/;
 const staminaRegExp = /🔋\d+\/\d+/;
@@ -35,6 +36,7 @@ const every = {
 const location = {
     contains: [every.contains, locationNameRegExp],
     conditional: [
+        every.contains,
         receivedCapsRegExp,
         receivedMaterialsRegExp,
         receivedBonusItemRegExp,
@@ -84,6 +86,7 @@ const dungeonBeast = {
 
 const regexps = {
     locationNameRegExp,
+    locationRaidPostfixRegExp,
     healthRegExp,
     hungerRegExp,
     staminaRegExp,
