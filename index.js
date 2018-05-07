@@ -1,10 +1,26 @@
 require('dotenv').config();
+const mongoose = require ('mongoose');
+const _ = require('underscore');
 const TeleBot = require('telebot');
 const program = require('commander');
 const moment = require('moment');
 
+
+
+const beastSchema = require('./src/schemes/beast');
+const locationSchema = require('./src/schemes/location');
+
+var uristring = process.env.MONGODB_URI;
+
+const Beast = mongoose.model('Beast', beastSchema);
+const Location = mongoose.model('Location', locationSchema);
+
+mongoose.connect(uristring);
+
+
 const parsePip = require('./src/parsers/parsePip');
 const beastParser = require('./src/parsers/parseBeast');
+const parseLocation = require('./src/parsers/parseLocation');
 
 const calculateUpgrade = require('./src/calculateUpgrade');
 
@@ -354,73 +370,72 @@ bot.on('/resetSessionAbort', (msg) => {
 }); */
 
 bot.on('forward', (msg) => {
-    const isLocation = regExpSetMatcher(msg.text, {
-        regexpSet: regexps.location
-    });
-    
-    const isRegularBeast = regExpSetMatcher(msg.text, {
-        regexpSet: regexps.regularBeast
-    });
-    
-    const isDungeonBeast = regExpSetMatcher(msg.text, {
-        regexpSet: regexps.dungeonBeast
-    });
-
-    if (isDungeonBeast) {
-        return msg.reply.text(JSON.stringify(beastParser.parseDungeonBeast(msg.text)), {asReply: true});
-    } else if (isRegularBeast) {
-        return msg.reply.text(JSON.stringify(beastParser.parseRegularBeast(msg.text)), {asReply: true});
-    } else if(isLocation) {
-        return msg.reply.text('location', {asReply: true});
-    } 
     if (sessions[msg.from.id] === undefined) {
         seedSession(msg.from.id);
     }
-    
-    if(sessions[msg.from.id].state === states.WAIT_FOR_FORWARD_END) {
+
+
+
+    // if(sessions[msg.from.id].state === states.WAIT_FOR_FORWARD_END) {
+        let data;
+        let dataType;
         const isLocation = regExpSetMatcher(msg.text, {
             regexpSet: regexps.location
         });
-        
+
         const isRegularBeast = regExpSetMatcher(msg.text, {
             regexpSet: regexps.regularBeast
         });
-        
+
         const isDungeonBeast = regExpSetMatcher(msg.text, {
             regexpSet: regexps.dungeonBeast
         });
-    
-       
+
+
+        if (isDungeonBeast) {
+            data = beastParser.parseDungeonBeast(msg.text);
+            dataType='dungeonBeast';
+        } else if (isRegularBeast) {
+            data = beastParser.parseRegularBeast(msg.text);
+            dataType='regularBeast';
+        } else if(isLocation) {
+            data = parseLocation(msg.text);
+            dataType='location';
+        }
+
+
 
         if (isDungeonBeast || isRegularBeast || isLocation) {
-            sessions[msg.from.id].data.push(msg.forward_date);
+            sessions[msg.from.id].data.push({
+                data,
+                dataType
+            });
         }
-    
+
         // return msg.reply.text('false', {asReply: true});
-    } else {
-        
-    
-        const pip = parsePip(msg);
-    
+    // } else {
+
+
+        /* const pip = parsePip(msg);
+
         if (typeof pip === 'object') {
             sessions[msg.from.id].pip = pip;
             sessions[msg.from.id].state = states.WAIT_FOR_SKILL;
-    
+
             const replyMarkup = bot.keyboard([
                 [buttons.skillSelectStrength.label, buttons.skillSelectAccuracy.label, buttons.skillSelectAgility.label],
                 [buttons.skillSelectHealth.label, buttons.skillSelectCharisma.label]
             ], {
                 resize: true
             });
-    
+
             return bot.sendMessage(msg.from.id, 'Что качать будешь?', {
                 replyMarkup
             });
         }
-    
         return msg.reply.text('Форвардни настоящий пип');
-    }
-    
+    }*/
+
 });
 
 bot.on([
@@ -441,6 +456,52 @@ bot.on('/reachableKm', msg => {
     sessions[msg.from.id].state = states.WAIT_FOR_LEVELS;
 
     askAmountOfLevels(msg);
+});
+
+bot.on('/locs_text', msg => {
+    return msg.reply.text(`
+8км - Безумный старик
+11км - ⛓Старая шахта
+13км -⚡️Купол Грома
+15км - 🛤Ореол
+19км - ⚠️Пещера Ореола
+23км - 🚽Сточная труба
+27км - 🏃🏿Белое гетто
+29км -⚙️Открытое Убежище
+30км - 🕎 Ядро
+34км - 🦇Бэт-пещера
+39км - 🦆Перевал Уткина
+43км - 🚪Уютный подвальчик
+45км - 🌁Высокий Хротгар
+50км - 🔴Руины Гексагона
+51км - 🛏Безопасный привал
+56км - 🔬Научная лаборатория
+69км - ⛩Храм Мудрости
+74км - Чёрная Меза
+
+Инфо взята из @trust_42 - https://t.me/trust_42/61
+    `, {
+        webPreview: false
+    });
+});
+
+bot.on('/raids_text', msg => {
+    return msg.reply.text(`
+📦5 - Материалы (Старая фабрика)
+🕳9 - Крышки (Завод "Ядер-Кола")
+💊12 - Вещества (Тюрьма)
+🍗16 - Еда (Склады)
+🔹20 - Кварц (Датацентр)
+❤️24 - Лечение (Госпиталь)
+💡28 - Генераторы (Завод "Электрон")
+💾32 - Микрочипы (Офисное здание)
+🔩38 - Иридий (Иридиевые шахты)
+🔗46 - Кубонит (Склад металла)
+
+Инфо взята из @trust_42 - https://t.me/trust_42/57
+    `, {
+        webPreview: false
+    });
 });
 
 bot.on('/upgradeSkill', msg => {
@@ -473,7 +534,7 @@ bot.on('/journeyforwardstart', msg => {
 
     msg.reply.text(`
 Хей, вижу ты хочешь поделиться со мной ценной информации с пустоши - отлично!
-Ну что же кидай блядь еёё сюда. 
+Ну что же кидай блядь еёё сюда.
     `, {
         replyMarkup
     })
@@ -486,9 +547,7 @@ bot.on('/journeyforwardend', msg => {
         replyMarkup: 'hide'
     });
 
-    sessions[msg.from.id].data.forEach(data => {
-        // console.log(moment(data*1000).format("hh:mm:ss"));
-    })
+    console.log(JSON.stringify(sessions[msg.from.id].data));
 
     setTimeout(() => {
         msg.reply.text(`
