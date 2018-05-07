@@ -9,7 +9,6 @@ const locationScheme = new Schema({
     materialsReceived: [Number],
     receivedItems: [Schema.Types.Mixed],
     battles: [{
-        hits: Number,
         totalDamageGiven: Number,
         totalDamageReceived: Number,
         damagesGiven: [Number],
@@ -22,7 +21,6 @@ const locationScheme = new Schema({
     concussions: [{
         agility: Number,
         amountOfConcussions: Number,
-        hits: Number
     }],
     lastUpdated: String
 });
