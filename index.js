@@ -1,11 +1,18 @@
 require('dotenv').config();
 const TeleBot = require('telebot');
 const program = require('commander');
+const moment = require('moment');
 
 const parsePip = require('./src/parsePip');
 const calculateUpgrade = require('./src/calculateUpgrade');
 
 const upgradeAmountValidation = require('./src/utils/upgradeAmountValidation');
+
+const {
+    matcher,
+    regExpSetMatcher
+} = require('./src/utils/matcher');
+const regexps = require('./src/regexp/regexp');
 
 const config = require('./package.json');
 
@@ -21,6 +28,7 @@ const WAIT_FOR_SKILL = 'WAIT_FOR_SKILL';
 const WAIT_FOR_DISTANCE = 'WAIT_FOR_DISTANCE';
 const WAIT_FOR_LEVELS = 'WAIT_FOR_LEVELS';
 const WAIT_FOR_RESPONSE = 'WAIT_FOR_RESPONSE';
+const WAIT_FOR_FORWARD_END = 'WAIT_FOR_FORWARD_END';
 const WAIT_FOR_START = 'WAIT_FOR_START';
 
 const states = {
@@ -28,7 +36,8 @@ const states = {
     WAIT_FOR_DISTANCE,
     WAIT_FOR_LEVELS,
     WAIT_FOR_RESPONSE,
-    WAIT_FOR_START
+    WAIT_FOR_START,
+    WAIT_FOR_FORWARD_END
 };
 
 const sessionAbort = (msg) => {
@@ -66,6 +75,29 @@ const askAmountOfLevels = (msg) => {
 Выбери на сколько уровней ты хочешь прокачать *${sessions[msg.from.id].upgradeSkill}*
 \`Либо напиши своё количество (например: 17)\`
 `, {
+        replyMarkup,
+        parseMode: 'markdown'
+    });
+};
+
+const journeyForwardEndKeyboard = (msg) => {
+    const replyMarkup = bot.keyboard([
+        [
+            buttons['journeyForwardEnd'].label
+        ]
+    ], {
+        resize: true
+    });
+
+    if (sessions[msg.from.id] === undefined) {
+        seedSession(msg.from.id);
+    }
+
+    sessions[msg.from.id].state = states.WAIT_FOR_START;
+
+    return bot.sendMessage(msg.from.id, `
+
+    `, {
         replyMarkup,
         parseMode: 'markdown'
     });
@@ -107,7 +139,7 @@ const getEffort = (msg, bot) => {
     const effort = calculateUpgrade(sessions[msg.from.id]);
 
     bot.sendMessage(msg.from.id, effort, {
-        replyMarkup: "hide",
+        replyMarkup: defaultKeyboard,
         parseMode: 'markdown'
     });
 
@@ -125,7 +157,8 @@ Amout to upgrade: ${sessions[msg.from.id].amountToUpgrade}
 const seedSession = id => {
     sessions[id] = {
         pip: null,
-        state: states.WAIT_FOR_START
+        state: states.WAIT_FOR_START,
+        data: []
     };
 };
 
@@ -210,6 +243,14 @@ const buttons = {
         label: "70+ км",
         command: "/reachableKm"
     },
+    journeyForwardStart: {
+        label: "Скинуть лог 🏃",
+        command: "/journeyforwardstart"
+    },
+    journeyForwardEnd: {
+        label: "Стоп 🙅‍♂️",
+        command: "/journeyforwardend"
+    }
 };
 
 const getToken = () => {
@@ -254,10 +295,18 @@ const bot = new TeleBot({
     }
 });
 
+const defaultKeyboard = bot.keyboard([
+    [
+        buttons['journeyForwardStart'].label
+    ]
+], {
+    resize: true
+});
+
 bot.on('/start', (msg) => {
     if (sessions[msg.from.id] === undefined) {
         seedSession(msg.from.id);
-    }
+    };
 
     return bot.sendMessage(
         msg.from.id,
@@ -274,14 +323,14 @@ _Учти, что я ещё нахожусь в бета-режиме, и ты �
 Но, не переживай - они будут пофикшены_
         `
         , {
-            replyMarkup: 'hide',
+            replyMarkup: defaultKeyboard,
             parseMode: 'markdown',
             webPreview: false
         }
     );
 });
 
-bot.on('/resetSession', (msg) => {
+/* bot.on('/resetSession', (msg) => {
     sessions[msg.from.id] = {
         pip: null,
         state: null
@@ -300,36 +349,63 @@ bot.on('/resetSessionAbort', (msg) => {
             replyMarkup: 'hide'
         }
     );
-});
+}); */
 
 bot.on('forward', (msg) => {
-    if (msg.from.is_bot) {
-        return;
-    }
-
     if (sessions[msg.from.id] === undefined) {
         seedSession(msg.from.id);
     }
-
-    const pip = parsePip(msg);
-
-    if (typeof pip === 'object') {
-        sessions[msg.from.id].pip = pip;
-        sessions[msg.from.id].state = states.WAIT_FOR_SKILL;
-
-        const replyMarkup = bot.keyboard([
-            [buttons.skillSelectStrength.label, buttons.skillSelectAccuracy.label, buttons.skillSelectAgility.label],
-            [buttons.skillSelectHealth.label, buttons.skillSelectCharisma.label]
-        ], {
-            resize: true
+    
+    if(sessions[msg.from.id].state === states.WAIT_FOR_FORWARD_END) {
+        const isLocation = regExpSetMatcher(msg.text, {
+            regexpSet: regexps.location
         });
-
-        return bot.sendMessage(msg.from.id, 'Что качать будешь?', {
-            replyMarkup
+        
+        const isRegularBeast = regExpSetMatcher(msg.text, {
+            regexpSet: regexps.regularBeast
         });
+        
+        const isDungeonBeast = regExpSetMatcher(msg.text, {
+            regexpSet: regexps.dungeonBeast
+        });
+    
+        /* if (isDungeonBeast) {
+            return msg.reply.text('dungeon beast', {asReply: true});
+        } else if (isRegularBeast) {
+            return msg.reply.text('regular beast', {asReply: true});
+        } else if(isLocation) {
+            return msg.reply.text('location', {asReply: true});
+        }  */
+
+        if (isDungeonBeast || isRegularBeast || isLocation) {
+            sessions[msg.from.id].data.push(msg.forward_date);
+        }
+    
+        // return msg.reply.text('false', {asReply: true});
+    } else {
+        
+    
+        const pip = parsePip(msg);
+    
+        if (typeof pip === 'object') {
+            sessions[msg.from.id].pip = pip;
+            sessions[msg.from.id].state = states.WAIT_FOR_SKILL;
+    
+            const replyMarkup = bot.keyboard([
+                [buttons.skillSelectStrength.label, buttons.skillSelectAccuracy.label, buttons.skillSelectAgility.label],
+                [buttons.skillSelectHealth.label, buttons.skillSelectCharisma.label]
+            ], {
+                resize: true
+            });
+    
+            return bot.sendMessage(msg.from.id, 'Что качать будешь?', {
+                replyMarkup
+            });
+        }
+    
+        return msg.reply.text('Форвардни настоящий пип');
     }
-
-    return msg.reply.text('Форвардни настоящий пип');
+    
 });
 
 bot.on([
@@ -366,23 +442,55 @@ bot.on('/upgradeSkill', msg => {
     getEffort(msg, bot);
 });
 
+bot.on('/journeyforwardstart', msg => {
+    if (sessions[msg.from.id] === undefined) {
+        seedSession(msg.from.id);
+    }
+
+    sessions[msg.from.id].state = states.WAIT_FOR_FORWARD_END;
+    const replyMarkup = bot.keyboard([
+        [
+            buttons['journeyForwardEnd'].label
+        ]
+    ], {
+        resize: true
+    });
+
+    msg.reply.text(`
+Хей, вижу ты хочешь поделиться со мной ценной информации с пустоши - отлично!
+Ну что же кидай блядь еёё сюда. 
+    `, {
+        replyMarkup
+    })
+});
+
+bot.on('/journeyforwardend', msg => {
+    sessions[msg.from.id].state = states.WAIT_FOR_START;
+
+    msg.reply.text(`Перехожу в режим оброботки данных, подожди пожалуйста немного :3`, {
+        replyMarkup: 'hide'
+    });
+
+    sessions[msg.from.id].data.forEach(data => {
+        // console.log(moment(data*1000).format("hh:mm:ss"));
+    })
+
+    setTimeout(() => {
+        msg.reply.text(`
+Фух, я со всём справился - спасибо тебе огромное за эту информацию!
+Теперь ты опять можешь пользоваться функционалом скилокачатор, либо если ты чего-то забыл докинуть - смело жми на \`[Скинуть лог 🏃]\`
+Я насчитал ${sessions[msg.from.id].data.length} данных!
+`, {
+            replyMarkup: defaultKeyboard,
+            parseMode: 'markdown'
+        });
+    }, 1500)
+});
+
 bot.on('/version', msg => msg.reply.text(config.version))
 
 bot.on('/debug', msg => {
-    return bot.sendMessage(msg.from.id, `
-_Поздравляю, ты потратил на харизму ${formatNubmer(calculations.amountSpentOnCharisma)} 🕳 крышек_
-
-Необходимо потратить ${formatNubmer(calculations.amountToSpend)} 🕳 крышек для прокачки навыка \`${upgradeSkill}\` от ${currentSkillLevel} уровня до ${upgradeTo} уровня
-
-Тебе необходимо сделать примерно *${Math.floor((calculations.raidsInfo.worstCaseScenario.amountOfRaids + 2) * 1.5)} 👣 ходок*
-\`Из-за недавнего обновления Wasteland Wars данные для расчёта ходок работают в эксперементальном режиме\`
-
-*Что бы быть в курсе работы над Скилокачатором - заходи на канал разработчика* @wwCharismaCalculator
-
-_За инфу о мобах - спасибо создателю_ @WastelandWarsHelper, 
-`, {
-    parseMode: 'markdown'
-    });
+    return bot.sendMessage(msg.from.id, '123');
 })
 
 bot.on(/^\d+$/, msg => {
