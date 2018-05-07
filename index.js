@@ -3,8 +3,8 @@ const TeleBot = require('telebot');
 const program = require('commander');
 const moment = require('moment');
 
-const parsePip = require('./src/parsePip');
-const beastParser = require('./src/utils/parseBeast');
+const parsePip = require('./src/parsers/parsePip');
+const beastParser = require('./src/parsers/parseBeast');
 
 const calculateUpgrade = require('./src/calculateUpgrade');
 
