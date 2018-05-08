@@ -6,7 +6,9 @@ const {
 const parseRegularBeast = beast => {
     const splitted = beast.split('\n');
 
-    let capsReceived, materialsReceived, fightResult;
+    let capsReceived = 0,
+        materialsReceived = 0,
+        fightResult = null;
 
     const isDungeon = false;
     const [, distance] = regexps.campDistanceRegExp.exec(beast);

@@ -5,7 +5,13 @@ const {
 const parseLocation = location => {
     const splitted = location.split('\n');
 
-    let capsReceived, materialsReceived, capsLost, materialsLost, healthInjuries, effect, isRaid;
+    let capsReceived = 0,
+        materialsReceived = [],
+        capsLost = 0,
+        materialsLost = 0,
+        healthInjuries = 0,
+        effect = 'none',
+        isRaid = false;
 
     let beastFaced = {
         faced: false,
@@ -39,7 +45,7 @@ const parseLocation = location => {
     }
     if (regexps.beastFacedRegExp.test(location)) {
         const [, name] = regexps.beastFacedRegExp.exec(location);
-        
+
         beastFaced.faced = true;
         beastFaced.name = name;
     }
