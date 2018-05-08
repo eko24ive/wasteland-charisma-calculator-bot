@@ -21,6 +21,10 @@ mongoose.connect(uristring);
 const parsePip = require('./src/parsers/parsePip');
 const beastParser = require('./src/parsers/parseBeast');
 const parseLocation = require('./src/parsers/parseLocation');
+const parseFleeDefeat = require('./src/parsers/parseFleeDefeat');
+const parseDeathMessage = require('./src/parsers/parseDeathMessage');
+const parseBeastFaced = require('./src/parsers/parseBeastFaced');
+
 
 const calculateUpgrade = require('./src/calculateUpgrade');
 
@@ -391,24 +395,50 @@ bot.on('forward', (msg) => {
             regexpSet: regexps.dungeonBeast
         });
 
+        const isFleeDefeat = regExpSetMatcher(msg.text, {
+            regexpSet: regexps.fleeDefeat
+        });
 
-        if (isDungeonBeast) {
+        const isDeathMessage = regExpSetMatcher(msg.text, {
+            regexpSet: regexps.deathMessage
+        });
+
+        const isDungeonBeastFaced = regExpSetMatcher(msg.text, {
+            regexpSet: regexps.dungeonBeastFaced
+        });
+
+        const pip = parsePip(msg);
+
+        if (isDungeonBeastFaced) {
+            data = parseBeastFaced.parseDungeonBeastFaced(msg.text);
+            dataType = 'dungeonBeastFaced';
+        } else if (isFleeDefeat) {
+            data = parseFleeDefeat(msg.text);
+            dataType = 'fleeDefeat';
+        } else if (isDeathMessage) {
+            data = parseDeathMessage(msg.text);
+            dataType = 'deathMessage';
+        } else if (isDungeonBeast) {
             data = beastParser.parseDungeonBeast(msg.text);
-            dataType='dungeonBeast';
+            dataType = 'dungeonBeast';
         } else if (isRegularBeast) {
             data = beastParser.parseRegularBeast(msg.text);
-            dataType='regularBeast';
+            dataType = 'regularBeast';
         } else if(isLocation) {
             data = parseLocation(msg.text);
-            dataType='location';
+            dataType = 'location';
+        } else if(_.isObject(pip)) {
+            data = pip;
+            dataType = 'pipboy';
         }
 
 
 
-        if (isDungeonBeast || isRegularBeast || isLocation) {
+        if (isDungeonBeast || isRegularBeast || isLocation || isFleeDefeat || isDeathMessage || parseBeastFaced) {
             sessions[msg.from.id].data.push({
                 data,
-                dataType
+                dataType,
+                date: msg.forward_date
             });
         }
 
@@ -534,7 +564,10 @@ bot.on('/journeyforwardstart', msg => {
 
     msg.reply.text(`
 Хей, вижу ты хочешь поделиться со мной ценной информации с пустоши - отлично!
-Ну что же кидай блядь еёё сюда.
+Ну что же кидай её сюда. 
+
+Пожалуйста убедись что все сообщение были пересланы - Телеграм может немного притормозить.
+Ну а как закончишь - смело жми кнопку [\`Стоп 🙅‍♂️\`]!
     `, {
         replyMarkup
     })
@@ -562,18 +595,6 @@ bot.on('/journeyforwardend', msg => {
 });
 
 bot.on('/version', msg => msg.reply.text(config.version))
-
-bot.on('/iwillforward', msg => {
-    console.log(`
-    ------------------------------------------
-    [IWILLFORWARD]
-    User: ${msg.from.username} | ${msg.from.id}
-    `);
-
-    return msg.reply.text('Спасибо, твой голос учтён!', {
-        asReply: true
-    })
-})
 
 bot.on('/debug', msg => {
     return bot.sendMessage(msg.from.id, '123');
