@@ -7,6 +7,11 @@ const parseLocation = location => {
 
     let capsReceived, materialsReceived, capsLost, materialsLost, healthInjuries, effect, isRaid;
 
+    let beastFaced = {
+        faced: false,
+        name: null
+    };
+
     const type = 'unknown';
 
     const [, distance] = regexps.campDistanceRegExp.exec(location);
@@ -31,6 +36,12 @@ const parseLocation = location => {
     }
     if (regexps.injuryRegExp.test(location)) {
         [, healthInjuries] = regexps.injuryRegExp.exec(location);
+    }
+    if (regexps.beastFacedRegExp.test(location)) {
+        const [, name] = regexps.beastFacedRegExp.exec(location);
+        
+        beastFaced.faced = true;
+        beastFaced.name = name;
     }
 
     const receivedItems = splitted.map(row => {
@@ -64,7 +75,8 @@ const parseLocation = location => {
         materialsLost: Number(materialsLost),
         healthInjuries: Number(healthInjuries),
         receivedItems,
-        receivedBonusItems
+        receivedBonusItems,
+        beastFaced
     }
 
     if(locationData.capsReceived > 0 || locationData.materialsReceived > 0) {
