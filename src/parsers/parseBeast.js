@@ -6,7 +6,7 @@ const {
 const parseRegularBeast = beast => {
     const splitted = beast.split('\n');
 
-    let capsReceived, materialsReceived, receivedItems, fightResult;
+    let capsReceived, materialsReceived, fightResult;
 
     const isDungeon = false;
     const [, distance] = regexps.campDistanceRegExp.exec(beast);
@@ -17,9 +17,6 @@ const parseRegularBeast = beast => {
     }
     if(regexps.actionReceivedMaterialsRegExp.test(beast)) {
         [, materialsReceived] = regexps.actionReceivedMaterialsRegExp.exec(beast);
-    }
-    if(regexps.receivedItemRegExp.test(beast)) {
-        [, receivedItems] = regexps.receivedItemRegExp.exec(beast);
     }
 
     if(regexps.beastVictoryRegExp.test(beast)) {
@@ -55,6 +52,16 @@ const parseRegularBeast = beast => {
 
         return false
     }).filter(dmg => dmg !== false);
+
+    const receivedItems = splitted.map(row => {
+        if (regexps.receivedItemRegExp.test(row)) {
+            var [, item] = regexps.receivedItemRegExp.exec(row);
+
+            return item;
+        }
+
+        return false;
+    }).filter(item => item !== false);
 
     return {
         distance,
