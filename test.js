@@ -5,7 +5,9 @@ const {
     regexps
 } = require('./src/regexp/regexp');
 
-const data = [{
+const checkPips = require('./src/utils/comparePips');
+
+const oData = [{
     "data": {
         "version": 2,
         "faction": "⚙️Убежище 4",
@@ -159,40 +161,56 @@ const normalizeItems = items => {
     return normalizedItems;
 };
 
-const reportData = {
-    capsReceived: 0,
-    capsLost: 0,
-    materialsLost: 0,
-    materialsReceived: 0,
-    receivedItems: [],
-    isDead: false,
-    distance: 0,
-    lastBeastSeen: null,
-    lastPip: null,
-    pipMismatchOccurred: false,
-    deathData: {},
-    pipRequired: true
-};
+const processData = (data, dataPips) => {
+    const reportData = {
+        capsReceived: 0,
+        capsLost: 0,
+        materialsLost: 0,
+        materialsReceived: 0,
+        receivedItems: [],
+        isDead: false,
+        distance: 0,
+        lastBeastSeen: null,
+        lastPip: null,
+        pips: [],
+        pipMismatchOccurred: false,
+        deathData: {},
+        pipRequired: true,
+        error: [],
+        recalculationRequired: false,
+        criticalError: false
+    };
 
-const updatesData = {
-    locations: [],
-    beasts: []
-}
+    const updatesData = {
+        locations: [],
+        beasts: []
+    };
 
-data.sort((first, second) => {
-    if (first.date < second.date) {
-        return -1;
+    if (dataPips.length > 1) {
+        if (!checkPips(dataPips)) {
+            reportData.criticalError = 'Пипы не соответсвуют!';
+            return reportData;
+        }
+
+        reportData.lastPip = dataPips.pop();
+    } else if (dataPips.length === 1) {
+        reportData.lastPip = dataPips.pop();
     }
-    if (first.date > second.date) {
-        return 1;
-    }
-    return 0;
-}).forEach(({
-    data,
-    dataType
-}) => {
-    switch (dataType) {
-        case 'location':
+
+    data.sort((first, second) => {
+        if (first.date < second.date) {
+            return -1;
+        }
+        if (first.date > second.date) {
+            return 1;
+        }
+        return 0;
+    }).forEach(({
+        data,
+        dataType
+    }) => {
+
+        if (dataType === 'location') {
             const locationData = _.clone(data);
 
             if (data.effect) {
@@ -218,27 +236,147 @@ data.sort((first, second) => {
             delete locationData.beastFaced;
             updatesData.locations.push(locationData);
 
-            break;
-        case 'regularBeast':
-            if (data.fightResult === 'win') {
-                reportData.receivedItems.push(_.flatten([data.receivedItems]));
-                reportData.capsReceived += Number(data.capsReceived);
-                reportData.materialsReceived += Number(data.materialsReceived);
-            } else if (data.fightResult === 'lose') {
+        }
 
+        if (dataType === 'regularBeast') {
+            const beastData = {
+                isDungeon: false
+            };
+
+            beastData.name = data.name;
+            beastData.distanceRange = [data.distance];
+
+
+            if (data.fightResult === 'win') {
+                beastData.battles = [{
+                    outcome: 'win'
+                }];
+                beastData.receivedItems = normalizeItems(data.receivedItems);
+                beastData.capsReceived = Number(data.capsReceived);
+                beastData.materialsReceived = Number(data.materialsReceived);
+            } else if (data.fightResult === 'lose') {
+                beastData.battles = [{
+                    outcome: 'lost'
+                }];
+
+                beastData.capsReceived = Number(data.capsReceived);
+                beastData.materialsReceived = Number(data.materialsReceived);
             }
 
-            break;
-        case 'dungeonBeast':
-            break;
-        case 'fleeDefeat':
-            reportData.lastFleeDefeat = data.distance;
+            if (data.amountOfConcussions.length > 0) {
+                beastData.concussions = [{
+                    amount: data.amountOfConcussions.length
+                }];
+
+                if (reportData.lastPip) {
+                    beastData.concussions[0].agility = reportData.lastPip.agility;
+                } else {
+                    reportData.recalculationRequired = true;
+                }
+            }
+
+            if (reportData.lastPip) {
+                beastData.battles[0].armor = reportData.lastPip.armor
+            } else {
+                reportData.recalculationRequired = true;
+            }
+
+            beastData.battles[0].totalDamageGiven = data.damagesGiven.reduce((a, b) => a + b);
+            beastData.battles[0].totalDamageReceived = data.damagesReceived.reduce((a, b) => a + b);
+            beastData.battles[0].damagesGiven = data.damagesGiven;
+            beastData.battles[0].damagesReceived = data.damagesReceived;
+            beastData.battles[0].healthOnStart = data.currentHealth + beastData.battles[0].totalDamageReceived;
+
+            updatesData.beasts.push(beastData);
+
+        }
+
+        if (dataType === 'dungeonBeast') {
+            const beastData = {
+                isDungeon: false
+            };
+
+            beastData.name = data.name;
+            beastData.distanceRange = [data.distance];
+
+
+            if (data.fightResult === 'win') {
+                beastData.battles = [{
+                    outcome: 'win'
+                }];
+                beastData.receivedItems = normalizeItems(data.receivedItems);
+                beastData.capsReceived = Number(data.capsReceived);
+                beastData.materialsReceived = Number(data.materialsReceived);
+            } else if (data.fightResult === 'lose') {
+                beastData.battles = [{
+                    outcome: 'lost'
+                }];
+
+                beastData.capsReceived = Number(data.capsReceived);
+                beastData.materialsReceived = Number(data.materialsReceived);
+            }
+
+            if (data.amountOfConcussions.length > 0) {
+                beastData.concussions = [{
+                    amount: data.amountOfConcussions.length
+                }];
+
+                if (reportData.lastPip) {
+                    beastData.concussions[0].agility = reportData.lastPip.agility;
+                } else {
+                    reportData.recalculationRequired = true;
+                }
+            }
+
+            if (reportData.lastPip) {
+                beastData.battles[0].armor = reportData.lastPip.armor
+            } else {
+                reportData.recalculationRequired = true;
+            }
+
+            beastData.battles[0].totalDamageGiven = data.damagesGiven.reduce((a, b) => a + b);
+            beastData.battles[0].totalDamageReceived = data.damagesReceived.reduce((a, b) => a + b);
+            beastData.battles[0].damagesGiven = data.damagesGiven;
+            beastData.battles[0].damagesReceived = data.damagesReceived;
+            beastData.battles[0].healthOnStart = data.currentHealth + beastData.battles[0].totalDamageReceived;
+
+            updatesData.beasts.push(beastData);
+        }
+
+        if (dataType === 'flee') {
+            const beastData = {
+                isDungeon: false,
+                distanceRange: [data.distance]
+            };
+
+            if (reportData.lastBeastSeen) {
+                beastData.name = reportData.lastBeastSeen.name
+            } else {
+                reportData.error.push("Не могу найти в форвардах монстра от которого ты сбежал");
+            }
+
+            beastData.flees = [{
+                outcome: data.outcome
+            }]
+
+            if (data.outcome === 'lose') {
+                beastData.flees[0].damageReceived = [data.healthInjuries];
+            }
+
+            if (reportData.lastPip) {
+                beastData.flees[0].agility = reportData.lastPip.agility;
+            } else {
+                reportData.recalculationRequired = true;
+            }
+
+            updatesData.beasts.push(beastData);
 
             // if (reportData.lastPip) {
             //     updatesData.flees = `Unsucsessfull flee from ${reportData.lastBeastSeen.name} on ${reportData.distance} with agility ${reportData.lastPip.agility}`;
             // }
-            break;
-        case 'deathMessage':
+        }
+
+        if (dataType === 'deathMessage') {
             reportData.isDead = true;
             reportData.capsLost -= data.capsLost;
             reportData.materialsLost -= data.materialsLost;
@@ -247,14 +385,25 @@ data.sort((first, second) => {
                 reportData.deathData.reason = 'flee';
             }
 
-            break;
-        case 'pipboy':
+        }
+
+        if (dataType === 'pipboy') {
             reportData.lastPip = data;
             reportData.pipRequired = false;
-            break;
-    }
-});
+            reportData.pips.push(data);
+        }
 
-reportData.receivedItems = _.flatten(reportData.receivedItems);
-console.log(JSON.stringify(updatesData));
-// console.log(updatesData);
+
+    });
+
+    // reportData.receivedItems = _.flatten(reportData.receivedItems);
+    // console.log(JSON.stringify(updatesData));
+    // console.log(updatesData);
+
+    return {
+        reportData,
+        updatesData
+    }
+}
+
+module.exports = processData;

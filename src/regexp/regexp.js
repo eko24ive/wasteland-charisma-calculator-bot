@@ -22,6 +22,7 @@ const playerBeastAttackRegExp = /👤Ты .+ 💥(\d+)/;
 const dungeonBeastAppeared = /(.+) перегородил тебе путь/;
 const beastDefeatRegExp = /Тебя буквально размазали/;
 const beastDefeatFleeRegExp = /Ты проиграл в этой схватке/;
+const beastSuccessFleeRegExp = /удалось избежать схватки/;
 const beastVictoryRegExp = /Ты одержал победу!/;
 const beastDefeatCapsLostRegExp = /Потеряно крышек: 🕳(\d+)/;
 const beastDefeatMaterialsLostRegExp = /Потеряно материалов: 📦(\d+)/;
@@ -44,6 +45,8 @@ const bonusEmojiResourceAmount = /([\u{1f300}-\u{1f5ff}\u{1f900}-\u{1f9ff}\u{1f6
 
 const achievmentMessageRegExp = /🏆Достижение получено!/;
 const achievmentContentRegExp = /✅(.+)\n(.+)/;
+
+const currentHealthRegExp = /❤️(.\d+)\/\d+/;
 
 
 const every = {
@@ -102,12 +105,15 @@ const dungeonBeast = {
     ]
 }
 
-const fleeDefeat = {
+const flee = {
     contains: [
         every.contains,
-        injuryRegExp,
+    ],
+    conditional: [
+        beastSuccessFleeRegExp,
         beastDefeatFleeRegExp,
         beastDefeatCapsLostRegExp,
+        injuryRegExp,
         beastDefeatMaterialsLostRegExp
     ]
 }
@@ -159,7 +165,10 @@ const regexps = {
     metalAmountRegExp,
     emojiRecourceAmount,
     bonusEmojiResourceAmount,
-    multipleItemsReceived
+    multipleItemsReceived,
+    currentHealthRegExp,
+    beastSuccessFleeRegExp,
+    beastDefeatFleeRegExp
 }
 
 module.exports = {
@@ -167,7 +176,7 @@ module.exports = {
     location,
     regularBeast,
     dungeonBeast,
-    fleeDefeat,
+    flee,
     deathMessage,
     dungeonBeastFaced,
     regexps

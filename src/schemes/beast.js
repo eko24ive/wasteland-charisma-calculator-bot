@@ -12,15 +12,19 @@ const locationScheme = new Schema({
         totalDamageGiven: Number,
         totalDamageReceived: Number,
         damagesGiven: [Number],
-        damagesReceived: [Number]
+        damagesReceived: [Number],
+        outcome: String,
+        armor: Number,
+        healthOnStart: Number
     }],
     flees: [{
         agility: Number,
-        damageReceived: Number
+        damageReceived: Number,
+        outcome: String
     }],
     concussions: [{
         agility: Number,
-        amountOfConcussions: Number,
+        amount: Number,
     }],
     lastUpdated: String
 });

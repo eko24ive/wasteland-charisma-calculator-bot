@@ -59,6 +59,7 @@ const parsePip = ({ text }) => {
         const agilityRegExp = /🤸🏽‍♂️(\d*)/g;
         const precisionRegExp = /🔫(\d*)/g;
         const strengthRegExp = /💪(\d*)/g;
+        const armorRegExp = /🛡(\d*)/g;
         const enduranceRegExp = /🔋\d*\/(\d*)/g;
         const hungerRegExp = /🍗(\d*)%/g;
         const healthRegExp = /❤️\d*\/(\d*)/g;
@@ -72,12 +73,14 @@ const parsePip = ({ text }) => {
         const [, precision] = precisionRegExp.exec(text);
         const [, hunger] = hungerRegExp.exec(text);
         const [, health] = healthRegExp.exec(text);
+        const [, armor] = armorRegExp.exec(text);
         const [, name] = nameRegExp.exec(text);
         const [, faction] = factionRegExp.exec(text);
 
 
         const data = {
             name,
+            armor,
             faction,
             health,
             hunger,
