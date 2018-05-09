@@ -1,6 +1,6 @@
 require('dotenv').config();
 var uristring = process.env.MONGODB_URI;
-
+var async = require('async');
 
 const mongoose = require('mongoose');
 const _ = require('underscore');
@@ -28,7 +28,7 @@ const upgradeAmountValidation = require('./src/utils/upgradeAmountValidation');
 
 const processForwards = require('./src/utils/processForwards');
 
-const Beast = mongoose.model('Beas', beastSchema);
+const Beast = mongoose.model('Beast', beastSchema);
 const Location = mongoose.model('Location', locationSchema);
 const User = mongoose.model('User', locationSchema);
 
@@ -407,9 +407,13 @@ bot.on('forward', (msg) => {
 
             msg.reply.text('Супер, я вижу твой пип - сейчас обработаю его вместе с твоими форвардами');
 
-            processUserData(msg);
+            processUserData(msg, {
+                usePip: true
+            });
         } else {
-            return msg.reply.text('Это не похоже на пип-бой. Если ты передумал его кидать - жми /skippipforward', {asReply: true});
+            return msg.reply.text('Это не похоже на пип-бой. Если ты передумал его кидать - жми /skippipforward', {
+                asReply: true
+            });
         }
 
     } else if (sessions[msg.from.id].state === states.WAIT_FOR_FORWARD_END) {
@@ -480,8 +484,6 @@ bot.on('forward', (msg) => {
         }
 
     } else {
-
-
         const pip = parsePip(msg);
 
         if (typeof pip === 'object') {
@@ -499,7 +501,6 @@ bot.on('forward', (msg) => {
                 replyMarkup
             });
         }
-        return msg.reply.text('Форвардни настоящий пип');
     }
 
 });
@@ -611,7 +612,7 @@ bot.on('/journeyforwardstart', msg => {
     })
 });
 
-const processUserData = (msg) => {
+const processUserData = (msg, options) => {
     sessions[msg.from.id].state = states.WAIT_FOR_DATA_TO_PROCESS;
 
     const {
@@ -624,7 +625,18 @@ const processUserData = (msg) => {
         updatesData
     } = processForwards(data, dataPips);
 
-    if (reportData.recalculationRequired) {
+    if (reportData.criticalError) {
+        return msg.reply.text(`
+Произошла критическая ошибка! Отменяю форварды.
+
+_${reportData.criticalError}_
+        `, {
+            parseMode: 'markdown',
+            replyMarkup: defaultKeyboard
+        });
+    }
+
+    if (options.usePip && reportData.pipRequired) {
         sessions[msg.from.id].state = states.WAIT_FOR_PIP_FORWARD;
         return msg.reply.text(`
 Хей, я так и не увидел твоего пип-боя, можешь мне его дослать?
@@ -632,27 +644,142 @@ const processUserData = (msg) => {
         `);
     }
 
-    const amountOfData = sessions[msg.from.id].data.length;
+    
 
-    console.log({reportData, updatesData});
+    msg.reply.text(`Перехожу в режим оброботки данных, подожди пожалуйста немного :3`, {
+        replyMarkup: 'hide'
+    });
 
-    // try to find PIP of user
+    const amountOfData = updatesData.beasts.length + updatesData.locations.length;
+
+    console.log({
+        reportData,
+        updatesData
+    });
+
+    /* User.findOne({'telegram.id':msg.from.id},function (err, user) {
+        if(user === null) {
+            const newUser = new User({
+                telegram: {
+                    id: msg.from.id,
+                    firstName: msg.from.first_name,
+                    userName: msg.from.username
+                },
+                pip: reportData.lastPip
+            });
+    
+            newUser.save().then(function(err, user) {
+                if(err) {
+                    console.log('#mongo_error User save error:'+err);
+                    return msg.reply.text('Ошибка при сохранении твоего пип-боя');
+                }
+            });
+        }
+    }); */
+
+
+
+    if (updatesData.beasts.length > 0) {
+        async.forEach(updatesData.beasts, function (iBeast, next) {
+            Beast.findOne({
+                name: iBeast.name,
+                distanceRange: iBeast.distanceRange[0]
+            }).then(function (fBeast) {
+                if (fBeast === null) {
+                    const newBeast = new Beast(iBeast);
+
+                    newBeast.save().then(() => next())
+                };
+
+                let isSameFleeExists;
+
+                const isSameBattleExists = fBeast.battles.map(battle => {
+                    const existingBattle = _.clone(battle.toJSON());
+                    delete existingBattle._id;
+
+                    return _.isEqual(existingBattle, iBeast.battles[0]);
+                }).some(result => result === true);
+
+                if (iBeast.flees.length === 1) {
+                    isSameBattleExists = fBeast.flees.map(flee => {
+                        const existingFlee = _.clone(flee.toJSON());
+                        delete existingFlee._id;
+
+                        return _.isEqual(existingFlee, iBeast.flees[0]);
+                    }).some(result => result === true);
+                }
+
+                if (!_.contains(fBeast.distanceRange, iBeast.distanceRange[0])) {
+                    fBeast.distanceRange.push(iBeast.distanceRange[0]);
+                }
+
+                if (!_.contains(fBeast.capsReceived, iBeast.capsReceived)) {
+                    fBeast.capsReceived.push(iBeast.capsReceived);
+                }
+
+                if (!_.contains(fBeast.materialsReceived, iBeast.materialsReceived)) {
+                    fBeast.materialsReceived.push(iBeast.materialsReceived);
+                }
+
+                if (!isSameBattleExists) {
+                    fBeast.battles.push(iBeast.battles[0]);
+                }
+
+                fBeast.save().then(() => next());
+            });
+
+            // tell async that that particular element of the iterator is done
+            // next(); 
+
+        }, function (err) {
+            console.log('iterating done');
+        });
+    }
+
+    /* if (updatesData.locations.length > 0) {
+        async.mapLimit(myArray, 10, function(document, next){
+            document.save(next);
+        }, done);
+    } */
+
+
     // if PIP exist - try to apply it to given data
     // if not - request recent PIP
     // try to apply PIP to given data
     // if PIP not applyible throw error and update data which is not relies on PIP
 
+    let errors = '';
 
-    setTimeout(() => {
-        msg.reply.text(`
-Фух, я со всём справился - спасибо тебе огромное за эту информацию!
-Теперь ты опять можешь пользоваться функционалом скилокачатор, либо если ты чего-то забыл докинуть - смело жми на \`[Скинуть лог 🏃]\`
-Я насчитал ${amountOfData} данных!
-`, {
-            replyMarkup: defaultKeyboard,
-            parseMode: 'markdown'
-        });
-    }, 1500);
+    if (reportData.errors.length > 0) {
+        errors = `
+*Также я заметил такие ошибки*:
+${reportData.errors.join('\n')}
+        `;
+    }
+
+    if (amountOfData > 0) {
+        setTimeout(() => {
+            msg.reply.text(`
+    Фух, я со всём справился - спасибо тебе огромное за эту информацию!
+    Теперь ты опять можешь пользоваться функционалом скилокачатор, либо если ты чего-то забыл докинуть - смело жми на \`[Скинуть лог 🏃]\`
+    Я насчитал ${amountOfData} данных!
+    
+    ${errors}
+    `, {
+                replyMarkup: defaultKeyboard,
+                parseMode: 'markdown'
+            });
+        }, 1500);
+    } else {
+        setTimeout(() => {
+            msg.reply.text(`
+    К сожалению я ничего не смог узнать из твоих форвардов :с
+    `, {
+                replyMarkup: defaultKeyboard,
+                parseMode: 'markdown'
+            });
+        }, 1500);
+    }
 
     sessions[msg.from.id].data = [];
 }
@@ -660,12 +787,10 @@ const processUserData = (msg) => {
 bot.on('/journeyforwardend', msg => {
     sessions[msg.from.id].state = states.WAIT_FOR_DATA_TO_PROCESS;
 
-    msg.reply.text(`Перехожу в режим оброботки данных, подожди пожалуйста немного :3`, {
-        replyMarkup: 'hide'
-    });
-
     // console.log(JSON.stringify(sessions[msg.from.id].data));
-    processUserData(msg);
+    processUserData(msg, {
+        usePip: true
+    });
 });
 
 bot.on('/journeyforwardcancel', msg => {
@@ -680,7 +805,9 @@ bot.on('/journeyforwardcancel', msg => {
 bot.on('/skippipforward', msg => {
     msg.reply.text('Окей, сейчас попробую обработать что смогу');
 
-    processUserData(msg, {usePip: false});
+    processUserData(msg, {
+        usePip: false
+    });
 })
 
 bot.on('/version', msg => msg.reply.text(config.version))
