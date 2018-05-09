@@ -15,3 +15,5 @@ const locationScheme = new Schema({
     healthInjuries: [Number],
     lastUpdated: String
 });
+
+module.exports = locationScheme;

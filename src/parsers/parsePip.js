@@ -14,6 +14,7 @@ const parsePip = ({ text }) => {
         const enduranceRegExp = /🔋Выносливость: \d*\/(\d*)/g;
         const hungerRegExp = /🍗Голод: ([\d]*)%/g;
         const healthRegExp = /❤️Здоровье: \d*\/(\d*)/g;
+        const verisonRegExp = /📟Пип-бой 3000 v(.+)/g;
 
         const [, charisma] = charismaRegExp.exec(text);
         const [, agility] = agilityRegExp.exec(text);
@@ -26,7 +27,7 @@ const parsePip = ({ text }) => {
         const [, hunger] = hungerRegExp.exec(text);
         const [, health] = healthRegExp.exec(text);
         const [, faction] = factionRegExp.exec(text);
-        const [, version] = versionRegExp.exec(text);
+        const [, version] =verisonRegExp.exec(text);
 
         const data = {
             version,
@@ -65,6 +66,7 @@ const parsePip = ({ text }) => {
         const healthRegExp = /❤️\d*\/(\d*)/g;
         const nameRegExp = /👤(.*)/g;
         const factionRegExp = /👤.*\n├(.*)/g;
+        const damageRegExp = /⚔️(\d+)/;
 
         const [, charisma] = charismaRegExp.exec(text);
         const [, agility] = agilityRegExp.exec(text);
@@ -76,6 +78,7 @@ const parsePip = ({ text }) => {
         const [, armor] = armorRegExp.exec(text);
         const [, name] = nameRegExp.exec(text);
         const [, faction] = factionRegExp.exec(text);
+        const [, damage] = damageRegExp.exec(text);
 
 
         const data = {
@@ -89,6 +92,7 @@ const parsePip = ({ text }) => {
             charisma,
             agility,
             endurance,
+            damage,
             version: 0
         };
 

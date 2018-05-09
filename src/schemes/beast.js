@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
-const locationScheme = new Schema({
+const beastScheme = new Schema({
     distanceRange: [Number],
     name: String,
     isDungeon: Boolean,
@@ -14,17 +14,26 @@ const locationScheme = new Schema({
         damagesGiven: [Number],
         damagesReceived: [Number],
         outcome: String,
-        armor: Number,
+        stats: {
+            armor: Number,
+            damage: Number
+        },
         healthOnStart: Number
     }],
     flees: [{
-        agility: Number,
+        stats: {
+            agility: Number
+        },
         damageReceived: Number,
         outcome: String
     }],
     concussions: [{
-        agility: Number,
+        stats: {
+            agility: Number
+        },
         amount: Number,
     }],
     lastUpdated: String
 });
+
+module.exports = beastScheme;

@@ -1,21 +1,17 @@
 require('dotenv').config();
-const mongoose = require ('mongoose');
+var uristring = process.env.MONGODB_URI;
+
+
+const mongoose = require('mongoose');
 const _ = require('underscore');
 const TeleBot = require('telebot');
 const program = require('commander');
 const moment = require('moment');
 
 
-
 const beastSchema = require('./src/schemes/beast');
 const locationSchema = require('./src/schemes/location');
-
-var uristring = process.env.MONGODB_URI;
-
-const Beast = mongoose.model('Beast', beastSchema);
-const Location = mongoose.model('Location', locationSchema);
-
-mongoose.connect(uristring);
+const userSchema = require('./src/schemes/user');
 
 
 const parsePip = require('./src/parsers/parsePip');
@@ -30,7 +26,14 @@ const calculateUpgrade = require('./src/calculateUpgrade');
 
 const upgradeAmountValidation = require('./src/utils/upgradeAmountValidation');
 
-const processForwardsData = require('./test');
+const processForwards = require('./src/utils/processForwards');
+
+const Beast = mongoose.model('Beas', beastSchema);
+const Location = mongoose.model('Location', locationSchema);
+const User = mongoose.model('User', locationSchema);
+
+mongoose.connect(uristring);
+
 
 const {
     matcher,
@@ -54,6 +57,8 @@ const WAIT_FOR_LEVELS = 'WAIT_FOR_LEVELS';
 const WAIT_FOR_RESPONSE = 'WAIT_FOR_RESPONSE';
 const WAIT_FOR_FORWARD_END = 'WAIT_FOR_FORWARD_END';
 const WAIT_FOR_START = 'WAIT_FOR_START';
+const WAIT_FOR_PIP_FORWARD = 'WAIT_FOR_PIP_FORWARD';
+const WAIT_FOR_DATA_TO_PROCESS = 'WAIT_FOR_DATA_TO_PROCESS';
 
 const states = {
     WAIT_FOR_SKILL,
@@ -61,7 +66,9 @@ const states = {
     WAIT_FOR_LEVELS,
     WAIT_FOR_RESPONSE,
     WAIT_FOR_START,
-    WAIT_FOR_FORWARD_END
+    WAIT_FOR_FORWARD_END,
+    WAIT_FOR_PIP_FORWARD,
+    WAIT_FOR_DATA_TO_PROCESS
 };
 
 const sessionAbort = (msg) => {
@@ -144,11 +151,11 @@ const askReachableKm = (msg) => {
         resize: true
     });
 
-    return bot.sendMessage(msg.from.id, "Выбери до какого километра ты ходишь (при этом оставаясь в живих)?\n"+
-"`Либо напиши своё количество (например: 28)`", {
-        replyMarkup,
-        parseMode: 'markdown'
-    });
+    return bot.sendMessage(msg.from.id, "Выбери до какого километра ты ходишь (при этом оставаясь в живих)?\n" +
+        "`Либо напиши своё количество (например: 28)`", {
+            replyMarkup,
+            parseMode: 'markdown'
+        });
 }
 
 const getEffort = (msg, bot) => {
@@ -275,6 +282,10 @@ const buttons = {
     journeyForwardEnd: {
         label: "Стоп 🙅‍♂️",
         command: "/journeyforwardend"
+    },
+    journeyForwardCancel: {
+        label: "Назад ↩️",
+        command: "/journeyforwardcancel"
     }
 };
 
@@ -346,8 +357,7 @@ bot.on('/start', (msg) => {
 
 _Учти, что я ещё нахожусь в бета-режиме, и ты можешь наткнуться на большие и маленькие баги.
 Но, не переживай - они будут пофикшены_
-        `
-        , {
+        `, {
             replyMarkup: defaultKeyboard,
             parseMode: 'markdown',
             webPreview: false
@@ -381,9 +391,28 @@ bot.on('forward', (msg) => {
         createSession(msg.from.id);
     }
 
+    if (sessions[msg.from.id].state === states.WAIT_FOR_PIP_FORWARD) {
+        const pip = parsePip(msg);
 
+        if (_.isObject(pip)) {
+            data = pip;
+            sessions[msg.from.id].dataPips.push(pip);
+            dataType = 'pipboy';
 
-    // if(sessions[msg.from.id].state === states.WAIT_FOR_FORWARD_END) {
+            sessions[msg.from.id].data.push({
+                data,
+                dataType,
+                date: msg.forward_date
+            });
+
+            msg.reply.text('Супер, я вижу твой пип - сейчас обработаю его вместе с твоими форвардами');
+
+            processUserData(msg);
+        } else {
+            return msg.reply.text('Это не похоже на пип-бой. Если ты передумал его кидать - жми /skippipforward', {asReply: true});
+        }
+
+    } else if (sessions[msg.from.id].state === states.WAIT_FOR_FORWARD_END) {
         let data;
         let dataType;
         const isLocation = regExpSetMatcher(msg.text, {
@@ -412,10 +441,10 @@ bot.on('forward', (msg) => {
 
         const pip = parsePip(msg);
 
-/*         if (isDungeonBeastFaced) {
-            data = parseBeastFaced.parseDungeonBeastFaced(msg.text);
-            dataType = 'dungeonBeastFaced';
-        } */
+        /*         if (isDungeonBeastFaced) {
+                    data = parseBeastFaced.parseDungeonBeastFaced(msg.text);
+                    dataType = 'dungeonBeastFaced';
+                } */
 
         /* if (isDungeonBeast) {
             data = beastParser.parseDungeonBeast(msg.text);
@@ -431,10 +460,10 @@ bot.on('forward', (msg) => {
         } else if (isRegularBeast) {
             data = beastParser.parseRegularBeast(msg.text);
             dataType = 'regularBeast';
-        } else if(isLocation) {
+        } else if (isLocation) {
             data = parseLocation(msg.text);
             dataType = 'location';
-        } else if(_.isObject(pip)) {
+        } else if (_.isObject(pip)) {
             data = pip;
             sessions[msg.from.id].dataPips.push(pip);
             dataType = 'pipboy';
@@ -450,11 +479,10 @@ bot.on('forward', (msg) => {
             });
         }
 
-        // return msg.reply.text('false', {asReply: true});
-    // } else {
+    } else {
 
 
-        /* const pip = parsePip(msg);
+        const pip = parsePip(msg);
 
         if (typeof pip === 'object') {
             sessions[msg.from.id].pip = pip;
@@ -472,7 +500,7 @@ bot.on('forward', (msg) => {
             });
         }
         return msg.reply.text('Форвардни настоящий пип');
-    }*/
+    }
 
 });
 
@@ -543,7 +571,7 @@ bot.on('/raids_text', msg => {
 });
 
 bot.on('/upgradeSkill', msg => {
-    if(msg.text === 'МАКСИМАЛОЧКА') {
+    if (msg.text === 'МАКСИМАЛОЧКА') {
         const pip = sessions[msg.from.id].pip;
         const skillToUpgrade = sessions[msg.from.id].upgradeSkill;
 
@@ -564,7 +592,8 @@ bot.on('/journeyforwardstart', msg => {
     sessions[msg.from.id].state = states.WAIT_FOR_FORWARD_END;
     const replyMarkup = bot.keyboard([
         [
-            buttons['journeyForwardEnd'].label
+            buttons['journeyForwardEnd'].label,
+            buttons['journeyForwardCancel'].label
         ]
     ], {
         resize: true
@@ -574,7 +603,7 @@ bot.on('/journeyforwardstart', msg => {
 Хей, вижу ты хочешь поделиться со мной ценной информации с пустоши - отлично!
 Ну что же кидай её сюда. 
 
-Пожалуйста убедись что все сообщение были пересланы - Телеграм может немного притормозить.
+Пожалуйста убедись что все сообщение были пересланы - Телеграм может немного притормаживать.
 Ну а как закончишь - смело жми кнопку [\`Стоп 🙅‍♂️\`]!
     `, {
         replyMarkup,
@@ -582,20 +611,37 @@ bot.on('/journeyforwardstart', msg => {
     })
 });
 
-bot.on('/journeyforwardend', msg => {
-    sessions[msg.from.id].state = states.WAIT_FOR_START;
+const processUserData = (msg) => {
+    sessions[msg.from.id].state = states.WAIT_FOR_DATA_TO_PROCESS;
 
-    msg.reply.text(`Перехожу в режим оброботки данных, подожди пожалуйста немного :3`, {
-        replyMarkup: 'hide'
-    });
+    const {
+        data,
+        dataPips
+    } = sessions[msg.from.id];
 
-    // console.log(JSON.stringify(sessions[msg.from.id].data));
-    const {data, dataPips} = sessions[msg.from.id];
-    const forwards = processForwardsData(data, dataPips);
+    const {
+        reportData,
+        updatesData
+    } = processForwards(data, dataPips);
+
+    if (reportData.recalculationRequired) {
+        sessions[msg.from.id].state = states.WAIT_FOR_PIP_FORWARD;
+        return msg.reply.text(`
+Хей, я так и не увидел твоего пип-боя, можешь мне его дослать?
+Если у тебя нет на это времени жми /skippipforward
+        `);
+    }
 
     const amountOfData = sessions[msg.from.id].data.length;
 
-    console.log(forwards.updatesData);
+    console.log({reportData, updatesData});
+
+    // try to find PIP of user
+    // if PIP exist - try to apply it to given data
+    // if not - request recent PIP
+    // try to apply PIP to given data
+    // if PIP not applyible throw error and update data which is not relies on PIP
+
 
     setTimeout(() => {
         msg.reply.text(`
@@ -609,7 +655,33 @@ bot.on('/journeyforwardend', msg => {
     }, 1500);
 
     sessions[msg.from.id].data = [];
+}
+
+bot.on('/journeyforwardend', msg => {
+    sessions[msg.from.id].state = states.WAIT_FOR_DATA_TO_PROCESS;
+
+    msg.reply.text(`Перехожу в режим оброботки данных, подожди пожалуйста немного :3`, {
+        replyMarkup: 'hide'
+    });
+
+    // console.log(JSON.stringify(sessions[msg.from.id].data));
+    processUserData(msg);
 });
+
+bot.on('/journeyforwardcancel', msg => {
+    createSession(msg.from.id);
+
+    return msg.reply.text('Окей, теперь можешь кинуть пип-бой для помощи в прокачке скилов либо же перейти в меню  [`Скинуть лог 🏃`]', {
+        replyMarkup: defaultKeyboard,
+        parseMode: 'markdown'
+    });
+});
+
+bot.on('/skippipforward', msg => {
+    msg.reply.text('Окей, сейчас попробую обработать что смогу');
+
+    processUserData(msg, {usePip: false});
+})
 
 bot.on('/version', msg => msg.reply.text(config.version))
 
@@ -622,7 +694,7 @@ bot.on(/^\d+$/, msg => {
         case states.WAIT_FOR_DISTANCE:
             const reachableKm = Number(msg.text);
 
-            if(reachableKm > 100) {
+            if (reachableKm > 100) {
                 msg.reply.text('Бля, ну не гони - давай чуть более реалистичней, окей ?)')
             } else if (reachableKm <= 100) {
                 sessions[msg.from.id].reachableKm = reachableKm;

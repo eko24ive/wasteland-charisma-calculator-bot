@@ -3,123 +3,9 @@ const moment = require('moment');
 
 const {
     regexps
-} = require('./src/regexp/regexp');
+} = require('./../regexp/regexp');
 
-const checkPips = require('./src/utils/comparePips');
-
-const oData = [{
-    "data": {
-        "version": 2,
-        "faction": "⚙️Убежище 4",
-        "health": 204,
-        "name": "Anatoliy",
-        "damage": 386,
-        "armor": 101,
-        "hunger": 40,
-        "strength": 170,
-        "precision": 15,
-        "charisma": 85,
-        "agility": 58,
-        "endurance": 9
-    },
-    "dataType": "pipboy",
-    "date": 1525700743
-}, {
-    "data": {
-        "name": "Мост",
-        "isRaid": false,
-        "distance": "45",
-        "type": "unknown",
-        "capsReceived": 0,
-        "materialsReceived": 0,
-        "capsLost": 0,
-        "materialsLost": 0,
-        "healthInjuries": 0,
-        "receivedItems": [],
-        "receivedBonusItems": [],
-        "beastFaced": {
-            "faced": true,
-            "name": "🐉Туннельщик (🏵🏵🏵Мифический)"
-        },
-        "effect": "none"
-    },
-    "dataType": "location",
-    "date": 1525701951
-}, {
-    "data": {
-        "distance": "45",
-        "name": "🐉Туннельщик (🏵🏵🏵Мифический)",
-        "isDungeon": false,
-        "capsReceived": "2516",
-        "materialsReceived": "3490",
-        "receivedItems": ["🔗Кубонит х155"],
-        "damageReceived": ["61"],
-        "damagesGiven": ["459", "341"],
-        "fightResult": "win",
-        "amountOfConcussions": []
-    },
-    "dataType": "regularBeast",
-    "date": 1525701981
-}, {
-    "data": {
-        "name": "Палаточный лагерь",
-        "isRaid": false,
-        "distance": "47",
-        "type": "unknown",
-        "capsReceived": 290,
-        "materialsReceived": 296,
-        "capsLost": 0,
-        "materialsLost": 0,
-        "healthInjuries": 0,
-        "receivedItems": ["🔗Кубонит 192", "Сухари"],
-        "receivedBonusItems": ["Провода x1"],
-        "beastFaced": {
-            "faced": false,
-            "name": null
-        },
-        "effect": "good"
-    },
-    "dataType": "location",
-    "date": 1525702251
-}, {
-    "data": {
-        "name": "Заброшенный супермаркет",
-        "isRaid": false,
-        "distance": "49",
-        "type": "unknown",
-        "capsReceived": 0,
-        "materialsReceived": 0,
-        "capsLost": 0,
-        "materialsLost": 0,
-        "healthInjuries": 0,
-        "receivedItems": [],
-        "receivedBonusItems": [],
-        "beastFaced": {
-            "faced": true,
-            "name": "🦅Касадор (🔱Особь 60)"
-        },
-        "effect": "none"
-    },
-    "dataType": "location",
-    "date": 1525702576
-}, {
-    "data": {
-        "distance": "49",
-        "capsLost": "18",
-        "materialsLost": "21",
-        "healthInjuries": "129"
-    },
-    "dataType": "fleeDefeat",
-    "date": 1525702607
-}, {
-    "data": {
-        "capsLost": "10524",
-        "materialsLost": "41258"
-    },
-    "dataType": "deathMessage",
-    "date": 1525702607
-}];
-
+const checkPips = require('../utils/comparePips');
 
 const normalizeItems = items => {
     const normalizedItems = {};
@@ -161,7 +47,7 @@ const normalizeItems = items => {
     return normalizedItems;
 };
 
-const processData = (data, dataPips) => {
+const processForwards = (data, dataPips, config) => {
     const reportData = {
         capsReceived: 0,
         capsLost: 0,
@@ -178,7 +64,8 @@ const processData = (data, dataPips) => {
         pipRequired: true,
         error: [],
         recalculationRequired: false,
-        criticalError: false
+        criticalError: false,
+        healthCapHistory: []
     };
 
     const updatesData = {
@@ -276,7 +163,10 @@ const processData = (data, dataPips) => {
             }
 
             if (reportData.lastPip) {
-                beastData.battles[0].armor = reportData.lastPip.armor
+                beastData.battles[0].stats = {
+                    armor: reportData.lastPip.armor,
+                    damage: reportData.lastPip.damage
+                }
             } else {
                 reportData.recalculationRequired = true;
             }
@@ -288,7 +178,7 @@ const processData = (data, dataPips) => {
             beastData.battles[0].healthOnStart = data.currentHealth + beastData.battles[0].totalDamageReceived;
 
             updatesData.beasts.push(beastData);
-
+            reportData.healthCapHistory.push(data.meta.healthCap)
         }
 
         if (dataType === 'dungeonBeast') {
@@ -364,7 +254,9 @@ const processData = (data, dataPips) => {
             }
 
             if (reportData.lastPip) {
-                beastData.flees[0].agility = reportData.lastPip.agility;
+                beastData.flees[0].stats = {
+                    agility: reportData.lastPip.agility
+                }
             } else {
                 reportData.recalculationRequired = true;
             }
@@ -384,7 +276,6 @@ const processData = (data, dataPips) => {
             if (reportData.lastFleeDefeat === reportData.distance) {
                 reportData.deathData.reason = 'flee';
             }
-
         }
 
         if (dataType === 'pipboy') {
@@ -392,8 +283,6 @@ const processData = (data, dataPips) => {
             reportData.pipRequired = false;
             reportData.pips.push(data);
         }
-
-
     });
 
     // reportData.receivedItems = _.flatten(reportData.receivedItems);
@@ -406,4 +295,4 @@ const processData = (data, dataPips) => {
     }
 }
 
-module.exports = processData;
+module.exports = processForwards;

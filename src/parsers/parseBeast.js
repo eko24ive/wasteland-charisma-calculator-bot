@@ -5,6 +5,7 @@ const {
 
 const parseRegularBeast = beast => {
     const splitted = beast.split('\n');
+    const meta = {};
 
     let capsReceived = 0,
         materialsReceived = 0,
@@ -14,21 +15,21 @@ const parseRegularBeast = beast => {
     const [, distance] = regexps.campDistanceRegExp.exec(beast);
     const [, name] = regexps.beastNameRegExp.exec(beast);
 
-    if(regexps.actionReceivedCapsRegExp.test(beast)) {
+    if (regexps.actionReceivedCapsRegExp.test(beast)) {
         [, capsReceived] = regexps.actionReceivedCapsRegExp.exec(beast);
     }
-    if(regexps.actionReceivedMaterialsRegExp.test(beast)) {
+    if (regexps.actionReceivedMaterialsRegExp.test(beast)) {
         [, materialsReceived] = regexps.actionReceivedMaterialsRegExp.exec(beast);
     }
 
-    if(regexps.beastVictoryRegExp.test(beast)) {
+    if (regexps.beastVictoryRegExp.test(beast)) {
         fightResult = 'win';
-    } else if(regexps.beastDefeatMaterialsLostRegExp.test(beast)) {
+    } else if (regexps.beastDefeatMaterialsLostRegExp.test(beast)) {
         fightResult = 'lose';
     }
 
     const damagesReceived = splitted.map(row => {
-        if(regexps.beastAttackRegExp.test(row)) {
+        if (regexps.beastAttackRegExp.test(row)) {
             var [, dmg] = regexps.beastAttackRegExp.exec(row);
 
             return Number(dmg);
@@ -38,7 +39,7 @@ const parseRegularBeast = beast => {
     }).filter(dmg => dmg !== false);
 
     const damagesGiven = splitted.map(row => {
-        if(regexps.playerBeastAttackRegExp.test(row)) {
+        if (regexps.playerBeastAttackRegExp.test(row)) {
             var [, dmg] = regexps.playerBeastAttackRegExp.exec(row);
 
             return Number(dmg);
@@ -48,7 +49,7 @@ const parseRegularBeast = beast => {
     }).filter(dmg => dmg !== false);
 
     const amountOfConcussions = splitted.map(row => {
-        if(regexps.beastStunRegExp.test(row)) {
+        if (regexps.beastStunRegExp.test(row)) {
             return true;
         }
 
@@ -65,7 +66,7 @@ const parseRegularBeast = beast => {
         return false;
     }).filter(item => item !== false);
 
-    const [, currentHealth] = regexps.currentHealthRegExp.exec(beast);
+    const [, negativePrefix, currentHealth, healthCap] = regexps.healthRegExp.exec(beast);
 
     return {
         distance: Number(distance),
@@ -78,7 +79,11 @@ const parseRegularBeast = beast => {
         damagesGiven,
         fightResult,
         currentHealth: Number(currentHealth),
-        amountOfConcussions
+        amountOfConcussions,
+        meta: {
+            negativePrefix,
+            healthCap: Number(healthCap)
+        }
     }
 };
 
@@ -90,7 +95,7 @@ const parseDungeonBeast = beast => {
     const [, name] = regexps.beastNameRegExp.exec(beast);
 
     const damageReceived = splitted.map(row => {
-        if(regexps.beastAttackRegExp.test(row)) {
+        if (regexps.beastAttackRegExp.test(row)) {
             var [, dmg] = regexps.beastAttackRegExp.exec(row);
 
             return dmg;
@@ -100,7 +105,7 @@ const parseDungeonBeast = beast => {
     }).filter(dmg => dmg !== false);
 
     const damagesGiven = splitted.map(row => {
-        if(regexps.playerBeastAttackRegExp.test(row)) {
+        if (regexps.playerBeastAttackRegExp.test(row)) {
             var [, dmg] = regexps.playerBeastAttackRegExp.exec(row);
 
             return dmg;
@@ -110,7 +115,7 @@ const parseDungeonBeast = beast => {
     }).filter(dmg => dmg !== false);
 
     const amountOfConcussions = splitted.map(row => {
-        if(regexps.beastStunRegExp.test(row)) {
+        if (regexps.beastStunRegExp.test(row)) {
             return true;
         }
 
