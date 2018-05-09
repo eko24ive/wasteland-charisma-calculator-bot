@@ -62,7 +62,7 @@ const processForwards = (data, dataPips, config) => {
         pipMismatchOccurred: false,
         deathData: {},
         pipRequired: true,
-        error: [],
+        errors: [],
         recalculationRequired: false,
         criticalError: false,
         healthCapHistory: []
@@ -76,12 +76,20 @@ const processForwards = (data, dataPips, config) => {
     if (dataPips.length > 1) {
         if (!checkPips(dataPips)) {
             reportData.criticalError = 'Пипы не соответсвуют!';
-            return reportData;
+            return {reportData};
         }
 
         reportData.lastPip = dataPips.pop();
+        reportData.pipRequired = false;
     } else if (dataPips.length === 1) {
         reportData.lastPip = dataPips.pop();
+        reportData.pipRequired = false;
+    }
+
+    if(data.filter(({date}) => date < 1525607078).length > 0) {
+        reportData.criticalError = 'Был замечен форвард время которого меньше за время выкатки обновы Wasteland Wars';
+        
+        return {reportData};
     }
 
     data.sort((first, second) => {
@@ -115,7 +123,10 @@ const processForwards = (data, dataPips, config) => {
             }
 
             if (data.beastFaced.faced) {
-                reportData.lastBeastSeen = data.beastFaced;
+                reportData.lastBeastSeen = {
+                    name: data.beastFaced.name,
+                    distance: data.distance
+                };
             }
 
             reportData.distance = data.distance;
@@ -171,10 +182,30 @@ const processForwards = (data, dataPips, config) => {
                 reportData.recalculationRequired = true;
             }
 
-            beastData.battles[0].totalDamageGiven = data.damagesGiven.reduce((a, b) => a + b);
-            beastData.battles[0].totalDamageReceived = data.damagesReceived.reduce((a, b) => a + b);
-            beastData.battles[0].damagesGiven = data.damagesGiven;
-            beastData.battles[0].damagesReceived = data.damagesReceived;
+            if(data.damagesGiven.length === 0) {
+                beastData.battles[0].totalDamageGiven = 0;
+            } else {
+                beastData.battles[0].totalDamageGiven = data.damagesGiven.reduce((a, b) => a + b);
+            }
+
+            if(data.damagesReceived.length === 0) {
+                beastData.battles[0].totalDamageReceived = 0;
+            } else {
+                beastData.battles[0].totalDamageReceived = data.damagesReceived.reduce((a, b) => a + b);
+            }
+
+            if(data.damagesGiven.length === 0) {
+                beastData.battles[0].damagesGiven = [0];
+            } else {
+                beastData.battles[0].damagesGiven = data.damagesGiven;
+            }
+
+            if(data.damagesReceived.length === 0) {
+                beastData.battles[0].damagesReceived = [0];
+            } else {
+                beastData.battles[0].damagesReceived = data.damagesReceived;
+            }
+
             beastData.battles[0].healthOnStart = data.currentHealth + beastData.battles[0].totalDamageReceived;
 
             updatesData.beasts.push(beastData);
@@ -240,28 +271,34 @@ const processForwards = (data, dataPips, config) => {
             };
 
             if (reportData.lastBeastSeen) {
-                beastData.name = reportData.lastBeastSeen.name
-            } else {
-                reportData.error.push("Не могу найти в форвардах монстра от которого ты сбежал");
-            }
+                if(data.distance === reportData.lastBeastSeen.distance) {
+                    beastData.name = reportData.lastBeastSeen.name;
 
-            beastData.flees = [{
-                outcome: data.outcome
-            }]
-
-            if (data.outcome === 'lose') {
-                beastData.flees[0].damageReceived = [data.healthInjuries];
-            }
-
-            if (reportData.lastPip) {
-                beastData.flees[0].stats = {
-                    agility: reportData.lastPip.agility
+                    beastData.flees = [{
+                        outcome: data.outcome
+                    }]
+        
+                    if (data.outcome === 'lose') {
+                        beastData.flees[0].damageReceived = [data.healthInjuries];
+                    }
+        
+                    if (reportData.lastPip) {
+                        beastData.flees[0].stats = {
+                            agility: reportData.lastPip.agility
+                        }
+                    } else {
+                        reportData.recalculationRequired = true;
+                    }
+        
+                    updatesData.beasts.push(beastData);
+                } else {
+                    reportData.errors.push(`Не могу найти в форвардах монстра от которого ты сбежал на ${data.distance}`);
                 }
             } else {
-                reportData.recalculationRequired = true;
+                reportData.errors.push(`Не могу найти в форвардах монстра от которого ты сбежал на ${data.distance}`);
             }
 
-            updatesData.beasts.push(beastData);
+            
 
             // if (reportData.lastPip) {
             //     updatesData.flees = `Unsucsessfull flee from ${reportData.lastBeastSeen.name} on ${reportData.distance} with agility ${reportData.lastPip.agility}`;
@@ -288,6 +325,12 @@ const processForwards = (data, dataPips, config) => {
     // reportData.receivedItems = _.flatten(reportData.receivedItems);
     // console.log(JSON.stringify(updatesData));
     // console.log(updatesData);
+
+    if(reportData.lastPip) {
+        if(reportData.healthCapHistory.some(health => health !== reportData.lastPip.health)) {
+            reportData.criticalError = 'Была замечена прокачка уровня здоровья. Во время одной вылазки подобное - не возможно.';
+        }
+    }
 
     return {
         reportData,
