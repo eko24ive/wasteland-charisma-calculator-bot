@@ -75,7 +75,7 @@ const processForwards = (data, dataPips, config) => {
 
     if (dataPips.length > 1) {
         if (!checkPips(dataPips)) {
-            reportData.criticalError = 'Пипы не соответсвуют!';
+            reportData.criticalError = 'Пипы не соответствуют!';
             return {reportData};
         }
 
