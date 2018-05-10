@@ -903,7 +903,7 @@ _${reportData.criticalError}_
                         fBeast.battles.push(iBeast.battles[0]);
                     }
 
-                    if (!isSameConcussionExists) {
+                    if (!isSameConcussionExists && isSameConcussionExists !== undefined) {
                         fBeast.concussions.push(iBeast.concussions[0]);
                     }
 
