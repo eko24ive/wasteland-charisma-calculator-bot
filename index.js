@@ -182,7 +182,7 @@ Reachable distance: ${sessions[msg.from.id].reachableKm}
 Amout to upgrade: ${sessions[msg.from.id].amountToUpgrade}
 `);
 
-    sessions[msg.from.id].state = states.WAIT_FOR_START;
+    delete sessions[msg.from.id];
 }
 
 const createSession = id => {
@@ -286,6 +286,22 @@ const buttons = {
     journeyForwardCancel: {
         label: "Назад ↩️",
         command: "/journeyforwardcancel"
+    },
+    showAllLocations: {
+        label: "🏜 Все локации",
+        command: "/locs_text"
+    },
+    showRaidLocations: {
+        label: "🤘 Рейдовые локации",
+        command: "/raids_text"
+    },
+    showHelp: {
+        label: "💬 Помощь",
+        command: "/show_help"
+    },
+    showDrones: {
+        label: "🛰 Дроны",
+        command: "/show_drones"
     }
 };
 
@@ -334,6 +350,16 @@ const bot = new TeleBot({
 const defaultKeyboard = bot.keyboard([
     [
         buttons['journeyForwardStart'].label
+    ],
+    [
+        buttons['showAllLocations'].label,
+        buttons['showRaidLocations'].label
+    ],
+    [
+        buttons['showDrones'].label
+    ],
+    [
+        buttons['showHelp'].label
     ]
 ], {
     resize: true
@@ -348,12 +374,12 @@ bot.on('/start', (msg) => {
         msg.from.id,
         `
 Привет, меня зовут «Скилокачатор» - я могу тебе помочь узнать информацию о том сколько нужно потратить заходов и крышек для прокачки твоих навыков.
-
 Как только ты перешлёш мне свой *📟Пип-бой* ты сможешь выбрать какой навык ты хочешь прокачать и на сколько уровней - и я сделаю всю грязную работу/математику за тебя.
+Также я теперь работаю как бот-ассистент, инфа тут - https://teletype.in/@eko24/SkUiLkzCz
 
-Если хочешь как «только так сразу»™ получать информацию о моих обновлениях - милости прошу на канал https://t.me/wwCharismaCalculator
+КАНАЛ С НОВОСТЯМИ https://t.me/wwCharismaCalculator
 
-Есть желание посоветовать крутой функционал или сообщить о баге - залетай в уютный(не очень) чат https://t.me/wwCharismaCalculatorChat
+ЧАТ БЫСТРОГО РЕАГИРОВАНИЯ https://t.me/wwCharismaCalculatorChat
 
 _Учти, что я ещё нахожусь в бета-режиме, и ты можешь наткнуться на большие и маленькие баги.
 Но, не переживай - они будут пофикшены_
@@ -415,7 +441,6 @@ bot.on('forward', (msg) => {
                 asReply: true
             });
         }
-
     } else if (sessions[msg.from.id].state === states.WAIT_FOR_FORWARD_END) {
         let data;
         let dataType;
@@ -474,7 +499,7 @@ bot.on('forward', (msg) => {
         }
 
 
-        // isDungeonBeast || 
+        // isDungeonBeast ||
         if (isRegularBeast || isLocation || isFlee || isDeathMessage || parseBeastFaced) {
             sessions[msg.from.id].data.push({
                 data,
@@ -486,7 +511,11 @@ bot.on('forward', (msg) => {
     } else {
         const pip = parsePip(msg);
 
-        if (typeof pip === 'object') {
+        const isRegularBeast = regExpSetMatcher(msg.text, {
+            regexpSet: regexps.regularBeastFaced
+        });
+
+        if (_.isObject(pip)) {
             sessions[msg.from.id].pip = pip;
             sessions[msg.from.id].state = states.WAIT_FOR_SKILL;
 
@@ -500,6 +529,115 @@ bot.on('forward', (msg) => {
             return bot.sendMessage(msg.from.id, 'Что качать будешь?', {
                 replyMarkup
             });
+        } else if (isRegularBeast) {
+            const beast = parseBeastFaced.parseRegularBeastFaced(msg.text);
+
+            Beast.findOne({
+                name: beast.name,
+                distanceRange: beast.distance
+            }).then(fBeast => {
+                if (fBeast !== null) {
+
+
+                    const minMax = (array) => {
+                        const min = _.min(array);
+                        const max = _.min(array);
+
+                        if (min !== max) {
+                            return `${min}-${max}`;
+                        }
+
+                        return `${min}`;
+                    }
+
+                    const getItems = items => {
+                        if (_.isEmpty(items)) {
+                            return 'Неизвестно'
+                        }
+
+                        return Object.keys(items).join(', ');
+                    }
+
+                    const getFlees = flees => {
+                        if (_.isEmpty(flees)) {
+                            return 'Нет данных'
+                        }
+
+                        const flee = flees.pop();
+                        if (flee.outcome === 'win') {
+                            return `Успешно при 🤸🏽‍♂️${flee.stats.agility}`
+                        }
+
+                        return `Не успешно при 🤸🏽‍♂️${flee.stats.agility}, урон - 💔${flee.damageReceived} `;
+                    }
+
+                    const getConcussions = concussions => {
+                        if (_.isEmpty(concussions)) {
+                            return 'Нет данных'
+                        }
+
+                        const concussion = concussions.pop();
+
+                        return `${concussion.amount} оглушений при 🤸🏽‍♂️${concussion.stats.agility}`
+                    }
+
+                    const getBattles = battles => {
+                        if (_.isEmpty(battles)) {
+                            return 'Нет данных';
+                        }
+
+                        let successBattles = [];
+                        let failBattles = [];
+
+                        battles.forEach(battle => {
+                            if (battle.outcome === 'win') {
+                                successBattles.push(`Успешно при уроне мобу ${battle.totalDamageGiven}.\nСтаты игрока: ⚔️Урон: ${battle.stats.damage} 🛡Броня: ${battle.stats.armor}.\nВсего урона от моба получено - ${battle.damagesReceived}`)
+                            } else {
+                                failBattles.push(`Неудача при уроне мобу ${battle.totalDamageGiven}.\nСтаты игрока:⚔️Урон: ${battle.start.damage} 🛡Броня: ${battle.stats.armor}.\nВсего урона от моба получено - ${battle.damagesReceived}`)
+                            }
+                        });
+
+                        return {
+                            successBattles: _.isEmpty(successBattles) ? ['Нет данных об удачных битвах'] : successBattles,
+                            failBattles: _.isEmpty(failBattles) ? ['Нет данных о неудачных битвах'] : failBattles
+                        }
+                    };
+
+                    const processedBattles = getBattles(fBeast.battles);
+
+                    let reply = `
+${fBeast.name}
+Был замечен на ${minMax(fBeast.distanceRange)}км
+
+[ДРОП]
+🕳${minMax(fBeast.capsReceived)} крышек
+📦${minMax(fBeast.materialsReceived)} материалов
+
+[ЛУТ]
+${getItems(fBeast.receivedItems)}
+
+[ПОБЕГ]
+${getFlees(fBeast.flees)}
+
+[ОГЛУШЕНИЯ]
+${getConcussions(fBeast.concussion)}
+
+[СТЫЧКИ]
+${processedBattles.successBattles.join('\n')}
+
+---
+
+${processedBattles.failBattles.join('\n')}
+                    `
+                    return msg.reply.text(reply, {
+                        asReply: true
+                    });
+                } else {
+                    return msg.reply.text(`Прости, я никогда не слышал про этого ${beast.name} :c`, {
+                        asReply: true
+                    })
+                }
+            }).catch(e => console.log(e));
         }
     }
 
@@ -590,6 +728,12 @@ bot.on('/journeyforwardstart', msg => {
         createSession(msg.from.id);
     }
 
+    let inlineReplyMarkup = bot.inlineKeyboard([
+        [
+            bot.inlineButton('📟 Перейти в игру.', {url: 'https://t.me/WastelandWarsBot'})
+        ]
+    ]);
+
     sessions[msg.from.id].state = states.WAIT_FOR_FORWARD_END;
     const replyMarkup = bot.keyboard([
         [
@@ -602,14 +746,22 @@ bot.on('/journeyforwardstart', msg => {
 
     msg.reply.text(`
 Хей, вижу ты хочешь поделиться со мной ценной информации с пустоши - отлично!
-Ну что же кидай её сюда. 
+Ну что же кидай её сюда.
 
-Пожалуйста убедись что все сообщение были пересланы - Телеграм может немного притормаживать.
-Ну а как закончишь - смело жми кнопку [\`Стоп 🙅‍♂️\`]!
+
     `, {
         replyMarkup,
         parseMode: 'markdown'
+    }).then(() => {
+        return msg.reply.text(`
+Пожалуйста убедись что все сообщение были пересланы - Телеграм может немного притормаживать.
+Ну а как закончишь - смело жми кнопку [\`Стоп 🙅‍♂️\`]!
+            `, {
+                replyMarkup: inlineReplyMarkup,
+                parseMode: 'markdown'
+            })
     })
+
 });
 
 const processUserData = (msg, options) => {
@@ -644,7 +796,7 @@ _${reportData.criticalError}_
         `);
     }
 
-    
+
 
     msg.reply.text(`Перехожу в режим оброботки данных, подожди пожалуйста немного :3`, {
         replyMarkup: 'hide'
@@ -657,8 +809,10 @@ _${reportData.criticalError}_
         updatesData
     });
 
-    /* User.findOne({'telegram.id':msg.from.id},function (err, user) {
-        if(user === null) {
+    /* User.findOne({
+        'telegram.id': msg.from.id
+    }, function (err, user) {
+        if (user === null) {
             const newUser = new User({
                 telegram: {
                     id: msg.from.id,
@@ -667,17 +821,15 @@ _${reportData.criticalError}_
                 },
                 pip: reportData.lastPip
             });
-    
-            newUser.save().then(function(err, user) {
-                if(err) {
-                    console.log('#mongo_error User save error:'+err);
+
+            newUser.save().then(function (user, err) {
+                if (err) {
+                    console.log('#mongo_error User save error:' + err);
                     return msg.reply.text('Ошибка при сохранении твоего пип-боя');
                 }
             });
         }
     }); */
-
-
 
     if (updatesData.beasts.length > 0) {
         async.forEach(updatesData.beasts, function (iBeast, next) {
@@ -689,58 +841,170 @@ _${reportData.criticalError}_
                     const newBeast = new Beast(iBeast);
 
                     newBeast.save().then(() => next())
-                };
+                } else {
+                    let isSameFleeExists, isSameConcussionExists;
 
-                let isSameFleeExists;
+                    const isSameBattleExists = fBeast.battles.map(battle => {
+                        const existingBattle = _.clone(battle.toJSON());
+                        delete existingBattle._id;
 
-                const isSameBattleExists = fBeast.battles.map(battle => {
-                    const existingBattle = _.clone(battle.toJSON());
-                    delete existingBattle._id;
-
-                    return _.isEqual(existingBattle, iBeast.battles[0]);
-                }).some(result => result === true);
-
-                if (iBeast.flees.length === 1) {
-                    isSameBattleExists = fBeast.flees.map(flee => {
-                        const existingFlee = _.clone(flee.toJSON());
-                        delete existingFlee._id;
-
-                        return _.isEqual(existingFlee, iBeast.flees[0]);
+                        return _.isEqual(existingBattle, iBeast.battles[0]);
                     }).some(result => result === true);
-                }
 
-                if (!_.contains(fBeast.distanceRange, iBeast.distanceRange[0])) {
-                    fBeast.distanceRange.push(iBeast.distanceRange[0]);
-                }
+                    if (iBeast.concussions) {
+                        if (iBeast.concussions.length > 0) {
+                            isSameConcussionExists = fBeast.concussions.map(concussion => {
+                                const existingConcussion = _.clone(concussion.toJSON());
+                                delete existingConcussion._id;
 
-                if (!_.contains(fBeast.capsReceived, iBeast.capsReceived)) {
-                    fBeast.capsReceived.push(iBeast.capsReceived);
-                }
+                                return _.isEqual(existingConcussion, iBeast.concussions[0]);
+                            }).some(result => result === true);
+                        }
+                    }
 
-                if (!_.contains(fBeast.materialsReceived, iBeast.materialsReceived)) {
-                    fBeast.materialsReceived.push(iBeast.materialsReceived);
-                }
+                    if (iBeast.flees) {
+                        if (iBeast.flees.length === 1) {
+                            isSameFleeExists = fBeast.flees.map(flee => {
+                                const existingFlee = _.clone(flee.toJSON());
+                                delete existingFlee._id;
 
-                if (!isSameBattleExists) {
-                    fBeast.battles.push(iBeast.battles[0]);
-                }
+                                return _.isEqual(existingFlee, iBeast.flees[0]);
+                            }).some(result => result === true);
+                        }
+                    }
 
-                fBeast.save().then(() => next());
+                    if (!_.isEmpty(iBeast.receivedItems)) {
+                        Object.keys(iBeast.receivedItems).map((item) => {
+                            const amount = iBeast.receivedItems[item];
+
+                            if (fBeast.receivedItems[item]) {
+                                if (!_.contains(fBeast.receivedItems[item], amount)) {
+                                    fBeast.receivedItems[item].push(amount);
+                                }
+                            } else {
+                                fBeast.receivedItems[item] = [amount];
+                            }
+                        })
+                    }
+
+                    if (!_.contains(fBeast.distanceRange, iBeast.distanceRange[0])) {
+                        fBeast.distanceRange.push(iBeast.distanceRange[0]);
+                    }
+
+                    if (!_.contains(fBeast.capsReceived, iBeast.capsReceived)) {
+                        fBeast.capsReceived.push(iBeast.capsReceived);
+                    }
+
+                    if (!_.contains(fBeast.materialsReceived, iBeast.materialsReceived)) {
+                        fBeast.materialsReceived.push(iBeast.materialsReceived);
+                    }
+
+                    if (!isSameBattleExists) {
+                        fBeast.battles.push(iBeast.battles[0]);
+                    }
+
+                    if (!isSameConcussionExists) {
+                        fBeast.concussions.push(iBeast.concussions[0]);
+                    }
+
+                    if (!isSameFleeExists) {
+                        fBeast.flees.push(iBeast.flees[0]);
+                    }
+
+
+                    // TODO: Concussion
+                    // TODO: Received items
+
+                    fBeast.save().then(() => next());
+                }
             });
-
-            // tell async that that particular element of the iterator is done
-            // next(); 
-
         }, function (err) {
             console.log('iterating done');
         });
     }
 
-    /* if (updatesData.locations.length > 0) {
-        async.mapLimit(myArray, 10, function(document, next){
-            document.save(next);
-        }, done);
-    } */
+    if (updatesData.locations.length > 0) {
+        async.forEach(updatesData.locations, function (iLocation, next) {
+            Location.findOne({
+                distance: iLocation.distance
+            }).then(function (fLocation) {
+                if (fLocation === null) {
+                    const newLocation = new Location({
+                        distance: iLocation.distance,
+                        name: iLocation.name,
+                        type: iLocation.type,
+                        isRaid: iLocation.isRaid,
+                        effects: [iLocation.effect],
+                        capsReceived: [iLocation.capsReceived],
+                        materialsReceived: [iLocation.materialsReceived],
+                        capsLost: [iLocation.capsLost],
+                        materialsLost: [iLocation.materialsLost],
+                        receivedItems: [iLocation.receivedItems],
+                        receivedBonusItems: [iLocation.receivedBonusItems],
+                        healthInjuries: [iLocation.healthInjuries]
+                    });
+
+                    newLocation.save().then(() => next())
+                } else {
+                    if (!_.contains(fLocation.effects, iLocation.effect)) {
+                        fLocation.effects.push(iLocation.effect);
+                    }
+
+                    if (!_.contains(fLocation.capsReceived, iLocation.capsReceived)) {
+                        fLocation.capsReceived.push(iLocation.capsReceived);
+                    }
+
+                    if (!_.contains(fLocation.materialsReceived, iLocation.materialsReceived)) {
+                        fLocation.materialsReceived.push(iLocation.materialsReceived);
+                    }
+
+                    if (!_.contains(fLocation.capsLost, iLocation.capsLost)) {
+                        fLocation.capsLost.push(iLocation.capsLost);
+                    }
+
+                    if (!_.contains(fLocation.materialsLost, iLocation.materialsLost)) {
+                        fLocation.materialsLost.push(iLocation.materialsLost);
+                    }
+
+                    if (!_.contains(fLocation.healthInjuries, iLocation.healthInjuries)) {
+                        fLocation.healthInjuries.push(iLocation.healthInjuries);
+                    }
+
+                    if (!_.isEmpty(iLocation.receivedItems)) {
+                        Object.keys(iLocation.receivedItems).map((item) => {
+                            const amount = iLocation.receivedItems[item];
+
+                            if (fLocation.receivedItems[item]) {
+                                if (!_.contains(fLocation.receivedItems[item], amount)) {
+                                    fLocation.receivedItems[item].push(amount);
+                                }
+                            } else {
+                                fLocation.receivedItems[item] = [amount];
+                            }
+                        })
+                    }
+
+                    if (!_.isEmpty(iLocation.receivedBonusItems)) {
+                        Object.keys(iLocation.receivedBonusItems).map((item) => {
+                            const amount = iLocation.receivedBonusItems[item];
+
+                            if (fLocation.receivedBonusItems[item]) {
+                                if (!_.contains(fLocation.receivedBonusItems[item], amount)) {
+                                    fLocation.receivedBonusItems[item].push(amount);
+                                }
+                            } else {
+                                fLocation.receivedBonusItems[item] = [amount];
+                            }
+                        })
+                    }
+
+                    fLocation.save().then(() => next());
+                }
+            });
+        }, function (err) {
+            console.log(err, 'iterating done');
+        });
+    }
 
 
     // if PIP exist - try to apply it to given data
@@ -760,11 +1024,11 @@ ${reportData.errors.join('\n')}
     if (amountOfData > 0) {
         setTimeout(() => {
             msg.reply.text(`
-    Фух, я со всём справился - спасибо тебе огромное за эту информацию!
-    Теперь ты опять можешь пользоваться функционалом скилокачатор, либо если ты чего-то забыл докинуть - смело жми на \`[Скинуть лог 🏃]\`
-    Я насчитал ${amountOfData} данных!
-    
-    ${errors}
+Фух, я со всём справился - спасибо тебе огромное за эту информацию!
+Теперь ты опять можешь пользоваться функционалом скилокачатор, либо если ты чего-то забыл докинуть - смело жми на \`[Скинуть лог 🏃]\`
+Я насчитал ${amountOfData} данных!
+
+${errors}
     `, {
                 replyMarkup: defaultKeyboard,
                 parseMode: 'markdown'
@@ -773,7 +1037,7 @@ ${reportData.errors.join('\n')}
     } else {
         setTimeout(() => {
             msg.reply.text(`
-    К сожалению я ничего не смог узнать из твоих форвардов :с
+К сожалению я ничего не смог узнать из твоих форвардов :с
     `, {
                 replyMarkup: defaultKeyboard,
                 parseMode: 'markdown'
@@ -781,7 +1045,7 @@ ${reportData.errors.join('\n')}
         }, 1500);
     }
 
-    sessions[msg.from.id].data = [];
+    delete sessions[msg.from.id];
 }
 
 bot.on('/journeyforwardend', msg => {
@@ -845,5 +1109,45 @@ bot.on(/^\d+$/, msg => {
             break;
     }
 });
+
+bot.on('/show_help', msg => msg.reply.text(`
+Бот работает в бета режиме.
+`));
+
+bot.on('/show_drones', msg => msg.reply.text(`
+🛰*Шерлокдрон* ⚙️Универсальный
+⚔️12 🛡130/130 ⚡️3%
+Имеет модуль *Радар*, позволяющий получать больше ресурсов.
+
+🛰*Robot* Rock 🔫Боевой
+⚔️46 🛡150/150 ⚡️14%
+
+🛰*Барахло* ⚙️Универсальный
+⚔️10 🛡50/50 ⚡️6%
+
+🛰*Малыш* ⚙️Универсальный
+⚔️18 🛡80/80 ⚡️10%
+
+🛰*Дефолт* ⚙️Универсальный
+⚔️28 🛡120/120 ⚡️12%
+
+🛰*AWESOM-O* 🛡Обороняющий
+⚔️23 🛡420/420 ⚡️16%
+
+🛰*Протекдрон* 🛡Обороняющий
+⚔️14 🛡270/270 ⚡️14%
+
+🛰*Рад-дрон* 🔫Боевой
+⚔️68 🛡180/180 ⚡️14%
+
+По статам:
+⚔️ - урон дрона
+🛡- прочность, уменьшается при попадание монстров по дрону.
+⚡️- шанс вступить в бой.
+
+За инфу спасибо @nushit - https://t.me/nushit/393
+`, {
+    parseMode: 'markdown'
+}));
 
 bot.start();

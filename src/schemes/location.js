@@ -11,9 +11,15 @@ const locationScheme = new Schema({
     materialsReceived: [Number],
     capsLost: [Number],
     materialsLost: [Number],
-    receivedItems: [Schema.Types.Mixed],
+    receivedItems: Object,
+    receivedBonusItems: Object,
     healthInjuries: [Number],
     lastUpdated: String
+}, {
+    timestamps: {
+        createdAt: 'createdAt',
+        updatedAt: 'updatedAt'
+    }
 });
 
 module.exports = locationScheme;

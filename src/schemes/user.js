@@ -38,6 +38,11 @@ const userSchema = mongoose.Schema({
             timeStamp: Number
         }]
     }
+}, {
+    timestamps: {
+        createdAt: 'createdAt',
+        updatedAt: 'updatedAt'
+    }
 });
 
 module.exports = userSchema;

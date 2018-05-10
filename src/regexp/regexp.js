@@ -126,6 +126,12 @@ const deathMessage = {
     ]
 };
 
+const regularBeastFaced = {
+    contains: [
+        beastFacedRegExp
+    ]
+};
+
 const dungeonBeastFaced = {
     contains: [
         dungeonBeastFacedRegExp
@@ -178,6 +184,7 @@ module.exports = {
     dungeonBeast,
     flee,
     deathMessage,
+    regularBeastFaced,
     dungeonBeastFaced,
     regexps
 };

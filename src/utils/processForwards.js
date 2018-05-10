@@ -33,14 +33,14 @@ const normalizeItems = items => {
             const existingAmount = normalizedItems[name];
 
             if (amount === undefined) {
-                normalizedItems[name] += 1;
+                normalizedItems[name] = [1];
 
             } else {
-                normalizedItems[name] += Number(amount);
+                normalizedItems[name] = [Number(amount)];
 
             }
         } else {
-            normalizedItems[name] = Number(amount) || 1;
+            normalizedItems[name] = [Number(amount || 1)];
         }
     });
 
@@ -86,9 +86,10 @@ const processForwards = (data, dataPips, config) => {
         reportData.pipRequired = false;
     }
 
+    // 1525607351
     if(data.filter(({date}) => date < 1525607078).length > 0) {
         reportData.criticalError = 'Был замечен форвард время которого меньше за время выкатки обновы Wasteland Wars';
-        
+
         return {reportData};
     }
 
@@ -277,11 +278,11 @@ const processForwards = (data, dataPips, config) => {
                     beastData.flees = [{
                         outcome: data.outcome
                     }]
-        
+
                     if (data.outcome === 'lose') {
                         beastData.flees[0].damageReceived = [data.healthInjuries];
                     }
-        
+
                     if (reportData.lastPip) {
                         beastData.flees[0].stats = {
                             agility: reportData.lastPip.agility
@@ -289,7 +290,7 @@ const processForwards = (data, dataPips, config) => {
                     } else {
                         reportData.recalculationRequired = true;
                     }
-        
+
                     updatesData.beasts.push(beastData);
                 } else {
                     reportData.errors.push(`Не могу найти в форвардах монстра от которого ты сбежал на ${data.distance}`);
@@ -298,7 +299,7 @@ const processForwards = (data, dataPips, config) => {
                 reportData.errors.push(`Не могу найти в форвардах монстра от которого ты сбежал на ${data.distance}`);
             }
 
-            
+
 
             // if (reportData.lastPip) {
             //     updatesData.flees = `Unsucsessfull flee from ${reportData.lastBeastSeen.name} on ${reportData.distance} with agility ${reportData.lastPip.agility}`;

@@ -7,7 +7,7 @@ const beastScheme = new Schema({
     isDungeon: Boolean,
     capsReceived: [Number],
     materialsReceived: [Number],
-    receivedItems: [Schema.Types.Mixed],
+    receivedItems: Object,
     battles: [{
         totalDamageGiven: Number,
         totalDamageReceived: Number,
@@ -34,6 +34,11 @@ const beastScheme = new Schema({
         amount: Number,
     }],
     lastUpdated: String
+}, {
+    timestamps: {
+        createdAt: 'createdAt',
+        updatedAt: 'updatedAt'
+    }
 });
 
 module.exports = beastScheme;
