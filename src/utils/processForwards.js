@@ -330,6 +330,7 @@ const processForwards = (data, dataPips, config) => {
     if(reportData.lastPip) {
         if(reportData.healthCapHistory.some(health => health !== reportData.lastPip.health)) {
             reportData.criticalError = 'Была замечена прокачка уровня здоровья. Во время одной вылазки подобное - не возможно.';
+            console.log(JSON.stringify(data), JSON.stringify(dataPips));
         }
     }
 
