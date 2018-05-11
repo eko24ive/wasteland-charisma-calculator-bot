@@ -168,7 +168,7 @@ const processForwards = (data, dataPips, config) => {
                 }];
 
                 if (reportData.lastPip) {
-                    beastData.concussions[0].agility = reportData.lastPip.agility;
+                    beastData.concussions[0].stats = {agility: reportData.lastPip.agility};
                 } else {
                     reportData.recalculationRequired = true;
                 }
