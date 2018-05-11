@@ -537,7 +537,7 @@ bot.on('forward', (msg) => {
 
             Beast.findOne({
                 name: beast.name,
-                distanceRange: beast.distance
+                isDungeon: false
             }).then(fBeast => {
                 if (fBeast !== null) {
 
@@ -596,7 +596,7 @@ bot.on('forward', (msg) => {
                             if (battle.outcome === 'win') {
                                 successBattles.push(`▫️ Успешно при уроне мобу ${battle.totalDamageGiven}.\nСтаты игрока: ⚔️Урон: ${battle.stats.damage} 🛡Броня: ${battle.stats.armor}.\nВсего урона от моба получено - ${battle.damagesReceived}\n`)
                             } else {
-                                failBattles.push(`▫️ Неудача при уроне мобу ${battle.totalDamageGiven}.\nСтаты игрока:⚔️Урон: ${battle.start.damage} 🛡Броня: ${battle.stats.armor}.\nВсего урона от моба получено - ${battle.damagesReceived}\n`)
+                                failBattles.push(`▫️ Неудача при уроне мобу ${battle.totalDamageGiven}.\nСтаты игрока:⚔️Урон: ${battle.stats.damage} 🛡Броня: ${battle.stats.armor}.\nВсего урона от моба получено - ${battle.damagesReceived}\n`)
                             }
                         });
 
