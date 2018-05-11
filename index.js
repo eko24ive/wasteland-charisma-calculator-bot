@@ -302,6 +302,10 @@ const buttons = {
     showDrones: {
         label: "🛰 Дроны",
         command: "/show_drones"
+    },
+    hallOfFame: {
+        label: "🏆 Зал Славы",
+        command: "/show_hall_of_fame"
     }
 };
 
@@ -353,12 +357,11 @@ const defaultKeyboard = bot.keyboard([
     ],
     [
         buttons['showAllLocations'].label,
-        buttons['showRaidLocations'].label
-    ],
-    [
+        buttons['showRaidLocations'].label,
         buttons['showDrones'].label
     ],
     [
+        buttons['hallOfFame'].label,
         buttons['showHelp'].label
     ]
 ], {
@@ -541,7 +544,7 @@ bot.on('forward', (msg) => {
 
                     const minMax = (array) => {
                         const min = _.min(array);
-                        const max = _.min(array);
+                        const max = _.max(array);
 
                         if (min !== max) {
                             return `${min}-${max}`;
@@ -560,25 +563,25 @@ bot.on('forward', (msg) => {
 
                     const getFlees = flees => {
                         if (_.isEmpty(flees)) {
-                            return 'Нет данных'
+                            return 'Нет данных';
                         }
 
                         const flee = flees.pop();
                         if (flee.outcome === 'win') {
-                            return `Успешно при 🤸🏽‍♂️${flee.stats.agility}`
+                            return `▫️ Успешно при 🤸🏽‍♂️${flee.stats.agility || flee.agility}\n`;
                         }
 
-                        return `Не успешно при 🤸🏽‍♂️${flee.stats.agility}, урон - 💔${flee.damageReceived} `;
+                        return `▫️ Не успешно при 🤸🏽‍♂️${flee.stats.agility  || flee.agility}, урон - 💔${flee.damageReceived}\n`;
                     }
 
                     const getConcussions = concussions => {
                         if (_.isEmpty(concussions)) {
-                            return 'Нет данных'
+                            return 'Нет данных';
                         }
 
                         const concussion = concussions.pop();
 
-                        return `${concussion.amount} оглушений при 🤸🏽‍♂️${concussion.stats.agility}`
+                        return `▫️ ${concussion.amount} оглушений при 🤸🏽‍♂️${concussion.stats.agility}\n`
                     }
 
                     const getBattles = battles => {
@@ -591,9 +594,9 @@ bot.on('forward', (msg) => {
 
                         battles.forEach(battle => {
                             if (battle.outcome === 'win') {
-                                successBattles.push(`Успешно при уроне мобу ${battle.totalDamageGiven}.\nСтаты игрока: ⚔️Урон: ${battle.stats.damage} 🛡Броня: ${battle.stats.armor}.\nВсего урона от моба получено - ${battle.damagesReceived}`)
+                                successBattles.push(`▫️ Успешно при уроне мобу ${battle.totalDamageGiven}.\nСтаты игрока: ⚔️Урон: ${battle.stats.damage} 🛡Броня: ${battle.stats.armor}.\nВсего урона от моба получено - ${battle.damagesReceived}\n`)
                             } else {
-                                failBattles.push(`Неудача при уроне мобу ${battle.totalDamageGiven}.\nСтаты игрока:⚔️Урон: ${battle.start.damage} 🛡Броня: ${battle.stats.armor}.\nВсего урона от моба получено - ${battle.damagesReceived}`)
+                                failBattles.push(`▫️ Неудача при уроне мобу ${battle.totalDamageGiven}.\nСтаты игрока:⚔️Урон: ${battle.start.damage} 🛡Броня: ${battle.stats.armor}.\nВсего урона от моба получено - ${battle.damagesReceived}\n`)
                             }
                         });
 
@@ -606,7 +609,7 @@ bot.on('forward', (msg) => {
                     const processedBattles = getBattles(fBeast.battles);
 
                     let reply = `
-${fBeast.name}
+*${fBeast.name}*
 Был замечен на ${minMax(fBeast.distanceRange)}км
 
 [ДРОП]
@@ -620,7 +623,7 @@ ${getItems(fBeast.receivedItems)}
 ${getFlees(fBeast.flees)}
 
 [ОГЛУШЕНИЯ]
-${getConcussions(fBeast.concussion)}
+${getConcussions(fBeast.concussions)}
 
 [СТЫЧКИ]
 ${processedBattles.successBattles.join('\n')}
@@ -630,7 +633,8 @@ ${processedBattles.successBattles.join('\n')}
 ${processedBattles.failBattles.join('\n')}
                     `
                     return msg.reply.text(reply, {
-                        asReply: true
+                        asReply: true,
+                        parseMode: 'markdown'
                     });
                 } else {
                     return msg.reply.text(`Прости, я никогда не слышал про этого ${beast.name} :c`, {
@@ -688,8 +692,6 @@ bot.on('/locs_text', msg => {
 -64км- 🐺 Яо-Гигант
 [69км] ⛩ Храм Мудрости
 [74км] 👁‍🗨 Чёрная Меза
-
-Инфо взята из @trust_42 - https://t.me/trust_42/61
     `, {
         webPreview: false
     });
@@ -697,37 +699,35 @@ bot.on('/locs_text', msg => {
 
 bot.on('/raids_text', msg => {
     return msg.reply.text(`
-Старая фабрика
+Старая фабрика*
 [5км] 📦Материалы
 
-Завод "Ядер-Кола"
+*Завод "Ядер-Кола"*
 [9км] 🕳Крышки
 
-Тюрьма
+*Тюрьма*
 [12км] 💊Вещества
 
-Склады
+*Склады*
 [16км] 🍗Еда
 
-Датацентр
+*Датацентр*
 [20км] 🔹Кварц
 
-Госпиталь
+*Госпиталь*
 [24км] ❤️Лечение
 
-Завод "Электрон"
+*Завод "Электрон"*
 [28км] 💡Генераторы
 
-Офисное здание
+*Офисное здание*
 [32км] 💾Микрочипы
 
-Иридиевые шахты
+*Иридиевые шахты*
 [38км] 🔩Иридий
 
-Склад металла
+*Склад металла*
 [46км] 🔗Кубонит
-
-Инфо взята из @trust_42 - https://t.me/trust_42/57
     `, {
         webPreview: false
     });
@@ -865,7 +865,7 @@ _${reportData.criticalError}_
 
                     newBeast.save().then(() => next());
                 } else {
-                    let isSameFleeExists, isSameConcussionExists;
+                    let isSameFleeExists=true, isSameConcussionExists=true;
 
                     const isSameBattleExists = fBeast.battles.map(battle => {
                         const existingBattle = _.clone(battle.toJSON());
@@ -926,7 +926,7 @@ _${reportData.criticalError}_
                         fBeast.battles.push(iBeast.battles[0]);
                     }
 
-                    if (!isSameConcussionExists && isSameConcussionExists !== undefined) {
+                    if (!isSameConcussionExists) {
                         fBeast.concussions.push(iBeast.concussions[0]);
                     }
 
@@ -938,7 +938,7 @@ _${reportData.criticalError}_
                     // TODO: Concussion
                     // TODO: Received items
 
-                    fBeast.save().then(() => next());
+                    fBeast.save().then(() => next()).catch(e => console.log(e));
                 }
             });
         }, function (err) {
@@ -1170,10 +1170,25 @@ bot.on('/show_drones', msg => msg.reply.text(`
 ⚔️ - урон дрона
 🛡- прочность, уменьшается при попадание монстров по дрону.
 ⚡️- шанс вступить в бой.
-
-За инфу спасибо @nushit - https://t.me/nushit/393
 `, {
     parseMode: 'markdown',
+    webPreview: false
+}));
+
+bot.on('/show_hall_of_fame', msg => msg.reply.text(`
+<code>Здесь увековечены жители и организации пустоши оказавшие титаническую помощь на этапе открытой беты</code>
+
+Ядерная благодарность каналу @nushit за информацию про дронов
+https://t.me/nushit/393
+
+Сорок два раза спасибо "Основе" и товарищу Звёздопылькину за ифнормацию про локации
+https://t.me/trust_42/57
+
+Отдельная благодарнасть товарищу @MohanMC за помощь в форматировании
+
+Список дополняется...
+`, {
+    parseMode: 'html',
     webPreview: false
 }));
 
