@@ -858,13 +858,12 @@ _${reportData.criticalError}_
     if (updatesData.beasts.length > 0) {
         async.forEach(updatesData.beasts, function (iBeast, next) {
             Beast.findOne({
-                name: iBeast.name,
-                distanceRange: iBeast.distanceRange[0]
+                name: iBeast.name
             }).then(function (fBeast) {
                 if (fBeast === null) {
                     const newBeast = new Beast(iBeast);
 
-                    newBeast.save().then(() => next())
+                    newBeast.save().then(() => next());
                 } else {
                     let isSameFleeExists, isSameConcussionExists;
 
