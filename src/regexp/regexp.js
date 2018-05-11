@@ -110,12 +110,10 @@ const flee = {
         every.contains,
     ],
     conditional: [
-        beastSuccessFleeRegExp,
         beastDefeatFleeRegExp,
-        beastDefeatCapsLostRegExp,
-        injuryRegExp,
-        beastDefeatMaterialsLostRegExp
-    ]
+        beastSuccessFleeRegExp
+    ],
+    excludes: [regularBeast.conditional]
 }
 
 const deathMessage = {
