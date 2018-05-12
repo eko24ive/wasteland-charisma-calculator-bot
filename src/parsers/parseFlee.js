@@ -30,10 +30,10 @@ const parseFleeDefeat = flee => {
 
     return {
         outcome,
-        distance,
+        distance: Number(distance),
         capsLost,
         materialsLost,
-        healthInjuries
+        healthInjuries: Number(healthInjuries)
     }
 };
 
