@@ -645,6 +645,7 @@ bot.on('forward', (msg) => {
 
                         battles.forEach(battle => {
                             if (battle.outcome === 'win') {
+                                // TODO: Fix battle parse
                                 if(battle.stats !== undefined) {
                                     successBattles.push(`▫️ Успешно при уроне мобу ${battle.totalDamageGiven}.\nСтаты игрока: ⚔️Урон: ${battle.stats.damage} 🛡Броня: ${battle.stats.armor}.\nВсего урона от моба получено - ${battle.damagesReceived}\n`)
                                 }
