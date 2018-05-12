@@ -546,6 +546,7 @@ bot.on('forward', (msg) => {
                 isDungeon: false
             }).then(fBeast => {
                 if (fBeast !== null) {
+                    const beast = fBeast.toJSON();
 
 
                     const minMax = (array) => {
@@ -559,6 +560,16 @@ bot.on('forward', (msg) => {
                         return `${min}`;
                     }
 
+                    const getDrop = (capsReceived, materialsReceived) => {
+                        if(_.isEmpty(capsReceived) && _.isEmpty(materialsReceived)) {
+                            return 'Нет данных';    
+                        }
+
+                        return `🕳${minMax(capsReceived)} крышек
+📦${minMax(materialsReceived)} материалов`;
+                        
+                    }
+
                     const getItems = items => {
                         if (_.isEmpty(items)) {
                             return 'Неизвестно'
@@ -569,15 +580,35 @@ bot.on('forward', (msg) => {
 
                     const getFlees = flees => {
                         if (_.isEmpty(flees)) {
-                            return 'Нет данных';
+                            return {
+                                successFlees: 'Нет данных об удачных побегах',
+                                failFlees: 'Нет данных о неудачных побегах'
+                            }
                         }
 
-                        const flee = flees.pop();
-                        if (flee.outcome === 'win') {
-                            return `▫️ Успешно при 🤸🏽‍♂️${flee.stats.agility || flee.agility}\n`;
+                        let successFlees = [];
+                        let failFlees = [];
+
+                        flees.forEach(flee => {
+                            if (flee.outcome === 'win') {
+                                successFlees.push(`▫️ Успешно при 🤸🏽‍♂️${flee.stats.agility || flee.agility}\n`);
+                            } else {
+                                failFlees.push(`▫️ Не успешно при 🤸🏽‍♂️${flee.stats.agility  || flee.agility}, урон - 💔${flee.damageReceived}`);
+                            }
+                        });
+
+                        if(successFlees.length > 5) {
+                            successFlees = successFlees.slice(0,5);
+                        } 
+
+                        if(failFlees.length > 5) {
+                            failFlees = failFlees.slice(0,5);
                         }
 
-                        return `▫️ Не успешно при 🤸🏽‍♂️${flee.stats.agility  || flee.agility}, урон - 💔${flee.damageReceived}\n`;
+                        return {
+                            successFlees: _.isEmpty(successFlees) ? 'Нет данных об удачных побегах' : successFlees.join('\n'),
+                            failFlees: _.isEmpty(failFlees) ? 'Нет данных о неудачных побегах' : failFlees.join('\n')
+                        }
                     }
 
                     const getConcussions = concussions => {
@@ -585,58 +616,77 @@ bot.on('forward', (msg) => {
                             return 'Нет данных';
                         }
 
-                        const concussion = concussions.pop();
-
-                        return `▫️ ${concussion.amount} оглушений при 🤸🏽‍♂️${concussion.stats.agility}\n`
+                        return concussions.map(concussion => `▫️ ${concussion.amount} оглушений при 🤸🏽‍♂️${concussion.stats.agility}\n`);
                     }
 
                     const getBattles = battles => {
                         if (_.isEmpty(battles)) {
-                            return 'Нет данных';
+                            return {
+                                successBattles: 'Нет данных об удачных битвах',
+                                failBattles: 'Нет данных о неудачных битвах'
+                            }
                         }
+
+                       
 
                         let successBattles = [];
                         let failBattles = [];
 
                         battles.forEach(battle => {
                             if (battle.outcome === 'win') {
-                                successBattles.push(`▫️ Успешно при уроне мобу ${battle.totalDamageGiven}.\nСтаты игрока: ⚔️Урон: ${battle.stats.damage} 🛡Броня: ${battle.stats.armor}.\nВсего урона от моба получено - ${battle.damagesReceived}\n`)
+                                if(battle.stats !== undefined) {
+                                    successBattles.push(`▫️ Успешно при уроне мобу ${battle.totalDamageGiven}.\nСтаты игрока: ⚔️Урон: ${battle.stats.damage} 🛡Броня: ${battle.stats.armor}.\nВсего урона от моба получено - ${battle.damagesReceived}\n`)
+                                }
                             } else {
-                                failBattles.push(`▫️ Неудача при уроне мобу ${battle.totalDamageGiven}.\nСтаты игрока:⚔️Урон: ${battle.stats.damage} 🛡Броня: ${battle.stats.armor}.\nВсего урона от моба получено - ${battle.damagesReceived}\n`)
+                                if(battle.stats !== undefined) {
+                                    failBattles.push(`▫️ Неудача при уроне мобу ${battle.totalDamageGiven}.\nСтаты игрока:⚔️Урон: ${battle.stats.damage} 🛡Броня: ${battle.stats.armor}.\nВсего урона от моба получено - ${battle.damagesReceived}\n`)
+                                }
                             }
                         });
 
+                        if(successBattles.length > 5) {
+                            successBattles = successBattles.slice(0,5);
+                        } 
+
+                        if(failBattles.length > 5) {
+                            failBattles = failBattles.slice(0,5);
+                        }
+
                         return {
-                            successBattles: _.isEmpty(successBattles) ? ['Нет данных об удачных битвах'] : successBattles,
-                            failBattles: _.isEmpty(failBattles) ? ['Нет данных о неудачных битвах'] : failBattles
+                            successBattles: _.isEmpty(successBattles) ? 'Нет данных об удачных битвах' : successBattles.join('\n'),
+                            failBattles: _.isEmpty(failBattles) ? 'Нет данных о неудачных битвах' : failBattles.join('\n')
                         }
                     };
 
-                    const processedBattles = getBattles(fBeast.battles);
+                    const processedBattles = getBattles(beast.battles);
+                    const processedFlees = getFlees(beast.flees);
 
                     let reply = `
-*${fBeast.name}*
-Был замечен на ${minMax(fBeast.distanceRange)}км
+*${beast.name}*
+Был замечен на ${minMax(beast.distanceRange)}км
 
-[ДРОП]
-🕳${minMax(fBeast.capsReceived)} крышек
-📦${minMax(fBeast.materialsReceived)} материалов
+*[ДРОП]*
+${getDrop(beast.capsReceived, beast.materialsReceived)}
 
-[ЛУТ]
-${getItems(fBeast.receivedItems)}
+*[ЛУТ]*
+${getItems(beast.receivedItems)}
 
-[ПОБЕГ]
-${getFlees(fBeast.flees)}
-
-[ОГЛУШЕНИЯ]
-${getConcussions(fBeast.concussions)}
-
-[СТЫЧКИ]
-${processedBattles.successBattles.join('\n')}
+*[ПОБЕГ]*
+${processedFlees.successFlees}
 
 ---
 
-${processedBattles.failBattles.join('\n')}
+${processedFlees.failFlees}
+
+*[ОГЛУШЕНИЯ]*
+${getConcussions(beast.concussions)}
+
+*[СТЫЧКИ]*
+${processedBattles.successBattles}
+
+---
+
+${processedBattles.failBattles}
                     `
                     return msg.reply.text(reply, {
                         asReply: true,
@@ -875,14 +925,22 @@ _${reportData.criticalError}_
 
                     newBeast.save().then(() => next());
                 } else {
-                    let isSameFleeExists=true, isSameConcussionExists=true;
+                    let isSameFleeExists=true, isSameConcussionExists=true, isSameBattleExists=true;
 
-                    const isSameBattleExists = fBeast.battles.map(battle => {
-                        const existingBattle = _.clone(battle.toJSON());
-                        delete existingBattle._id;
+                    if (iBeast.battles) {
+                        if (iBeast.battles.length > 0) {
+                            isSameBattleExists = fBeast.battles.map(battle => {
+                                if(iBeast.battles === undefined) {
+                                    return true;
+                                }
 
-                        return _.isEqual(existingBattle, iBeast.battles[0]);
-                    }).some(result => result === true);
+                                const existingBattle = _.clone(battle.toJSON());
+                                delete existingBattle._id;
+
+                                return _.isEqual(existingBattle, iBeast.battles[0]);
+                            }).some(result => result === true);
+                        }
+                    }
 
                     if (iBeast.concussions) {
                         if (iBeast.concussions.length > 0) {
@@ -924,12 +982,16 @@ _${reportData.criticalError}_
                         fBeast.distanceRange.push(iBeast.distanceRange[0]);
                     }
 
-                    if (!_.contains(fBeast.capsReceived, iBeast.capsReceived)) {
-                        fBeast.capsReceived.push(iBeast.capsReceived);
+                    if (iBeast.capsReceived !== undefined) {
+                        if (!_.contains(fBeast.capsReceived, iBeast.capsReceived)) {
+                            fBeast.capsReceived.push(iBeast.capsReceived);
+                        }
                     }
 
-                    if (!_.contains(fBeast.materialsReceived, iBeast.materialsReceived)) {
-                        fBeast.materialsReceived.push(iBeast.materialsReceived);
+                    if (iBeast.materialsReceived !== undefined) {
+                        if (!_.contains(fBeast.materialsReceived, iBeast.materialsReceived)) {
+                            fBeast.materialsReceived.push(iBeast.materialsReceived);
+                        }
                     }
 
                     if (!isSameBattleExists) {
