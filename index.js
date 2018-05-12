@@ -753,6 +753,9 @@ bot.on('/journeyforwardstart', msg => {
         createSession(msg.from.id);
     }
 
+    sessions[msg.from.id].dataPips = [];
+    sessions[msg.from.id].data = [];
+
     let inlineReplyMarkup = bot.inlineKeyboard([
         [
             bot.inlineButton('📟 Перейти в игру.', {url: 'https://t.me/WastelandWarsBot'})
