@@ -280,7 +280,7 @@ const processForwards = (data, dataPips, config) => {
                     }]
 
                     if (data.outcome === 'lose') {
-                        beastData.flees[0].damageReceived = [data.healthInjuries];
+                        beastData.flees[0].damageReceived = data.healthInjuries;
                     }
 
                     if (reportData.lastPip) {
