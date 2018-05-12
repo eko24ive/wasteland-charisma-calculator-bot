@@ -73,7 +73,7 @@ const parseLocation = location => {
     const locationData = {
         name,
         isRaid,
-        distance,
+        distance: Number(distance),
         type,
         capsReceived: Number(capsReceived),
         materialsReceived: Number(materialsReceived),
