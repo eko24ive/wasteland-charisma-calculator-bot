@@ -416,6 +416,12 @@ bot.on('/resetSessionAbort', (msg) => {
 }); */
 
 bot.on('forward', (msg) => {
+    if(msg.forward_from.id !== 430930191) {
+        return msg.reply.text('Форварды принимаються только от @WastelandWarsBot', {
+            asReply: true
+        })
+    }
+    
     if (sessions[msg.from.id] === undefined) {
         createSession(msg.from.id);
     }
