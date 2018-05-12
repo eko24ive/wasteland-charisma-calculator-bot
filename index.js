@@ -616,7 +616,18 @@ bot.on('forward', (msg) => {
                             return 'Нет данных';
                         }
 
-                        return concussions.map(concussion => `▫️ ${concussion.amount} оглушений при 🤸🏽‍♂️${concussion.stats.agility}\n`);
+                        const mappedConcussions = concussions.map(concussion => {
+                            // TODO: Fix concussion parse
+                            if(concussion.stats !== undefined) {
+                                return `▫️ ${concussion.amount} оглушений при 🤸🏽‍♂️${concussion.stats.agility}\n`;
+                            }
+
+                            return false
+                        }).filter(concussion => concussion !== false);
+
+                        if (_.isEmpty(mappedConcussions)) {
+                            return 'Нет данных';
+                        }
                     }
 
                     const getBattles = battles => {
