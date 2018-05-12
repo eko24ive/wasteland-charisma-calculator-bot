@@ -3,7 +3,13 @@ const _ = require('underscore');
 const blacklistKeys = [
   'faction',
   'name',
-  'version'
+  'version',
+  'damage',
+  'armor',
+  'hunger',
+  'precision',
+  'charisma',
+  'endurance'
 ];
 
 const comparePips = (newPip, lastPip) => {
