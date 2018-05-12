@@ -111,9 +111,10 @@ const flee = {
     ],
     conditional: [
         beastDefeatFleeRegExp,
-        beastSuccessFleeRegExp
-    ],
-    excludes: [regularBeast.conditional]
+        beastSuccessFleeRegExp,
+        beastDefeatCapsLostRegExp,
+        beastDefeatMaterialsLostRegExp
+    ]
 }
 
 const deathMessage = {
