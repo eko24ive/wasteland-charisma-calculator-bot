@@ -11,6 +11,7 @@ const moment = require('moment');
 
 const beastSchema = require('./src/schemes/beast');
 const locationSchema = require('./src/schemes/location');
+const giantScheme = require('./src/schemes/giant');
 const userSchema = require('./src/schemes/user');
 
 
@@ -20,6 +21,8 @@ const parseLocation = require('./src/parsers/parseLocation');
 const parseFlee = require('./src/parsers/parseFlee');
 const parseDeathMessage = require('./src/parsers/parseDeathMessage');
 const parseBeastFaced = require('./src/parsers/parseBeastFaced');
+const parseGiantFaced = require('./src/parsers/parseGiantFaced');
+const parseGiant = require('./src/parsers/parseGiant');
 
 
 const calculateUpgrade = require('./src/calculateUpgrade');
@@ -29,8 +32,11 @@ const upgradeAmountValidation = require('./src/utils/upgradeAmountValidation');
 const processForwards = require('./src/utils/processForwards');
 
 const Beast = mongoose.model('Beast', beastSchema);
+const Giant = mongoose.model('Giant', giantScheme);
 const Location = mongoose.model('Location', locationSchema);
 const User = mongoose.model('User', locationSchema);
+
+const buttons = require('./src/ui/buttons');
 
 mongoose.connect(uristring);
 
@@ -190,123 +196,9 @@ const createSession = id => {
         pip: null,
         state: states.WAIT_FOR_START,
         data: [],
-        dataPips: []
+        dataPips: [],
+        giantsMessage: []
     };
-};
-
-const buttons = {
-    sessionAbortYes: {
-        label: "Да",
-        command: "/resetSession"
-    },
-    sessionAbortNo: {
-        label: "Нет",
-        command: "/resetSessionAbort"
-    },
-    skillSelectHealth: {
-        label: "❤ Живучесть",
-        command: "/levelUpHealth"
-    },
-    skillSelectStrength: {
-        label: "💪 Сила",
-        command: "/levelUpStrength"
-    },
-    skillSelectAccuracy: {
-        label: "🔫 Меткость",
-        command: "/levelUpAccuracy"
-    },
-    skillSelectCharisma: {
-        label: "🗣 Харизма",
-        command: "/levelUpCharisma"
-    },
-    skillSelectAgility: {
-        label: "🤸‍♀️ Ловкость",
-        command: "/levelUpAgility"
-    },
-    amountOfLevelsTen: {
-        label: "+10",
-        command: "/upgradeSkill"
-    },
-    amountOfLevelsTwenty: {
-        label: "+20",
-        command: "/upgradeSkill"
-    },
-    amountOfLevelsThirty: {
-        label: "+20",
-        command: "/upgradeSkill"
-    },
-    amountOfLevelsFourty: {
-        label: "+40",
-        command: "/upgradeSkill"
-    },
-    amountOfLevelsFifty: {
-        label: "+50",
-        command: "/upgradeSkill"
-    },
-    amountOfLevelsSixty: {
-        label: "+60",
-        command: "/upgradeSkill"
-    },
-    amountOfLevelsMAX: {
-        label: "МАКСИМАЛОЧКА",
-        command: "/upgradeSkill"
-    },
-    reachableKm20: {
-        label: "20км",
-        command: "/reachableKm"
-    },
-    reachableKm30: {
-        label: "30км",
-        command: "/reachableKm"
-    },
-    reachableKm40: {
-        label: "40км",
-        command: "/reachableKm"
-    },
-    reachableKm50: {
-        label: "50км",
-        command: "/reachableKm"
-    },
-    reachableKm60: {
-        label: "60км",
-        command: "/reachableKm"
-    },
-    reachableKm70: {
-        label: "70+ км",
-        command: "/reachableKm"
-    },
-    journeyForwardStart: {
-        label: "Скинуть лог 🏃",
-        command: "/journeyforwardstart"
-    },
-    journeyForwardEnd: {
-        label: "Стоп 🙅‍♂️",
-        command: "/journeyforwardend"
-    },
-    journeyForwardCancel: {
-        label: "Назад ↩️",
-        command: "/journeyforwardcancel"
-    },
-    showAllLocations: {
-        label: "🏜 Все локации",
-        command: "/locs_text"
-    },
-    showRaidLocations: {
-        label: "🤘 Рейдовые локации",
-        command: "/raids_text"
-    },
-    showHelp: {
-        label: "💬 Помощь",
-        command: "/show_help"
-    },
-    showDrones: {
-        label: "🛰 Дроны",
-        command: "/show_drones"
-    },
-    hallOfFame: {
-        label: "🏆 Зал Славы",
-        command: "/show_hall_of_fame"
-    }
 };
 
 const getToken = () => {
@@ -358,6 +250,9 @@ const defaultKeyboard = bot.keyboard([
     [
         buttons['showAllLocations'].label,
         buttons['showRaidLocations'].label,
+    ],
+    [
+        buttons['showGiants'].label,
         buttons['showDrones'].label
     ],
     [
@@ -524,6 +419,14 @@ bot.on('forward', (msg) => {
             regexpSet: regexps.regularBeastFaced
         });
 
+        const isGiantFaced = regExpSetMatcher(msg.text, {
+            regexpSet: regexps.giantFaced
+        });
+
+        const isGiantFought = regExpSetMatcher(msg.text, {
+            regexpSet: regexps.giantFought
+        });
+
         if (_.isObject(pip)) {
             sessions[msg.from.id].pip = pip;
             sessions[msg.from.id].state = states.WAIT_FOR_SKILL;
@@ -535,8 +438,90 @@ bot.on('forward', (msg) => {
                 resize: true
             });
 
-            return bot.sendMessage(msg.from.id, 'Что качать будешь?', {
+            return msg.reply.text('Что качать будешь?', {
                 replyMarkup
+            });
+        } else if (isGiantFaced) {
+            const giant = parseGiantFaced(msg.text);
+            
+            Giant.findOne({
+                name: giant.name,
+                distance: giant.distance
+            }).then(fGiant => {
+                if (fGiant === null) {
+                    const newGiant = new Giant({
+                        distance: giant.distance,
+                        name: giant.name,
+                        health: {
+                            current: giant.healthCurrent,
+                            cap: giant.healthCap
+                        },
+                        forwardStamp: msg.forward_date
+                    });
+
+                    newGiant.save().then(res => {
+                        return msg.reply.text('Спасибо за форвард! Я добавил его в базу!', {
+                            asReply: true
+                        });
+                    })
+                } else {
+                    if (fGiant.forwardStamp >= msg.forward_date) {
+                        return msg.reply.text(`Прости, у меня есть более свежая иформация про *${giant.name}*`, {
+                            asReply: true,
+                            parseMode: 'markdown'
+                        });
+                    } else {
+                        fGiant.health.current = giant.healthCurrent;
+                        fGiant.health.cap = giant.healthCap;
+                        fGiant.forwardStamp = msg.forward_date;
+
+                        fGiant.save().then(res => {
+                            return msg.reply.text(`Спасибо за форвард! Я обновил ${giant.name} в базе!`, {
+                                asReply: true
+                            });
+                        })
+                    }
+                }
+            })
+        } else if (isGiantFought) {
+            const giant = parseGiant(msg.text);
+
+            Giant.findOne({
+                name: giant.name
+            }).then(fGiant => {
+                if (fGiant === null) {
+                    const newGiant = new Giant({
+                        name: giant.name,
+                        health: {
+                            current: giant.healthCurrent,
+                            cap: giant.healthCap
+                        },
+                        forwardStamp: msg.forward_date
+                    });
+
+                    newGiant.save().then(res => {
+                        return msg.reply.text('Спасибо за форвард! Я добавил его в базу!', {
+                            asReply: true
+                        });
+                    })
+                } else {
+                    if (fGiant.forwardStamp >= msg.forward_date) {
+                        return msg.reply.text(`Прости, у меня есть более свежая иформация про *${giant.name}*`, {
+                            asReply: true,
+                            parseMode: 'markdown'
+                        });
+                    } else {
+                        fGiant.health.current = giant.healthCurrent;
+                        fGiant.health.cap = giant.healthCap;
+                        fGiant.forwardStamp = msg.forward_date;
+
+                        fGiant.save().then(res => {
+                            return msg.reply.text(`Спасибо за форвард! Я обновил ${giant.name} в базе!`, {
+                                asReply: true
+                            });
+                        })
+                    }
+                }
             });
         } else if (isRegularBeast) {
             const beast = parseBeastFaced.parseRegularBeastFaced(msg.text);
@@ -817,12 +802,7 @@ bot.on('/upgradeSkill', msg => {
 });
 
 bot.on('/journeyforwardstart', msg => {
-    if (sessions[msg.from.id] === undefined) {
-        createSession(msg.from.id);
-    }
-
-    sessions[msg.from.id].dataPips = [];
-    sessions[msg.from.id].data = [];
+    createSession(msg.from.id);
 
     let inlineReplyMarkup = bot.inlineKeyboard([
         [
@@ -1260,7 +1240,11 @@ bot.on('/show_drones', msg => msg.reply.text(`
 }));
 
 bot.on('/show_hall_of_fame', msg => msg.reply.text(`
-<code>Здесь увековечены жители и организации пустоши, оказавшие титаническую помощь на этапе открытой беты</code>
+<code>Здесь увековечены жители и организации пустоши, оказавшие титаническую помощь на этапе открытой беты, и развития бота ещё как Скилокачатора</code>
+
+Самому харизматичному человеку в Пустоши - Илье (@Rev1veD) Фунту
+
+Низкий поклон Владимиру (@radueff) Кузьмичёву - создателю бота-хелпера
 
 Ядерная благодарность каналу @nushit за информацию про дронов
 https://t.me/nushit/393
@@ -1277,5 +1261,107 @@ https://t.me/trust_42/57
     parseMode: 'html',
     webPreview: false
 }));
+
+const giantsKeyboard = bot.inlineKeyboard([
+    [
+        bot.inlineButton('🔄 Обновить', {callback: 'update_giants'}),
+        bot.inlineButton('ℹ️ Информация', {callback: 'show_info'})
+    ]
+]);
+
+
+
+bot.on('/show_giants', msg => {
+    
+    
+
+Giant.find({}).then(giants => {
+    if (sessions[msg.from.id] === undefined) {
+        createSession(msg.from.id);
+    }
+
+    const giantsReply = giants.map(giant => {
+    const isDead = giant.health.current <= 0;
+    const time = moment(1526058154, 'X').format('DD.MM hh:mm');
+    
+    return `▫️ *${giant.name}* (${giant.distance}км) - ${time} - ${isDead ? 'убит' : `❤️${giant.health.current}`}`;
+});
+
+        const reply = `
+Текущее состояние по гигантам:
+
+${giantsReply.join('\n')}
+
+_Скидывайте форварды о встрече или бое и с гигантом - они запишутся автоматом_
+_Если гиганта в нет в списке - значи его ещё не присылали боту_
+`;
+
+        return msg.reply.text(reply, {
+            parseMode: 'markdown',
+            replyMarkup: giantsKeyboard
+        }).then(re => {
+            sessions[msg.from.id].giantsMessage = [msg.from.id, re.message_id];
+        })
+    });
+});
+
+// On button callback
+bot.on('callbackQuery', msg => {
+    // Send confirm
+    bot.answerCallbackQuery(msg.id);
+
+    const chatId = msg.from.id;
+    const messageId = msg.message.message_id;
+
+    if(msg.data === 'update_giants') {
+        Giant.find({}).then(giants => {
+            const giantsReply = giants.map(giant => {
+            const isDead = giant.health.current <= 0;
+            const time = moment(1526058154, 'X').format('DD.MM hh:mm');
+            
+            return `▫️ *${giant.name}* (${giant.distance}км) - ${time} - ${isDead ? 'убит' : `❤️${giant.health.current}`}`;
+        });
+        
+                const reply = `
+Текущее состояние по гигантам:
+
+${giantsReply.join('\n')}
+
+_Скидывайте форварды о встрече или бое и с гигантом - они запишутся автоматом_
+_Если гиганта в нет в списке - значи его ещё не присылали боту_
+        `;
+
+            
+        
+            return bot.editMessageText({chatId, messageId}, reply,{replyMarkup: giantsKeyboard, parseMode: 'markdown'});
+        }).catch(e => console.log(e));
+    } else if (msg.data === 'show_info') {
+
+        const reply = `
+На данный момент известно о следующих гигантах:
+▫️26км - 🗿Радиоактивный Голем 
+▫️36км - 🤖Киборг Анклава 
+▫️44км - 👹Повелитель Пустоши 
+▫️55км - ☠️Киберкоготь 
+▫️64км - 🐺Яо-Гигант 
+
+Гиганты имеют огромный запас здоровья. Игрок встречает гиганта, не убив которого нельзя пройти дальше. Каждый игрок может атаковать этого Гиганта.
+
+Если Гигант вас ударит в ответ и у вас не менее 11 единиц здоровья, то у вас останется 1 хп. Если у вас остается менее 11 единиц здоровья и вы получаете удар, то вы умираете.
+
+Гиганты общие для всех фракций, соответственно, чем больше игроков их атакуют, тем быстрее все смогут ходить дальше.
+
+После победы над Гигантом, он вновь появится на том же километре через 12 часов, за которые можно беспрепятственно проходить дальше в Пустошь вплоть до следующего Гиганта.
+        `;
+
+        return bot.editMessageText({chatId, messageId}, reply,{
+            replyMarkup: giantsKeyboard,
+            parseMode: 'markdown'
+        });
+    }
+
+});
+
+
 
 bot.start();
