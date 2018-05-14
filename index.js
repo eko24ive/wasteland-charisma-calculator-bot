@@ -316,7 +316,7 @@ bot.on('forward', (msg) => {
             asReply: true
         })
     }
-    
+
     if (sessions[msg.from.id] === undefined) {
         createSession(msg.from.id);
     }
@@ -443,7 +443,7 @@ bot.on('forward', (msg) => {
             });
         } else if (isGiantFaced) {
             const giant = parseGiantFaced(msg.text);
-            
+
             Giant.findOne({
                 name: giant.name,
                 distance: giant.distance
@@ -547,12 +547,12 @@ bot.on('forward', (msg) => {
 
                     const getDrop = (capsReceived, materialsReceived) => {
                         if(_.isEmpty(capsReceived) && _.isEmpty(materialsReceived)) {
-                            return 'Нет данных';    
+                            return 'Нет данных';
                         }
 
                         return `🕳${minMax(capsReceived)} крышек
 📦${minMax(materialsReceived)} материалов`;
-                        
+
                     }
 
                     const getItems = items => {
@@ -584,7 +584,7 @@ bot.on('forward', (msg) => {
 
                         if(successFlees.length > 5) {
                             successFlees = successFlees.slice(0,5);
-                        } 
+                        }
 
                         if(failFlees.length > 5) {
                             failFlees = failFlees.slice(0,5);
@@ -623,7 +623,7 @@ bot.on('forward', (msg) => {
                             }
                         }
 
-                       
+
 
                         let successBattles = [];
                         let failBattles = [];
@@ -632,18 +632,18 @@ bot.on('forward', (msg) => {
                             if (battle.outcome === 'win') {
                                 // TODO: Fix battle parse
                                 if(battle.stats !== undefined) {
-                                    successBattles.push(`▫️ Успешно при уроне мобу ${battle.totalDamageGiven}.\nСтаты игрока: ⚔️Урон: ${battle.stats.damage} 🛡Броня: ${battle.stats.armor}.\nВсего урона от моба получено - ${battle.damagesReceived}\n`)
+                                    successBattles.push(`▫️ Успешно при уроне мобу ${battle.totalDamageGiven}.\nСтаты игрока: ⚔️Урон: ${battle.stats.damage} 🛡Броня: ${battle.stats.armor}.\nВсего урона от моба получено - 💔${battle.totalDamageReceived}\n`)
                                 }
                             } else {
                                 if(battle.stats !== undefined) {
-                                    failBattles.push(`▫️ Неудача при уроне мобу ${battle.totalDamageGiven}.\nСтаты игрока:⚔️Урон: ${battle.stats.damage} 🛡Броня: ${battle.stats.armor}.\nВсего урона от моба получено - ${battle.damagesReceived}\n`)
+                                    failBattles.push(`▫️ Неудача при уроне мобу ${battle.totalDamageGiven}.\nСтаты игрока:⚔️Урон: ${battle.stats.damage} 🛡Броня: ${battle.stats.armor}.\nВсего урона от моба получено - 💔${battle.totalDamageReceived}\n`)
                                 }
                             }
                         });
 
                         if(successBattles.length > 5) {
                             successBattles = successBattles.slice(0,5);
-                        } 
+                        }
 
                         if(failBattles.length > 5) {
                             failBattles = failBattles.slice(0,5);
@@ -1272,8 +1272,8 @@ const giantsKeyboard = bot.inlineKeyboard([
 
 
 bot.on('/show_giants', msg => {
-    
-    
+
+
 
 Giant.find({}).then(giants => {
     if (sessions[msg.from.id] === undefined) {
@@ -1283,7 +1283,7 @@ Giant.find({}).then(giants => {
     const giantsReply = giants.map(giant => {
     const isDead = giant.health.current <= 0;
     const time = moment(1526058154, 'X').format('DD.MM hh:mm');
-    
+
     return `▫️ *${giant.name}* (${giant.distance}км) - ${time} - ${isDead ? 'убит' : `❤️${giant.health.current}`}`;
 });
 
@@ -1318,10 +1318,10 @@ bot.on('callbackQuery', msg => {
             const giantsReply = giants.map(giant => {
             const isDead = giant.health.current <= 0;
             const time = moment(1526058154, 'X').format('DD.MM hh:mm');
-            
+
             return `▫️ *${giant.name}* (${giant.distance}км) - ${time} - ${isDead ? 'убит' : `❤️${giant.health.current}`}`;
         });
-        
+
                 const reply = `
 Текущее состояние по гигантам:
 
@@ -1331,8 +1331,8 @@ _Скидывайте форварды о встрече или бое и с г�
 _Если гиганта в нет в списке - значи его ещё не присылали боту_
         `;
 
-            
-        
+
+
             return bot.editMessageText({chatId, messageId}, reply,{replyMarkup: giantsKeyboard, parseMode: 'markdown'});
         }).catch(e => console.log(e));
     } else if (msg.data === 'show_info') {
