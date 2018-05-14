@@ -897,7 +897,12 @@ _${reportData.criticalError}_
 
     console.log({
         reportData,
-        updatesData
+        updatesData,
+        telegram: {
+            id: msg.from.id,
+            firstName: msg.from.first_name,
+            userName: msg.from.username
+        }
     });
 
     /* User.findOne({
