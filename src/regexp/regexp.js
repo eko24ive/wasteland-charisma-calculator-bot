@@ -117,6 +117,9 @@ const flee = {
         beastSuccessFleeRegExp,
         beastDefeatCapsLostRegExp,
         beastDefeatMaterialsLostRegExp
+    ],
+    excludes: [
+        beastNameRegExp
     ]
 }
 
