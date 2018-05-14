@@ -604,7 +604,7 @@ bot.on('forward', (msg) => {
                         const mappedConcussions = concussions.map(concussion => {
                             // TODO: Fix concussion parse
                             if(concussion.stats !== undefined) {
-                                return `▫️ ${concussion.amount} оглушений при 🤸🏽‍♂️${concussion.stats.agility}\n`;
+                                return `▫️ ${concussion.amount} 💫оглушений при 🤸🏽‍♂️${concussion.stats.agility}\n`;
                             }
 
                             return false
@@ -613,6 +613,8 @@ bot.on('forward', (msg) => {
                         if (_.isEmpty(mappedConcussions)) {
                             return 'Нет данных';
                         }
+
+                        return mappedConcussions;
                     }
 
                     const getBattles = battles => {
