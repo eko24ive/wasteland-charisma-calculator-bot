@@ -1307,13 +1307,8 @@ const giantsKeyboard = bot.inlineKeyboard([
 bot.on('/show_giants', msg => {
 
 
-
 Giant.find({}).then(giants => {
-    if (sessions[msg.from.id] === undefined) {
-        createSession(msg.from.id);
-    }
-
-    const giantsReply = giants.map(giant => {
+    const giantsReply = _.sortBy(giants, 'distance').map(giant => {
     const isDead = giant.health.current <= 0;
     const time = moment(1526058154, 'X').format('DD.MM hh:mm');
 
@@ -1325,8 +1320,8 @@ Giant.find({}).then(giants => {
 
 ${_.isEmpty(giantsReply.join('\n')) ? 'Пока что данных нет' : giantsReply.join('\n')}
 
-_Скидывайте форварды о встрече или бое и с гигантом - они запишутся автоматом_
-_Если гиганта в нет в списке - значи его ещё не присылали боту_
+_Скидывайте форварды о встрече или бое с гигантом - они запишутся автоматом._
+_Если гиганта нет в списке - значит его ещё не присылали боту_
 `;
 
         return msg.reply.text(reply, {
@@ -1348,20 +1343,20 @@ bot.on('callbackQuery', msg => {
 
     if(msg.data === 'update_giants') {
         Giant.find({}).then(giants => {
-            const giantsReply = giants.map(giant => {
+            const giantsReply = _.sortBy(giants, 'distance').map(giant => {
             const isDead = giant.health.current <= 0;
             const time = moment(1526058154, 'X').format('DD.MM hh:mm');
-
+        
             return `▫️ *${giant.name}* (${giant.distance}км) - ${time} - ${isDead ? 'убит' : `❤️${giant.health.current}`}`;
         });
-
+        
                 const reply = `
 Текущее состояние по гигантам:
 
 ${_.isEmpty(giantsReply.join('\n')) ? 'Пока что данных нет' : giantsReply.join('\n')}
 
-_Скидывайте форварды о встрече или бое и с гигантом - они запишутся автоматом_
-_Если гиганта в нет в списке - значи его ещё не присылали боту_
+_Скидывайте форварды о встрече или бое с гигантом - они запишутся автоматом._
+_Если гиганта нет в списке - значит его ещё не присылали боту_
         `;
 
 
