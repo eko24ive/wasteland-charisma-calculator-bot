@@ -604,7 +604,7 @@ bot.on('forward', (msg) => {
                         const mappedConcussions = concussions.map(concussion => {
                             // TODO: Fix concussion parse
                             if(concussion.stats !== undefined) {
-                                return `▫️ ${concussion.amount} 💫оглушений при 🤸🏽‍♂️${concussion.stats.agility}\n`;
+                                return `▫️ ${concussion.amount} 💫оглушений при 🤸🏽‍♂️${concussion.stats.agility}`;
                             }
 
                             return false
@@ -614,7 +614,7 @@ bot.on('forward', (msg) => {
                             return 'Нет данных';
                         }
 
-                        return mappedConcussions;
+                        return mappedConcussions.join('\n');
                     }
 
                     const getBattles = battles => {
@@ -1246,7 +1246,9 @@ bot.on('/show_hall_of_fame', msg => msg.reply.text(`
 
 Самому харизматичному человеку в Пустоши - Илье (@Rev1veD) Фунту
 
-Низкий поклон Владимиру (@radueff) Кузьмичёву - создателю бота-хелпера
+Низкий поклон Владимиру (@radueff) Кузьмичёву - создателю первого бота-хелпера
+
+Бунтарная благодарочка каналу @chetirka_bund за помощь в распостронении инфы о боте-ассистенте
 
 Ядерная благодарность каналу @nushit за информацию про дронов
 https://t.me/nushit/393
