@@ -363,9 +363,9 @@ bot.on('forward', (msg) => {
             regexpSet: regexps.regularBeast
         });
 
-        /* const isDungeonBeast = regExpSetMatcher(msg.text, {
+        const isDungeonBeast = regExpSetMatcher(msg.text, {
             regexpSet: regexps.dungeonBeast
-        }); */
+        });
 
         const isFlee = regExpSetMatcher(msg.text, {
             regexpSet: regexps.flee
@@ -389,15 +389,13 @@ bot.on('forward', (msg) => {
         /* if (isDungeonBeast) {
             data = beastParser.parseDungeonBeast(msg.text);
             dataType = 'dungeonBeast';
-        } else */
-
-        if (isFlee) {
+        } else */ if (isFlee) {
             data = parseFlee(msg.text);
             dataType = 'flee';
         } else if (isDeathMessage) {
             data = parseDeathMessage(msg.text);
             dataType = 'deathMessage';
-        } else if (isRegularBeast) {
+        } else if (isRegularBeast && !isDungeonBeast) {
             data = beastParser.parseRegularBeast(msg.text);
             dataType = 'regularBeast';
         } else if (isLocation) {
@@ -411,7 +409,7 @@ bot.on('forward', (msg) => {
 
 
         // isDungeonBeast ||
-        if (isRegularBeast || isLocation || isFlee || isDeathMessage || parseBeastFaced) {
+        if (isRegularBeast || isLocation || isFlee || isDeathMessage) {
             sessions[msg.from.id].data.push({
                 data,
                 dataType,
@@ -1351,10 +1349,10 @@ bot.on('callbackQuery', msg => {
             const giantsReply = _.sortBy(giants, 'distance').map(giant => {
             const isDead = giant.health.current <= 0;
             const time = moment(giant.forwardStamp, 'X').format('DD.MM HH:mm');
-        
+
             return `▫️ *${giant.name}* (${giant.distance}км) - ${time} - ${isDead ? 'убит' : `❤️${giant.health.current}`}`;
         });
-        
+
                 const reply = `
 Текущее состояние по гигантам:
 
