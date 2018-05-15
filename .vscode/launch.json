@@ -7,20 +7,8 @@
         {
             "type": "node",
             "request": "launch",
-            "name": "Test",
-            "program": "${workspaceFolder}/test.js"
-        },
-        {
-            "type": "node",
-            "request": "launch",
             "name": "Runner",
             "program": "${workspaceFolder}/src/database/runner.js"
-        },
-        {
-            "type": "node",
-            "request": "launch",
-            "name": "Launch Program",
-            "program": "${workspaceFolder}/test.js"
         },
         {
             "type": "node",
