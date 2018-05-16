@@ -582,10 +582,12 @@ bot.on('forward', (msg) => {
                         let failFlees = [];
 
                         flees.forEach(flee => {
-                            if (flee.outcome === 'win') {
-                                successFlees.push(`▫️ Успешно при 🤸🏽‍♂️${flee.stats.agility || flee.agility}\n`);
-                            } else {
-                                failFlees.push(`▫️ Не успешно при 🤸🏽‍♂️${flee.stats.agility  || flee.agility}, урон - 💔${flee.damageReceived}`);
+                            if(flee.stats) {
+                                if (flee.outcome === 'win') {
+                                    successFlees.push(`▫️ Успешно при 🤸🏽‍♂️${flee.stats.agility || flee.agility}\n`);
+                                } else {
+                                    failFlees.push(`▫️ Не успешно при 🤸🏽‍♂️${flee.stats.agility  || flee.agility}, урон - 💔${flee.damageReceived}`);
+                                }
                             }
                         });
 
@@ -1184,13 +1186,35 @@ bot.on('/skippipforward', msg => {
 bot.on('/version', msg => msg.reply.text(config.version))
 
 bot.on('/debug', msg => {
-    return msg.reply.text(`
-Я не заметил в форвардах твоего пип-боя, можешь мне его дослать?
-Если у тебя нет на это времени жми /skippipforward
+    
+    let inlineReplyMarkup = bot.inlineKeyboard([
+        [
+            bot.inlineButton('Инфо', {callback: 'https://t.me/WastelandWarsBot'}),
+            bot.inlineButton('Лут', {callback: 'https://t.me/WastelandWarsBot'}),
+            bot.inlineButton('Бой', {callback: 'https://t.me/WastelandWarsBot'}),
+            bot.inlineButton('Побег', {callback: 'https://t.me/WastelandWarsBot'}),
+            bot.inlineButton('Оглушения', {callback: 'https://t.me/WastelandWarsBot'})
+        ]
+    ]);
 
-*ВНИМАЕНИЕ: НАЖИМАЯ /skippipforward - БОТ ПРОИГНОРИРУЕТ ТВОИ БИТВЫ И ПОБЕГИ ОТ МОБОВ И НЕ ЗАПИШЕТ ИХ В БАЗУ*
+    return msg.reply.text(`
+*🦎Геккон (⭐️)*
+Был замечен на 1-181км
+
+
+*Самый удачный бой при наименьшем уроне*:
+Уроне мобу 2899.
+Статы игрока: ⚔️Урон: 1365 🛡Броня: 290.
+Всего урона от моба получено - 💔749
+
+*Самый не удачный бой при наименьшем уроне*:
+Уроне мобу 1500.
+Статы игрока: ⚔️Урон: 866 🛡Броня: 110.
+Всего урона от моба получено - 💔500
 `, {
     parseMode: 'markdown',
+    replyMarkup: inlineReplyMarkup,
+    resize: false
 });
 })
 
