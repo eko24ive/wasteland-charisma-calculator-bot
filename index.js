@@ -28,6 +28,7 @@ const calculateUpgrade = require('./src/calculateUpgrade');
 const upgradeAmountValidation = require('./src/utils/upgradeAmountValidation');
 const processForwards = require('./src/utils/processForwards');
 const getRanges = require('./src/utils/getRanges');
+const tinyHash = require('./src/utils/tinyHash');
 
 const Beast = mongoose.model('Beast', beastSchema);
 const Giant = mongoose.model('Giant', giantScheme);
@@ -1309,6 +1310,20 @@ const giantsKeyboard = bot.inlineKeyboard([
     ]
 ]);
 
+const beastRangesKeyboard = bot.inlineKeyboard(_.chunk(getRanges.map(range => {
+    const first = _.min(range);
+    const last = _.max(range);
+
+    if (first !== last) {
+        return bot.inlineButton(`${first}-${last}`, {
+            callback: `show_beast_${first}-${last}`
+        });
+    }
+    return bot.inlineButton(`${first}`, {
+        callback: `show_beast_${first}-${first}`
+    });
+}), 5));
+
 
 
 bot.on('/show_giants', msg => {
@@ -1341,11 +1356,11 @@ _Если гиганта нет в списке - значит его ещё н�
 });
 
 bot.on('/show_beasts', msg => {
-    Beast.find({isDungeon:false}).then(beasts => {
-        const ranges = getRanges(beasts);
+    
 
-        console.log(JSON.stringify(ranges));
-    }).catch(e => console.log(e));
+    msg.reply.text('wow', {
+        replyMarkup: beastRangesKeyboard
+    }).catch(e => console.log(e))
 })
 
 // On button callback
@@ -1355,6 +1370,7 @@ bot.on('callbackQuery', msg => {
 
     const chatId = msg.from.id;
     const messageId = msg.message.message_id;
+    const showMobRegExp = /show_beast_(\d+)-(\d+)/;
 
     if(msg.data === 'update_giants') {
         Giant.find({}).then(giants => {
@@ -1401,6 +1417,38 @@ _Если гиганта нет в списке - значит его ещё н�
             replyMarkup: giantsKeyboard,
             parseMode: 'markdown'
         });
+    } else if (showMobRegExp.test(msg.data)) {
+        const [, from, to] = showMobRegExp.exec(msg.data);
+        
+
+        Beast.find({isDungeon: false}).then(beasts => {
+            const beastsInRange = beasts.filter(beast => {
+                return beast.distanceRange.some(distance => {
+                    return Number(from) <= distance && distance <= Number(to);
+                })
+            });
+
+            const beastsList = beastsInRange.map(beast => {
+                return `
+${beast.name}
+/mob_${beast.id}`;
+            }).join('\n');
+
+            console.log(beastsInRange);
+
+            const reply = `
+<b>Мобы на ${from}-${to}км</b>
+
+${beastsList}
+`;
+
+            return bot.editMessageText({chatId, messageId}, reply,{
+                replyMarkup: beastRangesKeyboard,
+                parseMode: 'html'
+            }).catch(e => console.log(e));
+        });
+
+        
     }
 
 });
