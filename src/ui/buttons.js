@@ -114,5 +114,9 @@ module.exports = {
     showGiants: {
         label: "🦂Гиганты",
         command: "/show_giants"
+    },
+    showBeasts: {
+        label: "💀Мобы",
+        command: "/show_beasts"
     }
 };
