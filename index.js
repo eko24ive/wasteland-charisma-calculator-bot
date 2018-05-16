@@ -975,6 +975,11 @@ _${reportData.criticalError}_
                     }
 
                     if (!_.isEmpty(iBeast.receivedItems)) {
+
+                        if(_.isEmpty(fBeast.receivedItems)) {
+                            fBeast.receivedItems = {};
+                        }
+
                         Object.keys(iBeast.receivedItems).map((item) => {
                             const amount = iBeast.receivedItems[item];
 
