@@ -1100,9 +1100,11 @@ _${reportData.criticalError}_
                         Object.keys(iLocation.receivedBonusItems).map((item) => {
                             const amount = iLocation.receivedBonusItems[item];
 
-                            if (fLocation.receivedBonusItems[item]) {
-                                if (!_.contains(fLocation.receivedBonusItems[item], amount)) {
-                                    fLocation.receivedBonusItems[item].push(amount);
+                            if (!_.isEmpty(fLocation.receivedBonusItems)) {
+                                if (fLocation.receivedBonusItems[item]) {
+                                    if (!_.contains(fLocation.receivedBonusItems[item], amount)) {
+                                        fLocation.receivedBonusItems[item].push(amount);
+                                    }
                                 }
                             } else {
                                 fLocation.receivedBonusItems[item] = [amount];
