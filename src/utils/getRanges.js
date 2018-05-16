@@ -2,10 +2,10 @@ const _ = require('underscore');
 var async = require('async');
 
 const multiDimensionalUnique = arr => {
-  const uniques = [];
-  const itemsFound = {};
-  for (const i = 0, l = arr.length; i < l; i++) {
-    const stringified = JSON.stringify(arr[i]);
+  let uniques = [];
+  let itemsFound = {};
+  for (let i = 0, l = arr.length; i < l; i++) {
+    let stringified = JSON.stringify(arr[i]);
     if (itemsFound[stringified]) {
       continue;
     }
@@ -45,7 +45,7 @@ const filterDupes = array => {
 }
 
 const getRanges = mobs => {
-  const sorted = a.map(data => {
+  const sorted = mobs.map(data => {
     return data.distanceRange.sort((a, b) => {
       if (a < b)
         return -1;
@@ -76,7 +76,13 @@ const getRanges = mobs => {
     return [first];
   });
 
-  const dupeless = multiDimensionalUnique(ranged);
+  const dupeless = multiDimensionalUnique(ranged).sort((a, b) => {
+    if (a[0] < b[0])
+      return -1;
+    if (a[0] > b[0])
+      return 1;
+    return 0;
+  });
 
   let filtered = filterDupes(dupeless);
 
@@ -93,7 +99,28 @@ const getRanges = mobs => {
     }
   );
 
-  return filtered;
+  const noSinglePoints = {};
+
+  filtered.forEach((range, index) => {
+    if(range.length !== 2 && (index + 1) < filtered.length) {
+      let nextRange = filtered[index + 1];
+      nextRange.push(range[0]);
+
+
+      const first = _.first(nextRange);
+      const last = _.last(nextRange);
+
+      noSinglePoints[`${first}-${last}`] = [first, last];
+
+    } else if (range.length === 2 && (index + 1) < filtered.length) {
+      if(noSinglePoints[`${range[0]}-${range[1]}`] === undefined) {
+        noSinglePoints[`${range[0]}-${range[1]}`] = range;
+      }
+    }
+  })
+
+  // return Object.keys(noSinglePoints).map(key => noSinglePoints[key].sort());
+  return dupeless;
 }
 
 module.exports = getRanges;

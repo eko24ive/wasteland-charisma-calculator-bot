@@ -8,7 +8,6 @@ const TeleBot = require('telebot');
 const program = require('commander');
 const moment = require('moment');
 
-
 const beastSchema = require('./src/schemes/beast');
 const locationSchema = require('./src/schemes/location');
 const giantScheme = require('./src/schemes/giant');
@@ -26,10 +25,9 @@ const parseGiant = require('./src/parsers/parseGiant');
 
 
 const calculateUpgrade = require('./src/calculateUpgrade');
-
 const upgradeAmountValidation = require('./src/utils/upgradeAmountValidation');
-
 const processForwards = require('./src/utils/processForwards');
+const getRanges = require('./src/utils/getRanges');
 
 const Beast = mongoose.model('Beast', beastSchema);
 const Giant = mongoose.model('Giant', giantScheme);
@@ -253,6 +251,7 @@ const defaultKeyboard = bot.keyboard([
     ],
     [
         buttons['showGiants'].label,
+        buttons['showBeasts'].label,
         buttons['showDrones'].label
     ],
     [
@@ -1340,6 +1339,14 @@ _Если гиганта нет в списке - значит его ещё н�
         })
     });
 });
+
+bot.on('/show_beasts', msg => {
+    Beast.find({isDungeon:false}).then(beasts => {
+        const ranges = getRanges(beasts);
+
+        console.log(JSON.stringify(ranges));
+    }).catch(e => console.log(e));
+})
 
 // On button callback
 bot.on('callbackQuery', msg => {
