@@ -30,7 +30,6 @@ const processForwards = require('./src/utils/processForwards');
 const getRanges = require('./src/utils/getRanges');
 const tinyHash = require('./src/utils/tinyHash');
 
-const regularBeastView = require('./src/views/regularBeastView');
 const routedBeastView = require('./src/views/routedBeastView');
 
 const Beast = mongoose.model('Beast', beastSchema);
