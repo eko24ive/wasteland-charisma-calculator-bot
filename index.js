@@ -1252,10 +1252,13 @@ bot.on('/show_beasts', msg => {
 
 Жмякай по <b>/mob_1234qwerty...</b> под нужным вам мобом, после вам будет доступна "карточка" простомтра моба с вкладками:
 [<code>Инфо</code>], [<code>Лут</code>], [<code>Бой</code>] и [<code>Оглушения</code>]
+
+Гайд тут: https://teletype.in/@eko24/Sy4pCyiRM
 `;
     msg.reply.text(reply, {
         replyMarkup: beastRangesKeyboard,
-        parseMode: 'html'
+        parseMode: 'html',
+        webPreview: false
     }).catch(e => console.log(e))
 });
 
