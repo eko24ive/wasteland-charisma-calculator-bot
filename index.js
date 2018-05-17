@@ -486,7 +486,7 @@ bot.on('forward', (msg) => {
                     })
                 } else {
                     const time = Number(moment.tz(moment().valueOf(), "Europe/Moscow").format('X'));
-                    
+
                     if (fGiant.forwardStamp >= time) {
                         return msg.reply.text(`Прости, у меня есть более свежая иформация про *${giant.name}*`, {
                             asReply: true,
@@ -1052,7 +1052,7 @@ bot.on('/skippipforward', msg => {
 bot.on('/version', msg => msg.reply.text(config.version))
 
 bot.on('/debug', msg => {
-    
+
     let inlineReplyMarkup = bot.inlineKeyboard([
         [
             bot.inlineButton('Инфо', {callback: 'https://t.me/WastelandWarsBot'}),
@@ -1283,8 +1283,6 @@ bot.on(/mob_(.+)/, msg => {
 })
 
 bot.on('callbackQuery', msg => {
-    // Send confirm
-
     const chatId = msg.from.id;
     const messageId = msg.message.message_id;
     const showMobRegExp = /show_beast_(\d+)-(\d+)/;
