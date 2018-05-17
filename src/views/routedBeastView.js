@@ -55,9 +55,9 @@ const routedBeastView = (Beast, seachParams, route) => {
 
                     flees.forEach(flee => {
                         if (flee.outcome === 'win') {
-                            successFlees.push(`✔️ при 🤸‍♂️${flee.stats.agility || flee.agility}\n`);
+                            successFlees.push(`Успешно при 🤸‍♂️${flee.stats.agility || flee.agility}\n`);
                         } else {
-                            failFlees.push(`❌ при 🤸‍♂️${flee.stats.agility  || flee.agility} (-💔${flee.damageReceived})`);
+                            failFlees.push(`Неудача при 🤸‍♂️${flee.stats.agility  || flee.agility} (-💔${flee.damageReceived})`);
                         }
                     });
 
@@ -163,7 +163,7 @@ const routedBeastView = (Beast, seachParams, route) => {
                 const {
                     successBattles: successBattlesShort,
                     failBattles: failBattlesShort
-                } = getBattles(beast.battles, 1, true);
+                } = getBattles(beast.battles, 1, false);
 
                 const processedFlees = getFlees(beast.flees);
 
