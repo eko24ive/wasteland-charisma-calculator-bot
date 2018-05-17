@@ -54,10 +54,12 @@ const routedBeastView = (Beast, seachParams, route) => {
                     let failFlees = [];
 
                     flees.forEach(flee => {
-                        if (flee.outcome === 'win') {
-                            successFlees.push(`Успешно при 🤸‍♂️${flee.stats.agility || flee.agility}\n`);
-                        } else {
-                            failFlees.push(`Неудача при 🤸‍♂️${flee.stats.agility  || flee.agility} (-💔${flee.damageReceived})`);
+                        if(flee.stats) {
+                            if (flee.outcome === 'win') {
+                                successFlees.push(`Успешно при 🤸‍♂️${flee.stats.agility || flee.agility}\n`);
+                            } else {
+                                failFlees.push(`Неудача при 🤸‍♂️${flee.stats.agility  || flee.agility} (-💔${flee.damageReceived})`);
+                            }
                         }
                     });
 
@@ -133,7 +135,7 @@ const routedBeastView = (Beast, seachParams, route) => {
                                 if(small) {
                                     battleReply = `💥${battle.totalDamageGiven} не хватило мобу за ${battle.damagesGiven.length} удар(а)`;
                                 } else {
-                                    const battleReply = `▫️ Неудача при уроне мобу ${battle.totalDamageGiven}.\nСтаты игрока:⚔️Урон: ${battle.stats.damage} 🛡Броня: ${battle.stats.armor}.\nВсего урона от моба получено -${damageReceived(battle)}`;
+                                    battleReply = `▫️ Неудача при уроне мобу ${battle.totalDamageGiven}.\nСтаты игрока:⚔️Урон: ${battle.stats.damage} 🛡Броня: ${battle.stats.armor}.\nВсего урона от моба получено -${damageReceived(battle)}`;
                                 }
 
                                 failBattles.push({battleReply, totalDamageReceived: battle.totalDamageReceived})
@@ -142,12 +144,15 @@ const routedBeastView = (Beast, seachParams, route) => {
                     });
 
                     if (successBattles.length > trim) {
-                        successBattles = _.first(_.sortBy(successBattles, 'totalDamageGiven'),trim).map(battle => battle.battleReply);
+                        successBattles = _.first(_.sortBy(successBattles, 'totalDamageGiven'),trim);
                     }
 
                     if (failBattles.length > trim) {
-                        failBattles = _.last(_.sortBy(failBattles, 'totalDamageReceived'),trim).map(battle => battle.battleReply);
+                        failBattles = _.last(_.sortBy(failBattles, 'totalDamageReceived'),trim);
                     }
+
+                    successBattles = successBattles.map(battle => battle.battleReply);
+                    failBattles = failBattles.map(battle => battle.battleReply);
 
                     return {
                         successBattles: _.isEmpty(successBattles) ? 'Нет данных об удачных битвах' : successBattles.join('\n'),
