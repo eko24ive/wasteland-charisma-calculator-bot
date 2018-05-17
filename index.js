@@ -166,7 +166,7 @@ const askReachableKm = (msg) => {
 }
 
 const getEffort = (msg, bot) => {
-    if (sessions[msg.from.id].state == states.WAIT_FOR_START) {
+    if (sessions[msg.from.id].state === states.WAIT_FOR_START) {
         return false;
     }
 
@@ -660,13 +660,13 @@ bot.on('/upgradeSkill', msg => {
         const pip = sessions[msg.from.id].pip;
         const skillToUpgrade = sessions[msg.from.id].upgradeSkill;
 
-        const newText = levelsToMax(pip, skillToUpgrade, 1200);
+        const newText = levelsToMax(pip, skillToUpgrade, 1300);
         msg.text = newText;
 
         getEffort(msg, bot);
+    } else {
+        getEffort(msg, bot);
     }
-
-    getEffort(msg, bot);
 });
 
 bot.on('/journeyforwardstart', msg => {
