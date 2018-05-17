@@ -552,7 +552,7 @@ bot.on('forward', (msg) => {
             }).then(({reply, beast}) => {
                 if(reply != false) {
                     const beastReplyMarkup = getBeastKeyboard(beast._id.toJSON());
-    
+
                     return msg.reply.text(reply,{
                         replyMarkup: beastReplyMarkup,
                         parseMode: 'markdown'
@@ -1154,7 +1154,8 @@ https://t.me/trust_42/57
 
 Отдельная благодарнасть товарищу @MohanMC за помощь в форматировании
 
-<code>Большое спасибо х2</code> @K3nny2k за обнаружение ужасного бага в сохранении побегов
+<code>🏅 Медаль с отличием х1</code> и <code>ОГРОМНОЕ спасибо х4</code> @K3nny2k за обнаружение ужасного бага в сохранении побегов,
+помощь в создании каталога мобов, обнаружении нескольких багов с гигантами, и хуй знает что ещё.
 
 <code>Необычная благодарность х1</code> @x59x75x72x79 за многочисленые багрепорты о выводе инфы
 
@@ -1240,7 +1241,7 @@ bot.on(/mob_(.+)/, msg => {
     }).then(({reply,beast}) => {
         if(reply != false) {
             const beastReplyMarkup = getBeastKeyboard(beast._id.toJSON());
-            
+
             return msg.reply.text(reply, {
                 asReply: true,
                 parseMode: 'markdown',
@@ -1265,7 +1266,7 @@ bot.on('callbackQuery', msg => {
     if(msg.data === 'update_giants') {
         Giant.find({}).then(giants => {
             bot.answerCallbackQuery(msg.id);
-            
+
             const giantsReply = _.sortBy(giants, 'distance').map(giant => {
             const isDead = giant.health.current <= 0;
             const time = moment(giant.forwardStamp, 'X').format('DD.MM HH:mm');
@@ -1312,7 +1313,7 @@ _Если гиганта нет в списке - значит его ещё н�
         });
     } else if (showMobRegExp.test(msg.data)) {
         const [, from, to] = showMobRegExp.exec(msg.data);
-        
+
 
         Beast.find({isDungeon: false}).then(beasts => {
             const beastsInRange = beasts.filter(beast => {
@@ -1321,7 +1322,7 @@ _Если гиганта нет в списке - значит его ещё н�
                 })
             });
             bot.answerCallbackQuery(msg.id);
-            
+
 
             const beastsList = beastsInRange.map(beast => {
                 return `
