@@ -330,7 +330,7 @@ const getRanges = mobs => {
       merged.push(range);
     };
   }
-    
+
   });
 
   return withTuples;
@@ -354,7 +354,7 @@ const ranges = [
   [43, 51],
   [52, 56],
   [57, 65],
-  [65, 70],
+  [66, 70],
   [71, 74],
   [76, 81]
 ]
