@@ -1340,16 +1340,11 @@ _Если гиганта нет в списке - значит его ещё н�
         const [, from, to] = showMobRegExp.exec(msg.data);
 
 
-        Beast.find({isDungeon: false}).then(beasts => {
-            const beastsInRange = beasts.filter(beast => {
-                return beast.distanceRange.some(distance => {
-                    return Number(from) <= distance && distance <= Number(to);
-                })
-            });
+        Beast.find({isDungeon: false, distanceRange: {$gte: Number(from), $lte: Number(to)}}).then(beasts => {
             bot.answerCallbackQuery(msg.id);
 
 
-            const beastsList = beastsInRange.map(beast => {
+            const beastsList = beasts.map(beast => {
                 return `
 ${beast.name}
 /mob_${beast.id}`;
@@ -1364,7 +1359,7 @@ ${beastsList}
                 replyMarkup: beastRangesKeyboard,
                 parseMode: 'html'
             }).catch(e => console.log(e));
-        });
+        }).catch(e => console.log(e));;
     } else if (showMobRouteRegExp.test(msg.data)) {
         bot.answerCallbackQuery(msg.id);
 
