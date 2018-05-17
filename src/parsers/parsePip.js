@@ -107,11 +107,11 @@ const parsePip = ({ text }) => {
         error = e;
     };
 
-    console.log(`
-===============================
-[ERROR]
-${error}
-`);
+//     console.log(`
+// ===============================
+// [ERROR]
+// ${error}
+// `);
 
     return false;
 }

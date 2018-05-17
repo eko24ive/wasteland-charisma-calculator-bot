@@ -6,7 +6,7 @@ const mongoose = require('mongoose');
 const _ = require('underscore');
 const TeleBot = require('telebot');
 const program = require('commander');
-const moment = require('moment');
+const moment = require('moment-timezone');
 
 const beastSchema = require('./src/schemes/beast');
 const locationSchema = require('./src/schemes/location');
@@ -485,7 +485,9 @@ bot.on('forward', (msg) => {
                         });
                     })
                 } else {
-                    if (fGiant.forwardStamp >= msg.forward_date) {
+                    const time = Number(moment.tz(moment().valueOf(), "Europe/Moscow").format('X'));
+                    
+                    if (fGiant.forwardStamp >= time) {
                         return msg.reply.text(`Прости, у меня есть более свежая иформация про *${giant.name}*`, {
                             asReply: true,
                             parseMode: 'markdown'
@@ -493,7 +495,7 @@ bot.on('forward', (msg) => {
                     } else {
                         fGiant.health.current = giant.healthCurrent;
                         fGiant.health.cap = giant.healthCap;
-                        fGiant.forwardStamp = msg.forward_date;
+                        fGiant.forwardStamp = time;
 
                         fGiant.save().then(res => {
                             return msg.reply.text(`Спасибо за форвард! Я обновил ${giant.name} в базе!`, {
@@ -959,9 +961,11 @@ _${reportData.criticalError}_
                         Object.keys(iLocation.receivedBonusItems).map((item) => {
                             const amount = iLocation.receivedBonusItems[item];
 
-                            if (fLocation.receivedBonusItems[item]) {
-                                if (!_.contains(fLocation.receivedBonusItems[item], amount)) {
-                                    fLocation.receivedBonusItems[item].push(amount);
+                            if (!_.isEmpty(fLocation.receivedBonusItems)) {
+                                if (fLocation.receivedBonusItems[item]) {
+                                    if (!_.contains(fLocation.receivedBonusItems[item], amount)) {
+                                        fLocation.receivedBonusItems[item].push(amount);
+                                    }
                                 }
                             } else {
                                 fLocation.receivedBonusItems[item] = [amount];
@@ -1048,13 +1052,35 @@ bot.on('/skippipforward', msg => {
 bot.on('/version', msg => msg.reply.text(config.version))
 
 bot.on('/debug', msg => {
-    return msg.reply.text(`
-Я не заметил в форвардах твоего пип-боя, можешь мне его дослать?
-Если у тебя нет на это времени жми /skippipforward
+    
+    let inlineReplyMarkup = bot.inlineKeyboard([
+        [
+            bot.inlineButton('Инфо', {callback: 'https://t.me/WastelandWarsBot'}),
+            bot.inlineButton('Лут', {callback: 'https://t.me/WastelandWarsBot'}),
+            bot.inlineButton('Бой', {callback: 'https://t.me/WastelandWarsBot'}),
+            bot.inlineButton('Побег', {callback: 'https://t.me/WastelandWarsBot'}),
+            bot.inlineButton('Оглушения', {callback: 'https://t.me/WastelandWarsBot'})
+        ]
+    ]);
 
-*ВНИМАЕНИЕ: НАЖИМАЯ /skippipforward - БОТ ПРОИГНОРИРУЕТ ТВОИ БИТВЫ И ПОБЕГИ ОТ МОБОВ И НЕ ЗАПИШЕТ ИХ В БАЗУ*
+    return msg.reply.text(`
+*🦎Геккон (⭐️)*
+Был замечен на 1-181км
+
+
+*Самый удачный бой при наименьшем уроне*:
+Уроне мобу 2899.
+Статы игрока: ⚔️Урон: 1365 🛡Броня: 290.
+Всего урона от моба получено - 💔749
+
+*Самый не удачный бой при наименьшем уроне*:
+Уроне мобу 1500.
+Статы игрока: ⚔️Урон: 866 🛡Броня: 110.
+Всего урона от моба получено - 💔500
 `, {
     parseMode: 'markdown',
+    replyMarkup: inlineReplyMarkup,
+    resize: false
 });
 })
 
@@ -1194,13 +1220,13 @@ bot.on('/show_giants', msg => {
 Giant.find({}).then(giants => {
     const giantsReply = _.sortBy(giants, 'distance').map(giant => {
     const isDead = giant.health.current <= 0;
-    const time = moment(giant.forwardStamp, 'X').format('DD.MM HH:mm');
+    const time = moment(giant.forwardStamp, 'X').add(1, 'hour').format('DD.MM HH:mm');
 
-    return `▫️ *${giant.name}* (${giant.distance}км) - ${time} - ${isDead ? 'убит' : `❤️${giant.health.current}`}`;
+    return `▫️ *${giant.name}* (${giant.distance || '??'}км) - ${time} - ${isDead ? 'убит' : `❤️${giant.health.current}`}`;
 });
 
         const reply = `
-Текущее состояние по гигантам:
+Текущее состояние по гигантам (МСК):
 
 ${_.isEmpty(giantsReply.join('\n')) ? 'Пока что данных нет' : giantsReply.join('\n')}
 
