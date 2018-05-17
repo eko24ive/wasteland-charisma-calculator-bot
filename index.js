@@ -25,10 +25,12 @@ const parseGiant = require('./src/parsers/parseGiant');
 
 
 const calculateUpgrade = require('./src/calculateUpgrade');
-
 const upgradeAmountValidation = require('./src/utils/upgradeAmountValidation');
-
 const processForwards = require('./src/utils/processForwards');
+const getRanges = require('./src/utils/getRanges');
+const tinyHash = require('./src/utils/tinyHash');
+
+const routedBeastView = require('./src/views/routedBeastView');
 
 const Beast = mongoose.model('Beast', beastSchema);
 const Giant = mongoose.model('Giant', giantScheme);
@@ -247,12 +249,13 @@ const defaultKeyboard = bot.keyboard([
         buttons['journeyForwardStart'].label
     ],
     [
-        buttons['showAllLocations'].label,
-        buttons['showRaidLocations'].label,
+        buttons['showGiants'].label,
+        buttons['showBeasts'].label,
+        buttons['showDrones'].label
     ],
     [
-        buttons['showGiants'].label,
-        buttons['showDrones'].label
+        buttons['showAllLocations'].label,
+        buttons['showRaidLocations'].label,
     ],
     [
         buttons['hallOfFame'].label,
@@ -261,6 +264,19 @@ const defaultKeyboard = bot.keyboard([
 ], {
     resize: true
 });
+
+
+const getBeastKeyboard = beastId => {
+    return bot.inlineKeyboard([
+        [
+            bot.inlineButton('Инфо', {callback: `show_beast_page_info-${beastId}`}),
+            bot.inlineButton('Лут', {callback: `show_beast_page_loot-${beastId}`}),
+            bot.inlineButton('Бой', {callback: `show_beast_page_battles-${beastId}`}),
+            bot.inlineButton('Оглушения', {callback: `show_beast_page_concussions-${beastId}`})
+        ]
+    ]);
+}
+
 
 bot.on('/start', (msg) => {
     if (sessions[msg.from.id] === undefined) {
@@ -532,177 +548,21 @@ bot.on('forward', (msg) => {
         } else if (isRegularBeast) {
             const beast = parseBeastFaced.parseRegularBeastFaced(msg.text);
 
-            Beast.findOne({
+            routedBeastView(Beast, {
                 name: beast.name,
                 isDungeon: false
-            }).then(fBeast => {
-                if (fBeast !== null) {
-                    const beast = fBeast.toJSON();
+            }).then(({reply, beast}) => {
+                if(reply != false) {
+                    const beastReplyMarkup = getBeastKeyboard(beast._id.toJSON());
 
-
-                    const minMax = (array) => {
-                        const min = _.min(array);
-                        const max = _.max(array);
-
-                        if (min !== max) {
-                            return `${min}-${max}`;
-                        }
-
-                        return `${min}`;
-                    }
-
-                    const getDrop = (capsReceived, materialsReceived) => {
-                        if(_.isEmpty(capsReceived) && _.isEmpty(materialsReceived)) {
-                            return 'Нет данных';
-                        }
-
-                        return `🕳${minMax(capsReceived)} крышек
-📦${minMax(materialsReceived)} материалов`;
-
-                    }
-
-                    const getItems = items => {
-                        if (_.isEmpty(items)) {
-                            return 'Неизвестно'
-                        }
-
-                        return Object.keys(items).join(', ');
-                    }
-
-                    const getFlees = flees => {
-                        if (_.isEmpty(flees)) {
-                            return {
-                                successFlees: 'Нет данных об удачных побегах',
-                                failFlees: 'Нет данных о неудачных побегах'
-                            }
-                        }
-
-                        let successFlees = [];
-                        let failFlees = [];
-
-                        flees.forEach(flee => {
-                            if(flee.stats) {
-                                if (flee.outcome === 'win') {
-                                    successFlees.push(`▫️ Успешно при 🤸🏽‍♂️${flee.stats.agility || flee.agility}\n`);
-                                } else {
-                                    failFlees.push(`▫️ Не успешно при 🤸🏽‍♂️${flee.stats.agility  || flee.agility}, урон - 💔${flee.damageReceived}`);
-                                }
-                            }
-                        });
-
-                        if(successFlees.length > 5) {
-                            successFlees = successFlees.slice(0,5);
-                        }
-
-                        if(failFlees.length > 5) {
-                            failFlees = failFlees.slice(0,5);
-                        }
-
-                        return {
-                            successFlees: _.isEmpty(successFlees) ? 'Нет данных об удачных побегах' : successFlees.join('\n'),
-                            failFlees: _.isEmpty(failFlees) ? 'Нет данных о неудачных побегах' : failFlees.join('\n')
-                        }
-                    }
-
-                    const getConcussions = concussions => {
-                        if (_.isEmpty(concussions)) {
-                            return 'Нет данных';
-                        }
-
-                        const mappedConcussions = concussions.map(concussion => {
-                            // TODO: Fix concussion parse
-                            if(concussion.stats !== undefined) {
-                                return `▫️ ${concussion.amount} 💫оглушений при 🤸🏽‍♂️${concussion.stats.agility}`;
-                            }
-
-                            return false
-                        }).filter(concussion => concussion !== false);
-
-                        if (_.isEmpty(mappedConcussions)) {
-                            return 'Нет данных';
-                        }
-
-                        return mappedConcussions.join('\n');
-                    }
-
-                    const getBattles = battles => {
-                        if (_.isEmpty(battles)) {
-                            return {
-                                successBattles: 'Нет данных об удачных битвах',
-                                failBattles: 'Нет данных о неудачных битвах'
-                            }
-                        }
-
-
-
-                        let successBattles = [];
-                        let failBattles = [];
-
-                        battles.forEach(battle => {
-                            if (battle.outcome === 'win') {
-                                // TODO: Fix battle parse
-                                if(battle.stats !== undefined) {
-                                    successBattles.push(`▫️ Успешно при уроне мобу ${battle.totalDamageGiven}.\nСтаты игрока: ⚔️Урон: ${battle.stats.damage} 🛡Броня: ${battle.stats.armor}.\nВсего урона от моба получено - 💔${battle.totalDamageReceived}\n`)
-                                }
-                            } else {
-                                if(battle.stats !== undefined) {
-                                    failBattles.push(`▫️ Неудача при уроне мобу ${battle.totalDamageGiven}.\nСтаты игрока:⚔️Урон: ${battle.stats.damage} 🛡Броня: ${battle.stats.armor}.\nВсего урона от моба получено - 💔${battle.totalDamageReceived}\n`)
-                                }
-                            }
-                        });
-
-                        if(successBattles.length > 5) {
-                            successBattles = successBattles.slice(0,5);
-                        }
-
-                        if(failBattles.length > 5) {
-                            failBattles = failBattles.slice(0,5);
-                        }
-
-                        return {
-                            successBattles: _.isEmpty(successBattles) ? 'Нет данных об удачных битвах' : successBattles.join('\n'),
-                            failBattles: _.isEmpty(failBattles) ? 'Нет данных о неудачных битвах' : failBattles.join('\n')
-                        }
-                    };
-
-                    const processedBattles = getBattles(beast.battles);
-                    const processedFlees = getFlees(beast.flees);
-
-                    let reply = `
-*${beast.name}*
-Был замечен на ${minMax(beast.distanceRange)}км
-
-*[ДРОП]*
-${getDrop(beast.capsReceived, beast.materialsReceived)}
-
-*[ЛУТ]*
-${getItems(beast.receivedItems)}
-
-*[ПОБЕГ]*
-${processedFlees.successFlees}
-
----
-
-${processedFlees.failFlees}
-
-*[ОГЛУШЕНИЯ]*
-${getConcussions(beast.concussions)}
-
-*[СТЫЧКИ]*
-${processedBattles.successBattles}
-
----
-
-${processedBattles.failBattles}
-                    `
-                    return msg.reply.text(reply, {
-                        asReply: true,
+                    return msg.reply.text(reply,{
+                        replyMarkup: beastReplyMarkup,
                         parseMode: 'markdown'
-                    });
+                    }).catch(e => console.log(e));
                 } else {
                     return msg.reply.text(`Прости, я никогда не слышал про этого ${beast.name} :c`, {
                         asReply: true
-                    })
+                    });
                 }
             }).catch(e => console.log(e));
         }
@@ -1320,7 +1180,8 @@ https://t.me/trust_42/57
 
 Отдельная благодарнасть товарищу @MohanMC за помощь в форматировании
 
-<code>Большое спасибо х2</code> @K3nny2k за обнаружение ужасного бага в сохранении побегов
+<code>🏅 Медаль с отличием х1</code> и <code>ОГРОМНОЕ спасибо х4</code> @K3nny2k за обнаружение ужасного бага в сохранении побегов,
+помощь в создании каталога мобов, обнаружении нескольких багов с гигантами, и хуй знает что ещё.
 
 <code>Необычная благодарность х1</code> @x59x75x72x79 за многочисленые багрепорты о выводе инфы
 
@@ -1336,6 +1197,20 @@ const giantsKeyboard = bot.inlineKeyboard([
         bot.inlineButton('ℹ️ Информация', {callback: 'show_info'})
     ]
 ]);
+
+const beastRangesKeyboard = bot.inlineKeyboard(_.chunk(getRanges.map(range => {
+    const first = _.min(range);
+    const last = _.max(range);
+
+    if (first !== last) {
+        return bot.inlineButton(`${first}-${last}`, {
+            callback: `show_beast_${first}-${last}`
+        });
+    }
+    return bot.inlineButton(`${first}`, {
+        callback: `show_beast_${first}-${first}`
+    });
+}), 5));
 
 
 
@@ -1368,16 +1243,57 @@ _Если гиганта нет в списке - значит его ещё н�
     });
 });
 
-// On button callback
+bot.on('/show_beasts', msg => {
+    const reply = `
+Это каталог всех мобов в Пустоши <i>(не данжевых)</i>
+Каталог наполняется посредством форвардов от игроков (бои, побеги и оглушения)
+
+Выбери интересующий диапазон километров, после вам будет доступен список мобов, которые были замечены на этом километре.
+
+Жмякай по <b>/mob_1234qwerty...</b> под нужным вам мобом, после вам будет доступна "карточка" простомтра моба с вкладками:
+[<code>Инфо</code>], [<code>Лут</code>], [<code>Бой</code>] и [<code>Оглушения</code>]
+`;
+    msg.reply.text(reply, {
+        replyMarkup: beastRangesKeyboard,
+        parseMode: 'html'
+    }).catch(e => console.log(e))
+});
+
+bot.on(/mob_(.+)/, msg => {
+    const [, id] = /mob_(.+)/.exec(msg.text);
+
+    routedBeastView(Beast, {
+        _id: id,
+        isDungeon: false
+    }).then(({reply,beast}) => {
+        if(reply != false) {
+            const beastReplyMarkup = getBeastKeyboard(beast._id.toJSON());
+
+            return msg.reply.text(reply, {
+                asReply: true,
+                parseMode: 'markdown',
+                replyMarkup: beastReplyMarkup
+            });
+        } else {
+            return msg.reply.text(`Прости, я никогда не слышал про этого ${beast.name} :c`, {
+                asReply: true
+            })
+        }
+    });
+})
+
 bot.on('callbackQuery', msg => {
     // Send confirm
-    bot.answerCallbackQuery(msg.id);
 
     const chatId = msg.from.id;
     const messageId = msg.message.message_id;
+    const showMobRegExp = /show_beast_(\d+)-(\d+)/;
+    const showMobRouteRegExp = /show_beast_page_(.+)-(.+)/;
 
     if(msg.data === 'update_giants') {
         Giant.find({}).then(giants => {
+            bot.answerCallbackQuery(msg.id);
+
             const giantsReply = _.sortBy(giants, 'distance').map(giant => {
             const isDead = giant.health.current <= 0;
             const time = moment(giant.forwardStamp, 'X').format('DD.MM HH:mm');
@@ -1399,6 +1315,7 @@ _Если гиганта нет в списке - значит его ещё н�
             return bot.editMessageText({chatId, messageId}, reply,{replyMarkup: giantsKeyboard, parseMode: 'markdown'});
         }).catch(e => console.log(e));
     } else if (msg.data === 'show_info') {
+        bot.answerCallbackQuery(msg.id);
 
         const reply = `
 На данный момент известно о следующих гигантах:
@@ -1421,8 +1338,55 @@ _Если гиганта нет в списке - значит его ещё н�
             replyMarkup: giantsKeyboard,
             parseMode: 'markdown'
         });
-    }
+    } else if (showMobRegExp.test(msg.data)) {
+        const [, from, to] = showMobRegExp.exec(msg.data);
 
+
+        Beast.find({isDungeon: false}).then(beasts => {
+            const beastsInRange = beasts.filter(beast => {
+                return beast.distanceRange.some(distance => {
+                    return Number(from) <= distance && distance <= Number(to);
+                })
+            });
+            bot.answerCallbackQuery(msg.id);
+
+
+            const beastsList = beastsInRange.map(beast => {
+                return `
+${beast.name}
+/mob_${beast.id}`;
+            }).join('\n');
+
+            console.log(beastsInRange);
+
+            const reply = `
+<b>Мобы на ${from}-${to}км</b>
+${beastsList}
+`;
+
+            return bot.editMessageText({chatId, messageId}, reply,{
+                replyMarkup: beastRangesKeyboard,
+                parseMode: 'html'
+            }).catch(e => console.log(e));
+        });
+    } else if (showMobRouteRegExp.test(msg.data)) {
+        bot.answerCallbackQuery(msg.id);
+
+        const [, route, beastId] = showMobRouteRegExp.exec(msg.data);
+        console.log(route, beastId);
+
+        routedBeastView(Beast, {
+            _id: beastId,
+            isDungeon: false
+        }, route).then(({reply, beast}) => {
+            const beastReplyMarkup = getBeastKeyboard(beast._id.toJSON());
+
+            return bot.editMessageText({chatId, messageId}, reply,{
+                replyMarkup: beastReplyMarkup,
+                parseMode: 'markdown'
+            }).catch(e => console.log(e));
+        })
+    }
 });
 
 
