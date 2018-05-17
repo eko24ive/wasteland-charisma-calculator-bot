@@ -31,6 +31,7 @@ const getRanges = require('./src/utils/getRanges');
 const tinyHash = require('./src/utils/tinyHash');
 
 const regularBeastView = require('./src/views/regularBeastView');
+const routedBeastView = require('./src/views/routedBeastView');
 
 const Beast = mongoose.model('Beast', beastSchema);
 const Giant = mongoose.model('Giant', giantScheme);
@@ -249,13 +250,13 @@ const defaultKeyboard = bot.keyboard([
         buttons['journeyForwardStart'].label
     ],
     [
-        buttons['showAllLocations'].label,
-        buttons['showRaidLocations'].label,
-    ],
-    [
         buttons['showGiants'].label,
         buttons['showBeasts'].label,
         buttons['showDrones'].label
+    ],
+    [
+        buttons['showAllLocations'].label,
+        buttons['showRaidLocations'].label,
     ],
     [
         buttons['hallOfFame'].label,
@@ -264,6 +265,19 @@ const defaultKeyboard = bot.keyboard([
 ], {
     resize: true
 });
+
+
+const getBeastKeyboard = beastId => {
+    return bot.inlineKeyboard([
+        [
+            bot.inlineButton('Инфо', {callback: `show_beast_page_info-${beastId}`}),
+            bot.inlineButton('Лут', {callback: `show_beast_page_loot-${beastId}`}),
+            bot.inlineButton('Бой', {callback: `show_beast_page_battles-${beastId}`}),
+            bot.inlineButton('Оглушения', {callback: `show_beast_page_concussions-${beastId}`})
+        ]
+    ]);
+}
+
 
 bot.on('/start', (msg) => {
     if (sessions[msg.from.id] === undefined) {
@@ -533,19 +547,21 @@ bot.on('forward', (msg) => {
         } else if (isRegularBeast) {
             const beast = parseBeastFaced.parseRegularBeastFaced(msg.text);
 
-            regularBeastView(Beast, {
+            routedBeastView(Beast, {
                 name: beast.name,
                 isDungeon: false
-            }).then(reply => {
+            }).then(({reply, beast}) => {
                 if(reply != false) {
-                    return msg.reply.text(reply, {
-                        asReply: true,
+                    const beastReplyMarkup = getBeastKeyboard(beast._id.toJSON());
+    
+                    return msg.reply.text(reply,{
+                        replyMarkup: beastReplyMarkup,
                         parseMode: 'markdown'
-                    });
+                    }).catch(e => console.log(e));
                 } else {
                     return msg.reply.text(`Прости, я никогда не слышал про этого ${beast.name} :c`, {
                         asReply: true
-                    })
+                    });
                 }
             }).catch(e => console.log(e));
         }
@@ -1205,19 +1221,22 @@ bot.on('/show_beasts', msg => {
     msg.reply.text('wow', {
         replyMarkup: beastRangesKeyboard
     }).catch(e => console.log(e))
-})
+});
 
 bot.on(/mob_(.+)/, msg => {
     const [, id] = /mob_(.+)/.exec(msg.text);
-    
+
     regularBeastView(Beast, {
         _id: id,
         isDungeon: false
-    }).then(reply => {
+    }).then(({reply,beast}) => {
         if(reply != false) {
+            const beastReplyMarkup = getBeastKeyboard(beast._id.toJSON());
+            
             return msg.reply.text(reply, {
                 asReply: true,
-                parseMode: 'markdown'
+                parseMode: 'markdown',
+                replyMarkup: beastReplyMarkup
             });
         } else {
             return msg.reply.text(`Прости, я никогда не слышал про этого ${beast.name} :c`, {
@@ -1229,14 +1248,16 @@ bot.on(/mob_(.+)/, msg => {
 
 bot.on('callbackQuery', msg => {
     // Send confirm
-    bot.answerCallbackQuery(msg.id);
 
     const chatId = msg.from.id;
     const messageId = msg.message.message_id;
     const showMobRegExp = /show_beast_(\d+)-(\d+)/;
+    const showMobRouteRegExp = /show_beast_page_(.+)-(.+)/;
 
     if(msg.data === 'update_giants') {
         Giant.find({}).then(giants => {
+            bot.answerCallbackQuery(msg.id);
+            
             const giantsReply = _.sortBy(giants, 'distance').map(giant => {
             const isDead = giant.health.current <= 0;
             const time = moment(giant.forwardStamp, 'X').format('DD.MM HH:mm');
@@ -1258,6 +1279,7 @@ _Если гиганта нет в списке - значит его ещё н�
             return bot.editMessageText({chatId, messageId}, reply,{replyMarkup: giantsKeyboard, parseMode: 'markdown'});
         }).catch(e => console.log(e));
     } else if (msg.data === 'show_info') {
+        bot.answerCallbackQuery(msg.id);
 
         const reply = `
 На данный момент известно о следующих гигантах:
@@ -1290,6 +1312,8 @@ _Если гиганта нет в списке - значит его ещё н�
                     return Number(from) <= distance && distance <= Number(to);
                 })
             });
+            bot.answerCallbackQuery(msg.id);
+            
 
             const beastsList = beastsInRange.map(beast => {
                 return `
@@ -1301,7 +1325,6 @@ ${beast.name}
 
             const reply = `
 <b>Мобы на ${from}-${to}км</b>
-
 ${beastsList}
 `;
 
@@ -1310,6 +1333,23 @@ ${beastsList}
                 parseMode: 'html'
             }).catch(e => console.log(e));
         });
+    } else if (showMobRouteRegExp.test(msg.data)) {
+        bot.answerCallbackQuery(msg.id);
+
+        const [, route, beastId] = showMobRouteRegExp.exec(msg.data);
+        console.log(route, beastId);
+
+        routedBeastView(Beast, {
+            _id: beastId,
+            isDungeon: false
+        }, route).then(({reply, beast}) => {
+            const beastReplyMarkup = getBeastKeyboard(beast._id.toJSON());
+
+            return bot.editMessageText({chatId, messageId}, reply,{
+                replyMarkup: beastReplyMarkup,
+                parseMode: 'markdown'
+            }).catch(e => console.log(e));
+        })
     }
 });
 
