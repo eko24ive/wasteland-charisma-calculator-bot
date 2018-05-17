@@ -1355,8 +1355,6 @@ ${beast.name}
 /mob_${beast.id}`;
             }).join('\n');
 
-            console.log(beastsInRange);
-
             const reply = `
 <b>Мобы на ${from}-${to}км</b>
 ${beastsList}
@@ -1371,7 +1369,6 @@ ${beastsList}
         bot.answerCallbackQuery(msg.id);
 
         const [, route, beastId] = showMobRouteRegExp.exec(msg.data);
-        console.log(route, beastId);
 
         routedBeastView(Beast, {
             _id: beastId,
