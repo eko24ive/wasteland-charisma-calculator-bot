@@ -6,8 +6,7 @@ const mongoose = require('mongoose');
 const _ = require('underscore');
 const TeleBot = require('telebot');
 const program = require('commander');
-const moment = require('moment');
-
+const moment = require('moment-timezone');
 
 const beastSchema = require('./src/schemes/beast');
 const locationSchema = require('./src/schemes/location');
@@ -470,7 +469,9 @@ bot.on('forward', (msg) => {
                         });
                     })
                 } else {
-                    if (fGiant.forwardStamp >= msg.forward_date) {
+                    const time = Number(moment.tz(moment().valueOf(), "Europe/Moscow").format('X'));
+                    
+                    if (fGiant.forwardStamp >= time) {
                         return msg.reply.text(`Прости, у меня есть более свежая иформация про *${giant.name}*`, {
                             asReply: true,
                             parseMode: 'markdown'
@@ -478,7 +479,7 @@ bot.on('forward', (msg) => {
                     } else {
                         fGiant.health.current = giant.healthCurrent;
                         fGiant.health.cap = giant.healthCap;
-                        fGiant.forwardStamp = msg.forward_date;
+                        fGiant.forwardStamp = time;
 
                         fGiant.save().then(res => {
                             return msg.reply.text(`Спасибо за форвард! Я обновил ${giant.name} в базе!`, {
@@ -1344,13 +1345,13 @@ bot.on('/show_giants', msg => {
 Giant.find({}).then(giants => {
     const giantsReply = _.sortBy(giants, 'distance').map(giant => {
     const isDead = giant.health.current <= 0;
-    const time = moment(giant.forwardStamp, 'X').format('DD.MM HH:mm');
+    const time = moment(giant.forwardStamp, 'X').add(1, 'hour').format('DD.MM HH:mm');
 
-    return `▫️ *${giant.name}* (${giant.distance}км) - ${time} - ${isDead ? 'убит' : `❤️${giant.health.current}`}`;
+    return `▫️ *${giant.name}* (${giant.distance || '??'}км) - ${time} - ${isDead ? 'убит' : `❤️${giant.health.current}`}`;
 });
 
         const reply = `
-Текущее состояние по гигантам:
+Текущее состояние по гигантам (МСК):
 
 ${_.isEmpty(giantsReply.join('\n')) ? 'Пока что данных нет' : giantsReply.join('\n')}
 
