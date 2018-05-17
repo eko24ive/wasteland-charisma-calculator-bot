@@ -1,6 +1,6 @@
 const _ = require('underscore');
 
-const regularBeastView = (Beast, seachParams) => {
+const routedBeastView = (Beast, seachParams, route) => {
     return new Promise((resolve, reject) => {
         Beast.findOne(seachParams).then(fBeast => {
             if (fBeast !== null) {
@@ -23,8 +23,7 @@ const regularBeastView = (Beast, seachParams) => {
                         return 'Нет данных';
                     }
         
-                    return `
-🕳${minMax(capsReceived)} крышек
+                    return `🕳${minMax(capsReceived)} крышек
 📦${minMax(materialsReceived)} материалов
         `;
         
@@ -35,7 +34,12 @@ const regularBeastView = (Beast, seachParams) => {
                         return 'Неизвестно'
                     }
         
-                    return Object.keys(items).join(', ');
+                    return Object.keys(items).map(key => {
+                        const drops = _.flatten(items[key]);
+                        const dropAmount = minMax(drops);
+
+                        return `${key}: x${dropAmount}`;
+                    }).join('\n');
                 }
         
                 const getFlees = flees => {
@@ -92,7 +96,7 @@ const regularBeastView = (Beast, seachParams) => {
                     return mappedConcussions.join('\n');
                 }
         
-                const getBattles = battles => {
+                const getBattles = (battles, trim) => {
                     if (_.isEmpty(battles)) {
                         return {
                             successBattles: 'Нет данных об удачных битвах',
@@ -107,21 +111,23 @@ const regularBeastView = (Beast, seachParams) => {
                         if (battle.outcome === 'win') {
                             // TODO: Fix battle parse
                             if (battle.stats !== undefined) {
-                                successBattles.push(`▫️ Успешно при уроне мобу ${battle.totalDamageGiven}.\nСтаты игрока: ⚔️Урон: ${battle.stats.damage} 🛡Броня: ${battle.stats.armor}.\nВсего урона от моба получено - 💔${battle.totalDamageReceived}\n`)
+                                const battleReply = `▫️ Успешно при уроне мобу ${battle.totalDamageGiven}.\nСтаты игрока: ⚔️Урон: ${battle.stats.damage} 🛡Броня: ${battle.stats.armor}.\nВсего урона от моба получено - 💔${battle.totalDamageReceived}\n`;
+                                successBattles.push({battleReply, totalDamageGiven: battle.totalDamageGiven})
                             }
                         } else {
                             if (battle.stats !== undefined) {
-                                failBattles.push(`▫️ Неудача при уроне мобу ${battle.totalDamageGiven}.\nСтаты игрока:⚔️Урон: ${battle.stats.damage} 🛡Броня: ${battle.stats.armor}.\nВсего урона от моба получено - 💔${battle.totalDamageReceived}\n`)
+                                const battleReply = `▫️ Неудача при уроне мобу ${battle.totalDamageGiven}.\nСтаты игрока:⚔️Урон: ${battle.stats.damage} 🛡Броня: ${battle.stats.armor}.\nВсего урона от моба получено - 💔${battle.totalDamageReceived}\n`;
+                                failBattles.push({battleReply, totalDamageReceived: battle.totalDamageReceived})
                             }
                         }
                     });
         
-                    if (successBattles.length > 5) {
-                        successBattles = successBattles.slice(0, 5);
+                    if (successBattles.length > trim) {
+                        successBattles = _.first(_.sortBy(successBattles, 'totalDamageGiven'),trim).map(battle => battle.battleReply);
                     }
         
-                    if (failBattles.length > 5) {
-                        failBattles = failBattles.slice(0, 5);
+                    if (failBattles.length > trim) {
+                        failBattles = _.last(_.sortBy(failBattles, 'totalDamageReceived'),trim).map(battle => battle.battleReply);
                     }
         
                     return {
@@ -130,43 +136,98 @@ const regularBeastView = (Beast, seachParams) => {
                     }
                 };
         
-                const processedBattles = getBattles(beast.battles);
-                const processedFlees = getFlees(beast.flees);
-        
-                let reply = `
-*${beast.name}*
-Был замечен на ${minMax(beast.distanceRange)}км
+                const {
+                    successBattles: successBattlesLong,
+                    failBattles: failBattlesLong
+                } = getBattles(beast.battles,5);
 
+                const {
+                    successBattles: successBattlesShort,
+                    failBattles: failBattlesShort
+                } = getBattles(beast.battles,1);
+
+                const processedFlees = getFlees(beast.flees);
+
+                
+const lootReply = `
 *[ДРОП]*
 ${getDrop(beast.capsReceived, beast.materialsReceived)}
 
-*[ЛУТ]*
+*[ВОЗМОЖНЫЙ ЛУТ]*
 ${getItems(beast.receivedItems)}
+`;
 
-*[ПОБЕГ]*
-${processedFlees.successFlees}
+const shortBattlesReply = `
+*Бои с мобом при наименьшем уроне ему, и от него*:
+
+${successBattlesShort}
+---
+${failBattlesShort}
+`;
+
+const longBattlesReply = `
+*[СТЫЧКИ]*
+${successBattlesLong}
 
 ---
 
-${processedFlees.failFlees}
+${failBattlesLong}
+`;
 
+const concussionsReply = `
 *[ОГЛУШЕНИЯ]*
 ${getConcussions(beast.concussions)}
+`;
 
-*[СТЫЧКИ]*
-${processedBattles.successBattles}
-
+const fleesReply = `
+*[ПОБЕГ]*
+${processedFlees.successFlees}
 ---
+${processedFlees.failFlees}
+`;
 
-${processedBattles.failBattles}
-        `;
-
-        resolve({reply, beast});
+const headerReply = `
+*${beast.name}*
+Был замечен на ${minMax(beast.distanceRange)}км
+`;
+ 
+        switch(route) {
+            case 'info':
+                resolve({
+                    reply: `${headerReply}\n${shortBattlesReply}\n${fleesReply}`,
+                    beast
+                });
+            break;
+            case 'loot':
+                resolve({
+                    reply: `${headerReply}\n${lootReply}`,
+                    beast
+                });
+            break;
+            case 'battles':
+                resolve({
+                    reply: `${headerReply}\n${longBattlesReply}`,
+                    beast
+                });
+            break;
+            case 'concussions':
+                resolve({
+                    reply: `${headerReply}\n${concussionsReply}`,
+                    beast
+                });
+            break;
+            default:
+                resolve({
+                    reply: `${headerReply}\n${shortBattlesReply}\n${fleesReply}`,
+                    beast
+                });
+            break;
+        }
             } else {
-                reject(false);
+                resolve(false);
             }
         }).catch(e => console.log(e));
     });
 }
 
-module.exports = regularBeastView;
+module.exports = routedBeastView;
