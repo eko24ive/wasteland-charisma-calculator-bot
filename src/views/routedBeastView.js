@@ -241,7 +241,9 @@ const headerReply = `*${beast.name}*
             break;
         }
             } else {
-                resolve(false);
+                resolve({
+                    reply: false
+                });
             }
         }).catch(e => console.log(e));
     });
