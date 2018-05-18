@@ -552,7 +552,7 @@ bot.on('forward', (msg) => {
                 name: beast.name,
                 isDungeon: false
             }).then(({reply, beast}) => {
-                if(reply != false) {
+                if(reply !== false) {
                     const beastReplyMarkup = getBeastKeyboard(beast._id.toJSON());
 
                     return msg.reply.text(reply,{
@@ -560,7 +560,7 @@ bot.on('forward', (msg) => {
                         parseMode: 'markdown'
                     }).catch(e => console.log(e));
                 } else {
-                    return msg.reply.text(`Прости, я никогда не слышал про этого ${beast.name} :c`, {
+                    return msg.reply.text(`Прости, я никогда не слышал про этого моба :c`, {
                         asReply: true
                     });
                 }
