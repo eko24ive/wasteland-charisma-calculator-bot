@@ -410,7 +410,7 @@ bot.on('forward', (msg) => {
         } else if (isDeathMessage) {
             data = parseDeathMessage(msg.text);
             dataType = 'deathMessage';
-        } else if (isRegularBeast && !isDungeonBeast) {
+        } else if (isRegularBeast) {
             data = beastParser.parseRegularBeast(msg.text);
             dataType = 'regularBeast';
         } else if (isLocation) {
