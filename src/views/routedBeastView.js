@@ -110,8 +110,8 @@ const routedBeastView = (Beast, seachParams, route) => {
                     let failBattles = [];
 
                     const damageReceived = battle => {
-                        if(battle.damagesGiven[0] !== 0) {
-                            return `💔${battle.totalDamageReceived} за ${battle.damagesGiven.length} удар(а)\n`;
+                        if(battle.damagesReceived[0] !== 0) {
+                            return `💔${battle.totalDamageReceived} за ${battle.damagesReceived.length} удар(а)\n`;
                         }
 
                         return `💔${battle.totalDamageReceived}`;
