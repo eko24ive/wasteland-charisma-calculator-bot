@@ -850,7 +850,10 @@ _${reportData.criticalError}_
                                 if (!_.contains(fBeast.receivedItems[item], amount)) {
                                     fBeast.receivedItems[item].push(amount);
                                 }
+                                // TODO: Apply to similar
+                                fBeast.markModified('receivedItems');
                             } else {
+                                fBeast.markModified('receivedItems');
                                 fBeast.receivedItems[item] = [amount];
                             }
                         })
