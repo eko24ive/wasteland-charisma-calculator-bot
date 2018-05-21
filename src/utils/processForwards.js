@@ -47,6 +47,10 @@ const normalizeItems = items => {
     return normalizedItems;
 };
 
+// TODO: Validate kilometers
+// TODO: Handle death
+// TODO: Typescript
+
 const processForwards = (data, dataPips, config) => {
     const reportData = {
         capsReceived: 0,
