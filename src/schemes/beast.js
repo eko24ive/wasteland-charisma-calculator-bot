@@ -1,6 +1,9 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
+// TODO: Add battle id
+// TODO: Add detailed battle output (just like from the forward)
+
 const beastScheme = new Schema({
     distanceRange: [Number],
     name: String,
