@@ -557,7 +557,7 @@ bot.on('forward', (msg) => {
 
                     return msg.reply.text(reply,{
                         replyMarkup: beastReplyMarkup,
-                        parseMode: 'markdown'
+                        parseMode: 'html'
                     }).catch(e => console.log(e));
                 } else {
                     return msg.reply.text(`Прости, я никогда не слышал про этого моба :c`, {
@@ -1173,7 +1173,7 @@ bot.on('/show_hall_of_fame', msg => msg.reply.text(`
 
 Низкий поклон Владимиру (@radueff) Кузьмичёву - создателю первого бота-хелпера
 
-Бунтарная благодарочка каналу @chetirka_bund за помощь в распостронении инфы о боте-ассистенте
+Бундарная благодарочка каналу @chetirka_bund за помощь в распостронении инфы о боте-ассистенте
 
 Ядерная благодарность каналу @nushit за информацию про дронов
 https://t.me/nushit/393
@@ -1350,7 +1350,19 @@ _Если гиганта нет в списке - значит его ещё н�
             bot.answerCallbackQuery(msg.id);
 
 
-            const beastsList = beasts.map(beast => {
+            const beastsList = beasts.sort((a, b) => {
+                const aBattle = _.sortBy(a.battles,'totalDamageReceived').shift();
+                const bBattle = _.sortBy(b.battles,'totalDamageReceived').shift();
+
+                if (aBattle !== undefined && bBattle !== undefined) {
+                    if (aBattle.totalDamageReceived < bBattle.totalDamageReceived)
+                        return -1;
+                    if (aBattle.totalDamageReceived > bBattle.totalDamageReceived)
+                        return 1;
+                }
+
+                return 0;
+              }).map(beast => {
                 return `
 ${beast.name}
 /mob_${beast.id}`;
@@ -1379,7 +1391,7 @@ ${beastsList}
 
             return bot.editMessageText({chatId, messageId}, reply,{
                 replyMarkup: beastReplyMarkup,
-                parseMode: 'markdown'
+                parseMode: 'html'
             }).catch(e => console.log(e));
         })
     }
