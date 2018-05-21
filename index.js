@@ -1277,7 +1277,7 @@ bot.on(/mob_(.+)/, msg => {
 
             return msg.reply.text(reply, {
                 asReply: true,
-                parseMode: 'markdown',
+                parseMode: 'html',
                 replyMarkup: beastReplyMarkup
             });
         } else {
