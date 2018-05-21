@@ -46,7 +46,7 @@ const bonusEmojiResourceAmount = /([\u{1f300}-\u{1f5ff}\u{1f900}-\u{1f9ff}\u{1f6
 const achievmentMessageRegExp = /🏆Достижение получено!/;
 const achievmentContentRegExp = /✅(.+)\n(.+)/;
 
-const currentHealthRegExp = /❤️(.\d+)\/\d+/;
+const currentHealthRegExp = /❤️(.\d*)\/\d+/;
 
 const giantFacedRegExp = /Твой путь преградил исполинских размеров монстр/;
 const giantHealthRegExp = /(.+) \(❤️(\d+|-\d+)\/(\d+)\)/;
