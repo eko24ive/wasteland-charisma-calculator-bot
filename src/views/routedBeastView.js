@@ -111,7 +111,7 @@ const routedBeastView = (Beast, seachParams, route) => {
 
                     const damageReceived = battle => {
                         if(battle.damagesReceived[0] !== 0) {
-                            return `💔${battle.totalDamageReceived} за ${battle.damagesReceived.length} удар(а)\n`;
+                            return `💔${battle.totalDamageReceived} за ${battle.damagesReceived.length} удар(а)`;
                         }
 
                         return `💔${battle.totalDamageReceived}`;
@@ -155,8 +155,8 @@ const routedBeastView = (Beast, seachParams, route) => {
                     failBattles = failBattles.map(battle => battle.battleReply);
 
                     return {
-                        successBattles: _.isEmpty(successBattles) ? 'Нет данных об удачных битвах' : successBattles.join('\n'),
-                        failBattles: _.isEmpty(failBattles) ? 'Нет данных о неудачных битвах' : failBattles.join('\n')
+                        successBattles: _.isEmpty(successBattles) ? 'Нет данных об удачных битвах' : successBattles.join('\n\n'),
+                        failBattles: _.isEmpty(failBattles) ? 'Нет данных о неудачных битвах' : failBattles.join('\n\n')
                     }
                 };
 
