@@ -122,7 +122,7 @@ const parseDungeonBeast = beast => {
         return false;
     }).filter(dmg => dmg !== false);
 
-    const [, currentHealth] = regexps.regecurrentHealthRegExp.exec(beast);
+    const [, currentHealth] = regexps.currentHealthRegExp.exec(beast);
 
     return {
         distance,
