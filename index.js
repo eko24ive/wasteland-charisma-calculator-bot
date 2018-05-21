@@ -401,10 +401,10 @@ bot.on('forward', (msg) => {
                     dataType = 'dungeonBeastFaced';
                 } */
 
-        /* if (isDungeonBeast) {
+        if (isDungeonBeast) {
             data = beastParser.parseDungeonBeast(msg.text);
             dataType = 'dungeonBeast';
-        } else */ if (isFlee) {
+        } else if (isFlee) {
             data = parseFlee(msg.text);
             dataType = 'flee';
         } else if (isDeathMessage) {
@@ -431,6 +431,8 @@ bot.on('forward', (msg) => {
                 date: msg.forward_date
             });
         }
+
+        return msg.reply.text(dataType);
 
     } else {
         const pip = parsePip(msg);
