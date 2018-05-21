@@ -1306,7 +1306,7 @@ bot.on('callbackQuery', msg => {
         });
 
                 const reply = `
-Текущее состояние по гигантам:
+Текущее состояние по гигантам (МСК):
 
 ${_.isEmpty(giantsReply.join('\n')) ? 'Пока что данных нет' : giantsReply.join('\n')}
 
