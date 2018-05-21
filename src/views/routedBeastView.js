@@ -172,21 +172,21 @@ const routedBeastView = (Beast, seachParams, route) => {
 
                 const processedFlees = getFlees(beast.flees);
 
-const lootReply = `*[ДРОП]*
+const lootReply = `<b>[ДРОП]</b>
 ${getDrop(beast.capsReceived, beast.materialsReceived)}
 
-*[ВОЗМОЖНЫЙ ЛУТ]*
+<b>[ВОЗМОЖНЫЙ ЛУТ]</b>
 ${getItems(beast.receivedItems)}
 `;
 
-const shortBattlesReply = `*[ПОБЕДА]*
+const shortBattlesReply = `<b>[ПОБЕДА]</b>
 ${successBattlesShort}
 
-*[НЕУДАЧА]*
+<b>[НЕУДАЧА]</b>
 ${failBattlesShort}
 `;
 
-const longBattlesReply = `*[СТЫЧКИ]*
+const longBattlesReply = `<b>[СТЫЧКИ]</b>
 ${successBattlesLong}
 
 ---
@@ -194,17 +194,17 @@ ${successBattlesLong}
 ${failBattlesLong}
 `;
 
-const concussionsReply = `*[ОГЛУШЕНИЯ]*
+const concussionsReply = `<b>[ОГЛУШЕНИЯ]</b>
 ${getConcussions(beast.concussions)}
 `;
 
-const fleesReply = `*[ПОБЕГ]*
+const fleesReply = `<b>[ПОБЕГ]</b>
 ${processedFlees.successFlees}
 ---
 ${processedFlees.failFlees}
 `;
 
-const headerReply = `*${beast.name}*
+const headerReply = `<b>${beast.name}</b>
 👣 ${minMax(beast.distanceRange)}км
 `;
 
