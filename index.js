@@ -390,20 +390,19 @@ bot.on('forward', (msg) => {
             regexpSet: regexps.deathMessage
         });
 
-        /* const isDungeonBeastFaced = regExpSetMatcher(msg.text, {
+        const isDungeonBeastFaced = regExpSetMatcher(msg.text, {
             regexpSet: regexps.dungeonBeastFaced
-        }); */
+        });
 
         const pip = parsePip(msg);
 
-        /*         if (isDungeonBeastFaced) {
-                    data = parseBeastFaced.parseDungeonBeastFaced(msg.text);
-                    dataType = 'dungeonBeastFaced';
-                } */
-
-        if (isDungeonBeast) {
+        /* if (isDungeonBeast) {
             data = beastParser.parseDungeonBeast(msg.text);
             dataType = 'dungeonBeast';
+        } */
+        if (isDungeonBeastFaced) {
+            data = parseBeastFaced.parseDungeonBeastFaced(msg.text);
+            dataType = 'dungeonBeastFaced';
         } else if (isFlee) {
             data = parseFlee(msg.text);
             dataType = 'flee';
@@ -424,7 +423,7 @@ bot.on('forward', (msg) => {
 
 
         // isDungeonBeast ||
-        if (isRegularBeast || isLocation || isFlee || isDeathMessage) {
+        if (isRegularBeast || isLocation || isFlee || isDeathMessage || isDungeonBeastFaced) {
             sessions[msg.from.id].data.push({
                 data,
                 dataType,
