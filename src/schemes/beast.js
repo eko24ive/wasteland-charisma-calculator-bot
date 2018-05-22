@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
 // TODO: Add battle id
-// TODO: Add detailed battle output (just like from the forward)
+// TODO: Add detailed battle output (just like from the forward) (field: battlelog)
 
 const beastScheme = new Schema({
     distanceRange: [Number],
