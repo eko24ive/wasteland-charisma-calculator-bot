@@ -1,5 +1,21 @@
 const mongoose = require("mongoose");
 
+/*
+meta: {
+    score: Number,
+    forwards: {
+        beast: {
+            wins: Number,
+            loss: Number,
+            flee: Number
+        },
+        locations: Number,
+        giants: Number
+
+    }
+}
+*/
+
 const userSchema = mongoose.Schema({
     telegram: {
         firstName: String,
