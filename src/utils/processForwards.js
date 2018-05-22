@@ -61,6 +61,7 @@ const processForwards = (data, dataPips, config) => {
         isDead: false,
         distance: 0,
         lastBeastSeen: null,
+        lastBeastSeenType: 'regular',
         lastPip: null,
         pips: [],
         pipMismatchOccurred: false,
@@ -109,8 +110,7 @@ const processForwards = (data, dataPips, config) => {
         data,
         dataType
     }) => {
-
-        if (dataType === 'location') {
+        if (dataType === 'location' && !reportData.isDead) {
             const locationData = _.clone(data);
 
             if (data.effect) {
@@ -132,6 +132,8 @@ const processForwards = (data, dataPips, config) => {
                     name: data.beastFaced.name,
                     distance: data.distance
                 };
+
+                reportData.lastBeastSeenType = 'regular';
             }
 
             reportData.distance = data.distance;
@@ -141,9 +143,11 @@ const processForwards = (data, dataPips, config) => {
 
         }
 
-        if (dataType === 'regularBeast') {
+        if (dataType === 'regularBeast' && !reportData.isDead) {
+            const isDungeon = reportData.lastBeastSeenType === 'dungeon';
+
             const beastData = {
-                isDungeon: false
+                isDungeon
             };
 
             beastData.name = data.name;
@@ -217,9 +221,11 @@ const processForwards = (data, dataPips, config) => {
             reportData.healthCapHistory.push(data.meta.healthCap)
         }
 
-        if (dataType === 'dungeonBeast') {
+        if (dataType === 'dungeonBeast' && !reportData.isDead) {
+            const isDungeon = reportData.lastBeastSeenType === 'dungeon';
+
             const beastData = {
-                isDungeon: false
+                isDungeon
             };
 
             beastData.name = data.name;
@@ -269,7 +275,7 @@ const processForwards = (data, dataPips, config) => {
             updatesData.beasts.push(beastData);
         }
 
-        if (dataType === 'flee') {
+        if (dataType === 'flee' && !reportData.isDead) {
             const beastData = {
                 isDungeon: false,
                 distanceRange: [data.distance]
@@ -302,15 +308,9 @@ const processForwards = (data, dataPips, config) => {
             } else {
                 reportData.errors.push(`Не могу найти в форвардах монстра от которого ты сбежал на ${data.distance}`);
             }
-
-
-
-            // if (reportData.lastPip) {
-            //     updatesData.flees = `Unsucsessfull flee from ${reportData.lastBeastSeen.name} on ${reportData.distance} with agility ${reportData.lastPip.agility}`;
-            // }
         }
 
-        if (dataType === 'deathMessage') {
+        if (dataType === 'deathMessage' && !reportData.isDead) {
             reportData.isDead = true;
             reportData.capsLost -= data.capsLost;
             reportData.materialsLost -= data.materialsLost;
@@ -318,6 +318,8 @@ const processForwards = (data, dataPips, config) => {
             if (reportData.lastFleeDefeat === reportData.distance) {
                 reportData.deathData.reason = 'flee';
             }
+
+            reportData.errors.push(`Вижу, ты склеил ласты на ${reportData.distance} километре. Сочуствую. Я не обрабатывал форварды после твоей смерти`);
         }
 
         if (dataType === 'pipboy') {
@@ -325,16 +327,16 @@ const processForwards = (data, dataPips, config) => {
             reportData.pipRequired = false;
             reportData.pips.push(data);
         }
-    });
 
-    // reportData.receivedItems = _.flatten(reportData.receivedItems);
-    // console.log(JSON.stringify(updatesData));
-    // console.log(updatesData);
+        if (dataType === 'dungeonBeastFaced') {
+            console.log(data);
+            reportData.lastBeastSeenType = 'dungeon';
+        }
+    });
 
     if(reportData.lastPip) {
         if(reportData.healthCapHistory.some(health => health !== reportData.lastPip.health)) {
             reportData.criticalError = 'Была замечена прокачка уровня здоровья. Во время одной вылазки подобное - не возможно.';
-            console.log(JSON.stringify(data), JSON.stringify(dataPips));
         }
     }
 
