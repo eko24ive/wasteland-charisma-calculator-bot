@@ -65,6 +65,7 @@ const WAIT_FOR_RESPONSE = 'WAIT_FOR_RESPONSE';
 const WAIT_FOR_FORWARD_END = 'WAIT_FOR_FORWARD_END';
 const WAIT_FOR_START = 'WAIT_FOR_START';
 const WAIT_FOR_PIP_FORWARD = 'WAIT_FOR_PIP_FORWARD';
+const WAIT_FOR_BEAST_FACE_FORWARD = 'WAIT_FOR_BEAST_FACE_FORWARD';
 const WAIT_FOR_DATA_TO_PROCESS = 'WAIT_FOR_DATA_TO_PROCESS';
 
 const states = {
@@ -75,6 +76,7 @@ const states = {
     WAIT_FOR_START,
     WAIT_FOR_FORWARD_END,
     WAIT_FOR_PIP_FORWARD,
+    WAIT_FOR_BEAST_FACE_FORWARD,
     WAIT_FOR_DATA_TO_PROCESS
 };
 
@@ -197,8 +199,10 @@ const createSession = id => {
         pip: null,
         state: states.WAIT_FOR_START,
         data: [],
-        dataPips: [],
-        giantsMessage: []
+        processDataConfig: {
+            usePip: true,
+            useBeastFace: true
+        }
     };
 };
 
@@ -343,26 +347,70 @@ bot.on('forward', (msg) => {
         const pip = parsePip(msg);
 
         if (_.isObject(pip)) {
-            data = pip;
-            sessions[msg.from.id].dataPips.push(pip);
+            data = pip;            
             dataType = 'pipboy';
 
-            sessions[msg.from.id].data.push({
-                data,
-                dataType,
-                date: msg.forward_date
-            });
 
-            msg.reply.text('Супер, я вижу твой пип - сейчас обработаю его вместе с твоими форвардами');
+            
 
-            processUserData(msg, {
-                usePip: true
+            msg.reply.text('Супер, я вижу твой пип - сейчас обработаю его вместе с твоими форвардами').then(res => {
+                sessions[msg.from.id].data.push({
+                    data,
+                    dataType,
+                    date: msg.forward_date
+                });
+
+                processUserData(msg, {
+                    usePip: sessions[msg.from.id].processDataConfig.usePip,
+                    useBeastFace: sessions[msg.from.id].processDataConfig.useBeastFace
+                })
             });
         } else {
             return msg.reply.text(`
 Это не похоже на пип-бой. Если ты передумал его кидать - жми /skippipforward
 
 *Но тогда я проигнорирую битвы и побеги от мобов*
+            `, {
+                asReply: true
+            });
+        }
+    } if (sessions[msg.from.id].state === states.WAIT_FOR_BEAST_FACE_FORWARD) {
+        let data;
+        let dataType;
+
+        const isLocation = regExpSetMatcher(msg.text, {
+            regexpSet: regexps.location
+        });
+
+        const isDungeonBeastFaced = regExpSetMatcher(msg.text, {
+            regexpSet: regexps.dungeonBeastFaced
+        });
+        
+        if (isDungeonBeastFaced) {
+            data = parseBeastFaced.parseDungeonBeastFaced(msg.text);
+            dataType = 'dungeonBeastFaced';
+        } else if (isLocation) {
+            data = parseLocation(msg.text);
+            dataType = 'location';
+        }
+
+        if (isLocation || isDungeonBeastFaced) {
+            sessions[msg.from.id].data.push({
+                data,
+                dataType,
+                date: msg.forward_date
+            });
+
+            msg.reply.text('Супер, я вижу встречу с мобом - сейчас обработаю её вместе с твоими форвардами').then(res => processUserData(msg, {
+                usePip: sessions[msg.from.id].processDataConfig.usePip,
+                useBeastFace: sessions[msg.from.id].processDataConfig.useBeastFace
+            }));
+        } else {
+            // TODO: Add /skipbeastforward
+            return msg.reply.text(`
+Это не похоже на встречу моба. Если ты передумал её кидать - жми /skipbeastforward
+
+*Но тогда я проигнорирую битву с этим мобом*
             `, {
                 asReply: true
             });
@@ -416,14 +464,13 @@ bot.on('forward', (msg) => {
             data = parseLocation(msg.text);
             dataType = 'location';
         } else if (_.isObject(pip)) {
-            data = pip;
-            sessions[msg.from.id].dataPips.push(pip);
+            data = pip;            
             dataType = 'pipboy';
         }
 
 
         // isDungeonBeast ||
-        if (isRegularBeast || isLocation || isFlee || isDeathMessage || isDungeonBeastFaced) {
+        if (isRegularBeast || isLocation || isFlee || isDeathMessage || isDungeonBeastFaced || _.isObject(pip)) {
             sessions[msg.from.id].data.push({
                 data,
                 dataType,
@@ -433,7 +480,11 @@ bot.on('forward', (msg) => {
 
         return msg.reply.text(dataType);
 
-    } else {
+    } else if (
+        sessions[msg.from.id].state !== states.WAIT_FOR_PIP_FORWARD &&
+        sessions[msg.from.id].state !== states.WAIT_FOR_BEAST_FACE_FORWARD &&
+        sessions[msg.from.id].state !== states.WAIT_FOR_FORWARD_END
+    ) {
         const pip = parsePip(msg);
 
         const isRegularBeast = regExpSetMatcher(msg.text, {
@@ -718,14 +769,13 @@ const processUserData = (msg, options) => {
     sessions[msg.from.id].state = states.WAIT_FOR_DATA_TO_PROCESS;
 
     const {
-        data,
-        dataPips
+        data
     } = sessions[msg.from.id];
 
     const {
         reportData,
         updatesData
-    } = processForwards(data, dataPips);
+    } = processForwards(data);
 
     if (reportData.criticalError) {
         return msg.reply.text(`
@@ -748,6 +798,24 @@ _${reportData.criticalError}_
 `, {
     parseMode: 'markdown',
 });
+    }
+
+    if(options.useBeastFace && !_.isEmpty(reportData.beastToValidate)) {
+        sessions[msg.from.id].state = states.WAIT_FOR_BEAST_FACE_FORWARD;
+        return msg.reply.text(`
+Слушай, я не могу понять кто тебе надрал задницу, ${reportData.beastToValidate[0].name} - это обычный моб или данжевый?
+
+Пожалуйста скинь форвард встречи с этим мобом:
+\`Во время вылазки на тебя напал...\`
+_или_
+\`...перегородил тебе путь.\`
+
+Если у тебя нет на это времени жми /skipbeastforward
+
+*ВНИМАНИЕ: ПРИ НАЖАТИИ НА /skipbeastforward - БОТ ПРОИГНОРИРУЕТ ТОЛЬКО РЕЗУЛЬТАТ ТВОЕЙ БИТВЫ С ${reportData.beastToValidate[0].name} НЕ ЗАПИШЕТ ИХ В БАЗУ*
+`, {
+    parseMode: 'markdown',
+});     
     }
 
 
@@ -793,7 +861,8 @@ _${reportData.criticalError}_
     if (updatesData.beasts.length > 0) {
         async.forEach(updatesData.beasts, function (iBeast, next) {
             Beast.findOne({
-                name: iBeast.name
+                name: iBeast.name,
+                isDungeon: iBeast.isDungeon
             }).then(function (fBeast) {
                 if (fBeast === null) {
                     const newBeast = new Beast(iBeast);
@@ -1032,7 +1101,8 @@ bot.on('/journeyforwardend', msg => {
 
     // console.log(JSON.stringify(sessions[msg.from.id].data));
     processUserData(msg, {
-        usePip: true
+        usePip: sessions[msg.from.id].processDataConfig.usePip,
+        useBeastFace: sessions[msg.from.id].processDataConfig.useBeastFace
     });
 });
 
@@ -1048,8 +1118,11 @@ bot.on('/journeyforwardcancel', msg => {
 bot.on('/skippipforward', msg => {
     msg.reply.text('Окей, сейчас попробую обработать что смогу');
 
+    sessions[msg.from.id].processDataConfig.usePip = false;
+    
     processUserData(msg, {
-        usePip: false
+        usePip: sessions[msg.from.id].processDataConfig.usePip,
+        useBeastFace: sessions[msg.from.id].processDataConfig.useBeastFace
     });
 })
 
