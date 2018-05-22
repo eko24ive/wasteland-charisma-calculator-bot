@@ -19,7 +19,6 @@ const beastNameRegExp = /Сражение с (.+)/;
 const beastAttackRegExp = /.+ 💔-(\d+)/;
 const beastStunRegExp = /(.+) оглушен ударом 💫/;
 const playerBeastAttackRegExp = /👤Ты .+ 💥(\d+)/;
-const dungeonBeastAppeared = /(.+) перегородил тебе путь/;
 const beastDefeatRegExp = /Тебя буквально размазали/;
 const beastDefeatFleeRegExp = /Ты проиграл в этой схватке/;
 const beastSuccessFleeRegExp = /удалось избежать схватки/;
@@ -178,7 +177,7 @@ const regexps = {
     beastAttackRegExp,
     beastStunRegExp,
     playerBeastAttackRegExp,
-    dungeonBeastAppeared,
+    dungeonBeastFacedRegExp,
     beastDefeatRegExp,
     beastVictoryRegExp,
     beastDefeatCapsLostRegExp,

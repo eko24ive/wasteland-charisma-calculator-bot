@@ -15,7 +15,7 @@ const parseRegularBeastFaced = data => {
 };
 
 const parseDungeonBeastFaced = data => {
-    const [, name] = regexps.dungeonBeastFaced.exec(data);
+    const [, name] = regexps.dungeonBeastFacedRegExp.exec(data);
 
     return {
         name
