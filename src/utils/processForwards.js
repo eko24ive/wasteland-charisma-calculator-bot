@@ -181,6 +181,8 @@ const processForwards = (data, config) => {
 
                 beastData.capsReceived = Number(data.capsReceived);
                 beastData.materialsReceived = Number(data.materialsReceived);
+                reportData.isDead = true;
+                reportData.errors.push(`Вижу, ты склеил ласты на ${reportData.distance} километре. Сочуствую. Я не обрабатывал форварды после твоей смерти`);
             }
 
             if (data.amountOfConcussions.length > 0) {
@@ -242,9 +244,6 @@ const processForwards = (data, config) => {
                         reportData.beastToValidate.push({name: data.name, distance: data.distance});
                     }
                 }
-
-            } else {
-
             }
 
 
@@ -322,6 +321,8 @@ const processForwards = (data, config) => {
 
                     if (data.outcome === 'lose') {
                         beastData.flees[0].damageReceived = data.healthInjuries;
+                        reportData.isDead = true;
+                        reportData.errors.push(`Вижу, ты склеил ласты на ${reportData.distance} километре. Сочуствую. Я не обрабатывал форварды после твоей смерти`);
                     }
 
                     if (reportData.lastPip) {
