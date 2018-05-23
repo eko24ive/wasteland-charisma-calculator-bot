@@ -321,8 +321,11 @@ const processForwards = (data, config) => {
 
                     if (data.outcome === 'lose') {
                         beastData.flees[0].damageReceived = data.healthInjuries;
-                        // reportData.isDead = true;
-                        // reportData.errors.push(`Вижу, ты склеил ласты на ${reportData.distance} километре. Сочуствую. Я не обрабатывал форварды после твоей смерти`);
+
+                        if(data.currentHealth <= 0) {
+                            reportData.isDead = true;
+                            reportData.errors.push(`Вижу, ты склеил ласты на ${reportData.distance} километре. Сочуствую. Я не обрабатывал форварды после твоей смерти`);
+                        }
                     }
 
                     if (reportData.lastPip) {
