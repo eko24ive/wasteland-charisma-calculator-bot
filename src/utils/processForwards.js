@@ -51,7 +51,7 @@ const normalizeItems = items => {
 // TODO: Handle death
 // TODO: Typescript
 
-const processForwards = (data, dataPips, config) => {
+const processForwards = (data, config) => {
     const reportData = {
         capsReceived: 0,
         capsLost: 0,
@@ -61,6 +61,7 @@ const processForwards = (data, dataPips, config) => {
         isDead: false,
         distance: 0,
         lastBeastSeen: null,
+        lastBeastSeenType: null,
         lastPip: null,
         pips: [],
         pipMismatchOccurred: false,
@@ -69,13 +70,26 @@ const processForwards = (data, dataPips, config) => {
         errors: [],
         recalculationRequired: false,
         criticalError: false,
-        healthCapHistory: []
+        healthCapHistory: [],
+        beastToValidate: []
     };
 
     const updatesData = {
         locations: [],
         beasts: []
     };
+
+    const dataPips = data.filter(({
+        dataType
+    }) => dataType === 'pipboy').sort((first, second) => {
+        if (first.date < second.date) {
+            return -1;
+        }
+        if (first.date > second.date) {
+            return 1;
+        }
+        return 0;
+    });
 
     if (dataPips.length > 1) {
         if (!checkPips(dataPips)) {
@@ -109,8 +123,7 @@ const processForwards = (data, dataPips, config) => {
         data,
         dataType
     }) => {
-
-        if (dataType === 'location') {
+        if (dataType === 'location' && !reportData.isDead) {
             const locationData = _.clone(data);
 
             if (data.effect) {
@@ -132,6 +145,8 @@ const processForwards = (data, dataPips, config) => {
                     name: data.beastFaced.name,
                     distance: data.distance
                 };
+
+                reportData.lastBeastSeenType = 'regular';
             }
 
             reportData.distance = data.distance;
@@ -141,9 +156,11 @@ const processForwards = (data, dataPips, config) => {
 
         }
 
-        if (dataType === 'regularBeast') {
+        if (dataType === 'regularBeast' && !reportData.isDead) {
+            const isDungeon = reportData.lastBeastSeenType !== 'regular';
+
             const beastData = {
-                isDungeon: false
+                isDungeon
             };
 
             beastData.name = data.name;
@@ -213,13 +230,33 @@ const processForwards = (data, dataPips, config) => {
 
             beastData.battles[0].healthOnStart = data.currentHealth + beastData.battles[0].totalDamageReceived;
 
+            if (data.fightResult === 'lose') {
+                if (!reportData.lastBeastSeen) {
+                    beastData.battles = [];
+
+                    reportData.beastToValidate.push({name: data.name, distance: data.distance});
+                } else {
+                    if(data.name !== reportData.lastBeastSeen.name && reportData.lastBeastSeenType !== 'regular' && data.fightResult === 'lose') {
+                        beastData.battles = [];
+
+                        reportData.beastToValidate.push({name: data.name, distance: data.distance});
+                    }
+                }
+
+            } else {
+
+            }
+
+
             updatesData.beasts.push(beastData);
             reportData.healthCapHistory.push(data.meta.healthCap)
         }
 
-        if (dataType === 'dungeonBeast') {
+        if (dataType === 'dungeonBeast' && !reportData.isDead) {
+            const isDungeon = reportData.lastBeastSeenType !== 'regular';
+
             const beastData = {
-                isDungeon: false
+                isDungeon
             };
 
             beastData.name = data.name;
@@ -269,7 +306,7 @@ const processForwards = (data, dataPips, config) => {
             updatesData.beasts.push(beastData);
         }
 
-        if (dataType === 'flee') {
+        if (dataType === 'flee' && !reportData.isDead) {
             const beastData = {
                 isDungeon: false,
                 distanceRange: [data.distance]
@@ -302,15 +339,9 @@ const processForwards = (data, dataPips, config) => {
             } else {
                 reportData.errors.push(`Не могу найти в форвардах монстра от которого ты сбежал на ${data.distance}`);
             }
-
-
-
-            // if (reportData.lastPip) {
-            //     updatesData.flees = `Unsucsessfull flee from ${reportData.lastBeastSeen.name} on ${reportData.distance} with agility ${reportData.lastPip.agility}`;
-            // }
         }
 
-        if (dataType === 'deathMessage') {
+        if (dataType === 'deathMessage' && !reportData.isDead) {
             reportData.isDead = true;
             reportData.capsLost -= data.capsLost;
             reportData.materialsLost -= data.materialsLost;
@@ -318,6 +349,8 @@ const processForwards = (data, dataPips, config) => {
             if (reportData.lastFleeDefeat === reportData.distance) {
                 reportData.deathData.reason = 'flee';
             }
+
+            reportData.errors.push(`Вижу, ты склеил ласты на ${reportData.distance} километре. Сочуствую. Я не обрабатывал форварды после твоей смерти`);
         }
 
         if (dataType === 'pipboy') {
@@ -325,16 +358,16 @@ const processForwards = (data, dataPips, config) => {
             reportData.pipRequired = false;
             reportData.pips.push(data);
         }
-    });
 
-    // reportData.receivedItems = _.flatten(reportData.receivedItems);
-    // console.log(JSON.stringify(updatesData));
-    // console.log(updatesData);
+        if (dataType === 'dungeonBeastFaced') {
+            reportData.lastBeastSeen = {name: data.name};
+            reportData.lastBeastSeenType = 'dungeon';
+        }
+    });
 
     if(reportData.lastPip) {
         if(reportData.healthCapHistory.some(health => health !== reportData.lastPip.health)) {
             reportData.criticalError = 'Была замечена прокачка уровня здоровья. Во время одной вылазки подобное - не возможно.';
-            console.log(JSON.stringify(data), JSON.stringify(dataPips));
         }
     }
 

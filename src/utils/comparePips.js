@@ -33,8 +33,8 @@ const check = pips => {
   var checks = [];
   pips.forEach((current,i) => {
       if(i<size) {
-        const next = pips[i+1];
-          checks.push(comparePips(next, current));
+        const next = pips[i+1].data;
+          checks.push(comparePips(next, current.data));
       }
   });
 
