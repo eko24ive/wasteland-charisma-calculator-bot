@@ -333,7 +333,7 @@ bot.on('/resetSessionAbort', (msg) => {
 }); */
 
 bot.on('forward', (msg) => {
-    if(msg.forward_from.id !== 430930191) {
+    if(msg.forward_from.id !== 430930191 && sessions[msg.from.id].state !== states.WAIT_FOR_FORWARD_END) {
         return msg.reply.text('Форварды принимаються только от @WastelandWarsBot', {
             asReply: true
         })
@@ -477,9 +477,6 @@ bot.on('forward', (msg) => {
                 date: msg.forward_date
             });
         }
-
-        return msg.reply.text(dataType);
-
     } else if (
         sessions[msg.from.id].state !== states.WAIT_FOR_PIP_FORWARD &&
         sessions[msg.from.id].state !== states.WAIT_FOR_BEAST_FACE_FORWARD &&
