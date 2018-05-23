@@ -81,7 +81,7 @@ const processForwards = (data, config) => {
 
     const dataPips = data.filter(({
         dataType
-    }) => dataType !== 'pipboy').sort((first, second) => {
+    }) => dataType === 'pipboy').sort((first, second) => {
         if (first.date < second.date) {
             return -1;
         }
@@ -233,20 +233,20 @@ const processForwards = (data, config) => {
             if (data.fightResult === 'lose') {
                 if (!reportData.lastBeastSeen) {
                     beastData.battles = [];
-                    
+
                     reportData.beastToValidate.push({name: data.name, distance: data.distance});
                 } else {
                     if(data.name !== reportData.lastBeastSeen.name && reportData.lastBeastSeenType !== 'regular' && data.fightResult === 'lose') {
                         beastData.battles = [];
-                        
+
                         reportData.beastToValidate.push({name: data.name, distance: data.distance});
                     }
                 }
-                
+
             } else {
-                
+
             }
-            
+
 
             updatesData.beasts.push(beastData);
             reportData.healthCapHistory.push(data.meta.healthCap)
