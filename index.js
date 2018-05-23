@@ -347,11 +347,11 @@ bot.on('forward', (msg) => {
         const pip = parsePip(msg);
 
         if (_.isObject(pip)) {
-            data = pip;            
+            data = pip;
             dataType = 'pipboy';
 
 
-            
+
 
             msg.reply.text('Супер, я вижу твой пип - сейчас обработаю его вместе с твоими форвардами').then(res => {
                 sessions[msg.from.id].data.push({
@@ -385,7 +385,7 @@ bot.on('forward', (msg) => {
         const isDungeonBeastFaced = regExpSetMatcher(msg.text, {
             regexpSet: regexps.dungeonBeastFaced
         });
-        
+
         if (isDungeonBeastFaced) {
             data = parseBeastFaced.parseDungeonBeastFaced(msg.text);
             dataType = 'dungeonBeastFaced';
@@ -464,7 +464,7 @@ bot.on('forward', (msg) => {
             data = parseLocation(msg.text);
             dataType = 'location';
         } else if (_.isObject(pip)) {
-            data = pip;            
+            data = pip;
             dataType = 'pipboy';
         }
 
@@ -497,6 +497,10 @@ bot.on('forward', (msg) => {
 
         const isGiantFought = regExpSetMatcher(msg.text, {
             regexpSet: regexps.giantFought
+        });
+
+        const isDungeonBeastFaced = regExpSetMatcher(msg.text, {
+            regexpSet: regexps.dungeonBeastFaced
         });
 
         if (_.isObject(pip)) {
@@ -614,6 +618,31 @@ bot.on('forward', (msg) => {
                 } else {
                     return msg.reply.text(`Прости, я никогда не слышал про этого моба :c`, {
                         asReply: true
+                    });
+                }
+            }).catch(e => console.log(e));
+        } else if (isDungeonBeastFaced) {
+            const oBeast = parseBeastFaced.parseDungeonBeastFaced(msg.text);
+
+            routedBeastView(Beast, {
+                name: oBeast.name,
+                isDungeon: true
+            }).then(({reply, beast}) => {
+                if(reply !== false) {
+                    /* const beastReplyMarkup = getBeastKeyboard(beast._id.toJSON());
+
+                    return msg.reply.text(reply,{
+                        replyMarkup: beastReplyMarkup,
+                        parseMode: 'html'
+                    }).catch(e => console.log(e)); */
+                    msg.reply.text(`Хей, у меня есть данные про *${oBeast.name}*, но я пока что не умею их выводить, прости :с`,{
+                        asReply: true,
+                        parseMode: 'markdown'
+                    })
+                } else {
+                    return msg.reply.text(`Чёрт, я никогда не слышал про *${oBeast.name}*, прости :с`, {
+                        asReply: true,
+                        parseMode: 'markdown'
                     });
                 }
             }).catch(e => console.log(e));
@@ -815,7 +844,7 @@ _или_
 *ВНИМАНИЕ: ПРИ НАЖАТИИ НА /skipbeastforward - БОТ ПРОИГНОРИРУЕТ ТОЛЬКО РЕЗУЛЬТАТ ТВОЕЙ БИТВЫ С ${reportData.beastToValidate[0].name} НЕ ЗАПИШЕТ ИХ В БАЗУ*
 `, {
     parseMode: 'markdown',
-});     
+});
     }
 
 
@@ -1119,7 +1148,7 @@ bot.on('/skippipforward', msg => {
     msg.reply.text('Окей, сейчас попробую обработать что смогу');
 
     sessions[msg.from.id].processDataConfig.usePip = false;
-    
+
     processUserData(msg, {
         usePip: sessions[msg.from.id].processDataConfig.usePip,
         useBeastFace: sessions[msg.from.id].processDataConfig.useBeastFace
@@ -1461,9 +1490,10 @@ ${beastsList}
             _id: beastId,
             isDungeon: false
         }, route).then(({reply, beast}) => {
+            // TODO: Fix keyboard for dungeon beasts
             const beastReplyMarkup = getBeastKeyboard(beast._id.toJSON());
 
-            return bot.editMessageText({chatId, messageId}, reply,{
+            return bot.editMessageText({chatId, messageId}, reply, {
                 replyMarkup: beastReplyMarkup,
                 parseMode: 'html'
             }).catch(e => console.log(e));
