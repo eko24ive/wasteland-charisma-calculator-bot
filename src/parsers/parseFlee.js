@@ -28,12 +28,16 @@ const parseFleeDefeat = flee => {
         outcome = 'lose'
     }
 
+    const [, negativePrefix, currentHealth, healthCap] = regexps.healthRegExp.exec(flee);
+    
+negativePrefix
     return {
         outcome,
         distance: Number(distance),
         capsLost,
         materialsLost,
-        healthInjuries: Number(healthInjuries)
+        healthInjuries: Number(healthInjuries),
+        currentHealth: Number(`${negativePrefix}${currentHealth}`)
     }
 };
 
