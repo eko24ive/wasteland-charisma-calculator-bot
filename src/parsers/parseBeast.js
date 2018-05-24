@@ -78,10 +78,9 @@ const parseRegularBeast = beast => {
         damagesReceived,
         damagesGiven,
         fightResult,
-        currentHealth: Number(currentHealth),
+        currentHealth: Number(`${negativePrefix}${currentHealth}`),
         amountOfConcussions,
         meta: {
-            negativePrefix,
             healthCap: Number(healthCap)
         }
     }
