@@ -1194,7 +1194,12 @@ bot.on('/skipbeastforward', msg => {
 })
 
 
-bot.on('/version', msg => msg.reply.text(config.version))
+bot.on('/version', msg => {
+    msg.reply.text(`Текущая версия бота - <b>${config.version}</b> [β]`, {
+        asReply: true,
+        parseMode: 'html'
+    });
+})
 
 bot.on('/debug', msg => {
 
