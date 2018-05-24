@@ -172,15 +172,21 @@ const processForwards = (data, config) => {
                     outcome: 'win'
                 }];
                 beastData.receivedItems = normalizeItems(data.receivedItems);
-                beastData.capsReceived = Number(data.capsReceived);
-                beastData.materialsReceived = Number(data.materialsReceived);
+
+                if(Number(data.capsReceived) !== 0) {
+                    beastData.capsReceived = Number(data.capsReceived);
+                    beastData.isDungeon = false;
+                }
+
+                if(Number(data.materialsReceived) !== 0) {
+                    beastData.materialsReceived = Number(data.materialsReceived);
+                    beastData.isDungeon = false;
+                }
             } else if (data.fightResult === 'lose') {
                 beastData.battles = [{
                     outcome: 'lost'
                 }];
 
-                beastData.capsReceived = Number(data.capsReceived);
-                beastData.materialsReceived = Number(data.materialsReceived);
                 reportData.isDead = true;
                 reportData.errors.push(`Вижу, ты склеил ласты на ${reportData.distance} километре. Сочуствую. Я не обрабатывал форварды после твоей смерти`);
             }
