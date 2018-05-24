@@ -888,10 +888,10 @@ _или_
             return beast.name === name;
         }).length > 0
     }
-    
+
     if (options.usePip !== true) {
         amountOfData = updatesData.locations.length;
-    } 
+    }
 
     if (updatesData.beasts.length > 0 && options.usePip === true) {
 
@@ -923,7 +923,7 @@ _или_
                                     }
 
                                     const existingBattle = _.clone(battle.toJSON());
-                                    
+
                                     return existingBattle.totalDamageReceived === iBeast.battles[0].totalDamageReceived &&
                                     existingBattle.totalDamageGiven === iBeast.battles[0].totalDamageGiven;
                                 }).some(result => result === true);
@@ -1123,11 +1123,15 @@ ${reportData.errors.join('\n')}
     }
 
     if (amountOfData > 0) {
+        // TODO: Move out shit to strings
+        // TODO: Implement meaningfull report data regarding found usefull data
         setTimeout(() => {
+    // Я насчитал ${amountOfData} данных!
+
             msg.reply.text(`
-Фух, я со всём справился - спасибо тебе огромное за эту информацию!
-Теперь ты опять можешь пользоваться функционалом скилокачатор, либо если ты чего-то забыл докинуть - смело жми на \`[Скинуть лог 🏃]\`
-Я насчитал ${amountOfData} данных!
+Фух, я со всём справился - спасибо тебе огромное за информацию!
+Теперь ты опять можешь пользоваться функционалом *Скилокачатора*.
+Если ты чего-то забыл докинуть - смело жми на \`[Скинуть лог 🏃]\` и _докидывай_
 ${errors}
     `, {
                 replyMarkup: defaultKeyboard,
