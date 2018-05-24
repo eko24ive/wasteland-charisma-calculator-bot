@@ -97,19 +97,19 @@ const processForwards = (data, config) => {
             return {reportData};
         }
 
-        reportData.lastPip = dataPips.pop();
+        reportData.lastPip = dataPips.pop().data;
         reportData.pipRequired = false;
     } else if (dataPips.length === 1) {
-        reportData.lastPip = dataPips.pop();
+        reportData.lastPip = dataPips.pop().data;
         reportData.pipRequired = false;
     }
 
     // 1525607351
-    if(data.filter(({date}) => date < 1525607078).length > 0) {
+    /* if(data.filter(({date}) => date < 1525607078).length > 0) {
         reportData.criticalError = 'Был замечен форвард время которого меньше за время выкатки обновы Wasteland Wars';
 
         return {reportData};
-    }
+    } */
 
     data.sort((first, second) => {
         if (first.date < second.date) {
