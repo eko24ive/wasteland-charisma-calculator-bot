@@ -1378,9 +1378,7 @@ _Если гиганта нет в списке - значит его ещё н�
         return msg.reply.text(reply, {
             parseMode: 'markdown',
             replyMarkup: giantsKeyboard
-        }).then(re => {
-            sessions[msg.from.id].giantsMessage = [msg.from.id, re.message_id];
-        })
+        });
     });
 });
 
