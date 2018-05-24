@@ -923,9 +923,9 @@ _или_
                                     }
 
                                     const existingBattle = _.clone(battle.toJSON());
-                                    delete existingBattle._id;
-
-                                    return _.isEqual(existingBattle, iBeast.battles[0]);
+                                    
+                                    return existingBattle.totalDamageReceived === iBeast.battles[0].totalDamageReceived &&
+                                    existingBattle.totalDamageGiven === iBeast.battles[0].totalDamageGiven;
                                 }).some(result => result === true);
                             }
                         }
@@ -934,9 +934,9 @@ _или_
                             if (iBeast.concussions.length > 0) {
                                 isSameConcussionExists = fBeast.concussions.map(concussion => {
                                     const existingConcussion = _.clone(concussion.toJSON());
-                                    delete existingConcussion._id;
 
-                                    return _.isEqual(existingConcussion, iBeast.concussions[0]);
+                                    return existingConcussion.stats.agility === iBeast.concussions[0].stats.agility &&
+                                            existingConcussion.amount === iBeast.concussions[0].amount;
                                 }).some(result => result === true);
                             }
                         }
@@ -945,9 +945,15 @@ _или_
                             if (iBeast.flees.length === 1) {
                                 isSameFleeExists = fBeast.flees.map(flee => {
                                     const existingFlee = _.clone(flee.toJSON());
-                                    delete existingFlee._id;
 
-                                    return _.isEqual(existingFlee, iBeast.flees[0]);
+                                    if (iBeast.flees[0].outcome === 'win') {
+                                        return existingFlee.stats.agility === iBeast.flees[0].stats.agility &&
+                                            existingFlee.outcome === iBeast.flees[0].outcome
+                                    }
+
+                                    return existingFlee.stats.agility === iBeast.flees[0].stats.agility &&
+                                            existingFlee.outcome === iBeast.flees[0].outcome &&
+                                            existingFlee.damageReceived === iBeast.flees[0].damageReceived;
                                 }).some(result => result === true);
                             }
                         }
