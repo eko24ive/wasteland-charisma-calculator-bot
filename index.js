@@ -1120,7 +1120,7 @@ _или_
 
     if (reportData.errors.length > 0) {
         errors = `
-*Также я заметил такие ошибки*:
+*Также я заметил такие вещи*:
 ${reportData.errors.join('\n')}
         `;
     }

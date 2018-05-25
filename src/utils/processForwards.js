@@ -71,7 +71,9 @@ const processForwards = (data, config) => {
         recalculationRequired: false,
         criticalError: false,
         healthCapHistory: [],
-        beastToValidate: []
+        distanceHistory: [],
+        beastToValidate: [],
+        prcoessAllowed: true
     };
 
     const updatesData = {
@@ -123,7 +125,22 @@ const processForwards = (data, config) => {
         data,
         dataType
     }) => {
-        if (dataType === 'location' && !reportData.isDead) {
+        if(reportData.prcoessAllowed) {
+            const lastDistance = _.last(reportData.distanceHistory);
+
+            const mismatch = reportData.distanceHistory.some(distance => {
+                return distance > lastDistance;
+            });
+
+            if(mismatch) {
+                reportData.prcoessAllowed = false;
+                const distanceProcessed = reportData.distanceHistory.filter((v,index) => index !== reportData.distanceHistory.length-1);
+                const lastpProcessedDistance = _.last(distanceProcessed);
+
+                reportData.errors.push(`Похоже что ты скинул километры с других кругов, я не обрабатывал данные что ты скинул после ${lastpProcessedDistance}км\nЯ обработал данные за: ${distanceProcessed.join('км, ')}км`);
+            }
+        }
+        if (dataType === 'location' && reportData.prcoessAllowed) {
             const locationData = _.clone(data);
 
             if (data.effect) {
@@ -150,13 +167,14 @@ const processForwards = (data, config) => {
             }
 
             reportData.distance = data.distance;
+            reportData.distanceHistory.push(data.distance);
 
             delete locationData.beastFaced;
             updatesData.locations.push(locationData);
 
         }
 
-        if (dataType === 'regularBeast' && !reportData.isDead) {
+        if (dataType === 'regularBeast' && reportData.prcoessAllowed) {
             const isDungeon = reportData.lastBeastSeenType !== 'regular';
 
             const beastData = {
@@ -165,6 +183,7 @@ const processForwards = (data, config) => {
 
             beastData.name = data.name;
             beastData.distanceRange = [data.distance];
+            reportData.distanceHistory.push(data.distance);
 
 
             if (data.fightResult === 'win') {
@@ -257,7 +276,7 @@ const processForwards = (data, config) => {
             reportData.healthCapHistory.push(data.meta.healthCap)
         }
 
-        if (dataType === 'dungeonBeast' && !reportData.isDead) {
+        if (dataType === 'dungeonBeast' && reportData.prcoessAllowed) {
             const isDungeon = reportData.lastBeastSeenType !== 'regular';
 
             const beastData = {
@@ -311,11 +330,13 @@ const processForwards = (data, config) => {
             updatesData.beasts.push(beastData);
         }
 
-        if (dataType === 'flee' && !reportData.isDead) {
+        if (dataType === 'flee' && reportData.prcoessAllowed) {
             const beastData = {
                 isDungeon: false,
                 distanceRange: [data.distance]
             };
+
+            reportData.distanceHistory.push(data.distance);
 
             if (reportData.lastBeastSeen) {
                 if(data.distance === reportData.lastBeastSeen.distance) {
@@ -351,8 +372,9 @@ const processForwards = (data, config) => {
             }
         }
 
-        if (dataType === 'deathMessage' && !reportData.isDead) {
+        if (dataType === 'deathMessage' && !reportData.isDead && reportData.prcoessAllowed) {
             reportData.isDead = true;
+            reportData.prcoessAllowed = false;
             reportData.capsLost -= data.capsLost;
             reportData.materialsLost -= data.materialsLost;
 
@@ -363,13 +385,13 @@ const processForwards = (data, config) => {
             reportData.errors.push(`Вижу, ты склеил ласты на ${reportData.distance} километре. Сочуствую. Я не обрабатывал форварды после твоей смерти`);
         }
 
-        if (dataType === 'pipboy') {
+        if (dataType === 'pipboy' && reportData.prcoessAllowed) {
             reportData.lastPip = data;
             reportData.pipRequired = false;
             reportData.pips.push(data);
         }
 
-        if (dataType === 'dungeonBeastFaced') {
+        if (dataType === 'dungeonBeastFaced' && reportData.prcoessAllowed) {
             reportData.lastBeastSeen = {name: data.name};
             reportData.lastBeastSeenType = 'dungeon';
         }
