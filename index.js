@@ -7,7 +7,7 @@ const _ = require('underscore');
 const TeleBot = require('telebot');
 const program = require('commander');
 const moment = require('moment-timezone');
-const objectfind = require('obj-traverse');
+const objectDeepSearch = require('object-deep-search');
 
 const beastSchema = require('./src/schemes/beast');
 const locationSchema = require('./src/schemes/location');
@@ -1548,13 +1548,14 @@ ${beastsList}
         const submenuRegExp = /equipment_menu-(.+)_.+/;
     
         const [, menu_route] = showEquipmentKeyboardRegExp.exec(msg.data);
-        const chosenMenu = objectfind.findFirst(equipmentMenu, 'content', {name: menu_route});
+        
+        const chosenMenu = objectDeepSearch.findFirst(equipmentMenu, {name: menu_route});
 
         let buttonsMenu = chosenMenu;
         
         if(submenuRegExp.test(msg.data)) {
             const [, parentMenuName] = submenuRegExp.exec(msg.data);
-            buttonsMenu = objectfind.findFirst(equipmentMenu, 'content', {name: parentMenuName});
+            buttonsMenu = objectDeepSearch.findFirst(equipmentMenu, {name: parentMenuName});
         }
 
         let chosenMenuButtons = processMenu(buttonsMenu).map(menuItem => {
@@ -1567,8 +1568,6 @@ ${beastsList}
             parseMode: 'markdown',
             replyMarkup: inlineReplyMarkup
         });
-
-        // bot.sendMessage(chatId, JSON.stringify(chosenMenu));
     }
 });
 
