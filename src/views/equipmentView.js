@@ -454,15 +454,15 @@ const inventionsArmor = `
 🏅 (187🛡) - Минизаряд(31);  Батарейка BIOS(4);  Магнит(5);  Подорожник(16);
 🔆 (198🛡) - Минизаряд(46);  Батарейка BIOS(15);  Магнит(35);  Подорожник(36);`;
 
-module.exports = {
+const menu = {
   name: 'equipment',
   title: 'Экиперовка',
-  text: equipmentText
+  text: equipmentText,
   content: [
     {
       name: 'vendor',
       title: '🏚Торгаш',
-      text: vendorText
+      text: vendorText,
       content: [
         {
           name:'vendor_weapon',
@@ -478,6 +478,10 @@ module.exports = {
           name:'vendor_helmets',
           title:'️Шлемы',
           text:vendorHelmets
+        },
+        {
+          title: 'Назад',
+          name: 'equipment'
         }
       ]
     },
@@ -495,23 +499,10 @@ module.exports = {
           name:'workbench_armor',
           title:'️Броня',
           text:workbenchArmor
-        }
-      ]
-    },
-    {
-      name: 'workbench',
-      title: '🛠Верстак',
-      text: workbenchText,
-      content: [
-        {
-          name:'workbench_weapon',
-          title:'️Оружие',
-          text: workbenchWeapon
         },
         {
-          name:'workbench_armor',
-          title:'️Броня',
-          text:workbenchArmor
+          title: 'Назад',
+          name: 'equipment'
         }
       ]
     },
@@ -544,6 +535,10 @@ module.exports = {
           name:'engineer_firstAid',
           title:'️Аптечка',
           text:engineerFirstAid
+        },
+        {
+          title: 'Назад',
+          name: 'equipment'
         }
       ]
     },
@@ -551,42 +546,68 @@ module.exports = {
       name: 'basement',
       title: '🚪Уютный подвальчик',
       text: basementText,
-      content: []
+      content: [
+        {
+          title: 'Назад',
+          name: 'equipment'
+        }
+      ]
     },
     {
       name: 'madman',
-      title: 'coreText',
+      title: '🧙‍♂Безумный старик',
       text: madmanText,
-      content: []
+      content: [
+        {
+          title: 'Назад',
+          name: 'equipment'
+        }
+      ]
     },
     {
       name: 'core',
-      title: '🕎Ядре',
+      title: '🕎Ядро',
       text: coreText,
-      content: []
+      content: [
+        {
+          title: 'Назад',
+          name: 'equipment'
+        }
+      ]
     },
     {
       name: 'accessory',
       title: '🏺Аксессуары',
       text: accessoryText,
-      content: []
+      content: [
+        {
+          title: 'Назад',
+          name: 'equipment'
+        }
+      ]
     },
     {
       name: 'inventions',
-      title: 'Изобритения',
+      title: 'Изобретения',
       text: inventionsText,
       content: [
         {
-          name: 'Оружие',
           title: 'inventions_weapon',
+          name: 'Оружие',
           text: inventionsWeapon
         },
         {
-          name: 'Броня',
           title: 'invention_armor',
+          name: 'Броня',
           text: inventionsArmor
+        },
+        {
+          title: 'Назад',
+          name: 'equipment'
         }
       ]
     }
   ]
-}
+};
+
+module.exports = menu;
