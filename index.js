@@ -7,7 +7,7 @@ const _ = require('underscore');
 const TeleBot = require('telebot');
 const program = require('commander');
 const moment = require('moment-timezone');
-const objectfind = require('obj-traverse/lib/obj-traverse');
+const objectfind = require('obj-traverse');
 
 const beastSchema = require('./src/schemes/beast');
 const locationSchema = require('./src/schemes/location');
