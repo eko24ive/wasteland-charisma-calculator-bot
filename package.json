@@ -1,8 +1,21 @@
 {
   "name": "wasteland-charisma-calculator-bot",
-  "version": "0.6",
+  "version": "1.0.0",
   "description": "",
   "main": "index.js",
+  "dependencies": {
+    "async": "^2.6.0",
+    "commander": "^2.15.1",
+    "cool-ascii-faces": "^1.3.4",
+    "dotenv": "^5.0.1",
+    "moment": "^2.22.1",
+    "moment-timezone": "^0.5.17",
+    "mongoose": "^5.0.17",
+    "numeral": "^2.0.6",
+    "telebot": "^1.2.6",
+    "underscore": "^1.9.0",
+    "object-deep-search": "0.0.7"
+  },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "node ./index.js -D",
@@ -18,20 +31,5 @@
   "bugs": {
     "url": "https://github.com/eko24ive/wasteland-charisma-calculator-bot/issues"
   },
-  "homepage": "https://github.com/eko24ive/wasteland-charisma-calculator-bot#readme",
-  "dependencies": {
-    "async": "^2.6.0",
-    "commander": "^2.15.1",
-    "dotenv": "^5.0.1",
-    "moment": "^2.22.1",
-    "moment-timezone": "^0.5.17",
-    "mongoose": "^5.0.17",
-    "numeral": "^2.0.6",
-    "object-deep-search": "0.0.7",
-    "telebot": "^1.2.6",
-    "underscore": "^1.9.0"
-  },
-  "devDependencies": {
-    "write-json-file": "^2.3.0"
-  }
+  "homepage": "https://github.com/eko24ive/wasteland-charisma-calculator-bot#readme"
 }
