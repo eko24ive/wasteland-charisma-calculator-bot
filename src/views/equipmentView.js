@@ -314,7 +314,7 @@ const basementText = `
      💪Урон: ?
 
 ❇️γ-Дезинтегратор - 📦1426900, 🔗Кубонит x99990, 🔗Осмий х79560, 🔗β-Ti3Au x66980
-     💪Урон: ?
+     💪Урон: +507
 `;
 
 const madmanText = `Вещи у 🧙‍♂Безумного старика, который живет на расстоянии 👣6км от лагеря. Все вещи у него делаются по порядку:
@@ -588,17 +588,17 @@ const menu = {
     },
     {
       name: 'inventions',
-      title: 'Изобретения',
+      title: '🔆 Изобретения',
       text: inventionsText,
       content: [
         {
-          title: 'inventions_weapon',
-          name: 'Оружие',
+          name: 'inventions_weapon',
+          title: 'Оружие',
           text: inventionsWeapon
         },
         {
-          title: 'invention_armor',
-          name: 'Броня',
+          name: 'invention_armor',
+          title: 'Броня',
           text: inventionsArmor
         },
         {
