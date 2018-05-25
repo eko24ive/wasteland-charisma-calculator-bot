@@ -1,12 +1,13 @@
 require('dotenv').config();
-var uristring = process.env.MONGODB_URI;
-var async = require('async');
+const uristring = process.env.MONGODB_URI;
 
+const async = require('async');
 const mongoose = require('mongoose');
 const _ = require('underscore');
 const TeleBot = require('telebot');
 const program = require('commander');
 const moment = require('moment-timezone');
+const objectfind = require('obj-traverse/lib/obj-traverse');
 
 const beastSchema = require('./src/schemes/beast');
 const locationSchema = require('./src/schemes/location');
@@ -31,6 +32,10 @@ const getRanges = require('./src/utils/getRanges');
 const tinyHash = require('./src/utils/tinyHash');
 
 const routedBeastView = require('./src/views/routedBeastView');
+const equipmentMenu = require('./src/views/equipmentView');
+
+const processMenu = require('./src/utils/processMenu');
+const menuItemHandler = require('./src/utils/menuItemHandler');
 
 const Beast = mongoose.model('Beast', beastSchema);
 const Giant = mongoose.model('Giant', giantScheme);
@@ -1204,37 +1209,31 @@ bot.on('/version', msg => {
     });
 })
 
+bot.on('/eqp', msg => {
+    const buttons = processMenu(equipmentMenu).map(menuItem => {
+        return bot.inlineButton(menuItem.title, {callback: `equipment_menu-${menuItem.name}`});
+    });
+
+    let inlineReplyMarkup = bot.inlineKeyboard(_.chunk(buttons, 2));
+
+    return msg.reply.text(equipmentMenu.text, {
+        parseMode: 'markdown',
+        replyMarkup: inlineReplyMarkup
+    });
+})
+
 bot.on('/debug', msg => {
 
-    let inlineReplyMarkup = bot.inlineKeyboard([
-        [
-            bot.inlineButton('Инфо', {callback: 'https://t.me/WastelandWarsBot'}),
-            bot.inlineButton('Лут', {callback: 'https://t.me/WastelandWarsBot'}),
-            bot.inlineButton('Бой', {callback: 'https://t.me/WastelandWarsBot'}),
-            bot.inlineButton('Побег', {callback: 'https://t.me/WastelandWarsBot'}),
-            bot.inlineButton('Оглушения', {callback: 'https://t.me/WastelandWarsBot'})
-        ]
-    ]);
+    const buttons = processMenu(equipmentMenu).map(menuItem => {
+        return bot.inlineButton(menuItem.title, {callback: `equipment_menu-${menuItem.name}`});
+    });
 
-    return msg.reply.text(`
-*🦎Геккон (⭐️)*
-Был замечен на 1-181км
+    let inlineReplyMarkup = bot.inlineKeyboard(_.chunk(buttons, 2));
 
-
-*Самый удачный бой при наименьшем уроне*:
-Уроне мобу 2899.
-Статы игрока: ⚔️Урон: 1365 🛡Броня: 290.
-Всего урона от моба получено - 💔749
-
-*Самый не удачный бой при наименьшем уроне*:
-Уроне мобу 1500.
-Статы игрока: ⚔️Урон: 866 🛡Броня: 110.
-Всего урона от моба получено - 💔500
-`, {
-    parseMode: 'markdown',
-    replyMarkup: inlineReplyMarkup,
-    resize: false
-});
+    return msg.reply.text(equipmentMenu.text, {
+        parseMode: 'markdown',
+        replyMarkup: inlineReplyMarkup
+    });
 })
 
 bot.on(/^\d+$/, msg => {
@@ -1440,6 +1439,7 @@ bot.on('callbackQuery', msg => {
     const chatId = msg.from.id;
     const messageId = msg.message.message_id;
     const showMobRegExp = /show_beast_(\d+)-(\d+)/;
+    const showEquipmentKeyboardRegExp = /equipment_menu-(.+)/;
     const showMobRouteRegExp = /show_beast_page_(.+)-(.+)/;
 
     if(msg.data === 'update_giants') {
@@ -1543,6 +1543,24 @@ ${beastsList}
                 parseMode: 'html'
             }).catch(e => console.log(e));
         })
+    } else if (showEquipmentKeyboardRegExp.test(msg.data)) {
+        bot.answerCallbackQuery(msg.id);
+        
+        const [, menu_route] = showEquipmentKeyboardRegExp.exec(msg.data);
+        const chosenMenu = objectfind.findFirst(equipmentMenu, 'content', {name: menu_route});
+
+        const chosenMenuButtons = processMenu(chosenMenu).map(menuItem => {
+            return bot.inlineButton(menuItem.title, {callback: `equipment_menu-${menuItem.name}`});
+        });
+
+        let inlineReplyMarkup = bot.inlineKeyboard(_.chunk(chosenMenuButtons, 2));
+
+        return bot.editMessageText({chatId, messageId}, chosenMenu.text, {
+            parseMode: 'markdown',
+            replyMarkup: inlineReplyMarkup
+        });
+
+        // bot.sendMessage(chatId, JSON.stringify(chosenMenu));
     }
 });
 
