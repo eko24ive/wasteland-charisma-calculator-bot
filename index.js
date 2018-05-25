@@ -1545,11 +1545,19 @@ ${beastsList}
         })
     } else if (showEquipmentKeyboardRegExp.test(msg.data)) {
         bot.answerCallbackQuery(msg.id);
-        
+        const submenuRegExp = /equipment_menu-(.+)_.+/;
+    
         const [, menu_route] = showEquipmentKeyboardRegExp.exec(msg.data);
         const chosenMenu = objectfind.findFirst(equipmentMenu, 'content', {name: menu_route});
 
-        const chosenMenuButtons = processMenu(chosenMenu).map(menuItem => {
+        let buttonsMenu = chosenMenu;
+        
+        if(submenuRegExp.test(msg.data)) {
+            const [, parentMenuName] = submenuRegExp.exec(msg.data);
+            buttonsMenu = objectfind.findFirst(equipmentMenu, 'content', {name: parentMenuName});
+        }
+
+        let chosenMenuButtons = processMenu(buttonsMenu).map(menuItem => {
             return bot.inlineButton(menuItem.title, {callback: `equipment_menu-${menuItem.name}`});
         });
 
