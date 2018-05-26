@@ -1210,6 +1210,7 @@ bot.on('/version', msg => {
 })
 
 bot.on('/eqp', msg => {
+    // TODO: Inline button resize
     const buttons = processMenu(equipmentMenu).map(menuItem => {
         return bot.inlineButton(menuItem.title, {callback: `equipment_menu-${menuItem.name}`});
     });
