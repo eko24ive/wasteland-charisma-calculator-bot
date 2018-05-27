@@ -37,6 +37,7 @@ const routedBeastView = require('./src/views/routedBeastView');
 
 const equipmentMenu = require('./src/staticMenus/equipmentMenu');
 const locationsMenu = require('./src/staticMenus/locationsMenu');
+const suppliesMenu = require('./src/staticMenus/suppliesMenu');
 
 
 
@@ -1236,7 +1237,21 @@ bot.on('/locations', msg => {
     let inlineReplyMarkup = bot.inlineKeyboard(_.chunk(buttons, 2));
 
     return msg.reply.text(locationsMenu.text, {
-        parseMode: 'markdown',
+        parseMode: 'html',
+        replyMarkup: inlineReplyMarkup
+    });
+})
+
+bot.on('/sppl', msg => {
+    // TODO: Inline button resize
+    const buttons = processMenu(suppliesMenu).map(menuItem => {
+        return bot.inlineButton(menuItem.title, {callback: `supplies_menu-${menuItem.name}`});
+    });
+
+    let inlineReplyMarkup = bot.inlineKeyboard(_.chunk(buttons, 2));
+
+    return msg.reply.text(suppliesMenu.text, {
+        parseMode: 'html',
         replyMarkup: inlineReplyMarkup
     });
 })
@@ -1452,8 +1467,9 @@ bot.on('callbackQuery', msg => {
     const showMobRegExp = /show_beast_(\d+)-(\d+)/;
     const showEquipmentKeyboardRegExp = /equipment_menu-(.+)/;
     const showLocationsKeyboardRegExp = /locations_menu-(.+)/;
+    const showSuppliesKeyboardRegExp = /supplies_menu-(.+)/;
     const showMobRouteRegExp = /show_beast_page_(.+)-(.+)/;
-
+    
     if(msg.data === 'update_giants') {
         Giant.find({}).then(giants => {
             bot.answerCallbackQuery(msg.id);
@@ -1606,6 +1622,36 @@ ${beastsList}
 
         return bot.editMessageText({chatId, messageId}, chosenMenu.text, {
             parseMode: locationsMenu.config.parseMode,
+            replyMarkup: inlineReplyMarkup
+        });
+    } else if (showSuppliesKeyboardRegExp.test(msg.data)) {
+        bot.answerCallbackQuery(msg.id);
+        
+
+        const submenuRegExp = /supplies_menu-(.+)+/;
+        const [, menu_route] = showSuppliesKeyboardRegExp.exec(msg.data);
+        const chosenMenu = objectDeepSearch.findFirst(suppliesMenu, {name: menu_route});
+        let buttonsMenu = chosenMenu;
+        
+        if(submenuRegExp.test(msg.data)) {
+            const [, parentMenuName] = submenuRegExp.exec(msg.data);
+            buttonsMenu = objectDeepSearch.findFirst(suppliesMenu, {name: parentMenuName});
+        }
+
+        let chosenMenuButtons = processMenu(buttonsMenu).map(menuItem => {
+            return bot.inlineButton(menuItem.title, {callback: `supplies_menu-${menuItem.name}`});
+        });
+
+        if (_.isEmpty(chosenMenuButtons)) {
+            chosenMenuButtons = processMenu(suppliesMenu).map(menuItem => {
+                return bot.inlineButton(menuItem.title, {callback: `supplies_menu-${menuItem.name}`});
+            });
+        }
+
+        let inlineReplyMarkup = bot.inlineKeyboard(_.chunk(chosenMenuButtons, 2));
+
+        return bot.editMessageText({chatId, messageId}, chosenMenu.text, {
+            parseMode: suppliesMenu.config.parseMode,
             replyMarkup: inlineReplyMarkup
         });
     }
