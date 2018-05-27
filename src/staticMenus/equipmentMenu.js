@@ -525,30 +525,31 @@ const domOfThunderText = `
 Спасибо что воспользовались нашими услугами.
 `;
 
-const menu = {
+const equipmentMenu = {
+  config: {
+    parseMode: 'markdown'
+  },
   name: 'equipment',
   title: 'Экиперовка',
   text: equipmentText,
-  content: [
-    {
+  content: [{
       name: 'vendor',
       title: '🏚Торгаш',
       text: vendorText,
-      content: [
-        {
-          name:'vendor_weapon',
-          title:'🔫Оружие',
+      content: [{
+          name: 'vendor_weapon',
+          title: '🔫Оружие',
           text: vendorWeapon
         },
         {
-          name:'vendor_armor',
-          title:'🛡️Броня',
-          text:vendorArmor
+          name: 'vendor_armor',
+          title: '🛡️Броня',
+          text: vendorArmor
         },
         {
-          name:'vendor_helmets',
-          title:'🛡️️Шлемы',
-          text:vendorHelmets
+          name: 'vendor_helmets',
+          title: '🛡️️Шлемы',
+          text: vendorHelmets
         },
         {
           title: 'Назад',
@@ -560,16 +561,15 @@ const menu = {
       name: 'workbench',
       title: '🛠Верстак',
       text: workbenchText,
-      content: [
-        {
-          name:'workbench_weapon',
-          title:'🔫Оружие',
+      content: [{
+          name: 'workbench_weapon',
+          title: '🔫Оружие',
           text: workbenchWeapon
         },
         {
-          name:'workbench_armor',
-          title:'🛡️Броня',
-          text:workbenchArmor
+          name: 'workbench_armor',
+          title: '🛡️Броня',
+          text: workbenchArmor
         },
         {
           title: 'Назад',
@@ -581,31 +581,30 @@ const menu = {
       name: 'engineer',
       title: '👓Инженер',
       text: engineerText,
-      content: [
-        {
-          name:'engineer_weapon',
-          title:'🔫Оружие',
+      content: [{
+          name: 'engineer_weapon',
+          title: '🔫Оружие',
           text: engineerWeapon
         },
         {
-          name:'engineer_armor',
-          title:'🛡️Броня',
-          text:engineerArmor
+          name: 'engineer_armor',
+          title: '🛡️Броня',
+          text: engineerArmor
         },
         {
-          name:'engineer_helmets',
-          title:'️🛡️Шлемы',
-          text:engineerHelmets
+          name: 'engineer_helmets',
+          title: '️🛡️Шлемы',
+          text: engineerHelmets
         },
         {
-          name:'engineer_modules',
-          title:'📥️Модули',
-          text:engineerModules
+          name: 'engineer_modules',
+          title: '📥️Модули',
+          text: engineerModules
         },
         {
-          name:'engineer_firstAid',
-          title:'⛑️Аптечка',
-          text:engineerFirstAid
+          name: 'engineer_firstAid',
+          title: '⛑️Аптечка',
+          text: engineerFirstAid
         },
         {
           title: 'Назад',
@@ -617,67 +616,56 @@ const menu = {
       name: 'basement',
       title: '🚪Уютный подвальчик',
       text: basementText,
-      content: [
-        {
-          title: 'Назад',
-          name: 'equipment'
-        }
-      ]
+      content: [{
+        title: 'Назад',
+        name: 'equipment'
+      }]
     },
     {
       name: 'madman',
       title: '👴Безумный старик',
       text: madmanText,
-      content: [
-        {
-          title: 'Назад',
-          name: 'equipment'
-        }
-      ]
+      content: [{
+        title: 'Назад',
+        name: 'equipment'
+      }]
     },
     {
       name: 'core',
       title: '🕎Ядро',
       text: coreText,
-      content: [
-        {
-          title: 'Назад',
-          name: 'equipment'
-        }
-      ]
+      content: [{
+        title: 'Назад',
+        name: 'equipment'
+      }]
     },
     {
       name: 'dungeons',
       title: '⚠️Подземелья',
       text: dungeonText,
-      content: [
-        {
-          title: 'Назад',
-          name: 'equipment'
-        }
-      ]
+      content: [{
+        title: 'Назад',
+        name: 'equipment'
+      }]
     },
     {
       name: 'accessory',
       title: '🏺Аксессуары',
       text: accessoryText,
-      content: [
-        {
-          title: 'Назад',
-          name: 'equipment'
-        }
-      ]
+      content: [{
+        title: 'Назад',
+        name: 'equipment'
+      }]
     },
     {
       name: 'inventions',
       title: '🔆Изобретения',
       text: inventionsText,
-      content: [
-        {
+      content: [{
           name: 'inventions_weapon',
           title: '🔫Оружие',
           text: inventionsWeapon
-        }, 
+        },
         {
           name: 'inventions_armor',
           title: '🛡️Броня',
@@ -694,14 +682,12 @@ const menu = {
       name: 'domeOfThunder',
       title: '⚡️Купол Грома',
       text: domOfThunderText,
-      content: [
-        {
-          title: 'Назад',
-          name: 'equipment'
-        }
-      ]
+      content: [{
+        title: 'Назад',
+        name: 'equipment'
+      }]
     }
   ]
 };
 
-module.exports = menu;
+module.exports = equipmentMenu;
