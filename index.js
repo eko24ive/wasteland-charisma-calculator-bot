@@ -9,6 +9,9 @@ const program = require('commander');
 const moment = require('moment-timezone');
 const objectDeepSearch = require('object-deep-search');
 
+const config = require('./package.json');
+const regexps = require('./src/regexp/regexp');
+
 const beastSchema = require('./src/schemes/beast');
 const locationSchema = require('./src/schemes/location');
 const giantScheme = require('./src/schemes/giant');
@@ -24,7 +27,10 @@ const parseBeastFaced = require('./src/parsers/parseBeastFaced');
 const parseGiantFaced = require('./src/parsers/parseGiantFaced');
 const parseGiant = require('./src/parsers/parseGiant');
 
-
+const {
+    matcher,
+    regExpSetMatcher
+} = require('./src/utils/matcher');
 const calculateUpgrade = require('./src/calculateUpgrade');
 const upgradeAmountValidation = require('./src/utils/upgradeAmountValidation');
 const processForwards = require('./src/utils/processForwards');
@@ -38,27 +44,15 @@ const routedBeastView = require('./src/views/routedBeastView');
 const equipmentMenu = require('./src/staticMenus/equipmentMenu');
 const locationsMenu = require('./src/staticMenus/locationsMenu');
 const suppliesMenu = require('./src/staticMenus/suppliesMenu');
-
-
-
-
-const Beast = mongoose.model('Beast', beastSchema);
-const Giant = mongoose.model('Giant', giantScheme);
-const Location = mongoose.model('Location', locationSchema);
-const User = mongoose.model('User', locationSchema);
+const achievementsMenu = require('./src/staticMenus/achievementsMenu');
 
 const buttons = require('./src/ui/buttons');
 
 mongoose.connect(uristring);
-
-
-const {
-    matcher,
-    regExpSetMatcher
-} = require('./src/utils/matcher');
-const regexps = require('./src/regexp/regexp');
-
-const config = require('./package.json');
+const Beast = mongoose.model('Beast', beastSchema);
+const Giant = mongoose.model('Giant', giantScheme);
+const Location = mongoose.model('Location', locationSchema);
+const User = mongoose.model('User', locationSchema);
 
 program
     .version('0.1.0')
@@ -1256,6 +1250,19 @@ bot.on('/sppl', msg => {
     });
 })
 
+bot.on('/achv', msg => {
+    const buttons = processMenu(achievementsMenu).map(menuItem => {
+        return bot.inlineButton(menuItem.title, {callback: `achievements_menu-${menuItem.name}`});
+    });
+
+    let inlineReplyMarkup = bot.inlineKeyboard(_.chunk(buttons, 2));
+
+    return msg.reply.text(achievementsMenu.text, {
+        parseMode: 'markdown',
+        replyMarkup: inlineReplyMarkup
+    });
+})
+
 bot.on('/debug', msg => {
     return msg.reply.text('fuck off', {
         asReply: true
@@ -1400,13 +1407,13 @@ Giant.find({}).then(giants => {
     const isDead = giant.health.current <= 0;
     const time = moment(giant.forwardStamp, 'X').add(3, 'hour').format('DD.MM HH:mm');
 
-    return `▫️ *${giant.name}* (${giant.distance || '??'}км) - ${time} - ${isDead ? 'убит' : `❤️${giant.health.current}`}`;
+    return `${giant.distance || '??'}км - *${giant.name}*\n${time} - ${isDead ? '💫 повержен' : `❤️${giant.health.current}`}`;
 });
 
         const reply = `
 Текущее состояние по гигантам (МСК):
 
-${_.isEmpty(giantsReply.join('\n')) ? 'Пока что данных нет' : giantsReply.join('\n')}
+${_.isEmpty(giantsReply) ? 'Пока что данных нет' : giantsReply.join('\n\n')}
 
 _Скидывайте форварды о встрече или бое с гигантом - они запишутся автоматом._
 _Если гиганта нет в списке - значит его ещё не присылали боту_
@@ -1468,6 +1475,7 @@ bot.on('callbackQuery', msg => {
     const showEquipmentKeyboardRegExp = /equipment_menu-(.+)/;
     const showLocationsKeyboardRegExp = /locations_menu-(.+)/;
     const showSuppliesKeyboardRegExp = /supplies_menu-(.+)/;
+    const showAchievementseyboardRegExp = /achievements_menu-(.+)/;
     const showMobRouteRegExp = /show_beast_page_(.+)-(.+)/;
     
     if(msg.data === 'update_giants') {
@@ -1478,13 +1486,13 @@ bot.on('callbackQuery', msg => {
             const isDead = giant.health.current <= 0;
             const time = moment(giant.forwardStamp, 'X').format('DD.MM HH:mm');
 
-            return `▫️ *${giant.name}* (${giant.distance}км) - ${time} - ${isDead ? 'убит' : `❤️${giant.health.current}`}`;
+            return `${giant.distance || '??'}км - *${giant.name}*\n${time} - ${isDead ? '💫 повержен' : `❤️${giant.health.current}`}`;
         });
 
                 const reply = `
 Текущее состояние по гигантам (МСК):
 
-${_.isEmpty(giantsReply.join('\n')) ? 'Пока что данных нет' : giantsReply.join('\n')}
+${_.isEmpty(giantsReply) ? 'Пока что данных нет' : giantsReply.join('\n\n')}
 
 _Скидывайте форварды о встрече или бое с гигантом - они запишутся автоматом._
 _Если гиганта нет в списке - значит его ещё не присылали боту_
@@ -1652,6 +1660,37 @@ ${beastsList}
 
         return bot.editMessageText({chatId, messageId}, chosenMenu.text, {
             parseMode: suppliesMenu.config.parseMode,
+            replyMarkup: inlineReplyMarkup
+        });
+    } else if (showAchievementseyboardRegExp.test(msg.data)) {
+        bot.answerCallbackQuery(msg.id);
+        showAchievementseyboardRegExp
+
+
+        const submenuRegExp = /achievements_menu-(.+)+/;
+        const [, menu_route] = showAchievementseyboardRegExp.exec(msg.data);
+        const chosenMenu = objectDeepSearch.findFirst(achievementsMenu, {name: menu_route});
+        let buttonsMenu = chosenMenu;
+        
+        if(submenuRegExp.test(msg.data)) {
+            const [, parentMenuName] = submenuRegExp.exec(msg.data);
+            buttonsMenu = objectDeepSearch.findFirst(achievementsMenu, {name: parentMenuName});
+        }
+
+        let chosenMenuButtons = processMenu(buttonsMenu).map(menuItem => {
+            return bot.inlineButton(menuItem.title, {callback: `achievements_menu-${menuItem.name}`});
+        });
+
+        if (_.isEmpty(chosenMenuButtons)) {
+            chosenMenuButtons = processMenu(achievementsMenu).map(menuItem => {
+                return bot.inlineButton(menuItem.title, {callback: `achievements_menu-${menuItem.name}`});
+            });
+        }
+
+        let inlineReplyMarkup = bot.inlineKeyboard(_.chunk(chosenMenuButtons, 2));
+
+        return bot.editMessageText({chatId, messageId}, chosenMenu.text, {
+            parseMode: achievementsMenu.config.parseMode,
             replyMarkup: inlineReplyMarkup
         });
     }
