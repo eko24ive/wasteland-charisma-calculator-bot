@@ -262,14 +262,18 @@ const defaultKeyboard = bot.keyboard([
     [
         buttons['showGiants'].label,
         buttons['showBeasts'].label,
-        buttons['showDrones'].label
+        buttons['showEquipment'].label,
     ],
     [
-        buttons['showAllLocations'].label,
-        buttons['showRaidLocations'].label,
+        buttons['showLocations'].label,
+        buttons['showSupplies'].label,
+        buttons['showAchievments'].label
     ],
     [
         buttons['hallOfFame'].label,
+        buttons['showInGameCommands'].label
+    ],
+    [
         buttons['showHelp'].label
     ]
 ], {
@@ -1217,7 +1221,7 @@ bot.on('/eqp', msg => {
         return bot.inlineButton(menuItem.title, {callback: `equipment_menu-${menuItem.name}`});
     });
 
-    let inlineReplyMarkup = bot.inlineKeyboard(_.chunk(buttons, 2));
+    let inlineReplyMarkup = bot.inlineKeyboard(_.chunk(buttons, 3));
 
     return msg.reply.text(equipmentMenu.text, {
         parseMode: 'markdown',
@@ -1231,7 +1235,7 @@ bot.on('/locations', msg => {
         return bot.inlineButton(menuItem.title, {callback: `locations_menu-${menuItem.name}`});
     });
 
-    let inlineReplyMarkup = bot.inlineKeyboard(_.chunk(buttons, 2));
+    let inlineReplyMarkup = bot.inlineKeyboard(_.chunk(buttons, 3));
 
     return msg.reply.text(locationsMenu.text, {
         parseMode: 'html',
@@ -1245,7 +1249,7 @@ bot.on('/sppl', msg => {
         return bot.inlineButton(menuItem.title, {callback: `supplies_menu-${menuItem.name}`});
     });
 
-    let inlineReplyMarkup = bot.inlineKeyboard(_.chunk(buttons, 2));
+    let inlineReplyMarkup = bot.inlineKeyboard(_.chunk(buttons, 3));
 
     return msg.reply.text(suppliesMenu.text, {
         parseMode: 'html',
@@ -1258,7 +1262,7 @@ bot.on('/achv', msg => {
         return bot.inlineButton(menuItem.title, {callback: `achievements_menu-${menuItem.name}`});
     });
 
-    let inlineReplyMarkup = bot.inlineKeyboard(_.chunk(buttons, 2));
+    let inlineReplyMarkup = bot.inlineKeyboard(_.chunk(buttons, 3));
 
     return msg.reply.text(achievementsMenu.text, {
         parseMode: 'markdown',
