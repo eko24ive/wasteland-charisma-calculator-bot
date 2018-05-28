@@ -99,12 +99,32 @@ module.exports = {
         label: "🤘 Рейдовые локации",
         command: "/raids_text"
     },
+    showLocations: {
+        label: "🏜️Локации",
+        command: "/locations"
+    },
+    showInGameCommands: {
+        label: "🔄Команды при лагах",
+        command: "/cfl"
+    },
+    showEquipment: {
+        label: "🎒Экипировка",
+        command: "/eqp"
+    },
+    showSupplies: {
+        label: "🗃Припасы",
+        command: "/sppl"
+    },
+    showAchievments: {
+        label: "✅Достижения",
+        command: "/achv"
+    },
     showHelp: {
-        label: "💬 Помощь",
+        label: "💬Помощь",
         command: "/show_help"
     },
     showDrones: {
-        label: "🛰 Дроны",
+        label: "🛰Дроны",
         command: "/show_drones"
     },
     hallOfFame: {
