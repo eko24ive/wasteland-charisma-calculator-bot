@@ -1609,7 +1609,7 @@ ${beastsList}
             return bot.inlineButton(menuItem.title, {callback: `equipment_menu-${menuItem.name}`});
         });
 
-        let inlineReplyMarkup = bot.inlineKeyboard(_.chunk(chosenMenuButtons, 2));
+        let inlineReplyMarkup = bot.inlineKeyboard(_.chunk(chosenMenuButtons, 3));
 
         return bot.editMessageText({chatId, messageId}, chosenMenu.text, {
             parseMode: 'markdown',
@@ -1637,7 +1637,7 @@ ${beastsList}
             });
         }
 
-        let inlineReplyMarkup = bot.inlineKeyboard(_.chunk(chosenMenuButtons, 2));
+        let inlineReplyMarkup = bot.inlineKeyboard(_.chunk(chosenMenuButtons, 3));
 
         return bot.editMessageText({chatId, messageId}, chosenMenu.text, {
             parseMode: locationsMenu.config.parseMode,
@@ -1667,7 +1667,7 @@ ${beastsList}
             });
         }
 
-        let inlineReplyMarkup = bot.inlineKeyboard(_.chunk(chosenMenuButtons, 2));
+        let inlineReplyMarkup = bot.inlineKeyboard(_.chunk(chosenMenuButtons, 3));
 
         return bot.editMessageText({chatId, messageId}, chosenMenu.text, {
             parseMode: suppliesMenu.config.parseMode,
@@ -1698,7 +1698,7 @@ ${beastsList}
             });
         }
 
-        let inlineReplyMarkup = bot.inlineKeyboard(_.chunk(chosenMenuButtons, 2));
+        let inlineReplyMarkup = bot.inlineKeyboard(_.chunk(chosenMenuButtons, 3));
 
         return bot.editMessageText({chatId, messageId}, chosenMenu.text, {
             parseMode: achievementsMenu.config.parseMode,
