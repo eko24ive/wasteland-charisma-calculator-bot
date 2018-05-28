@@ -262,22 +262,6 @@ const defaultKeyboard = bot.keyboard([
     [
         buttons['showGiants'].label,
         buttons['showBeasts'].label,
-        buttons['showDrones'].label
-    ],
-    [
-        buttons['showAllLocations'].label,
-        buttons['showRaidLocations'].label,
-    ],
-    [
-        buttons['hallOfFame'].label,
-        buttons['showHelp'].label
-    ]
-    /*     [
-        buttons['journeyForwardStart'].label
-    ],
-    [
-        buttons['showGiants'].label,
-        buttons['showBeasts'].label,
         buttons['showEquipment'].label,
     ],
     [
@@ -291,7 +275,7 @@ const defaultKeyboard = bot.keyboard([
     ],
     [
         buttons['showHelp'].label
-    ] */
+    ]
 ], {
     resize: true
 });
