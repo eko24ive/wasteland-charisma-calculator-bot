@@ -47,6 +47,9 @@ const suppliesMenu = require('./src/staticMenus/suppliesMenu');
 const achievementsMenu = require('./src/staticMenus/achievementsMenu');
 
 const buttons = require('./src/ui/buttons');
+const {
+    commandsForLag
+} = require('./src/strings/strings');
 
 mongoose.connect(uristring);
 const Beast = mongoose.model('Beast', beastSchema);
@@ -1261,6 +1264,10 @@ bot.on('/achv', msg => {
         parseMode: 'markdown',
         replyMarkup: inlineReplyMarkup
     });
+})
+
+bot.on('/cfl', msg => {
+    return msg.reply.text(commandsForLag);
 })
 
 bot.on('/debug', msg => {
