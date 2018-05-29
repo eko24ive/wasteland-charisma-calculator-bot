@@ -26,6 +26,7 @@ const parseDeathMessage = require('./src/parsers/parseDeathMessage');
 const parseBeastFaced = require('./src/parsers/parseBeastFaced');
 const parseGiantFaced = require('./src/parsers/parseGiantFaced');
 const parseGiant = require('./src/parsers/parseGiant');
+const parseGiantOnField = require('./src/parsers/parseGiantOnField');
 
 const {
     matcher,
@@ -506,6 +507,10 @@ bot.on('forward', (msg) => {
             regexpSet: regexps.giantFought
         });
 
+        const isGiantOnField = regExpSetMatcher(msg.text, {
+            regexpSet: regexps.giantFacedOnField
+        })
+
         const isDungeonBeastFaced = regExpSetMatcher(msg.text, {
             regexpSet: regexps.dungeonBeastFaced
         });
@@ -570,6 +575,46 @@ bot.on('forward', (msg) => {
             })
         } else if (isGiantFought) {
             const giant = parseGiant(msg.text);
+
+            Giant.findOne({
+                name: giant.name
+            }).then(fGiant => {
+                if (fGiant === null) {
+                    const newGiant = new Giant({
+                        name: giant.name,
+                        health: {
+                            current: giant.healthCurrent,
+                            cap: giant.healthCap
+                        },
+                        forwardStamp: msg.forward_date
+                    });
+
+                    newGiant.save().then(res => {
+                        return msg.reply.text('Спасибо за форвард! Я добавил его в базу!', {
+                            asReply: true
+                        });
+                    })
+                } else {
+                    if (fGiant.forwardStamp >= msg.forward_date) {
+                        return msg.reply.text(`Прости, у меня есть более свежая иформация про *${giant.name}*`, {
+                            asReply: true,
+                            parseMode: 'markdown'
+                        });
+                    } else {
+                        fGiant.health.current = giant.healthCurrent;
+                        fGiant.health.cap = giant.healthCap;
+                        fGiant.forwardStamp = msg.forward_date;
+
+                        fGiant.save().then(res => {
+                            return msg.reply.text(`Спасибо за форвард! Я обновил ${giant.name} в базе!`, {
+                                asReply: true
+                            });
+                        })
+                    }
+                }
+            });
+        } else if (isGiantOnField) {
+            const giant = parseGiantOnField(msg.text);
 
             Giant.findOne({
                 name: giant.name
@@ -1488,7 +1533,7 @@ bot.on('callbackQuery', msg => {
     const showSuppliesKeyboardRegExp = /supplies_menu-(.+)/;
     const showAchievementseyboardRegExp = /achievements_menu-(.+)/;
     const showMobRouteRegExp = /show_beast_page_(.+)-(.+)/;
-    
+
     if(msg.data === 'update_giants') {
         Giant.find({}).then(giants => {
             bot.answerCallbackQuery(msg.id);
@@ -1593,13 +1638,13 @@ ${beastsList}
     } else if (showEquipmentKeyboardRegExp.test(msg.data)) {
         bot.answerCallbackQuery(msg.id);
         const submenuRegExp = /equipment_menu-(.+)_.+/;
-    
+
         const [, menu_route] = showEquipmentKeyboardRegExp.exec(msg.data);
-        
+
         const chosenMenu = objectDeepSearch.findFirst(equipmentMenu, {name: menu_route});
 
         let buttonsMenu = chosenMenu;
-        
+
         if(submenuRegExp.test(msg.data)) {
             const [, parentMenuName] = submenuRegExp.exec(msg.data);
             buttonsMenu = objectDeepSearch.findFirst(equipmentMenu, {name: parentMenuName});
@@ -1621,7 +1666,7 @@ ${beastsList}
         const [, menu_route] = showLocationsKeyboardRegExp.exec(msg.data);
         const chosenMenu = objectDeepSearch.findFirst(locationsMenu, {name: menu_route});
         let buttonsMenu = chosenMenu;
-        
+
         if(submenuRegExp.test(msg.data)) {
             const [, parentMenuName] = submenuRegExp.exec(msg.data);
             buttonsMenu = objectDeepSearch.findFirst(locationsMenu, {name: parentMenuName});
@@ -1645,13 +1690,13 @@ ${beastsList}
         });
     } else if (showSuppliesKeyboardRegExp.test(msg.data)) {
         bot.answerCallbackQuery(msg.id);
-        
+
 
         const submenuRegExp = /supplies_menu-(.+)+/;
         const [, menu_route] = showSuppliesKeyboardRegExp.exec(msg.data);
         const chosenMenu = objectDeepSearch.findFirst(suppliesMenu, {name: menu_route});
         let buttonsMenu = chosenMenu;
-        
+
         if(submenuRegExp.test(msg.data)) {
             const [, parentMenuName] = submenuRegExp.exec(msg.data);
             buttonsMenu = objectDeepSearch.findFirst(suppliesMenu, {name: parentMenuName});
@@ -1682,7 +1727,7 @@ ${beastsList}
         const [, menu_route] = showAchievementseyboardRegExp.exec(msg.data);
         const chosenMenu = objectDeepSearch.findFirst(achievementsMenu, {name: menu_route});
         let buttonsMenu = chosenMenu;
-        
+
         if(submenuRegExp.test(msg.data)) {
             const [, parentMenuName] = submenuRegExp.exec(msg.data);
             buttonsMenu = objectDeepSearch.findFirst(achievementsMenu, {name: parentMenuName});
