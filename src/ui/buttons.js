@@ -138,5 +138,9 @@ module.exports = {
     showBeasts: {
         label: "💀Мобы",
         command: "/show_beasts"
+    },
+    cancelAction: {
+        label: "↩️Назад",
+        command: "/cancel"
     }
 };
