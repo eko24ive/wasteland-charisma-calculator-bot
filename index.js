@@ -521,13 +521,20 @@ bot.on('forward', (msg) => {
 
             const replyMarkup = bot.keyboard([
                 [buttons.skillSelectStrength.label, buttons.skillSelectAccuracy.label, buttons.skillSelectAgility.label],
-                [buttons.skillSelectHealth.label, buttons.skillSelectCharisma.label]
+                [buttons.skillSelectHealth.label, buttons.skillSelectCharisma.label],
+                [buttons.cancelAction.label]
             ], {
                 resize: true
             });
 
-            return msg.reply.text('Что качать будешь?', {
-                replyMarkup
+            return msg.reply.text(`
+Что качать будешь?
+
+Что бы вернуться в меню - нажми кнопку <code>[↩️Назад]</code>.
+Либо, в любой момент напиши /cancel.
+            `, {
+                replyMarkup,
+                parseMode: 'html'
             });
         } else if (isGiantFaced) {
             const giant = parseGiantFaced(msg.text);
@@ -1522,6 +1529,21 @@ bot.on(/mob_(.+)/, msg => {
             })
         }
     });
+});
+
+bot.on('/cancel', msg => {
+    if(sessions[msg.from.id].state === states.WAIT_FOR_DATA_TO_PROCESS) {
+        return msg.reply.text('Дождись результатов обработки форвардов', {
+            asReply: true
+        });
+    } else {
+        createSession(msg.from.id);
+
+        return msg.reply.text('Ты вернусля в главное меню', {
+            replyMarkup: defaultKeyboard
+        });
+    }
+
 })
 
 bot.on('callbackQuery', msg => {
