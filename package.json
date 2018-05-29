@@ -1,6 +1,6 @@
 {
   "name": "wasteland-charisma-calculator-bot",
-  "version": "0.7",
+  "version": "0.7.0",
   "description": "",
   "main": "index.js",
   "dependencies": {
@@ -16,6 +16,7 @@
     "underscore": "^1.9.0",
     "object-deep-search": "0.0.7"
   },
+  "devDependencies": {},
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "node ./index.js -D",
