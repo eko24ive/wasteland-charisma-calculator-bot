@@ -272,10 +272,11 @@ const defaultKeyboard = bot.keyboard([
         buttons['showAchievments'].label
     ],
     [
-        buttons['hallOfFame'].label,
+        buttons['showDungeons'].label,
         buttons['showInGameCommands'].label
     ],
     [
+        buttons['hallOfFame'].label,
         buttons['showHelp'].label
     ]
 ], {
