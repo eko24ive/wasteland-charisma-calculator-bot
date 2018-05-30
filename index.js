@@ -1625,23 +1625,21 @@ _Если гиганта нет в списке - значит его ещё н�
         const [, from, to] = showMobRegExp.exec(msg.data);
 
 
-        Beast.find({isDungeon: false, distanceRange: {$gte: Number(from), $lte: Number(to)}}).then(beasts => {
+        Beast.find({isDungeon: false, distanceRange: {$gte: Number(from), $lte: Number(to)}}, 'battles.totalDamageReceived name id').then(beasts => {
             bot.answerCallbackQuery(msg.id);
 
+            const jsonBeasts = beasts.map(b => {
+                const jsoned = b.toJSON();
 
-            const beastsList = beasts.sort((a, b) => {
-                const aBattle = _.sortBy(a.battles,'totalDamageReceived').shift();
-                const bBattle = _.sortBy(b.battles,'totalDamageReceived').shift();
-
-                if (aBattle !== undefined && bBattle !== undefined) {
-                    if (aBattle.totalDamageReceived < bBattle.totalDamageReceived)
-                        return -1;
-                    if (aBattle.totalDamageReceived > bBattle.totalDamageReceived)
-                        return 1;
+                return {
+                    id: b.id,
+                    ...jsoned
                 }
+            });
 
-                return 0;
-              }).map(beast => {
+            const beastsByDamage = _.sortBy(jsonBeasts, v => v.battles.totalDamageReceived);
+              
+            const beastsList = beastsByDamage.map(beast => {
                 return `
 ${beast.name}
 /mob_${beast.id}`;
