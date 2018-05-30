@@ -1647,6 +1647,7 @@ ${beast.name}
 
             const reply = `
 <b>Мобы на ${from}-${to}км</b>
+<i>Отсортированы от слабым к сильным</i>
 ${beastsList}
 `;
 
