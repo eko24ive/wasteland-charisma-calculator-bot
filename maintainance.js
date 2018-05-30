@@ -36,7 +36,11 @@ const bot = new TeleBot({
 });
 
 bot.on('*', msg => {
-    return msg.reply.text('*Бот выключен на момент проведения технических работ, следите за новостями на канале @wwCharismaCalculator*', {
+    return msg.reply.text(`
+*Бот выключен на момент проведения технических работ, следите за новостями на канале @wwAssistantBotNews*
+
+Также милости просим в чат - @wwAssistantChat
+    `, {
         asReply: true,
         parseMode: 'markdown'
     }).catch(e => console.log(e));
