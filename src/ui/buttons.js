@@ -142,5 +142,9 @@ module.exports = {
     cancelAction: {
         label: "↩️Назад",
         command: "/cancel"
+    },
+    showDungeons: {
+        label: "⚠️Подземелья",
+        command: "/dng"
     }
 };
