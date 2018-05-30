@@ -46,6 +46,7 @@ const equipmentMenu = require('./src/staticMenus/equipmentMenu');
 const locationsMenu = require('./src/staticMenus/locationsMenu');
 const suppliesMenu = require('./src/staticMenus/suppliesMenu');
 const achievementsMenu = require('./src/staticMenus/achievementsMenu');
+const dungeonMenu = require('./src/staticMenus/dungeonMenu');
 
 const buttons = require('./src/ui/buttons');
 const {
@@ -1322,6 +1323,20 @@ bot.on('/achv', msg => {
     });
 })
 
+bot.on('/dng', msg => {
+    const buttons = processMenu(dungeonMenu).map(menuItem => {
+        return bot.inlineButton(menuItem.title, {callback: `dungeons_menu-${menuItem.name}`});
+    });
+
+    let inlineReplyMarkup = bot.inlineKeyboard(_.chunk(buttons, 2));
+
+    return msg.reply.text(dungeonMenu.text, {
+        parseMode: 'html',
+        replyMarkup: inlineReplyMarkup,
+        webPreview: false
+    });
+})
+
 bot.on('/cfl', msg => {
     return msg.reply.text(commandsForLag);
 })
@@ -1553,7 +1568,8 @@ bot.on('callbackQuery', msg => {
     const showEquipmentKeyboardRegExp = /equipment_menu-(.+)/;
     const showLocationsKeyboardRegExp = /locations_menu-(.+)/;
     const showSuppliesKeyboardRegExp = /supplies_menu-(.+)/;
-    const showAchievementseyboardRegExp = /achievements_menu-(.+)/;
+    const showAchievementsKeyboardRegExp = /achievements_menu-(.+)/;
+    const showDungeonsKeyboardRegExp = /dungeons_menu-(.+)/;
     const showMobRouteRegExp = /show_beast_page_(.+)-(.+)/;
 
     if(msg.data === 'update_giants') {
@@ -1740,13 +1756,13 @@ ${beastsList}
             parseMode: suppliesMenu.config.parseMode,
             replyMarkup: inlineReplyMarkup
         });
-    } else if (showAchievementseyboardRegExp.test(msg.data)) {
+    } else if (showAchievementsKeyboardRegExp.test(msg.data)) {
         bot.answerCallbackQuery(msg.id);
-        showAchievementseyboardRegExp
+        showAchievementsKeyboardRegExp
 
 
         const submenuRegExp = /achievements_menu-(.+)+/;
-        const [, menu_route] = showAchievementseyboardRegExp.exec(msg.data);
+        const [, menu_route] = showAchievementsKeyboardRegExp.exec(msg.data);
         const chosenMenu = objectDeepSearch.findFirst(achievementsMenu, {name: menu_route});
         let buttonsMenu = chosenMenu;
 
@@ -1771,6 +1787,41 @@ ${beastsList}
             parseMode: achievementsMenu.config.parseMode,
             replyMarkup: inlineReplyMarkup
         });
+    } else if (showDungeonsKeyboardRegExp.test(msg.data)) {
+
+        const handler =  _.throttle(() => {
+            bot.answerCallbackQuery(msg.id);
+
+            const submenuRegExp = /dungeons_menu-(.+)+/;
+            const [, menu_route] = showDungeonsKeyboardRegExp.exec(msg.data);
+            const chosenMenu = objectDeepSearch.findFirst(dungeonMenu, {name: menu_route});
+            let buttonsMenu = chosenMenu;
+
+            if(submenuRegExp.test(msg.data)) {
+                const [, parentMenuName] = submenuRegExp.exec(msg.data);
+                buttonsMenu = objectDeepSearch.findFirst(dungeonMenu, {name: parentMenuName});
+            }
+
+            let chosenMenuButtons = processMenu(buttonsMenu).map(menuItem => {
+                return bot.inlineButton(menuItem.title, {callback: `dungeons_menu-${menuItem.name}`});
+            });
+
+            if (_.isEmpty(chosenMenuButtons)) {
+                chosenMenuButtons = processMenu(dungeonMenu).map(menuItem => {
+                    return bot.inlineButton(menuItem.title, {callback: `dungeons_menu-${menuItem.name}`});
+                });
+            }
+
+            let inlineReplyMarkup = bot.inlineKeyboard(_.chunk(chosenMenuButtons, 2));
+
+            return bot.editMessageText({chatId, messageId}, chosenMenu.text, {
+                parseMode: dungeonMenu.config.parseMode,
+                replyMarkup: inlineReplyMarkup
+            });
+        }, 2500);
+
+        handler();
+
     }
 });
 
