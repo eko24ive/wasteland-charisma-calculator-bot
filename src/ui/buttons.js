@@ -36,7 +36,7 @@ module.exports = {
         command: "/upgradeSkill"
     },
     amountOfLevelsThirty: {
-        label: "+20",
+        label: "+30",
         command: "/upgradeSkill"
     },
     amountOfLevelsFourty: {
