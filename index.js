@@ -17,7 +17,6 @@ const locationSchema = require('./src/schemes/location');
 const giantScheme = require('./src/schemes/giant');
 const userSchema = require('./src/schemes/user');
 
-
 const parsePip = require('./src/parsers/parsePip');
 const beastParser = require('./src/parsers/parseBeast');
 const parseLocation = require('./src/parsers/parseLocation');
@@ -88,18 +87,6 @@ const states = {
     WAIT_FOR_BEAST_FACE_FORWARD,
     WAIT_FOR_DATA_TO_PROCESS
 };
-
-const sessionAbort = (msg) => {
-    const replyMarkup = bot.keyboard([
-        [buttons.sessionAbortYes.label, buttons.sessionAbortNo.label]
-    ], {
-        resize: true
-    });
-
-    return bot.sendMessage(msg.from.id, 'Ты хочешь обнулить данные своего пип-боя ?', {
-        replyMarkup
-    });
-}
 
 const askAmountOfLevels = (msg) => {
     const replyMarkup = bot.keyboard([
@@ -187,11 +174,6 @@ const getEffort = (msg, bot) => {
 
     const effort = calculateUpgrade(sessions[msg.from.id]);
 
-    bot.sendMessage(msg.from.id, effort, {
-        replyMarkup: defaultKeyboard,
-        parseMode: 'markdown'
-    });
-
     console.log(`
 ------------------------------------------
 [REPLY]
@@ -200,7 +182,12 @@ Reachable distance: ${sessions[msg.from.id].reachableKm}
 Amout to upgrade: ${sessions[msg.from.id].amountToUpgrade}
 `);
 
-    delete sessions[msg.from.id];
+    bot.sendMessage(msg.from.id, effort, {
+        replyMarkup: defaultKeyboard,
+        parseMode: 'markdown'
+    });
+
+    createSession(msg.from.id);
 }
 
 const createSession = id => {
@@ -324,27 +311,6 @@ _Учти, что я ещё нахожусь в бета-режиме, и ты �
         }
     );
 });
-
-/* bot.on('/resetSession', (msg) => {
-    sessions[msg.from.id] = {
-        pip: null,
-        state: null
-    };
-
-    bot.sendMessage(
-        msg.from.id, 'Данные сброшены - можешь скинуть свой пип-бой снова.', {
-            replyMarkup: 'hide'
-        }
-    );
-});
-
-bot.on('/resetSessionAbort', (msg) => {
-    bot.sendMessage(
-        msg.from.id, 'Cброс данных отменён.', {
-            replyMarkup: 'hide'
-        }
-    );
-}); */
 
 bot.on('forward', (msg) => {
     if(msg.forward_from.id !== 430930191 && sessions[msg.from.id].state !== states.WAIT_FOR_FORWARD_END) {
@@ -1217,13 +1183,12 @@ ${errors}
         }, 1500);
     }
 
-    delete sessions[msg.from.id];
+    createSession(msg.from.id)
 }
 
 bot.on('/journeyforwardend', msg => {
     sessions[msg.from.id].state = states.WAIT_FOR_DATA_TO_PROCESS;
 
-    // console.log(JSON.stringify(sessions[msg.from.id].data));
     processUserData(msg, {
         usePip: sessions[msg.from.id].processDataConfig.usePip,
         useBeastFace: sessions[msg.from.id].processDataConfig.useBeastFace
