@@ -929,6 +929,12 @@ _или_
         }
     });
 
+    try {
+        console.log(`USAGE: ${reportData.lastPip.faction} | ${reportData.lastPip.name} | ${reportData.telegram.userName}`)
+    } catch(e) {
+        
+    }
+
     /* User.findOne({
         'telegram.id': msg.from.id
     }, function (err, user) {
