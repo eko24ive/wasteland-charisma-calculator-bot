@@ -1368,7 +1368,7 @@ bot.on(/^\d+$/, msg => {
             const pip = sessions[msg.from.id].pip;
             const skillToUpgrade = sessions[msg.from.id].upgradeSkill;
 
-            if (upgradeAmountValidation(pip, skillToUpgrade, upgradeAmount, 1060)) {
+            if (upgradeAmountValidation(pip, skillToUpgrade, upgradeAmount, 1300)) {
                 getEffort(msg, bot);
             } else {
                 msg.reply.text('Чёто дохуя получилось, попробуй число поменьше.')
@@ -1638,7 +1638,7 @@ _Если гиганта нет в списке - значит его ещё н�
             });
 
             const beastsByDamage = _.sortBy(jsonBeasts, v => v.battles.totalDamageReceived);
-              
+
             const beastsList = beastsByDamage.map(beast => {
                 return `
 ${beast.name}
