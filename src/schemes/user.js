@@ -1,21 +1,5 @@
 const mongoose = require("mongoose");
 
-/*
-meta: {
-    score: Number,
-    forwards: {
-        beast: {
-            wins: Number,
-            loss: Number,
-            flee: Number
-        },
-        locations: Number,
-        giants: Number
-
-    }
-}
-*/
-
 const userSchema = mongoose.Schema({
     telegram: {
         firstName: String,
@@ -36,6 +20,19 @@ const userSchema = mongoose.Schema({
         damage: Number,
         armor: Number,
         timeStamp: Date
+    },
+    meta: {
+        score: Number,
+        forwards: {
+            beast: {
+                wins: Number,
+                loss: Number,
+                flee: Number
+            },
+            locations: Number,
+            giants: Number
+    
+        }
     },
     history: {
         pip: [{
