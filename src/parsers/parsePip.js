@@ -74,7 +74,7 @@ const parseSimple = text => {
     return data;
 };
 
-const parsePip = ({ text, isClassic }) => {
+const parsePip = ({ text }, isClassic) => {
     if (isClassic) {
         return parseClassic(text);
     }
