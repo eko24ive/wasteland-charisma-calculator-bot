@@ -11,6 +11,7 @@ const objectDeepSearch = require('object-deep-search');
 
 const config = require('./package.json');
 const regexps = require('./src/regexp/regexp');
+const PipRegexps = require('./src/regexp/pip');
 
 const beastSchema = require('./src/schemes/beast');
 const locationSchema = require('./src/schemes/location');
@@ -324,14 +325,17 @@ bot.on('forward', (msg) => {
     }
 
     if (sessions[msg.from.id].state === states.WAIT_FOR_PIP_FORWARD) {
-        const pip = parsePip(msg);
+        const isClassicPip = regExpSetMatcher(msg.text, {
+            regexpSet: PipRegexps.classicPip
+        });
+        
+        const isSimplePip = regExpSetMatcher(msg.text, {
+            regexpSet: PipRegexps.simplePip
+        });
 
-        if (_.isObject(pip)) {
-            data = pip;
+        if (isClassicPip || isSimplePip) {
+            data = parsePip(msg, isClassicPip);
             dataType = 'pipboy';
-
-
-
 
             msg.reply.text('Супер, я вижу твой пип - сейчас обработаю его вместе с твоими форвардами').then(res => {
                 sessions[msg.from.id].data.push({
@@ -397,6 +401,7 @@ bot.on('forward', (msg) => {
     } else if (sessions[msg.from.id].state === states.WAIT_FOR_FORWARD_END) {
         let data;
         let dataType;
+
         const isLocation = regExpSetMatcher(msg.text, {
             regexpSet: regexps.location
         });
@@ -420,8 +425,14 @@ bot.on('forward', (msg) => {
         const isDungeonBeastFaced = regExpSetMatcher(msg.text, {
             regexpSet: regexps.dungeonBeastFaced
         });
-
-        const pip = parsePip(msg);
+        
+        const isClassicPip = regExpSetMatcher(msg.text, {
+            regexpSet: PipRegexps.classicPip
+        });
+        
+        const isSimplePip = regExpSetMatcher(msg.text, {
+            regexpSet: PipRegexps.simplePip
+        });
 
         /* if (isDungeonBeast) {
             data = beastParser.parseDungeonBeast(msg.text);
@@ -442,14 +453,14 @@ bot.on('forward', (msg) => {
         } else if (isLocation) {
             data = parseLocation(msg.text);
             dataType = 'location';
-        } else if (_.isObject(pip)) {
-            data = pip;
+        } else if (isClassicPip || isSimplePip) {
+            data = parsePip(msg, isClassicPip);
             dataType = 'pipboy';
         }
 
 
         // isDungeonBeast ||
-        if (isRegularBeast || isLocation || isFlee || isDeathMessage || isDungeonBeastFaced || _.isObject(pip)) {
+        if (isRegularBeast || isLocation || isFlee || isDeathMessage || isDungeonBeastFaced || (isClassicPip || isSimplePip)) {
             sessions[msg.from.id].data.push({
                 data,
                 dataType,
@@ -461,7 +472,13 @@ bot.on('forward', (msg) => {
         sessions[msg.from.id].state !== states.WAIT_FOR_BEAST_FACE_FORWARD &&
         sessions[msg.from.id].state !== states.WAIT_FOR_FORWARD_END
     ) {
-        const pip = parsePip(msg);
+        const isClassicPip = regExpSetMatcher(msg.text, {
+            regexpSet: PipRegexps.classicPip
+        });
+        
+        const isSimplePip = regExpSetMatcher(msg.text, {
+            regexpSet: PipRegexps.simplePip
+        });
 
         const isRegularBeast = regExpSetMatcher(msg.text, {
             regexpSet: regexps.regularBeastFaced
@@ -483,7 +500,9 @@ bot.on('forward', (msg) => {
             regexpSet: regexps.dungeonBeastFaced
         });
 
-        if (_.isObject(pip)) {
+        if (isClassicPip || isSimplePip) {
+            const pip = parsePip(msg, isClassicPip);
+            
             sessions[msg.from.id].pip = pip;
             sessions[msg.from.id].state = states.WAIT_FOR_SKILL;
 
