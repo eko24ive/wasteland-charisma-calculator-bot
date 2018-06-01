@@ -314,21 +314,21 @@ _Учти, что я ещё нахожусь в бета-режиме, и ты �
 });
 
 bot.on('forward', (msg) => {
+    if (sessions[msg.from.id] === undefined) {
+        createSession(msg.from.id);
+    }
+
     if(msg.forward_from.id !== 430930191 && sessions[msg.from.id].state !== states.WAIT_FOR_FORWARD_END) {
         return msg.reply.text('Форварды принимаються только от @WastelandWarsBot', {
             asReply: true
         })
     }
 
-    if (sessions[msg.from.id] === undefined) {
-        createSession(msg.from.id);
-    }
-
     if (sessions[msg.from.id].state === states.WAIT_FOR_PIP_FORWARD) {
         const isClassicPip = regExpSetMatcher(msg.text, {
             regexpSet: PipRegexps.classicPip
         });
-        
+
         const isSimplePip = regExpSetMatcher(msg.text, {
             regexpSet: PipRegexps.simplePip
         });
@@ -425,11 +425,11 @@ bot.on('forward', (msg) => {
         const isDungeonBeastFaced = regExpSetMatcher(msg.text, {
             regexpSet: regexps.dungeonBeastFaced
         });
-        
+
         const isClassicPip = regExpSetMatcher(msg.text, {
             regexpSet: PipRegexps.classicPip
         });
-        
+
         const isSimplePip = regExpSetMatcher(msg.text, {
             regexpSet: PipRegexps.simplePip
         });
@@ -475,7 +475,7 @@ bot.on('forward', (msg) => {
         const isClassicPip = regExpSetMatcher(msg.text, {
             regexpSet: PipRegexps.classicPip
         });
-        
+
         const isSimplePip = regExpSetMatcher(msg.text, {
             regexpSet: PipRegexps.simplePip
         });
@@ -502,7 +502,7 @@ bot.on('forward', (msg) => {
 
         if (isClassicPip || isSimplePip) {
             const pip = parsePip(msg, isClassicPip);
-            
+
             sessions[msg.from.id].pip = pip;
             sessions[msg.from.id].state = states.WAIT_FOR_SKILL;
 
