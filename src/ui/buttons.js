@@ -67,12 +67,12 @@ module.exports = {
         label: "40км",
         command: "/reachableKm"
     },
-    reachableKm50: {
-        label: "50км",
+    reachableKm56: {
+        label: "56км",
         command: "/reachableKm"
     },
-    reachableKm60: {
-        label: "60км",
+    reachableKm65: {
+        label: "65км",
         command: "/reachableKm"
     },
     reachableKm70: {
