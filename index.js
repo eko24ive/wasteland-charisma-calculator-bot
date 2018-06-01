@@ -192,13 +192,16 @@ const getEffort = (msg, bot) => {
         parseMode: 'markdown'
     });
 
-    console.log(`
+    console.log(`[SKILL UPGRADE]: ${reportData.lastPip.faction} | ${reportData.lastPip.name} | ${reportData.telegram.userName}`)
+
+
+/*     console.log(`
 ------------------------------------------
-[REPLY]
+[SKILL UPGRADE]
 User: ${sessions[msg.from.id].pip.name} | ${sessions[msg.from.id].pip.faction} | ${msg.from.username}
 Reachable distance: ${sessions[msg.from.id].reachableKm}
 Amout to upgrade: ${sessions[msg.from.id].amountToUpgrade}
-`);
+`); */
 
     delete sessions[msg.from.id];
 }
@@ -354,7 +357,7 @@ bot.on('forward', (msg) => {
     if(msg.forward_from.id !== 430930191) {
         if (sessions[msg.from.id].state === states.WAIT_FOR_FORWARD_END) {
             console.log(`[CULPRIT]: ${msg.from.id} | ${msg.from.first_name} | ${msg.from.username}`);
-            
+
             createSession(msg.from.id);
 
             return msg.reply.text(`
@@ -938,7 +941,7 @@ _или_
 
     let amountOfData = updatesData.beasts.length + updatesData.locations.length;
 
-    console.log({
+    /* console.log({
         reportData,
         updatesData,
         telegram: {
@@ -946,12 +949,12 @@ _или_
             firstName: msg.from.first_name,
             userName: msg.from.username
         }
-    });
+    }); */
 
     try {
-        console.log(`USAGE: ${reportData.lastPip.faction} | ${reportData.lastPip.name} | ${reportData.telegram.userName}`)
+        console.log(`[USAGE]: ${reportData.lastPip.faction} | ${reportData.lastPip.name} | ${reportData.telegram.userName}`)
     } catch(e) {
-        
+
     }
 
     /* User.findOne({
@@ -1111,7 +1114,7 @@ _или_
             }
 
         }, function (err) {
-            console.log('iterating done');
+            // console.log('iterating done');
         });
     }
 
@@ -1196,7 +1199,7 @@ _или_
                 }
             });
         }, function (err) {
-            console.log(err, 'iterating done');
+            // console.log(err, 'iterating done');
         });
     }
 
