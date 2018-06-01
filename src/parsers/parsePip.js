@@ -1,6 +1,6 @@
 const { regexps } = require('../regexp/pip');
 
-const parseClassic = ({ text }) => {
+const parseClassic = text => {
     const [, charisma] = regexps.classicCharismaRegExp.exec(text);
     const [, agility] = regexps.classicAgilityRegExp.exec(text);
     const [, name] = regexps.classicNameRegExp.exec(text);
@@ -37,7 +37,7 @@ const parseClassic = ({ text }) => {
 
     return data;
 }
-const parseSimple = ({ text }) => {
+const parseSimple = text => {
     const [, charisma] = regexps.simpleCharismaRegExp.exec(text);
     const [, agility] = regexps.simpleAgilityRegExp.exec(text);
     const [, strength] = regexps.simpleStrengthRegExp.exec(text);
@@ -74,7 +74,12 @@ const parseSimple = ({ text }) => {
     return data;
 };
 
-module.exports = {
-    parseClassic,
-    parseSimple
-};
+const parsePip = ({ text, isClassic }) => {
+    if (isClassic) {
+        return parseClassic(text);
+    }
+
+    return parseSimple(text);
+}
+
+module.exports = parsePip;
