@@ -161,8 +161,8 @@ const askReachableKm = (msg) => {
         ],
         [
 
-            buttons['reachableKm50'].label,
-            buttons['reachableKm60'].label,
+            buttons['reachableKm56'].label,
+            buttons['reachableKm65'].label,
             buttons['reachableKm70'].label
         ]
     ], {
@@ -186,13 +186,14 @@ const getEffort = (msg, bot) => {
     sessions[msg.from.id].amountToUpgrade = msg.text;
 
     const effort = calculateUpgrade(sessions[msg.from.id]);
+    const { pip } = sessions[msg.from.id];
 
     bot.sendMessage(msg.from.id, effort, {
         replyMarkup: defaultKeyboard,
         parseMode: 'markdown'
     });
 
-    console.log(`[SKILL UPGRADE]: ${reportData.lastPip.faction} | ${reportData.lastPip.name} | ${reportData.telegram.userName}`)
+    console.log(`[SKILL UPGRADE]: ${pip.faction} | ${pip.name} | ${msg.from.username}`)
 
 
 /*     console.log(`
@@ -952,7 +953,7 @@ _или_
     }); */
 
     try {
-        console.log(`[USAGE]: ${reportData.lastPip.faction} | ${reportData.lastPip.name} | ${reportData.telegram.userName}`)
+        console.log(`[USAGE]: ${reportData.lastPip.faction} | ${reportData.lastPip.name} | ${msg.from.username}`)
     } catch(e) {
 
     }
