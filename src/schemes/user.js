@@ -5,6 +5,7 @@ const userSchema = mongoose.Schema({
         firstName: String,
         id: Number,
         userName: String
+        userNamesHistory: [String]
     },
     pip: {
         version: Number,
@@ -31,7 +32,7 @@ const userSchema = mongoose.Schema({
             },
             locations: Number,
             giants: Number
-    
+
         }
     },
     history: {
