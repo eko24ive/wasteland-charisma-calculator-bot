@@ -1040,6 +1040,7 @@ _или_
                             }
                         }
 
+                        // TODO: Error logging for no stats object
                         if (iBeast.concussions) {
                             if (iBeast.concussions.length > 0) {
                                 isSameConcussionExists = fBeast.concussions.map(concussion => {
