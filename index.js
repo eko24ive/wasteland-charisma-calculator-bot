@@ -414,6 +414,7 @@ bot.on('forward', (msg) => {
     } if (sessions[msg.from.id].state === states.WAIT_FOR_BEAST_FACE_FORWARD) {
         let data;
         let dataType;
+        let beastName;
 
         const isLocation = regExpSetMatcher(msg.text, {
             regexpSet: regexps.location
@@ -426,12 +427,23 @@ bot.on('forward', (msg) => {
         if (isDungeonBeastFaced) {
             data = parseBeastFaced.parseDungeonBeastFaced(msg.text);
             dataType = 'dungeonBeastFaced';
+            beastName = data.name;
         } else if (isLocation) {
             data = parseLocation(msg.text);
             dataType = 'location';
+            beastName = data.beastFaced.name
         }
 
-        if (isLocation || isDungeonBeastFaced) {
+        if (beastName !== sessions[msg.from.id].beastToValidateName) {
+            return msg.reply.text(`
+Этот моб не похож на того с которым ты дрался. Ты чё - наебать меня вздумал?!
+
+Если ты передумал её кидать - жми /skipbeastforward
+*Но тогда я проигнорирую битву с этим мобом*
+            `, {
+                asReply: true
+            });
+        } else if (isLocation || isDungeonBeastFaced) {
             sessions[msg.from.id].data.push({
                 data,
                 dataType,
@@ -918,6 +930,7 @@ _${reportData.criticalError}_
 
     if(options.useBeastFace && !_.isEmpty(reportData.beastToValidate)) {
         sessions[msg.from.id].state = states.WAIT_FOR_BEAST_FACE_FORWARD;
+        sessions[msg.from.id].beastToValidateName = reportData.beastToValidate[0].name;
         return msg.reply.text(`
 Слушай, я не могу понять кто тебе надрал задницу, ${reportData.beastToValidate[0].name} - это обычный моб или данжевый?
 
