@@ -46,7 +46,6 @@ const achievmentMessageRegExp = /🏆Достижение получено!/;
 const achievmentContentRegExp = /✅(.+)\n(.+)/;
 
 const currentHealthRegExp = /❤️(.\d*)\/\d+/;
-const currenthealthCapRegExp = /❤️(|\-)\d+\/(\d*)/;
 
 const giantFacedRegExp = /Твой путь преградил исполинских размеров монстр/;
 const giantHealthRegExp = /(.+) \(❤️(\d+|-\d+)\/(\d+)\)/;
@@ -209,8 +208,7 @@ const regexps = {
     beastDefeatFleeRegExp,
     giantHealthRegExp,
     giantNameOnField,
-    giantHealthOnField,
-    currenthealthCapRegExp
+    giantHealthOnField
 }
 
 module.exports = {
