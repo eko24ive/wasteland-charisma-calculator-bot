@@ -51,7 +51,7 @@ const normalizeItems = items => {
 // TODO: Handle death
 // TODO: Typescript
 
-const processForwards = (data, config) => {
+const processForwards = (inputData, config) => {
     const reportData = {
         capsReceived: 0,
         capsLost: 0,
@@ -81,7 +81,7 @@ const processForwards = (data, config) => {
         beasts: []
     };
 
-    const dataPips = data.filter(({
+    const dataPips = inputData.filter(({
         dataType
     }) => dataType === 'pipboy').sort((first, second) => {
         if (first.date < second.date) {
@@ -113,7 +113,7 @@ const processForwards = (data, config) => {
         return {reportData};
     }
 
-    data.sort((first, second) => {
+    inputData.sort((first, second) => {
         if (first.date < second.date) {
             return -1;
         }
@@ -171,6 +171,7 @@ const processForwards = (data, config) => {
 
             delete locationData.beastFaced;
             updatesData.locations.push(locationData);
+            reportData.healthCapHistory.push(data.healthCap)
 
         }
 
@@ -183,6 +184,7 @@ const processForwards = (data, config) => {
 
             beastData.name = data.name;
             beastData.distanceRange = [data.distance];
+            reportData.distance = data.distance;
             reportData.distanceHistory.push(data.distance);
 
 
@@ -285,7 +287,8 @@ const processForwards = (data, config) => {
 
             beastData.name = data.name;
             beastData.distanceRange = [data.distance];
-
+            reportData.distance = data.distance;
+            reportData.distanceHistory.push(data.distance);
 
             if (data.fightResult === 'win') {
                 beastData.battles = [{
