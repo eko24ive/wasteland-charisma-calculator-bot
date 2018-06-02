@@ -22,6 +22,7 @@ const parseLocation = location => {
 
     const [, distance] = regexps.campDistanceRegExp.exec(location);
     let [, name] = regexps.locationNameRegExp.exec(location);
+    let [, ,healthCap] = regexps.currenthealthCapRegExp.exec(location);
 
     if(regexps.locationRaidPostfixRegExp.test(name)) {
         name = name.replace(regexps.locationRaidPostfixRegExp);
@@ -82,7 +83,8 @@ const parseLocation = location => {
         healthInjuries: Number(healthInjuries),
         receivedItems,
         receivedBonusItems,
-        beastFaced
+        beastFaced,
+        healthCap: Number(healthCap)
     }
 
     if(locationData.capsReceived > 0 || locationData.materialsReceived > 0) {
