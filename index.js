@@ -1,3 +1,5 @@
+// TODO: Apply pip from database to journey forwards
+// TODO: Handle forward of beast battle directly to bot and supply it with pip from database (with appropriate validation just like from the processForwards)
 require('dotenv').config();
 const uristring = process.env.MONGODB_URI;
 
