@@ -1382,7 +1382,9 @@ bot.on('/dng', msg => {
 })
 
 bot.on('/cfl', msg => {
-    return msg.reply.text(commandsForLag);
+    return msg.reply.text(commandsForLag, {
+        paresMode: 'html'
+    });
 })
 
 bot.on('/debug', msg => {
