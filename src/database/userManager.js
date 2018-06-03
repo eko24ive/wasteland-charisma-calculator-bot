@@ -100,7 +100,7 @@ const userManager = User => ({
                 return resolve({
                     ok: true,
                     reason: 'USER_FOUND',
-                    data: databaseUser.toJSON()
+                    data: databaseUser.toJSON().pip
                 });
             });
         });
