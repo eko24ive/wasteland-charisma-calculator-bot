@@ -59,6 +59,13 @@ const userManager = User => ({
                     });
                 }
 
+                if (databaseUser.pip.timeStamp > pipData.timeStamp) {
+                    return resolve({
+                        ok: false,
+                        reason: 'PIP_OUTDATED'
+                    });
+                }
+
                 databaseUser.pip = pipData;
                 databaseUser.history.pip.push(pipData);
 
