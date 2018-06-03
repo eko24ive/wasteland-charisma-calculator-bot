@@ -94,6 +94,34 @@ const states = {
     WAIT_FOR_DATA_TO_PROCESS
 };
 
+const updateOrCreate = (msg, pip, cb) => {
+    const telegramData = {
+        first_name: msg.from.first_name,
+        id: msg.from.id,
+        username: msg.from.username
+    }
+
+    const pipData = {...pip, timeStamp: msg.forward_date};
+
+    userManager.findByTelegramId(msg.from.id).then(result => {
+        if (result.ok === false && result.reason === 'USER_NOT_FOUND') {
+            userManager.create({telegramData,pipData}).then(result => {
+                cb(result);
+            });
+        } else if (result.ok === true && result.reason === 'USER_FOUND') {
+            userManager.update({telegramData,pipData}).then(result => {
+                cb(result);
+            });
+        }
+    });
+};
+
+const findPip = (msg, cb) => {
+    userManager.findByTelegramId(msg.from.id).then(result => {
+        cb(result);
+    });
+}
+
 const askAmountOfLevels = (msg) => {
     const replyMarkup = bot.keyboard([
         [
@@ -113,7 +141,7 @@ const askAmountOfLevels = (msg) => {
         resize: true
     });
 
-    return bot.sendMessage(msg.from.id, `
+    return msg.reply.text(msg.from.id, `
 Выбери на сколько уровней ты хочешь прокачать *${sessions[msg.from.id].upgradeSkill}*
 \`Либо напиши своё количество (например: 17)\`
 `, {
@@ -252,7 +280,8 @@ const bot = new TeleBot({
 
 const defaultKeyboard = bot.keyboard([
     [
-        buttons['journeyForwardStart'].label
+        buttons['journeyForwardStart'].label,
+        buttons['skillUpgrade'].label
     ],
     [
         buttons['showGiants'].label,
@@ -275,6 +304,18 @@ const defaultKeyboard = bot.keyboard([
 ], {
     resize: true
 });
+
+const toGameKeyboard = bot.inlineKeyboard([
+    [
+        bot.inlineButton('📟 Перейти в игру.', {url: 'https://t.me/WastelandWarsBot'})
+    ]
+]);
+
+const toSkillOMaticKeyboard = bot.inlineKeyboard([
+    [
+        bot.inlineButton('Запустить "🎓Скилокачатор"', {callback: 'initialize_skill_upgrade'})
+    ]
+]);
 
 
 const getBeastKeyboard = beastId => {
@@ -299,17 +340,17 @@ bot.on('/start', (msg) => {
         `
 Привет, меня зовут «*Wasteland Wars Assistant*», я - что-то на подобии "умной" энциклопедии.
 
-Как только ты перешлёшь мне свой *📟Пип-бой* - я помогу тебе узнать сколько нужно сделать заходов и крышек для прокачки твоих навыков.
-Если хочешь посмотреть что я знаю о мобе которого ты встретил - скинь форвард встречи с ним.
+⬦ Если хочешь посмотреть что я знаю о мобе которого ты встретил - скинь форвард встречи с ним.
 
-Если хочешь научить бота новому - нажими \`[Скинуть лог 🏃]\`, затем cкидывай все свои форварды, которые хочешь записать(я умею обрабатывать бои и побеги с монстрами и проход км) и в конце свежий пип. Затем жми \`[Стоп 🙅‍♂️]\` и жди моего ответа.
+⬦ Если хочешь что бы я помог тебе информацией о прокачке твоих скилов - жми кнопку \`[🎓Скилокачатор]\`
 
+⬦ Если хочешь отправить боту новые данные про мобов - нажими \`[Скинуть лог 🏃]\`
 
 КАНАЛ С НОВОСТЯМИ @wwAssistantBotNews
 ЧАТ БЫСТРОГО РЕАГИРОВАНИЯ @wwAssistantChat
 
 _Учти, что я ещё нахожусь в бета-режиме, и ты можешь наткнуться на большие и маленькие баги.
-Но, не переживай - они будут пофикшены_
+Не переживай - они будут пофикшены_
         `, {
             replyMarkup: defaultKeyboard,
             parseMode: 'markdown',
@@ -507,46 +548,32 @@ bot.on('forward', (msg) => {
 
         if (isClassicPip || isSimplePip) {
             const pip = parsePip(msg, isClassicPip);
-
-            sessions[msg.from.id].pip = pip;
-            sessions[msg.from.id].state = states.WAIT_FOR_SKILL;
-
-            const replyMarkup = bot.keyboard([
-                [buttons.skillSelectStrength.label, buttons.skillSelectAccuracy.label, buttons.skillSelectAgility.label],
-                [buttons.skillSelectHealth.label, buttons.skillSelectCharisma.label],
-                [buttons.cancelAction.label]
-            ], {
-                resize: true
-            });
-
-            const telegramData = {
-                first_name: msg.from.first_name,
-                id: msg.from.id,
-                username: msg.from.username
-            }
-
-            const pipData = {...pip, timeStamp: msg.forward_date};
-
-            userManager.findByTelegramId(msg.from.id).then(result => {
-                if (result.ok === false && result.reason === 'USER_NOT_FOUND') {
-                    userManager.create({telegramData,pipData}).then(result => {
-                        result;
-                    });
-                } else if (result.ok === true && result.reason === 'USER_FOUND') {
-                    userManager.update({telegramData,pipData}).then(result => {
-                        result;
-                    });
+            let reply;
+            updateOrCreate(msg,pip, result => {
+                if(!result.ok && result.reason === 'PIP_VALIDATION_FAILED') {
+                    reply = `Я не вижу что бы ты прокачал какие-то скилы :c
+Скидывай пип-бой как только прокачаешься!`;
                 }
-            });
 
-            return msg.reply.text(`
-Что качать будешь?
+                if(!result.ok && result.reason === 'PIP_OUTDATED') {
+                    reply = 'У меня в базе есть более актуальная запись про твой пип-бой';
+                }
+                
+                if(result.ok && result.reason === 'USER_CREATED') {
+                    reply = `
+Супер, я сохранил твой пип!
+Не забывай скидывать мне свой пип-бой по мере того как будешь скидывать скилы!`;
+                }
+                
+                if(result.ok && result.reason === 'USER_UPDATED') {
+reply = `Шикардос, я обновил твой пип!
+Не забудь скинуть новый пип, когда качнешься!`;
+                }
 
-Что бы вернуться в меню - нажми кнопку <code>[↩️Назад]</code>.
-Либо, в любой момент напиши /cancel.
-            `, {
-                replyMarkup,
-                parseMode: 'html'
+                return msg.reply.text(reply, {
+                    asReply: true,
+                    replyMarkup: toSkillOMaticKeyboard
+                });
             });
         } else if (isGiantFaced) {
             const giant = parseGiantFaced(msg.text);
@@ -829,7 +856,7 @@ bot.on('/upgradeSkill', msg => {
 bot.on('/journeyforwardstart', msg => {
     createSession(msg.from.id);
 
-    let inlineReplyMarkup = bot.inlineKeyboard([
+    const inlineReplyMarkup = bot.inlineKeyboard([
         [
             bot.inlineButton('📟 Перейти в игру.', {url: 'https://t.me/WastelandWarsBot'})
         ]
@@ -1349,6 +1376,71 @@ bot.on('/cfl', msg => {
     return msg.reply.text(commandsForLag);
 })
 
+bot.on('/skill_upgrade', msg => {
+    const skillOMaticText = `
+В «<b>🎓 Скилокачаторе</b>» я могу помочь тебе посчитать финансовые затраты на прокачку твоих скилов.`;
+
+    findPip(msg, result => {
+        if(result.ok && result.reason === 'USER_FOUND') {
+            if(sessions[msg.from.id] === undefined) {
+                createSession(msg.from.id);
+            }
+
+            sessions[msg.from.id].pip = result.data;
+            sessions[msg.from.id].state = states.WAIT_FOR_SKILL;
+
+            const replyMarkup = bot.keyboard([
+                [buttons.skillSelectStrength.label, buttons.skillSelectAccuracy.label, buttons.skillSelectAgility.label],
+                [buttons.skillSelectHealth.label, buttons.skillSelectCharisma.label],
+                [buttons.cancelAction.label]
+            ], {
+                resize: true
+            });
+
+            const skillMap = {
+                "health": "❤ Живучесть",
+                "strength": "💪 Сила",
+                "precision": "🔫 Меткость",
+                "charisma": "🗣 Харизма",
+                "agility": "🤸‍♀️ Ловкость"
+            };
+
+            const userSkills = Object.keys(skillMap).map(key => {
+                const skillName = skillMap[key];
+
+                return `<b>${skillName}</b>: ${result.data[key]}`;
+            })
+
+            return msg.reply.text(`
+${skillOMaticText}
+
+Вот что я знаю про твои скилы:
+${userSkills.join('\n')}
+<i>(Если они не акутальные - просто отправь мне свой новый пип-бой)</i>
+
+
+<b>Выбери какой скил ты хочешь прокачать</b>
+
+Что бы вернуться в меню - нажми кнопку <code>[↩️Назад]</code>.
+Либо, в любой момент напиши /cancel.
+            `, {
+                replyMarkup,
+                parseMode: 'html'
+            });
+        }
+
+        return msg.reply.text(`
+${skillOMaticText}
+
+Оу, похоже я ещё ничего не знаю про твой пип :с
+Перейди в игру по кнопке внизу и перешли мне его пожалуйста!
+        `, {
+            replyMarkup: toGameKeyboard,
+            parseMode: 'html'
+        });
+    });
+})
+
 bot.on('/debug', msg => {
     userManager.findByTelegramId(msg.from.id).then(result => {
         return msg.reply.text(JSON.stringify(result), {
@@ -1830,7 +1922,70 @@ ${beastsList}
         }, 2500);
 
         handler();
+    } else if (msg.data === 'initialize_skill_upgrade') {
+        const skillOMaticText = `
+В «<b>🎓 Скилокачаторе</b>» я могу помочь тебе посчитать финансовые затраты на прокачку твоих скилов.`;
 
+    findPip(msg, result => {
+        bot.answerCallbackQuery(msg.id);
+        if(result.ok && result.reason === 'USER_FOUND') {
+            if(sessions[msg.from.id] === undefined) {
+                createSession(msg.from.id);
+            }
+
+            sessions[msg.from.id].pip = result.data;
+            sessions[msg.from.id].state = states.WAIT_FOR_SKILL;
+
+            const replyMarkup = bot.keyboard([
+                [buttons.skillSelectStrength.label, buttons.skillSelectAccuracy.label, buttons.skillSelectAgility.label],
+                [buttons.skillSelectHealth.label, buttons.skillSelectCharisma.label],
+                [buttons.cancelAction.label]
+            ], {
+                resize: true
+            });
+
+            const skillMap = {
+                "health": "❤ Живучесть",
+                "strength": "💪 Сила",
+                "precision": "🔫 Меткость",
+                "charisma": "🗣 Харизма",
+                "agility": "🤸‍♀️ Ловкость"
+            };
+
+            const userSkills = Object.keys(skillMap).map(key => {
+                const skillName = skillMap[key];
+
+                return `<b>${skillName}</b>: ${result.data[key]}`;
+            })
+
+            return bot.sendMessage(msg.from.id, `
+${skillOMaticText}
+
+Вот что я знаю про твои скилы:
+${userSkills.join('\n')}
+<i>(Если они не акутальные - просто отправь мне свой новый пип-бой)</i>
+
+
+<b>Выбери какой скил ты хочешь прокачать</b>
+
+Что бы вернуться в меню - нажми кнопку <code>[↩️Назад]</code>.
+Либо, в любой момент напиши /cancel.
+            `, {
+                replyMarkup,
+                parseMode: 'html'
+            });
+        }
+
+        return bot.sendMessage(msg.from.id, `
+${skillOMaticText}
+
+Оу, похоже я ещё ничего не знаю про твой пип :с
+Перейди в игру по кнопке внизу и перешли мне его пожалуйста!
+        `, {
+            replyMarkup: toGameKeyboard,
+            parseMode: 'html'
+        });
+    });
     }
 });
 
