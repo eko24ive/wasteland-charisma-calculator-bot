@@ -1200,6 +1200,7 @@ _или_
 
                             if (!_.isEmpty(fLocation.receivedBonusItems)) {
                                 if (fLocation.receivedBonusItems[item]) {
+                                    // FIXME: TypeError: fLocation.receivedBonusItems[item].push is not a function
                                     if (!_.contains(fLocation.receivedBonusItems[item], amount)) {
                                         fLocation.receivedBonusItems[item].push(amount);
                                     }
