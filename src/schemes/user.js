@@ -33,7 +33,6 @@ const userSchema = mongoose.Schema({
             },
             locations: Number,
             giants: Number
-
         }
     },
     history: {
