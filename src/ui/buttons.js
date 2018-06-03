@@ -146,5 +146,9 @@ module.exports = {
     showDungeons: {
         label: "⚠️Подземелья",
         command: "/dng"
+    },
+    skillUpgrade: {
+        label: "🎓Скилокачатор",
+        command: "/skill_upgrade"
     }
 };
