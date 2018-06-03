@@ -14,9 +14,7 @@ let purgeAmount = 0;
 let issuesFound = 0;
 
 Beast.find({
-    'battles.stats': {
-        $exists: false
-    }
+    'battles.stats': null
 }).then(beasts => {
     async.forEach(beasts, function (databaseBeast, next) {
         const beast = databaseBeast.toJSON();

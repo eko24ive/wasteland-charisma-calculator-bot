@@ -14,13 +14,11 @@ let purgeAmount = 0;
 let issuesFound = 0;
 
 Beast.find({
-    'battles.stats': {
-        $exists: false
-    }
+    'concussions.stats': null
 }).then(beasts => {
     async.forEach(beasts, function (databaseBeast, next) {
         const beast = databaseBeast.toJSON();
-        const battlesBefore = beast.concussions.length;
+        const concussionsBefore = beast.concussions.length;
 
         if(_.isEmpty(beast.concussions)) {
             return next();
@@ -30,7 +28,7 @@ Beast.find({
             return _.isEmpty(battle.toJSON().stats);
         }).forEach(battle => databaseBeast.concussions.remove(battle.id));
 
-        purgeAmount += battlesBefore - databaseBeast.toJSON().concussions.length;
+        purgeAmount += concussionsBefore - databaseBeast.toJSON().concussions.length;
         issuesFound++;
 
         databaseBeast.save().then(() => next());
