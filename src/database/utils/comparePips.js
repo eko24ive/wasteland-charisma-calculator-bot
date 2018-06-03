@@ -3,8 +3,10 @@ const _ = require('underscore');
 const blacklistKeys = [
   'faction',
   'name',
-  'version'
-]
+  'version',
+  'armor',
+  'timeStamp'
+];
 
 const comparePips = (newPip, lastPip) => {
   return Object.keys(lastPip).map(key => {
@@ -18,8 +20,10 @@ const comparePips = (newPip, lastPip) => {
     }
 
 
-    return true;
-  }).every(validation => validation === true);
+    return null;
+  })
+  .filter(validation => validation !== null)  
+  .some(validation => validation === true);
 }
 
 module.exports = comparePips;
