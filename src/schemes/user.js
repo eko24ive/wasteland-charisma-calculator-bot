@@ -24,7 +24,7 @@ const userSchema = mongoose.Schema({
         endurance: Number,
         damage: Number,
         armor: Number,
-        timeStamp: Date
+        timeStamp: Number
     },
     points: {
         score: {
