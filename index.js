@@ -1594,6 +1594,13 @@ bot.on(/mob_(.+)/, msg => {
 });
 
 bot.on('/cancel', msg => {
+    if(sessions[msg.from.id] === undefined) {
+        createSession(msg.from.id);
+
+        return msg.reply.text('Ты вернусля в главное меню', {
+            replyMarkup: defaultKeyboard
+        });
+    }
     if(sessions[msg.from.id].state === states.WAIT_FOR_DATA_TO_PROCESS) {
         return msg.reply.text('Дождись результатов обработки форвардов', {
             asReply: true
@@ -1625,7 +1632,7 @@ bot.on('callbackQuery', msg => {
 
             const giantsReply = _.sortBy(giants, 'distance').map(giant => {
             const isDead = giant.health.current <= 0;
-            const time = moment(giant.forwardStamp, 'X').format('DD.MM HH:mm');
+            const time = moment(giant.forwardStamp, 'X').add(3, 'hour').format('DD.MM HH:mm');
 
             return `${giant.distance || '??'}км - *${giant.name}*\n${time} - ${isDead ? '💫 повержен' : `❤️${giant.health.current}`}`;
         });
