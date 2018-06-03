@@ -53,11 +53,16 @@ const {
     commandsForLag
 } = require('./src/strings/strings');
 
+const UserManager = require('./src/database/userManager');
+
 mongoose.connect(uristring);
+
 const Beast = mongoose.model('Beast', beastSchema);
 const Giant = mongoose.model('Giant', giantScheme);
 const Location = mongoose.model('Location', locationSchema);
-const User = mongoose.model('User', locationSchema);
+const User = mongoose.model('User', userSchema);
+
+const userManager = UserManager(User);
 
 program
     .version('0.1.0')
@@ -512,6 +517,26 @@ bot.on('forward', (msg) => {
                 [buttons.cancelAction.label]
             ], {
                 resize: true
+            });
+
+            const telegramData = {
+                first_name: msg.from.first_name,
+                id: msg.from.id,
+                username: msg.from.username
+            }
+
+            const pipData = {...pip, timeStamp: msg.forward_date};
+
+            userManager.findByTelegramId(msg.from.id).then(result => {
+                if (result.ok === false && result.reason === 'USER_NOT_FOUND') {
+                    userManager.create({telegramData,pipData}).then(result => {
+                        result;
+                    });
+                } else if (result.ok === true && result.reason === 'USER_FOUND') {
+                    userManager.update({telegramData,pipData}).then(result => {
+                        result;
+                    });
+                }
             });
 
             return msg.reply.text(`
@@ -1268,7 +1293,6 @@ bot.on('/eqp', msg => {
 })
 
 bot.on('/locations', msg => {
-    // TODO: Inline button resize
     const buttons = processMenu(locationsMenu).map(menuItem => {
         return bot.inlineButton(menuItem.title, {callback: `locations_menu-${menuItem.name}`});
     });
@@ -1282,7 +1306,6 @@ bot.on('/locations', msg => {
 })
 
 bot.on('/sppl', msg => {
-    // TODO: Inline button resize
     const buttons = processMenu(suppliesMenu).map(menuItem => {
         return bot.inlineButton(menuItem.title, {callback: `supplies_menu-${menuItem.name}`});
     });
@@ -1327,10 +1350,12 @@ bot.on('/cfl', msg => {
 })
 
 bot.on('/debug', msg => {
-    return msg.reply.text('fuck off', {
-        asReply: true
-    })
-})
+    userManager.findByTelegramId(msg.from.id).then(result => {
+        return msg.reply.text(JSON.stringify(result), {
+            asReply: true
+        });
+    });
+});
 
 bot.on(/^\d+$/, msg => {
     switch (sessions[msg.from.id].state) {
