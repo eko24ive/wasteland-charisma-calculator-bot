@@ -1,7 +1,10 @@
 const mongoose = require("mongoose");
 
 const userSchema = mongoose.Schema({
-    restricted: Boolean,
+    restricted: {
+        type: Boolean,
+        default: false
+    },
     telegram: {
         firstName: String,
         id: Number,
@@ -24,15 +27,33 @@ const userSchema = mongoose.Schema({
         timeStamp: Date
     },
     points: {
-        score: Number,
+        score: {
+            type: Number,
+            default: 0
+        },
         forwards: {
             beast: {
-                wins: Number,
-                loss: Number,
-                flee: Number
+                wins: {
+                    type: Number,
+                    default: 0
+                },
+                loss: {
+                    type: Number,
+                    default: 0
+                },
+                flee: {
+                    type: Number,
+                    default: 0
+                }
             },
-            locations: Number,
-            giants: Number
+            locations: {
+                type: Number,
+                default: 0
+            },
+            giants: {
+                type: Number,
+                default: 0
+            }
         }
     },
     history: {
