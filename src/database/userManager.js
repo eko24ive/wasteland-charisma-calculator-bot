@@ -1,48 +1,103 @@
+const _ = require('underscore');
+const comparePips = require('./utils/comparePips');
+
 const userManager = User => ({
     create: ({telegramData, pipData}) => {
         return new Promise((resolve, reject) => {
-            const newUser = new User({
-
+            User.findOne({
+                'telegram.firstName': telegramData.first_name,
+                'telegram.id': telegramData.id,
+                $or: [
+                    {'telegram.userName': telegramData.username},
+                    {'telegram.userNamesHistory': telegramData.username}
+                ]
+            }).then(databaseUser => {
+                if(databaseUser !== null) {
+                    return resolve({
+                        ok: false,
+                        status: 'USER_ALREADY_EXISTS'
+                    });
+                }
             });
 
-
-            newUser.save().then(user => {
-                if(user === null) {
-                    resolve(null);
+            const newUser = new User({
+                telegram: {
+                    firstName: telegramData.first_name,
+                    id: telegramData.id,
+                    userName: telegramData.username,
+                    userNamesHistory: [telegramData.first_name]
+                },
+                pip: pipData,
+                history: {
+                    pip: [pipData]
                 }
+            });
 
-                resolve(user.toJSON());
+            newUser.save().then(databaseUser => {
+                return resolve({
+                    ok: true,
+                    reason: 'USER_CREATED',
+                    data: databaseUser.toJSON()
+                });
             });
         });
     },
-    update: ({id, telegramData, pipData}) => {
+    update: ({telegramData, pipData}) => {
         return new Promise((resolve, reject) => {
-            User.find({'telegram.id': id}).then(user => {
-                // TODO: Detect is pip outdated
-                // TODO: Detect is skills decreased
-                // TODO: Detect is skills upgraded
-                // TODO: Update pip values
-                // TODO: Update pip history
-                // TODO: Detect telegram username change and update if necessary
-
-
-                if(user === null) {
-                    resolve(null);
+            User.findOne({'telegram.id': telegramData.id}).then(databaseUser => {
+                if(databaseUser === null) {
+                    return resolve({
+                        ok: false,
+                        reason: 'USER_NOT_FOUND'
+                    });
                 }
 
-                resolve(user.toJSON());
+                if (!comparePips(pipData, databaseUser.pip)) {
+                    return resolve({
+                        ok: false,
+                        reason: 'PIP_VALIDATION_FAILED'
+                    });
+                }
+
+                databaseUser.pip = pipData;
+                databaseUser.history.pip.push(pipData);
+
+                if(databaseUser.telegram.username !== telegramData.user_name) {
+                    databaseUser.telegram.username = telegramData.user_name;
+
+                    if(!_.contains(databaseUser.telegram.userNamesHistory, telegramData.user_name)) {
+                        databaseUser.telegram.userNamesHistory.push(telegramData.user_name);
+                    }
+                }
+
+                databaseUser.save().then(databaseUser => {
+                    return resolve({
+                        ok: true,
+                        reason: 'USER_UPDATED',
+                        data: databaseUser.toJSON()
+                    });
+                });
             });
         });
     },
     findByTelegramId: id => {
         return new Promise((resolve, reject) => {
-            User.find({'telegram.id': id}).then(user => {
-                if(user === null) {
-                    resolve(null);
+            User.findOne({'telegram.id': id}).then(databaseUser => {
+                if(databaseUser === null) {
+                    return resolve({
+                        ok: false,
+                        reason: 'USER_NOT_FOUND'
+                    });
                 }
 
-                resolve(user.toJSON());
+                return resolve({
+                    ok: true,
+                    reason: 'USER_FOUND',
+                    data: databaseUser.toJSON()
+                });
             });
         });
     },
 });
+
+module.exports = userManager;
