@@ -52,17 +52,17 @@ const userManager = User => ({
                     });
                 }
 
-                if (!comparePips(pipData, databaseUser.pip)) {
-                    return resolve({
-                        ok: false,
-                        reason: 'PIP_VALIDATION_FAILED'
-                    });
-                }
-
                 if (databaseUser.pip.timeStamp > pipData.timeStamp) {
                     return resolve({
                         ok: false,
                         reason: 'PIP_OUTDATED'
+                    });
+                }
+
+                if (!comparePips(pipData, databaseUser.pip)) {
+                    return resolve({
+                        ok: false,
+                        reason: 'PIP_VALIDATION_FAILED'
                     });
                 }
 
