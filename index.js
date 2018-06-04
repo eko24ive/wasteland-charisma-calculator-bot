@@ -1,4 +1,3 @@
-// TODO: Apply pip from database to journey forwards
 // TODO: Handle forward of beast battle directly to bot and supply it with pip from database (with appropriate validation just like from the processForwards)
 require('dotenv').config();
 const uristring = process.env.MONGODB_URI;
@@ -950,9 +949,8 @@ _${reportData.criticalError}_
     }
 
     if (options.usePip && reportData.pipRequired) {
-        // try to use pip from database
         userManager.findByTelegramId(msg.from.id).then(result => {
-            if(result.ok && result.status === 'USER_FOUND') {
+            if(result.ok && result.reason === 'USER_FOUND') {
                 sessions[msg.from.id].data.push({
                     data: result.data,
                     dataType: 'pipboy',
@@ -960,13 +958,11 @@ _${reportData.criticalError}_
                 });
 
                 const {
-                    reportDataWithUserPip,
-                    updatesDataWithUserPip
+                    reportData: reportDataWithUserPip,
+                    updatesData: updatesDataWithUserPip
                 } = processForwards(data);
 
                 if(reportDataWithUserPip.criticalError) {
-                    console.log(reportDataWithUserPip.criticalError);
-
                     sessions[msg.from.id].state = states.WAIT_FOR_PIP_FORWARD;
         return msg.reply.text(`
 Твой пип-бой, который я когда-то сохранил - устарел.
@@ -990,10 +986,13 @@ _${reportData.criticalError}_
 *ВНИМАНИЕ: ПРИ НАЖАТИИ НА /skippipforward - БОТ ПРОИГНОРИРУЕТ ТВОИ БИТВЫ И ПОБЕГИ ОТ МОБОВ И НЕ ЗАПИШЕТ ИХ В БАЗУ*
 `, {
     parseMode: 'markdown',
+    replyMarkup: toGameKeyboard
 });
             }
         });
     }
+
+    // TODO: Try to silently update pip
 
     if(options.useBeastFace && !_.isEmpty(reportData.beastToValidate)) {
         sessions[msg.from.id].state = states.WAIT_FOR_BEAST_FACE_FORWARD;
@@ -1012,7 +1011,6 @@ _или_
     parseMode: 'markdown',
 });
     }
-
 
 
     msg.reply.text(`Перехожу в режим обработки данных, подожди пожалуйста немного :3`, {
@@ -1254,7 +1252,6 @@ _или_
             console.log(err, 'iterating done');
         });
     }
-
 
     // if PIP exist - try to apply it to given data
     // if not - request recent PIP
