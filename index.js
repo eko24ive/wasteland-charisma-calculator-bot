@@ -1265,13 +1265,22 @@ ${errors}
 }
 
 bot.on('/journeyforwardend', msg => {
-    sessions[msg.from.id].state = states.WAIT_FOR_DATA_TO_PROCESS;
+    if(sessions[msg.from.id] === undefined) {
+        createSession(msg.from.id);
 
-    // console.log(JSON.stringify(sessions[msg.from.id].data));
-    processUserData(msg, {
-        usePip: sessions[msg.from.id].processDataConfig.usePip,
-        useBeastFace: sessions[msg.from.id].processDataConfig.useBeastFace
-    });
+        return msg.reply.text(`Чёрт, похоже что бот был перезагружен и твои форварды не сохранились, прости пожалуйста :с`, {
+            replyMarkup: defaultKeyboard
+        });
+    } else {
+        sessions[msg.from.id].state = states.WAIT_FOR_DATA_TO_PROCESS;
+
+        // console.log(JSON.stringify(sessions[msg.from.id].data));
+        processUserData(msg, {
+            usePip: sessions[msg.from.id].processDataConfig.usePip,
+            useBeastFace: sessions[msg.from.id].processDataConfig.useBeastFace
+        });
+    }
+
 });
 
 bot.on('/journeyforwardcancel', msg => {
