@@ -385,17 +385,46 @@ bot.on('forward', (msg) => {
             data = parsePip(msg, isClassicPip);
             dataType = 'pipboy';
 
-            msg.reply.text('Супер, я вижу твой пип - сейчас обработаю его вместе с твоими форвардами').then(res => {
-                sessions[msg.from.id].data.push({
-                    data,
-                    dataType,
-                    date: msg.forward_date
-                });
+            updateOrCreate(msg,pip, result => {
+                if(!result.ok && result.reason === 'PIP_VALIDATION_FAILED') {
+                    reply = `Я не вижу что бы ты прокачал какие-то скилы :c
+Скидывай пип-бой как только прокачаешься!`;
+                }
 
-                processUserData(msg, {
-                    usePip: sessions[msg.from.id].processDataConfig.usePip,
-                    useBeastFace: sessions[msg.from.id].processDataConfig.useBeastFace
-                })
+                if(!result.ok && result.reason === 'PIP_OUTDATED') {
+                    reply = 'У меня в базе есть более актуальная запись про твой пип-бой';
+                }
+
+                if(result.ok && result.reason === 'USER_CREATED') {
+                    reply = `
+Супер, я сохранил твой пип!
+Не забывай скидывать мне свой пип-бой по мере того как будешь скидывать скилы!`;
+                }
+
+                if(result.ok && result.reason === 'USER_UPDATED') {
+reply = `Шикардос, я обновил твой пип!
+Не забудь скинуть новый пип, когда качнешься!`;
+                }
+
+                if(result.ok) {
+                    return msg.reply.text(`${reply}\nТеперь я займусь твоими форвардами`).then(res => {
+                        sessions[msg.from.id].data.push({
+                            data,
+                            dataType,
+                            date: msg.forward_date
+                        });
+
+                        processUserData(msg, {
+                            usePip: sessions[msg.from.id].processDataConfig.usePip,
+                            useBeastFace: sessions[msg.from.id].processDataConfig.useBeastFace
+                        })
+                    });
+
+                } else {
+                    return msg.reply.text(reply, {
+                        asReply: true
+                    })
+                }
             });
         } else {
             return msg.reply.text(`
@@ -560,13 +589,13 @@ bot.on('forward', (msg) => {
                 if(!result.ok && result.reason === 'PIP_OUTDATED') {
                     reply = 'У меня в базе есть более актуальная запись про твой пип-бой';
                 }
-                
+
                 if(result.ok && result.reason === 'USER_CREATED') {
                     reply = `
 Супер, я сохранил твой пип!
 Не забывай скидывать мне свой пип-бой по мере того как будешь скидывать скилы!`;
                 }
-                
+
                 if(result.ok && result.reason === 'USER_UPDATED') {
 reply = `Шикардос, я обновил твой пип!
 Не забудь скинуть новый пип, когда качнешься!`;
@@ -904,7 +933,7 @@ const processUserData = (msg, options) => {
         data
     } = sessions[msg.from.id];
 
-    const {
+    let {
         reportData,
         updatesData
     } = processForwards(data);
@@ -921,15 +950,49 @@ _${reportData.criticalError}_
     }
 
     if (options.usePip && reportData.pipRequired) {
-        sessions[msg.from.id].state = states.WAIT_FOR_PIP_FORWARD;
+        // try to use pip from database
+        userManager.findByTelegramId(msg.from.id).then(result => {
+            if(result.ok && result.status === 'USER_FOUND') {
+                sessions[msg.from.id].data.push({
+                    data: result.data,
+                    dataType: 'pipboy',
+                    date: result.data.timeStamp
+                });
+
+                const {
+                    reportDataWithUserPip,
+                    updatesDataWithUserPip
+                } = processForwards(data);
+
+                if(reportDataWithUserPip.criticalError) {
+                    console.log(reportDataWithUserPip.criticalError);
+
+                    sessions[msg.from.id].state = states.WAIT_FOR_PIP_FORWARD;
         return msg.reply.text(`
-Я не заметил в форвардах твоего пип-боя, можешь мне его дослать?
+Твой пип-бой, который я когда-то сохранил - устарел.
+Пожалуйста скинь мне свой новый пип-бой.
+Если у тебя нет на это времени жми /skippipforward
+
+*ВНИМАНИЕ: ПРИ НАЖАТИИ НА /skippipforward - БОТ ПРОИГНОРИРУЕТ ТВОИ БИТВЫ И ПОБЕГИ ОТ МОБОВ И НЕ ЗАПИШЕТ ИХ В БАЗУ*
+`, {
+    parseMode: 'markdown',
+    replyMarkup: toGameKeyboard
+});
+                } else {
+                    updatesData = updatesDataWithUserPip;
+                }
+            } else {
+                sessions[msg.from.id].state = states.WAIT_FOR_PIP_FORWARD;
+        return msg.reply.text(`
+Похоже ты мне ещё не скидывал пип бой
 Если у тебя нет на это времени жми /skippipforward
 
 *ВНИМАНИЕ: ПРИ НАЖАТИИ НА /skippipforward - БОТ ПРОИГНОРИРУЕТ ТВОИ БИТВЫ И ПОБЕГИ ОТ МОБОВ И НЕ ЗАПИШЕТ ИХ В БАЗУ*
 `, {
     parseMode: 'markdown',
 });
+            }
+        });
     }
 
     if(options.useBeastFace && !_.isEmpty(reportData.beastToValidate)) {
@@ -967,28 +1030,6 @@ _или_
             userName: msg.from.username
         }
     });
-
-    /* User.findOne({
-        'telegram.id': msg.from.id
-    }, function (err, user) {
-        if (user === null) {
-            const newUser = new User({
-                telegram: {
-                    id: msg.from.id,
-                    firstName: msg.from.first_name,
-                    userName: msg.from.username
-                },
-                pip: reportData.lastPip
-            });
-
-            newUser.save().then(function (user, err) {
-                if (err) {
-                    console.log('#mongo_error User save error:' + err);
-                    return msg.reply.text('Ошибка при сохранении твоего пип-боя');
-                }
-            });
-        }
-    }); */
 
     const isBeastUnderValidation = (name) => {
         return reportData.beastToValidate.filter(beast => {
