@@ -105,6 +105,37 @@ const userManager = User => ({
             });
         });
     },
+    addPoints: (id, points) => {
+        return new Promise((resolve, reject) => {
+            User.findOne({'telegram.id': id}).then(databaseUser => {
+                if(databaseUser === null) {
+                    return resolve({
+                        ok: false,
+                        reason: 'USER_NOT_FOUND'
+                    });
+                }
+
+                if (points <= 0) {
+                    return resolve({
+                        ok: false,
+                        reason: 'INCORECT_POINTS_VALUE'
+                    });
+                } else {
+                    databaseUser.points.score += points;
+
+                    databaseUser.save().then(databaseUpdatedUser => {
+                        return resolve({
+                            ok: true,
+                            reason: 'USER_FOUND',
+                            data: databaseUpdatedUser.toJSON().points.score
+                        });
+                    })
+                }
+
+                
+            });
+        });
+    }
 });
 
 module.exports = userManager;

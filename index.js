@@ -11,6 +11,9 @@ const moment = require('moment-timezone');
 const objectDeepSearch = require('object-deep-search');
 
 const config = require('./package.json');
+
+const forwardPoints = require('./src/constants/forwardPoints');
+
 const regexps = require('./src/regexp/regexp');
 const PipRegexps = require('./src/regexp/pip');
 
@@ -1019,6 +1022,12 @@ _${reportData.criticalError}_
         });
 
         let amountOfData = updatesData.beasts.length + updatesData.locations.length;
+        let userForwardPoints = 0;
+        let dataProcessed = 0;
+
+        const addUserPoints = amount => {
+            userForwardPoints += amount;
+        }
 
         console.log({
             reportData,
@@ -1041,7 +1050,6 @@ _${reportData.criticalError}_
         }
 
         if (updatesData.beasts.length > 0 && options.usePip === true) {
-
             async.forEach(updatesData.beasts, function (iBeast, next) {
                 if (!options.useBeastFace) {
                     if (isBeastUnderValidation(iBeast.name)) {
@@ -1055,6 +1063,9 @@ _${reportData.criticalError}_
                     }).then(function (fBeast) {
                         if (fBeast === null) {
                             const newBeast = new Beast(iBeast);
+                            
+                            dataProcessed += 1;
+                            addUserPoints(forwardPoints.newMob);
 
                             newBeast.save().then(() => next());
                         } else {
@@ -1128,7 +1139,11 @@ _${reportData.criticalError}_
                             }
 
                             if (!_.contains(fBeast.distanceRange, iBeast.distanceRange[0])) {
+                                addUserPoints(forwardPoints.newDistance);
+
                                 fBeast.distanceRange.push(iBeast.distanceRange[0]);
+                            } else {
+                                addUserPoints(forwardPoints.oldDistance);
                             }
 
                             if (iBeast.capsReceived !== undefined) {
@@ -1144,7 +1159,31 @@ _${reportData.criticalError}_
                             }
 
                             if (!isSameBattleExists) {
+                                const battle = iBeast.battles[0];
+                                
+                                if (battle.damagesGiven.length === 1) {
+                                    addUserPoints(forwardPoints.oneShotBattle);
+                                } else {
+                                    if(battle.outcome === 'win') {
+                                        addUserPoints(forwardPoints.newBattleWin);
+                                    } else {
+                                        addUserPoints(forwardPoints.newBattleLose);
+                                    }
+                                }
+                                
                                 fBeast.battles.push(iBeast.battles[0]);
+                            } else {
+                                const battle = iBeast.battles[0];
+                               
+                                if (battle.damagesGiven.length === 1) {
+                                    addUserPoints(forwardPoints.oneShotBattle);
+                                } else {
+                                    if(battle.outcome === 'win') {
+                                        addUserPoints(forwardPoints.sameBattleWin);
+                                    } else {
+                                        addUserPoints(forwardPoints.sameBattleLose);
+                                    }
+                                }
                             }
 
                             if (!isSameConcussionExists) {
@@ -1152,8 +1191,24 @@ _${reportData.criticalError}_
                             }
 
                             if (!isSameFleeExists) {
+                                const flee = iBeast.flees[0];
+                                
+                                if(flee.outcome === 'win') {
+                                    addUserPoints(forwardPoints.newFleeWin);
+                                } else {
+                                    addUserPoints(forwardPoints.newFleeLose);
+                                }
+
                                 fBeast.flees.push(iBeast.flees[0]);
+                            } else {
+                                if(flee.outcome === 'win') {
+                                    addUserPoints(forwardPoints.sameFleeWin);
+                                } else {
+                                    addUserPoints(forwardPoints.sameFleeLose);
+                                }
                             }
+
+                            dataProcessed += 1;                            
 
 
                             // TODO: Concussion
@@ -1189,6 +1244,8 @@ _${reportData.criticalError}_
                             receivedBonusItems: [iLocation.receivedBonusItems],
                             healthInjuries: [iLocation.healthInjuries]
                         });
+
+                        dataProcessed += 1;                        
 
                         newLocation.save().then(() => next())
                     } else {
@@ -1246,6 +1303,8 @@ _${reportData.criticalError}_
                             })
                         }
 
+                        dataProcessed += 1;                        
+
                         fLocation.save().then(() => next());
                     }
                 });
@@ -1268,34 +1327,41 @@ _${reportData.criticalError}_
             `;
         }
 
-        if (amountOfData > 0) {
-            // TODO: Move out shit to strings
-            // TODO: Implement meaningfull report data regarding found usefull data
-            setTimeout(() => {
-                // Я насчитал ${amountOfData} данных!
+        userManager.addPoints(userForwardPoints).then(result => {
+                if(!result.ok) {
+                    console.log('userManager.addPoints: '+result);
+                }
 
-                msg.reply.text(`
-    Фух, я со всём справился - спасибо тебе огромное за информацию!
-    Теперь ты опять можешь пользоваться функционалом *Скилокачатора*.
-    Если ты чего-то забыл докинуть - смело жми на \`[Скинуть лог 🏃]\` и _докидывай_
-    ${errors}
-        `, {
-                    replyMarkup: defaultKeyboard,
-                    parseMode: 'markdown'
-                });
-            }, 1500);
-        } else {
-            setTimeout(() => {
-                msg.reply.text(`
-    К сожалению я ничего не смог узнать из твоих форвардов :с
-        `, {
-                    replyMarkup: defaultKeyboard,
-                    parseMode: 'markdown'
-                });
-            }, 1500);
-        }
+                if (amountOfData > 0) {
+                    // TODO: Move out shit to strings
+                    // TODO: Implement meaningfull report data regarding found usefull data
+                    setTimeout(() => {
+        
+                        msg.reply.text(`
+Фух, я со всём справился - спасибо тебе огромное за информацию!
+Ты заработал 💎${userForwardPoints} Шмепселей за свои форварды!
+Всего я насчитал ${dataProcessed} данных!
 
-        createSession(msg.from.id)
+Если ты чего-то забыл докинуть - смело жми на \`[Скинуть лог 🏃]\` и _докидывай_
+${errors}
+                `, {
+                            replyMarkup: defaultKeyboard,
+                            parseMode: 'markdown'
+                        });
+                    }, 1500);
+                } else {
+                    setTimeout(() => {
+                        msg.reply.text(`
+К сожалению я ничего не смог узнать из твоих форвардов :с
+                `, {
+                            replyMarkup: defaultKeyboard,
+                            parseMode: 'markdown'
+                        });
+                    }, 1500);
+                }
+        
+                createSession(msg.from.id);
+        });
     }
 }
 
