@@ -1,5 +1,7 @@
 const mongoose = require("mongoose");
 
+// TODO: Refactor points structure
+
 const userSchema = mongoose.Schema({
     restricted: {
         type: Boolean,
