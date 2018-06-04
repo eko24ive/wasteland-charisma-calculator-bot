@@ -1,4 +1,8 @@
+// TODO: Add user profile
+// TODO: Add scoreboard of users
 // TODO: Handle forward of beast battle directly to bot and supply it with pip from database (with appropriate validation just like from the processForwards)
+// TODO: Implement /mypipstats
+
 require('dotenv').config();
 const uristring = process.env.MONGODB_URI;
 
