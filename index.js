@@ -412,6 +412,8 @@ bot.on('forward', (msg) => {
             });
         }
     } if (sessions[msg.from.id].state === states.WAIT_FOR_BEAST_FACE_FORWARD) {
+        // TODO: Validate forward date - should be greater that date of the first forward and less than date of last forward
+
         let data;
         let dataType;
         let beastName;
