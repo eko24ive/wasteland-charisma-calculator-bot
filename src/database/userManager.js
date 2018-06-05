@@ -152,13 +152,15 @@ const userManager = User => ({
                 }
                 // const sorted = _.sortBy(data, data => -data.points.score);
 
-                const userIndex = _.findIndex(users, user => user.telegram.id === id) + 1;
+
+
+                const userIndex = _.findIndex(users, user => user.telegram.id === id);
 
                 const topTen = users.slice(0, 10);
 
                 const pastOutput = (index) => {
-                    if (index > 10) {
-                        const user = users[userIndex - 1];
+                    if (index > 10 && userIndex !== -1) {
+                        const user = users[userIndex];
                         let reply = '\n========================\n';
 
                         if (user.telegram.id === id) {
@@ -168,6 +170,8 @@ const userManager = User => ({
                         }
 
                         return reply;
+                    } else {
+                        return '\n\nУ меня ещё нет твоего профиля - скинь свой пип-бой и начни кидать форварды боту что бы получить очки!'
                     }
 
                     return '';
