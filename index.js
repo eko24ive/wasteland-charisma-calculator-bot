@@ -1,8 +1,4 @@
-// TODO: Add user profile
-// TODO: Add scoreboard of users
 // TODO: Handle forward of beast battle directly to bot and supply it with pip from database (with appropriate validation just like from the processForwards)
-// TODO: Implement /mypipstats
-// TODO: Points for giants
 
 require('dotenv').config();
 const uristring = process.env.MONGODB_URI;
@@ -26,6 +22,8 @@ const beastSchema = require('./src/schemes/beast');
 const locationSchema = require('./src/schemes/location');
 const giantScheme = require('./src/schemes/giant');
 const userSchema = require('./src/schemes/user');
+
+const chartGeneration = require('./src/utils/chartGeneration');
 
 const parsePip = require('./src/parsers/parsePip');
 const beastParser = require('./src/parsers/parseBeast');
@@ -676,6 +674,12 @@ reply = `Шикардос, я обновил твой пип!
                     newGiant.save().then(res => {
                         return msg.reply.text('Спасибо за форвард! Я добавил его в базу!', {
                             asReply: true
+                        }).then(o => {
+                            userManager.addPoints(msg.from.id, userForwardPoints.newGiantData).then(result => {
+                                if(!result.ok) {
+                                    // console.log('userManager.addPoints: '+JSON.stringify(result));
+                                }
+                            });
                         });
                     })
                 } else {
@@ -692,6 +696,12 @@ reply = `Шикардос, я обновил твой пип!
                         fGiant.save().then(res => {
                             return msg.reply.text(`Спасибо за форвард! Я обновил ${giant.name} в базе!`, {
                                 asReply: true
+                            }).then(o => {
+                                userManager.addPoints(msg.from.id, userForwardPoints.newGiantData).then(result => {
+                                    if(!result.ok) {
+                                        // console.log('userManager.addPoints: '+JSON.stringify(result));
+                                    }
+                                });
                             });
                         })
                     }
@@ -1596,6 +1606,159 @@ bot.on('/leaderboard', msg => {
         }
     });
 });
+
+bot.on("/mypipstats", msg => {
+    User.findOne({ "telegram.id": msg.from.id }, function(err, person) {
+      if (err) {
+        console.log(err);
+        return;
+      }
+
+      if (person === null) {
+        return msg.reply.text('Я не могу показать тебе твой график прогресса - ты мне ещё не скидывал своего пип-боя')
+      }
+  
+      let pips = person.history.pip.toObject();
+      var pipsSize = pips.length;
+      var limit = 10;
+  
+      if (pips.length <= 1) {
+        return msg.reply.text(
+          "Я не видел что бы прокачивался в скилах. Скинь свой пип-бой когда прокачаешь какой-то скил",
+          { asReply: true }
+        );
+      }
+  
+      if (pipsSize > limit) {
+        pips = pips.slice(pipsSize-limit, pipsSize)
+      }
+  
+      const whiteListKeys = [
+        "health",
+        "strength",
+        "precision",
+        "charisma",
+        "agility"
+      ];
+  
+      const systemToHumanKeysMap = {
+        health: "Живучесть",
+        strength: "Сила",
+        precision: "Меткость",
+        charisma: "Харизма",
+        agility: "Ловкость"
+      };
+  
+      const history = {};
+  
+      whiteListKeys.forEach(key => {
+        history[key] = [];
+      });
+  
+      pips.forEach(pip => {
+        Object.keys(pip).forEach(key => {
+          if (_.contains(whiteListKeys, key)) {
+            const value = pip[key];
+  
+            history[key].push(value);
+          }
+        });
+      });
+  
+      const flattify = arr => {
+        const maxIndex = arr.length - 1;
+  
+        return arr.map((v, i) => {
+          if (i !== maxIndex && i !== 0) {
+            const prevValue = arr[i - 1];
+            const nextValue = arr[i + 1];
+  
+            if (prevValue < v && nextValue < v) {
+              return prevValue;
+            }
+  
+            return v;
+          } else if (i === 0 || i === maxIndex) {
+            return v;
+          }
+        });
+      };
+  
+      Object.keys(history).forEach(key => {
+        const arrayOfValues = history[key];
+        history[key] = flattify(arrayOfValues);
+      });
+  
+      const colors = {
+        health: "rgba(231, 76, 60,1.0)",
+        strength: "rgba(241, 196, 15,1.0)",
+        precision: "rgba(39, 174, 96,1.0)",
+        charisma: "rgba(52, 73, 94,1.0)",
+        agility: "rgba(189, 195, 199,1.0)"
+      };
+  
+      const createDataSets = history => {
+        return whiteListKeys.map(key => {
+          return {
+            label: systemToHumanKeysMap[key],
+            backgroundColor: colors[key],
+            borderColor: colors[key],
+            data: history[key],
+            fill: false,
+            lineTension: 0
+          };
+        });
+      };
+  
+      const getDateLabels = pips => {
+        return pips.map(pip => moment(pip.timeStamp * 1000).format("DD/MM"));
+      };
+  
+      var config = {
+        type: "line",
+        data: {
+          labels: getDateLabels(pips),
+          datasets: createDataSets(history)
+        },
+        options: {
+          scales: {
+            xAxes: [
+              {
+                display: true,
+                scaleLabel: {
+                  display: true,
+                  labelString: "Дата"
+                }
+              }
+            ],
+            yAxes: [
+              {
+                display: true,
+                scaleLabel: {
+                  display: true,
+                  labelString: "Уровень"
+                }
+              }
+            ]
+          },
+          legend: {
+            position: 'bottom'
+          },
+          title: {
+            display: true,
+            text: 'Прогрес по Пип-Бою'
+          }
+        }
+      };
+  
+      chartGeneration(config, buffer => {
+        msg.reply.photo(buffer, {
+          asReply: true,
+          caption: `Получи и распишись!`
+        }).catch(e => console.log(e));
+      })
+    });
+  });
 
 bot.on('/debug', msg => {
     userManager.findByTelegramId(msg.from.id).then(result => {
