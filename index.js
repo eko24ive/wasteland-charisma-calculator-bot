@@ -1004,7 +1004,7 @@ _или_
                 }).then(function (fBeast) {
                     if (fBeast === null) {
                         const newBeast = new Beast(iBeast);
-                        
+
                         dataProcessed += 1;
                         addUserPoints(forwardPoints.newMob);
 
@@ -1101,7 +1101,7 @@ _или_
 
                         if (!isSameBattleExists) {
                             const battle = iBeast.battles[0];
-                            
+
                             if (battle.damagesGiven.length === 1) {
                                 addUserPoints(forwardPoints.oneShotBattle);
                             } else {
@@ -1111,12 +1111,12 @@ _или_
                                     addUserPoints(forwardPoints.newBattleLose);
                                 }
                             }
-                            
+
                             fBeast.battles.push(iBeast.battles[0]);
                         } else {
                             if(iBeast.battles !== undefined) {
                                 const battle = iBeast.battles[0];
-                            
+
                                 if (battle.damagesGiven.length === 1) {
                                     addUserPoints(forwardPoints.oneShotBattle);
                                 } else {
@@ -1135,7 +1135,7 @@ _или_
 
                         if (!isSameFleeExists) {
                             const flee = iBeast.flees[0];
-                            
+
                             if(flee.outcome === 'win') {
                                 addUserPoints(forwardPoints.newFleeWin);
                             } else {
@@ -1146,17 +1146,17 @@ _или_
                         } else {
                             if(iBeast.flees !== undefined) {
                                 const flee = iBeast.flees[0];
-                                
+
                                 if(flee.outcome === 'win') {
                                     addUserPoints(forwardPoints.sameFleeWin);
                                 } else {
                                     addUserPoints(forwardPoints.sameFleeLose);
                                 }
                             }
-                            
+
                         }
 
-                        dataProcessed += 1;                            
+                        dataProcessed += 1;
 
 
                         // TODO: Concussion
@@ -1193,7 +1193,7 @@ _или_
                         healthInjuries: [iLocation.healthInjuries]
                     });
 
-                    dataProcessed += 1;                        
+                    dataProcessed += 1;
 
                     newLocation.save().then(() => next())
                 } else {
@@ -1251,7 +1251,7 @@ _или_
                         })
                     }
 
-                    dataProcessed += 1;                        
+                    dataProcessed += 1;
 
                     fLocation.save().then(() => next());
                 }
@@ -1279,7 +1279,7 @@ ${reportData.errors.join('\n')}
                 // TODO: Move out shit to strings
                 // TODO: Implement meaningfull report data regarding found usefull data
                 setTimeout(() => {
-    
+
                     msg.reply.text(`
 Фух, я со всём справился - спасибо тебе огромное за информацию!
 Ты заработал ${userForwardPoints} 💎*Шмепселей* за свои форварды!
@@ -1302,7 +1302,7 @@ ${errors}
                     });
                 }, 1500);
             }
-    
+
             createSession(msg.from.id);
     });
 }
@@ -1334,9 +1334,9 @@ _${reportData.criticalError}_
         userManager.findByTelegramId(msg.from.id).then(result => {
             if (result.ok && result.reason === 'USER_FOUND') {
                 sessions[msg.from.id].data.push({
-                    data: result.data,
+                    data: result.data.pip,
                     dataType: 'pipboy',
-                    date: result.data.timeStamp
+                    date: result.data.pip.timeStamp
                 });
 
                 const {
@@ -1509,7 +1509,7 @@ bot.on('/skill_upgrade', msg => {
                 createSession(msg.from.id);
             }
 
-            sessions[msg.from.id].pip = result.data;
+            sessions[msg.from.id].pip = result.data.pip;
             sessions[msg.from.id].state = states.WAIT_FOR_SKILL;
 
             const replyMarkup = bot.keyboard([
@@ -1531,7 +1531,7 @@ bot.on('/skill_upgrade', msg => {
             const userSkills = Object.keys(skillMap).map(key => {
                 const skillName = skillMap[key];
 
-                return `<b>${skillName}</b>: ${result.data[key]}`;
+                return `<b>${skillName}</b>: ${result.data.pip[key]}`;
             })
 
             return msg.reply.text(`
@@ -1563,6 +1563,24 @@ ${skillOMaticText}
         });
     });
 })
+
+bot.on('/top', msg => {
+    userManager.findByTelegramId(msg.from.id).then(result => {
+        if(result.ok && result.reason === 'USER_FOUND') {
+            return msg.reply.text(top, {
+                asReply: true
+            });
+        }
+
+        return msg.reply.text(`
+Оу, похоже я ещё ничего не знаю про твой пип :с
+Перейди в игру по кнопке внизу и перешли мне его пожалуйста!
+        `, {
+            replyMarkup: toGameKeyboard,
+            parseMode: 'html'
+        });
+    });
+});
 
 bot.on('/debug', msg => {
     userManager.findByTelegramId(msg.from.id).then(result => {
@@ -2056,7 +2074,7 @@ ${beastsList}
                 createSession(msg.from.id);
             }
 
-            sessions[msg.from.id].pip = result.data;
+            sessions[msg.from.id].pip = result.data.pip;
             sessions[msg.from.id].state = states.WAIT_FOR_SKILL;
 
             const replyMarkup = bot.keyboard([
@@ -2078,7 +2096,7 @@ ${beastsList}
             const userSkills = Object.keys(skillMap).map(key => {
                 const skillName = skillMap[key];
 
-                return `<b>${skillName}</b>: ${result.data[key]}`;
+                return `<b>${skillName}</b>: ${result.data.pip[key]}`;
             })
 
             return bot.sendMessage(msg.from.id, `
