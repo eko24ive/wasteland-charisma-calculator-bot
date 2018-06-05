@@ -139,62 +139,80 @@ const userManager = User => ({
             });
         });
     },
-    leaderboard: (name, data) => {
-        // Usage: leaderboard('Lawson', x);
-        const sorted = _.sortBy(data, data => -data.points.score);
+    leaderboard: id => {
+        return new Promise((resolve, reject) => {
+            User.find().sort({
+                'points.score': 1
+            }).then(users => {
+                if(users.length === 0) {
+                    return resolve({
+                        ok: false,
+                        reason: 'NO_USERS_FOUND'
+                    });
+                }
+                // const sorted = _.sortBy(data, data => -data.points.score);
 
-        const userIndex = _.findIndex(sorted, user => user.telegram.userName === name) + 1;
+                const userIndex = _.findIndex(users, user => user.telegram.id === id) + 1;
 
-        const topTen = sorted.slice(0,10);
+                const topTen = users.slice(0, 10);
 
-        const pastOutput = (index) => {
-          if(index > 10) {
-            const user = sorted[userIndex - 1];
-            let reply = '\n========================\n';
-            if(user.telegram.userName === name) {
-              reply +=`${index}. <b>${user.telegram.userName}</b> - ${Math.floor(user.points.score)}`;
-            } else {
-              reply +=`${index}. ${user.telegram.userName} - ${Math.floor(user.points.score)}`;
-            }
+                const pastOutput = (index) => {
+                    if (index > 10) {
+                        const user = users[userIndex - 1];
+                        let reply = '\n========================\n';
 
-            return reply;
-          }
+                        if (user.telegram.id === id) {
+                            reply += `${index}. <b>${user.telegram.userName}</b> - ${Math.floor(user.points.score)}`;
+                        } else {
+                            reply += `${index}. ${user.telegram.userName} - ${Math.floor(user.points.score)}`;
+                        }
 
-          return '';
-        }
+                        return reply;
+                    }
 
-        return topTen.map((user, index) => {
-          const place = index + 1;
-          const getMedal = position => {
-            switch(position) {
-              case 1:
-                return '🥇';
-              case 2:
-                return '🥈';
-              case 3:
-                return '🥉';
-              case 4:
-              case 5:
-              case 6:
-              case 7:
-              case 8:
-              case 9:
-              case 10:
-                return '🏅';
-              default:
-                return '';
-            }
-          }
+                    return '';
+                }
 
-            if(user.telegram.userName === name) {
-            return `${place}. ${getMedal(place)}<b>${user.telegram.userName}</b> - ${Math.floor(user.points.score)}`;
-            }
+                const leaderboard = topTen.map((user, index) => {
+                    const place = index + 1;
+                    const getMedal = position => {
+                        switch (position) {
+                            case 1:
+                                return '🥇';
+                            case 2:
+                                return '🥈';
+                            case 3:
+                                return '🥉';
+                            case 4:
+                            case 5:
+                            case 6:
+                            case 7:
+                            case 8:
+                            case 9:
+                            case 10:
+                                return '🏅';
+                            default:
+                                return '';
+                        }
+                    }
 
-            return `${place}. ${getMedal(place)}${user.telegram.userName} - ${Math.floor(user.points.score)}`;
+                    if (user.telegram.id === id) {
+                        return `${place}. ${getMedal(place)}<b>${user.telegram.userName}</b> - ${Math.floor(user.points.score)}`;
+                    }
 
-        }).join('\n') + pastOutput(userIndex);
+                    return `${place}. ${getMedal(place)}${user.telegram.userName} - ${Math.floor(user.points.score)}`;
+
+                }).join('\n') + pastOutput(userIndex);
+
+
+                return resolve({
+                    ok: true,
+                    reason: 'LEADERBOARD_GENERATED',
+                    data: leaderboard
+                });
+            });
+        });
     }
-
 });
 
 module.exports = userManager;
