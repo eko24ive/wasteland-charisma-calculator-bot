@@ -2,6 +2,7 @@
 // TODO: Add scoreboard of users
 // TODO: Handle forward of beast battle directly to bot and supply it with pip from database (with appropriate validation just like from the processForwards)
 // TODO: Implement /mypipstats
+// TODO: Points for giants
 
 require('dotenv').config();
 const uristring = process.env.MONGODB_URI;
@@ -149,7 +150,7 @@ const askAmountOfLevels = (msg) => {
         resize: true
     });
 
-    return msg.reply.text(msg.from.id, `
+    return msg.reply.text(`
 Выбери на сколько уровней ты хочешь прокачать *${sessions[msg.from.id].upgradeSkill}*
 \`Либо напиши своё количество (например: 17)\`
 `, {
@@ -990,320 +991,336 @@ _или_
         amountOfData = updatesData.locations.length;
     }
 
-    if (updatesData.beasts.length > 0 && options.usePip === true) {
-        async.forEach(updatesData.beasts, function (iBeast, next) {
-            if (!options.useBeastFace) {
-                if (isBeastUnderValidation(iBeast.name)) {
-                    amountOfData -= 1;
-                    next();
-                }
-            } else {
-                Beast.findOne({
-                    name: iBeast.name,
-                    isDungeon: iBeast.isDungeon
-                }).then(function (fBeast) {
-                    if (fBeast === null) {
-                        const newBeast = new Beast(iBeast);
-
-                        dataProcessed += 1;
-                        addUserPoints(forwardPoints.newMob);
-
-                        newBeast.save().then(() => next());
+    const processBeasts = () => {
+        return new Promise((resolve, reject) => {
+            if (updatesData.beasts.length > 0 && options.usePip === true) {
+                async.forEach(updatesData.beasts, function (iBeast, next) {
+                    if (!options.useBeastFace) {
+                        if (isBeastUnderValidation(iBeast.name)) {
+                            amountOfData -= 1;
+                            next();
+                        }
                     } else {
-                        let isSameFleeExists = true,
-                            isSameConcussionExists = true,
-                            isSameBattleExists = true;
-
-                        if (iBeast.battles) {
-                            if (iBeast.battles.length > 0) {
-                                isSameBattleExists = fBeast.battles.map(battle => {
-                                    if (iBeast.battles === undefined) {
-                                        return true;
-                                    }
-
-                                    const existingBattle = _.clone(battle.toJSON());
-
-                                    return existingBattle.totalDamageReceived === iBeast.battles[0].totalDamageReceived &&
-                                        existingBattle.totalDamageGiven === iBeast.battles[0].totalDamageGiven;
-                                }).some(result => result === true);
-                            }
-                        }
-
-                        if (iBeast.concussions) {
-                            if (iBeast.concussions.length > 0) {
-                                isSameConcussionExists = fBeast.concussions.map(concussion => {
-                                    const existingConcussion = _.clone(concussion.toJSON());
-
-                                    return existingConcussion.stats.agility === iBeast.concussions[0].stats.agility &&
-                                        existingConcussion.amount === iBeast.concussions[0].amount;
-                                }).some(result => result === true);
-                            }
-                        }
-
-                        if (iBeast.flees) {
-                            if (iBeast.flees.length === 1) {
-                                isSameFleeExists = fBeast.flees.map(flee => {
-                                    const existingFlee = _.clone(flee.toJSON());
-
-                                    if (iBeast.flees[0].outcome === 'win') {
-                                        return existingFlee.stats.agility === iBeast.flees[0].stats.agility &&
-                                            existingFlee.outcome === iBeast.flees[0].outcome
-                                    }
-
-                                    return existingFlee.stats.agility === iBeast.flees[0].stats.agility &&
-                                        existingFlee.outcome === iBeast.flees[0].outcome &&
-                                        existingFlee.damageReceived === iBeast.flees[0].damageReceived;
-                                }).some(result => result === true);
-                            }
-                        }
-
-                        if (!_.isEmpty(iBeast.receivedItems)) {
-
-                            if (_.isEmpty(fBeast.receivedItems)) {
-                                fBeast.receivedItems = {};
-                            }
-
-                            Object.keys(iBeast.receivedItems).map((item) => {
-                                const amount = iBeast.receivedItems[item];
-
-                                if (fBeast.receivedItems[item]) {
-                                    if (!_.contains(fBeast.receivedItems[item], amount)) {
-                                        fBeast.receivedItems[item].push(amount);
-                                    }
-                                    // TODO: Apply to similar
-                                    fBeast.markModified('receivedItems');
-                                } else {
-                                    fBeast.markModified('receivedItems');
-                                    fBeast.receivedItems[item] = [amount];
-                                }
-                            })
-                        }
-
-                        if (!_.contains(fBeast.distanceRange, iBeast.distanceRange[0])) {
-                            addUserPoints(forwardPoints.newDistance);
-
-                            fBeast.distanceRange.push(iBeast.distanceRange[0]);
-                        } else {
-                            addUserPoints(forwardPoints.sameGiantData);
-                        }
-
-                        if (iBeast.capsReceived !== undefined) {
-                            if (!_.contains(fBeast.capsReceived, iBeast.capsReceived)) {
-                                fBeast.capsReceived.push(iBeast.capsReceived);
-                            }
-                        }
-
-                        if (iBeast.materialsReceived !== undefined) {
-                            if (!_.contains(fBeast.materialsReceived, iBeast.materialsReceived)) {
-                                fBeast.materialsReceived.push(iBeast.materialsReceived);
-                            }
-                        }
-
-                        if (!isSameBattleExists) {
-                            const battle = iBeast.battles[0];
-
-                            if (battle.damagesGiven.length === 1) {
-                                addUserPoints(forwardPoints.oneShotBattle);
+                        Beast.findOne({
+                            name: iBeast.name,
+                            isDungeon: iBeast.isDungeon
+                        }).then(function (fBeast) {
+                            if (fBeast === null) {
+                                const newBeast = new Beast(iBeast);
+        
+                                dataProcessed += 1;
+                                userForwardPoints += forwardPoints.newMob;
+        
+                                newBeast.save().then(() => next());
                             } else {
-                                if(battle.outcome === 'win') {
-                                    addUserPoints(forwardPoints.newBattleWin);
-                                } else {
-                                    addUserPoints(forwardPoints.newBattleLose);
+                                let isSameFleeExists = true,
+                                    isSameConcussionExists = true,
+                                    isSameBattleExists = true;
+        
+                                if (iBeast.battles) {
+                                    if (iBeast.battles.length > 0) {
+                                        isSameBattleExists = fBeast.battles.map(battle => {
+                                            if (iBeast.battles === undefined) {
+                                                return true;
+                                            }
+        
+                                            const existingBattle = _.clone(battle.toJSON());
+        
+                                            return existingBattle.totalDamageReceived === iBeast.battles[0].totalDamageReceived &&
+                                                existingBattle.totalDamageGiven === iBeast.battles[0].totalDamageGiven;
+                                        }).some(result => result === true);
+                                    }
                                 }
-                            }
-
-                            fBeast.battles.push(iBeast.battles[0]);
-                        } else {
-                            if(iBeast.battles !== undefined) {
-                                const battle = iBeast.battles[0];
-
-                                if (battle.damagesGiven.length === 1) {
-                                    addUserPoints(forwardPoints.oneShotBattle);
+        
+                                if (iBeast.concussions) {
+                                    if (iBeast.concussions.length > 0) {
+                                        isSameConcussionExists = fBeast.concussions.map(concussion => {
+                                            const existingConcussion = _.clone(concussion.toJSON());
+        
+                                            return existingConcussion.stats.agility === iBeast.concussions[0].stats.agility &&
+                                                existingConcussion.amount === iBeast.concussions[0].amount;
+                                        }).some(result => result === true);
+                                    }
+                                }
+        
+                                if (iBeast.flees) {
+                                    if (iBeast.flees.length === 1) {
+                                        isSameFleeExists = fBeast.flees.map(flee => {
+                                            const existingFlee = _.clone(flee.toJSON());
+        
+                                            if (iBeast.flees[0].outcome === 'win') {
+                                                return existingFlee.stats.agility === iBeast.flees[0].stats.agility &&
+                                                    existingFlee.outcome === iBeast.flees[0].outcome
+                                            }
+        
+                                            return existingFlee.stats.agility === iBeast.flees[0].stats.agility &&
+                                                existingFlee.outcome === iBeast.flees[0].outcome &&
+                                                existingFlee.damageReceived === iBeast.flees[0].damageReceived;
+                                        }).some(result => result === true);
+                                    }
+                                }
+        
+                                if (!_.isEmpty(iBeast.receivedItems)) {
+        
+                                    if (_.isEmpty(fBeast.receivedItems)) {
+                                        fBeast.receivedItems = {};
+                                    }
+        
+                                    Object.keys(iBeast.receivedItems).map((item) => {
+                                        const amount = iBeast.receivedItems[item];
+        
+                                        if (fBeast.receivedItems[item]) {
+                                            if (!_.contains(fBeast.receivedItems[item], amount)) {
+                                                fBeast.receivedItems[item].push(amount);
+                                            }
+                                            // TODO: Apply to similar
+                                            fBeast.markModified('receivedItems');
+                                        } else {
+                                            fBeast.markModified('receivedItems');
+                                            fBeast.receivedItems[item] = [amount];
+                                        }
+                                    })
+                                }
+        
+                                if (!_.contains(fBeast.distanceRange, iBeast.distanceRange[0])) {
+                                    userForwardPoints += forwardPoints.newDistance;
+        
+                                    fBeast.distanceRange.push(iBeast.distanceRange[0]);
                                 } else {
-                                    if(battle.outcome === 'win') {
-                                        addUserPoints(forwardPoints.sameBattleWin);
+                                    userForwardPoints += forwardPoints.sameGiantData;
+                                }
+        
+                                if (iBeast.capsReceived !== undefined) {
+                                    if (!_.contains(fBeast.capsReceived, iBeast.capsReceived)) {
+                                        fBeast.capsReceived.push(iBeast.capsReceived);
+                                    }
+                                }
+        
+                                if (iBeast.materialsReceived !== undefined) {
+                                    if (!_.contains(fBeast.materialsReceived, iBeast.materialsReceived)) {
+                                        fBeast.materialsReceived.push(iBeast.materialsReceived);
+                                    }
+                                }
+        
+                                if (!isSameBattleExists) {
+                                    const battle = iBeast.battles[0];
+        
+                                    if (battle.damagesGiven.length === 1) {
+                                        userForwardPoints += forwardPoints.oneShotBattle;
                                     } else {
-                                        addUserPoints(forwardPoints.sameBattleLose);
+                                        if(battle.outcome === 'win') {
+                                            userForwardPoints += forwardPoints.newBattleWin;
+                                        } else {
+                                            userForwardPoints += forwardPoints.newBattleLose;
+                                        }
                                     }
-                                }
-                            }
-                        }
-
-                        if (!isSameConcussionExists) {
-                            fBeast.concussions.push(iBeast.concussions[0]);
-                        }
-
-                        if (!isSameFleeExists) {
-                            const flee = iBeast.flees[0];
-
-                            if(flee.outcome === 'win') {
-                                addUserPoints(forwardPoints.newFleeWin);
-                            } else {
-                                addUserPoints(forwardPoints.newFleeLose);
-                            }
-
-                            fBeast.flees.push(iBeast.flees[0]);
-                        } else {
-                            if(iBeast.flees !== undefined) {
-                                const flee = iBeast.flees[0];
-
-                                if(flee.outcome === 'win') {
-                                    addUserPoints(forwardPoints.sameFleeWin);
+        
+                                    fBeast.battles.push(iBeast.battles[0]);
                                 } else {
-                                    addUserPoints(forwardPoints.sameFleeLose);
-                                }
-                            }
-
-                        }
-
-                        dataProcessed += 1;
-
-
-                        // TODO: Concussion
-                        // TODO: Received items
-
-                        fBeast.save().then(() => next()).catch(e => console.log(e));
-                    }
-                });
-            }
-
-        }, function (err) {
-            console.log('iterating done');
-        });
-    }
-
-    if (updatesData.locations.length > 0) {
-        async.forEach(updatesData.locations, function (iLocation, next) {
-            Location.findOne({
-                distance: iLocation.distance
-            }).then(function (fLocation) {
-                if (fLocation === null) {
-                    const newLocation = new Location({
-                        distance: iLocation.distance,
-                        name: iLocation.name,
-                        type: iLocation.type,
-                        isRaid: iLocation.isRaid,
-                        effects: [iLocation.effect],
-                        capsReceived: [iLocation.capsReceived],
-                        materialsReceived: [iLocation.materialsReceived],
-                        capsLost: [iLocation.capsLost],
-                        materialsLost: [iLocation.materialsLost],
-                        receivedItems: [iLocation.receivedItems],
-                        receivedBonusItems: [iLocation.receivedBonusItems],
-                        healthInjuries: [iLocation.healthInjuries]
-                    });
-
-                    dataProcessed += 1;
-
-                    newLocation.save().then(() => next())
-                } else {
-                    if (!_.contains(fLocation.effects, iLocation.effect)) {
-                        fLocation.effects.push(iLocation.effect);
-                    }
-
-                    if (!_.contains(fLocation.capsReceived, iLocation.capsReceived)) {
-                        fLocation.capsReceived.push(iLocation.capsReceived);
-                    }
-
-                    if (!_.contains(fLocation.materialsReceived, iLocation.materialsReceived)) {
-                        fLocation.materialsReceived.push(iLocation.materialsReceived);
-                    }
-
-                    if (!_.contains(fLocation.capsLost, iLocation.capsLost)) {
-                        fLocation.capsLost.push(iLocation.capsLost);
-                    }
-
-                    if (!_.contains(fLocation.materialsLost, iLocation.materialsLost)) {
-                        fLocation.materialsLost.push(iLocation.materialsLost);
-                    }
-
-                    if (!_.contains(fLocation.healthInjuries, iLocation.healthInjuries)) {
-                        fLocation.healthInjuries.push(iLocation.healthInjuries);
-                    }
-
-                    if (!_.isEmpty(iLocation.receivedItems)) {
-                        Object.keys(iLocation.receivedItems).map((item) => {
-                            const amount = iLocation.receivedItems[item];
-
-                            if (fLocation.receivedItems[item]) {
-                                if (!_.contains(fLocation.receivedItems[item], amount)) {
-                                    fLocation.receivedItems[item].push(amount);
-                                }
-                            } else {
-                                fLocation.receivedItems[item] = [amount];
-                            }
-                        })
-                    }
-
-                    if (!_.isEmpty(iLocation.receivedBonusItems)) {
-                        Object.keys(iLocation.receivedBonusItems).map((item) => {
-                            const amount = iLocation.receivedBonusItems[item];
-
-                            if (!_.isEmpty(fLocation.receivedBonusItems)) {
-                                if (fLocation.receivedBonusItems[item]) {
-                                    if (!_.contains(fLocation.receivedBonusItems[item], amount)) {
-                                        fLocation.receivedBonusItems[item].push(amount);
+                                    if(iBeast.battles !== undefined) {
+                                        const battle = iBeast.battles[0];
+        
+                                        if (battle.damagesGiven.length === 1) {
+                                            userForwardPoints += forwardPoints.oneShotBattle;
+                                        } else {
+                                            if(battle.outcome === 'win') {
+                                                userForwardPoints += forwardPoints.sameBattleWin;
+                                            } else {
+                                                userForwardPoints += forwardPoints.sameBattleLose;
+                                            }
+                                        }
                                     }
                                 }
-                            } else {
-                                fLocation.receivedBonusItems[item] = [amount];
+        
+                                if (!isSameConcussionExists) {
+                                    fBeast.concussions.push(iBeast.concussions[0]);
+                                }
+        
+                                if (!isSameFleeExists) {
+                                    const flee = iBeast.flees[0];
+        
+                                    if(flee.outcome === 'win') {
+                                        userForwardPoints += forwardPoints.newFleeWin;
+                                    } else {
+                                        userForwardPoints += forwardPoints.newFleeLose;
+                                    }
+        
+                                    fBeast.flees.push(iBeast.flees[0]);
+                                } else {
+                                    if(iBeast.flees !== undefined) {
+                                        const flee = iBeast.flees[0];
+        
+                                        if(flee.outcome === 'win') {
+                                            userForwardPoints += forwardPoints.sameFleeWin;
+                                        } else {
+                                            userForwardPoints += forwardPoints.sameFleeLose;
+                                        }
+                                    }
+        
+                                }
+        
+                                dataProcessed += 1;
+        
+        
+                                // TODO: Concussion
+                                // TODO: Received items
+        
+                                fBeast.save().then(() => next()).catch(e => console.log(e));
                             }
-                        })
+                        });
                     }
-
-                    dataProcessed += 1;
-
-                    fLocation.save().then(() => next());
-                }
-            });
-        }, function (err) {
-            console.log(err, 'iterating done');
+        
+                }, function (err) {
+                    resolve();
+                });
+            } else {
+                resolve();
+            }
         });
     }
 
-    let errors = '';
-
-    if (reportData.errors.length > 0) {
-        errors = `
-*Также я заметил такие вещи*:
-${reportData.errors.join('\n')}
-        `;
-    }
-
-    userManager.addPoints(userForwardPoints).then(result => {
-            if(!result.ok) {
-                console.log('userManager.addPoints: '+JSON.stringify(result));
+    const processLocations = () => {
+        return new Promise((resolve, reject) => {
+            if (updatesData.locations.length > 0) {
+                async.forEach(updatesData.locations, function (iLocation, next) {
+                    Location.findOne({
+                        distance: iLocation.distance
+                    }).then(function (fLocation) {
+                        if (fLocation === null) {
+                            const newLocation = new Location({
+                                distance: iLocation.distance,
+                                name: iLocation.name,
+                                type: iLocation.type,
+                                isRaid: iLocation.isRaid,
+                                effects: [iLocation.effect],
+                                capsReceived: [iLocation.capsReceived],
+                                materialsReceived: [iLocation.materialsReceived],
+                                capsLost: [iLocation.capsLost],
+                                materialsLost: [iLocation.materialsLost],
+                                receivedItems: [iLocation.receivedItems],
+                                receivedBonusItems: [iLocation.receivedBonusItems],
+                                healthInjuries: [iLocation.healthInjuries]
+                            });
+        
+                            dataProcessed += 1;
+        
+                            newLocation.save().then(() => next())
+                        } else {
+                            if (!_.contains(fLocation.effects, iLocation.effect)) {
+                                fLocation.effects.push(iLocation.effect);
+                            }
+        
+                            if (!_.contains(fLocation.capsReceived, iLocation.capsReceived)) {
+                                fLocation.capsReceived.push(iLocation.capsReceived);
+                            }
+        
+                            if (!_.contains(fLocation.materialsReceived, iLocation.materialsReceived)) {
+                                fLocation.materialsReceived.push(iLocation.materialsReceived);
+                            }
+        
+                            if (!_.contains(fLocation.capsLost, iLocation.capsLost)) {
+                                fLocation.capsLost.push(iLocation.capsLost);
+                            }
+        
+                            if (!_.contains(fLocation.materialsLost, iLocation.materialsLost)) {
+                                fLocation.materialsLost.push(iLocation.materialsLost);
+                            }
+        
+                            if (!_.contains(fLocation.healthInjuries, iLocation.healthInjuries)) {
+                                fLocation.healthInjuries.push(iLocation.healthInjuries);
+                            }
+        
+                            if (!_.isEmpty(iLocation.receivedItems)) {
+                                Object.keys(iLocation.receivedItems).map((item) => {
+                                    const amount = iLocation.receivedItems[item];
+        
+                                    if (fLocation.receivedItems[item]) {
+                                        if (!_.contains(fLocation.receivedItems[item], amount)) {
+                                            fLocation.receivedItems[item].push(amount);
+                                        }
+                                    } else {
+                                        fLocation.receivedItems[item] = [amount];
+                                    }
+                                })
+                            }
+        
+                            if (!_.isEmpty(iLocation.receivedBonusItems)) {
+                                Object.keys(iLocation.receivedBonusItems).map((item) => {
+                                    const amount = iLocation.receivedBonusItems[item];
+        
+                                    if (!_.isEmpty(fLocation.receivedBonusItems)) {
+                                        if (fLocation.receivedBonusItems[item]) {
+                                            if (!_.contains(fLocation.receivedBonusItems[item], amount)) {
+                                                fLocation.receivedBonusItems[item].push(amount);
+                                            }
+                                        }
+                                    } else {
+                                        fLocation.receivedBonusItems[item] = [amount];
+                                    }
+                                })
+                            }
+        
+                            dataProcessed += 1;
+        
+                            fLocation.save().then(() => next());
+                        }
+                    });
+                }, function (err) {
+                    resolve();
+                });
+            } else {
+                resolve();
             }
+        })
+    };
 
-            if (dataProcessed > 0) {
-                // TODO: Move out shit to strings
-                // TODO: Implement meaningfull report data regarding found usefull data
-                setTimeout(() => {
 
-                    msg.reply.text(`
+    Promise.all([
+        processBeasts(),
+        processLocations()
+    ]).then(o => {
+        let errors = '';
+
+        if (reportData.errors.length > 0) {
+            errors = `
+    *Также я заметил такие вещи*:
+    ${reportData.errors.join('\n')}
+            `;
+        }
+    
+        if (dataProcessed > 0) {
+            // TODO: Move out shit to strings
+            // TODO: Implement meaningfull report data regarding found usefull data
+            setTimeout(() => {
+    
+                msg.reply.text(`
 Фух, я со всём справился - спасибо тебе огромное за информацию!
 Ты заработал ${userForwardPoints} 💎*Шмепселей* за свои форварды!
 Всего я насчитал ${dataProcessed} данных!
 
 Если ты чего-то забыл докинуть - смело жми на \`[Скинуть лог 🏃]\` и _докидывай_
-${errors}
-            `, {
-                        replyMarkup: defaultKeyboard,
-                        parseMode: 'markdown'
+${errors}`, {
+                    replyMarkup: defaultKeyboard,
+                    parseMode: 'markdown'
+                }).then(res => {
+                    userManager.addPoints(msg.from.id, userForwardPoints).then(result => {
+                        if(!result.ok) {
+                            console.log('userManager.addPoints: '+JSON.stringify(result));
+                        }
                     });
-                }, 1500);
-            } else {
-                setTimeout(() => {
-                    msg.reply.text(`
-К сожалению я ничего не смог узнать из твоих форвардов :с
-            `, {
-                        replyMarkup: defaultKeyboard,
-                        parseMode: 'markdown'
-                    });
-                }, 1500);
-            }
-
-            createSession(msg.from.id);
+                });
+            }, 1500);
+        } else {
+            setTimeout(() => {
+                msg.reply.text(`
+К сожалению я ничего не смог узнать из твоих форвардов :сx`, {
+                    replyMarkup: defaultKeyboard,
+                    parseMode: 'markdown'
+                });
+            }, 1500);
+        }
+    
+        createSession(msg.from.id);
     });
 }
 
@@ -1564,21 +1581,19 @@ ${skillOMaticText}
     });
 })
 
-bot.on('/top', msg => {
-    userManager.findByTelegramId(msg.from.id).then(result => {
-        if(result.ok && result.reason === 'USER_FOUND') {
-            return msg.reply.text(top, {
-                asReply: true
+bot.on('/leaderboard', msg => {
+    userManager.leaderboard(msg.from.id).then(result => {
+        if (result.ok && result.reason === 'LEADERBOARD_GENERATED') {
+            return msg.reply.text(`<i>Топ игроков отпраляющих форварды:</i> \n\n`+result.data, {
+                parseMode: 'html'
             });
-        }
+        } else {
+            if(result.reason === 'NO_USERS_FOUND') {
+                return msg.reply.text('В базе пока что нет юзеров :с');
+            }
 
-        return msg.reply.text(`
-Оу, похоже я ещё ничего не знаю про твой пип :с
-Перейди в игру по кнопке внизу и перешли мне его пожалуйста!
-        `, {
-            replyMarkup: toGameKeyboard,
-            parseMode: 'html'
-        });
+            return msg.reply.text(JSON.stringify(result))
+        }
     });
 });
 
