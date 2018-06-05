@@ -24,7 +24,7 @@ const simpleHungerRegExp = /🍗(\d*)%/;
 const simpleHealthRegExp = /❤️\d*\/(\d*)/;
 
 const classicPip = {
-    includes: [
+    contains: [
         classicNameRegExp,
         classicFactionRegExp,
         classicCharismaRegExp,
@@ -54,8 +54,33 @@ const classicPip = {
 };
 
 const simplePip = {
-    includes: classicPip.excludes,
-    excludes: classicPip.includes
+    contains: [
+        simpleNameRegExp,
+        simpleFactionRegExp,
+        simpleCharismaRegExp,
+        simpleAgilityRegExp,
+        simpleDamageRegExp,
+        simpleArmorRegExp,
+        simpleStrengthRegExp,
+        simplePrecisionRegExp,
+        simpleEnduranceRegExp,
+        simpleHungerRegExp,
+        simpleHealthRegExp
+    ],
+    excludes: [
+        classicNameRegExp,
+        classicFactionRegExp,
+        classicCharismaRegExp,
+        classicAgilityRegExp,
+        classicDamageRegExp,
+        classicArmorRegExp,
+        classicStrengthRegExp,
+        classicPrecisionRegExp,
+        classicEnduranceRegExp,
+        classicHungerRegExp,
+        classicHealthRegExp,
+        classicVerisonRegExp
+    ]
 };
 
 const regexps = {
