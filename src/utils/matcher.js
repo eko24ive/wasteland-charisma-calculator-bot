@@ -1,10 +1,15 @@
 const _ = require('underscore');
 
-const testRegExpsOnString = (regexpSet, string, expectation) => {
+const testRegExpsOnString = (regexpSet, string, strict, expectation) => {
     try {
-        return regexpSet
-            .map(regExp => regExp.test(string))
-            .some(test => test === expectation);
+        const testedString = regexpSet
+            .map(regExp => regExp.test(string));
+
+        if(strict) {
+            return testedString.every(test => test === expectation); 
+        }
+
+        return testedString.some(test => test === expectation); 
     } catch (e) {
         return false;
     }
@@ -28,15 +33,15 @@ const regExpSetMatcher = (string, {
     excludes = _.flatten(excludes);
 
     if (contains !== undefined && contains.length > 0) {
-        containsCheck = testRegExpsOnString(contains, string, true);
+        containsCheck = testRegExpsOnString(contains, string, true, true);
     }
 
     if (conditional !== undefined && conditional.length > 0) {
-        conditionalCheck = testRegExpsOnString(conditional, string, true);
+        conditionalCheck = testRegExpsOnString(conditional, string, false, true);
     }
 
     if (excludes !== undefined && excludes.length > 0) {
-        excludesCheck = testRegExpsOnString(excludes, string, false);
+        excludesCheck = testRegExpsOnString(excludes, string, true, false);
     }
 
     return (containsCheck && conditionalCheck && excludesCheck);
