@@ -339,9 +339,7 @@ const getBeastKeyboard = beastId => {
 
 
 bot.on('/start', (msg) => {
-    if (sessions[msg.from.id] === undefined) {
-        createSession(msg.from.id);
-    };
+    createSession(msg.from.id);
 
     return bot.sendMessage(
         msg.from.id,
@@ -808,14 +806,17 @@ reply = `Шикардос, я обновил твой пип!
                     });
                 }
             }).catch(e => console.log(e));
-        } else if (isDungeonBeast) {
-            // || isLocation || isRegularBeast || isFlee
+        } else if (isRegularBeast) {
+            // || isLocation || isDungeonBeast || isFlee
             let data;
             let dataType;
 
             createSession(msg.from.id);
 
-            if (isDungeonBeast) {
+            data = beastParser.parseRegularBeast(msg.text);
+            dataType = 'regularBeast';
+
+            /* if (isDungeonBeast) {
                 data = beastParser.parseDungeonBeast(msg.text);
                 dataType = 'dungeonBeast';
             } else if (isFlee) {
@@ -827,7 +828,7 @@ reply = `Шикардос, я обновил твой пип!
             } else if (isLocation) {
                 data = parseLocation(msg.text);
                 dataType = 'location';
-            }
+            } */
 
             sessions[msg.from.id].data.push({
                 data,
@@ -992,8 +993,6 @@ bot.on('/journeyforwardstart', msg => {
 });
 
 const actualProcessUserData = (msg, reportData, updatesData, options) => {
-    // TODO: Add identificator of forward using id of user and timestamp of forward
-
     updateOrCreate(msg, reportData.lastPip, result => {
         console.log(result);
     });
@@ -1353,16 +1352,23 @@ _или_
             // TODO: Move out shit to strings
             // TODO: Implement meaningfull report data regarding found usefull data
             setTimeout(() => {
-    
-                msg.reply.text(`
-Фух, я со всём справился - спасибо тебе огромное за информацию!
+
+                if(options.silent) {
+                    reply = `
+Спасибо за форвард. Я перевёл ${userForwardPoints} 💎*Шмепселей* на твой счёт.`;
+                } else {
+                    reply = `Фух, я со всём справился - спасибо тебе огромное за информацию!
 Ты заработал ${userForwardPoints} 💎*Шмепселей* за свои форварды!
 Всего я насчитал ${dataProcessed} данных!
 
 Если ты чего-то забыл докинуть - смело жми на \`[Скинуть лог 🏃]\` и _докидывай_
-${errors}`, {
+${errors}`;
+                }
+    
+                msg.reply.text(reply, {
                     replyMarkup: defaultKeyboard,
-                    parseMode: 'markdown'
+                    parseMode: 'markdown',
+                    asReply: options.silent
                 }).then(res => {
                     userManager.addPoints(msg.from.id, userForwardPoints).then(result => {
                         if(!result.ok) {
@@ -1427,6 +1433,8 @@ _${reportData.criticalError}_
                     return msg.reply.text(`
 Твой пип-бой, который я когда-то сохранил - устарел.
 Пожалуйста скинь мне свой новый пип-бой.
+Либо же это форвард с статами, отличными от твоих.
+
 Если у тебя нет на это времени жми /skippipforward
 
 *ВНИМАНИЕ: ПРИ НАЖАТИИ НА /skippipforward - БОТ ПРОИГНОРИРУЕТ ТВОИ БИТВЫ И ПОБЕГИ ОТ МОБОВ И НЕ ЗАПИШЕТ ИХ В БАЗУ*
