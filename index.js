@@ -1,4 +1,4 @@
-// TODO: Handle forward of beast battle directly to bot and supply it with pip from database (with appropriate validation just like from the processForwards)
+// TODO: Supply it with pip from database (with appropriate validation just like from the processForwards)
 
 require('dotenv').config();
 const uristring = process.env.MONGODB_URI;
@@ -238,7 +238,8 @@ const createSession = id => {
         data: [],
         processDataConfig: {
             usePip: true,
-            useBeastFace: true
+            useBeastFace: true,
+            silent: false
         }
     };
 };
@@ -516,11 +517,10 @@ reply = `Шикардос, я обновил твой пип!
             regexpSet: PipRegexps.simplePip
         });
 
-        /* if (isDungeonBeast) {
+        if (isDungeonBeast) {
             data = beastParser.parseDungeonBeast(msg.text);
             dataType = 'dungeonBeast';
-        } */
-        if (isDungeonBeastFaced) {
+        } else if (isDungeonBeastFaced) {
             data = parseBeastFaced.parseDungeonBeastFaced(msg.text);
             dataType = 'dungeonBeastFaced';
         } else if (isFlee) {
@@ -562,7 +562,7 @@ reply = `Шикардос, я обновил твой пип!
             regexpSet: PipRegexps.simplePip
         });
 
-        const isRegularBeast = regExpSetMatcher(msg.text, {
+        const isRegularBeastFaced = regExpSetMatcher(msg.text, {
             regexpSet: regexps.regularBeastFaced
         });
 
@@ -581,6 +581,22 @@ reply = `Шикардос, я обновил твой пип!
         const isDungeonBeastFaced = regExpSetMatcher(msg.text, {
             regexpSet: regexps.dungeonBeastFaced
         });
+
+        const isRegularBeast = regExpSetMatcher(msg.text, {
+            regexpSet: regexps.regularBeast
+        });
+
+        /* const isLocation = regExpSetMatcher(msg.text, {
+            regexpSet: regexps.location
+        });
+
+        const isDungeonBeast = regExpSetMatcher(msg.text, {
+            regexpSet: regexps.dungeonBeast
+        });
+
+        const isFlee = regExpSetMatcher(msg.text, {
+            regexpSet: regexps.flee
+        }); */
 
         if (isClassicPip || isSimplePip) {
             const pip = parsePip(msg, isClassicPip);
@@ -747,7 +763,7 @@ reply = `Шикардос, я обновил твой пип!
                     }
                 }
             });
-        } else if (isRegularBeast) {
+        } else if (isRegularBeastFaced) {
             const beast = parseBeastFaced.parseRegularBeastFaced(msg.text);
 
             routedBeastView(Beast, {
@@ -792,6 +808,38 @@ reply = `Шикардос, я обновил твой пип!
                     });
                 }
             }).catch(e => console.log(e));
+        } else if (isDungeonBeast) {
+            // || isLocation || isRegularBeast || isFlee
+            let data;
+            let dataType;
+
+            createSession(msg.from.id);
+
+            if (isDungeonBeast) {
+                data = beastParser.parseDungeonBeast(msg.text);
+                dataType = 'dungeonBeast';
+            } else if (isFlee) {
+                data = parseFlee(msg.text);
+                dataType = 'flee';
+            } else if (isRegularBeast) {
+                data = beastParser.parseRegularBeast(msg.text);
+                dataType = 'regularBeast';
+            } else if (isLocation) {
+                data = parseLocation(msg.text);
+                dataType = 'location';
+            }
+
+            sessions[msg.from.id].data.push({
+                data,
+                dataType,
+                date: msg.forward_date
+            });
+
+            processUserData(msg, {
+                usePip: sessions[msg.from.id].processDataConfig.usePip,
+                useBeastFace: sessions[msg.from.id].processDataConfig.useBeastFace,
+                silent: true
+            });
         }
     }
 
@@ -969,9 +1017,12 @@ _или_
     }
 
 
-    msg.reply.text(`Перехожу в режим обработки данных, подожди пожалуйста немного :3`, {
-        replyMarkup: 'hide'
-    });
+    if(!options.silent) {
+        msg.reply.text(`Перехожу в режим обработки данных, подожди пожалуйста немного :3`, {
+            replyMarkup: 'hide'
+        });
+    }
+    
 
     let amountOfData = updatesData.beasts.length + updatesData.locations.length;
     let userForwardPoints = 0;
