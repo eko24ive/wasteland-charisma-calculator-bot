@@ -13,15 +13,15 @@ const classicVerisonRegExp = /📟Пип-бой 3000 v(.+)/;
 
 const simpleNameRegExp = /👤(.*)/;
 const simpleFactionRegExp = /👤.*\n├(.*)/;
-const simpleCharismaRegExp = /🗣(\d*)/;
-const simpleAgilityRegExp = /🤸🏽‍♂️(\d*)/;
+const simpleCharismaRegExp = /🗣(\d+)/;
+const simpleAgilityRegExp = /🤸🏽‍♂️(\d+)/;
 const simpleDamageRegExp = /⚔️(\d+)/;
-const simpleArmorRegExp = /🛡(\d*)/;
-const simpleStrengthRegExp = /💪(\d*)/;
-const simplePrecisionRegExp = /🔫(\d*)/;
-const simpleEnduranceRegExp = /🔋\d*\/(\d*)/;
-const simpleHungerRegExp = /🍗(\d*)%/;
-const simpleHealthRegExp = /❤️\d*\/(\d*)/;
+const simpleArmorRegExp = /🛡(\d+)/;
+const simpleStrengthRegExp = /💪(\d+)/;
+const simplePrecisionRegExp = /🔫(\d+)/;
+const simpleEnduranceRegExp = /🔋\d*\/(\d+)/;
+const simpleHungerRegExp = /🍗(\d+)%/;
+const simpleHealthRegExp = /❤️\d*\/(\d+)/;
 
 const classicPip = {
     contains: [
