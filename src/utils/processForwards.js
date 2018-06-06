@@ -407,8 +407,12 @@ const processForwards = (inputData, config) => {
     });
 
     if(reportData.lastPip) {
-        if(reportData.healthCapHistory.some(health => health !== reportData.lastPip.health)) {
+        if(reportData.healthCapHistory.some(health => health > reportData.lastPip.health)) {
             reportData.criticalError = 'Была замечена прокачка уровня здоровья. Во время одной вылазки подобное - не возможно.';
+            reportData.couldBeUpdated = true;
+        } else if (health => health < reportData.lastPip.health) {
+            reportData.criticalError = 'Была замечена прокачка уровня здоровья. Во время одной вылазки подобное - не возможно.';
+            reportData.couldBeUpdated = false;
         }
     }
 
