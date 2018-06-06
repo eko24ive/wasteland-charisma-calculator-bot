@@ -5,40 +5,35 @@ const userManager = User => ({
     create: ({telegramData, pipData}) => {
         return new Promise((resolve, reject) => {
             User.findOne({
-                'telegram.firstName': telegramData.first_name,
-                'telegram.id': telegramData.id,
-                $or: [
-                    {'telegram.userName': telegramData.username},
-                    {'telegram.userNamesHistory': telegramData.username}
-                ]
+                'telegram.id': telegramData.id
             }).then(databaseUser => {
                 if(databaseUser !== null) {
                     return resolve({
                         ok: false,
                         status: 'USER_ALREADY_EXISTS'
                     });
+                } else {
+                    const newUser = new User({
+                        telegram: {
+                            firstName: telegramData.first_name,
+                            id: telegramData.id,
+                            userName: telegramData.username,
+                            userNamesHistory: [telegramData.username]
+                        },
+                        pip: pipData,
+                        history: {
+                            pip: [pipData]
+                        }
+                    });
+        
+                    newUser.save().then(databaseUser => {
+                        return resolve({
+                            ok: true,
+                            reason: 'USER_CREATED',
+                            data: databaseUser.toJSON()
+                        });
+                    });
                 }
-            });
-
-            const newUser = new User({
-                telegram: {
-                    firstName: telegramData.first_name,
-                    id: telegramData.id,
-                    userName: telegramData.username,
-                    userNamesHistory: [telegramData.username]
-                },
-                pip: pipData,
-                history: {
-                    pip: [pipData]
-                }
-            });
-
-            newUser.save().then(databaseUser => {
-                return resolve({
-                    ok: true,
-                    reason: 'USER_CREATED',
-                    data: databaseUser.toJSON()
-                });
             });
         });
     },
