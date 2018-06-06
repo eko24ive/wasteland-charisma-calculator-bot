@@ -544,7 +544,8 @@ reply = `Шикардос, я обновил твой пип!
             sessions[msg.from.id].data.push({
                 data,
                 dataType,
-                date: msg.forward_date
+                date: msg.forward_date,
+                userId: msg.from.id
             });
         }
     } else if (
@@ -833,7 +834,8 @@ reply = `Шикардос, я обновил твой пип!
             sessions[msg.from.id].data.push({
                 data,
                 dataType,
-                date: msg.forward_date
+                date: msg.forward_date,
+                userId: msg.from.id
             });
 
             processUserData(msg, {
@@ -1021,11 +1023,15 @@ _или_
             replyMarkup: 'hide'
         });
     }
-    
+
 
     let amountOfData = updatesData.beasts.length + updatesData.locations.length;
     let userForwardPoints = 0;
     let dataProcessed = 0;
+    const dupes = {
+        battles: 0,
+        flees: 0
+    }
 
     const addUserPoints = amount => {
         userForwardPoints += amount;
@@ -1067,68 +1073,84 @@ _или_
                         }).then(function (fBeast) {
                             if (fBeast === null) {
                                 const newBeast = new Beast(iBeast);
-        
+
                                 dataProcessed += 1;
                                 userForwardPoints += forwardPoints.newMob;
-        
+
                                 newBeast.save().then(() => next());
                             } else {
                                 let isSameFleeExists = true,
                                     isSameConcussionExists = true,
-                                    isSameBattleExists = true;
-        
+                                    isSameBattleExists = true,
+                                    isBattleDupe = false,
+                                    isFleeDupe = false;
+
                                 if (iBeast.battles) {
                                     if (iBeast.battles.length > 0) {
                                         isSameBattleExists = fBeast.battles.map(battle => {
                                             if (iBeast.battles === undefined) {
                                                 return true;
                                             }
-        
+
                                             const existingBattle = _.clone(battle.toJSON());
-        
-                                            return existingBattle.totalDamageReceived === iBeast.battles[0].totalDamageReceived &&
-                                                existingBattle.totalDamageGiven === iBeast.battles[0].totalDamageGiven;
+                                            const sameStatsBattle = existingBattle.totalDamageReceived === iBeast.battles[0].totalDamageReceived &&
+                                            existingBattle.totalDamageGiven === iBeast.battles[0].totalDamageGiven;
+                                            const sameStamp = iBeast.battles[0].stamp === battle.stamp;
+
+                                            if(sameStamp) {
+                                                isBattleDupe = true;
+                                                dupes.battles += 1;
+                                            }
+
+                                            return sameStatsBattle || sameStamp;
                                         }).some(result => result === true);
                                     }
                                 }
-        
+
                                 if (iBeast.concussions) {
                                     if (iBeast.concussions.length > 0) {
                                         isSameConcussionExists = fBeast.concussions.map(concussion => {
                                             const existingConcussion = _.clone(concussion.toJSON());
-        
+
                                             return existingConcussion.stats.agility === iBeast.concussions[0].stats.agility &&
                                                 existingConcussion.amount === iBeast.concussions[0].amount;
                                         }).some(result => result === true);
                                     }
                                 }
-        
+
                                 if (iBeast.flees) {
                                     if (iBeast.flees.length === 1) {
                                         isSameFleeExists = fBeast.flees.map(flee => {
                                             const existingFlee = _.clone(flee.toJSON());
-        
+
                                             if (iBeast.flees[0].outcome === 'win') {
                                                 return existingFlee.stats.agility === iBeast.flees[0].stats.agility &&
                                                     existingFlee.outcome === iBeast.flees[0].outcome
                                             }
-        
-                                            return existingFlee.stats.agility === iBeast.flees[0].stats.agility &&
-                                                existingFlee.outcome === iBeast.flees[0].outcome &&
-                                                existingFlee.damageReceived === iBeast.flees[0].damageReceived;
+
+                                            const sameStatsFlee = existingFlee.stats.agility === iBeast.flees[0].stats.agility &&
+                                            existingFlee.outcome === iBeast.flees[0].outcome &&
+                                            existingFlee.damageReceived === iBeast.flees[0].damageReceived;
+                                            const sameStamp = iBeast.flees[0].stamp === flee.stamp;
+
+                                            if(sameStamp) {
+                                                isFleeDupe = true;
+                                                dupes.flees += 1;
+                                            }
+
+                                            return sameStatsFlee || sameStamp;
                                         }).some(result => result === true);
                                     }
                                 }
-        
+
                                 if (!_.isEmpty(iBeast.receivedItems)) {
-        
                                     if (_.isEmpty(fBeast.receivedItems)) {
                                         fBeast.receivedItems = {};
                                     }
-        
+
                                     Object.keys(iBeast.receivedItems).map((item) => {
                                         const amount = iBeast.receivedItems[item];
-        
+
                                         if (fBeast.receivedItems[item]) {
                                             if (!_.contains(fBeast.receivedItems[item], amount)) {
                                                 fBeast.receivedItems[item].push(amount);
@@ -1141,95 +1163,100 @@ _или_
                                         }
                                     })
                                 }
-        
-                                if (!_.contains(fBeast.distanceRange, iBeast.distanceRange[0])) {
-                                    userForwardPoints += forwardPoints.newDistance;
-        
-                                    fBeast.distanceRange.push(iBeast.distanceRange[0]);
-                                } else {
-                                    userForwardPoints += forwardPoints.sameGiantData;
+
+                                if(!isBattleDupe) {
+                                    if (!_.contains(fBeast.distanceRange, iBeast.distanceRange[0])) {
+                                        userForwardPoints += forwardPoints.newDistance;
+
+                                        fBeast.distanceRange.push(iBeast.distanceRange[0]);
+                                    } else {
+                                        userForwardPoints += forwardPoints.sameGiantData;
+                                    }
                                 }
-        
+
                                 if (iBeast.capsReceived !== undefined) {
                                     if (!_.contains(fBeast.capsReceived, iBeast.capsReceived)) {
                                         fBeast.capsReceived.push(iBeast.capsReceived);
                                     }
                                 }
-        
+
                                 if (iBeast.materialsReceived !== undefined) {
                                     if (!_.contains(fBeast.materialsReceived, iBeast.materialsReceived)) {
                                         fBeast.materialsReceived.push(iBeast.materialsReceived);
                                     }
                                 }
-        
-                                if (!isSameBattleExists) {
-                                    const battle = iBeast.battles[0];
-        
-                                    if (battle.damagesGiven.length === 1) {
-                                        userForwardPoints += forwardPoints.oneShotBattle;
-                                    } else {
-                                        if(battle.outcome === 'win') {
-                                            userForwardPoints += forwardPoints.newBattleWin;
-                                        } else {
-                                            userForwardPoints += forwardPoints.newBattleLose;
-                                        }
-                                    }
-        
-                                    fBeast.battles.push(iBeast.battles[0]);
-                                } else {
-                                    if(iBeast.battles !== undefined) {
+
+                                if(!isBattleDupe) {
+                                    if (!isSameBattleExists) {
                                         const battle = iBeast.battles[0];
-        
+
                                         if (battle.damagesGiven.length === 1) {
                                             userForwardPoints += forwardPoints.oneShotBattle;
                                         } else {
                                             if(battle.outcome === 'win') {
-                                                userForwardPoints += forwardPoints.sameBattleWin;
+                                                userForwardPoints += forwardPoints.newBattleWin;
                                             } else {
-                                                userForwardPoints += forwardPoints.sameBattleLose;
+                                                userForwardPoints += forwardPoints.newBattleLose;
+                                            }
+                                        }
+
+                                        fBeast.battles.push(iBeast.battles[0]);
+                                    } else {
+                                        if(iBeast.battles !== undefined) {
+                                            const battle = iBeast.battles[0];
+
+                                            if (battle.damagesGiven.length === 1) {
+                                                userForwardPoints += forwardPoints.oneShotBattle;
+                                            } else {
+                                                if(battle.outcome === 'win') {
+                                                    userForwardPoints += forwardPoints.sameBattleWin;
+                                                } else {
+                                                    userForwardPoints += forwardPoints.sameBattleLose;
+                                                }
                                             }
                                         }
                                     }
                                 }
-        
-                                if (!isSameConcussionExists) {
+
+                                if (!isSameConcussionExists && !isBattleDupe) {
                                     fBeast.concussions.push(iBeast.concussions[0]);
                                 }
-        
-                                if (!isSameFleeExists) {
-                                    const flee = iBeast.flees[0];
-        
-                                    if(flee.outcome === 'win') {
-                                        userForwardPoints += forwardPoints.newFleeWin;
-                                    } else {
-                                        userForwardPoints += forwardPoints.newFleeLose;
-                                    }
-        
-                                    fBeast.flees.push(iBeast.flees[0]);
-                                } else {
-                                    if(iBeast.flees !== undefined) {
+
+                                if (!isFleeDupe) {
+                                    if (!isSameFleeExists) {
                                         const flee = iBeast.flees[0];
-        
+
                                         if(flee.outcome === 'win') {
-                                            userForwardPoints += forwardPoints.sameFleeWin;
+                                            userForwardPoints += forwardPoints.newFleeWin;
                                         } else {
-                                            userForwardPoints += forwardPoints.sameFleeLose;
+                                            userForwardPoints += forwardPoints.newFleeLose;
                                         }
+
+                                        fBeast.flees.push(iBeast.flees[0]);
+                                    } else {
+                                        if(iBeast.flees !== undefined) {
+                                            const flee = iBeast.flees[0];
+
+                                            if(flee.outcome === 'win') {
+                                                userForwardPoints += forwardPoints.sameFleeWin;
+                                            } else {
+                                                userForwardPoints += forwardPoints.sameFleeLose;
+                                            }
+                                        }
+
                                     }
-        
                                 }
-        
+
                                 dataProcessed += 1;
-        
-        
+
                                 // TODO: Concussion
                                 // TODO: Received items
-        
+
                                 fBeast.save().then(() => next()).catch(e => console.log(e));
                             }
                         });
                     }
-        
+
                 }, function (err) {
                     resolve();
                 });
@@ -1261,39 +1288,39 @@ _или_
                                 receivedBonusItems: [iLocation.receivedBonusItems],
                                 healthInjuries: [iLocation.healthInjuries]
                             });
-        
+
                             dataProcessed += 1;
-        
+
                             newLocation.save().then(() => next())
                         } else {
                             if (!_.contains(fLocation.effects, iLocation.effect)) {
                                 fLocation.effects.push(iLocation.effect);
                             }
-        
+
                             if (!_.contains(fLocation.capsReceived, iLocation.capsReceived)) {
                                 fLocation.capsReceived.push(iLocation.capsReceived);
                             }
-        
+
                             if (!_.contains(fLocation.materialsReceived, iLocation.materialsReceived)) {
                                 fLocation.materialsReceived.push(iLocation.materialsReceived);
                             }
-        
+
                             if (!_.contains(fLocation.capsLost, iLocation.capsLost)) {
                                 fLocation.capsLost.push(iLocation.capsLost);
                             }
-        
+
                             if (!_.contains(fLocation.materialsLost, iLocation.materialsLost)) {
                                 fLocation.materialsLost.push(iLocation.materialsLost);
                             }
-        
+
                             if (!_.contains(fLocation.healthInjuries, iLocation.healthInjuries)) {
                                 fLocation.healthInjuries.push(iLocation.healthInjuries);
                             }
-        
+
                             if (!_.isEmpty(iLocation.receivedItems)) {
                                 Object.keys(iLocation.receivedItems).map((item) => {
                                     const amount = iLocation.receivedItems[item];
-        
+
                                     if (fLocation.receivedItems[item]) {
                                         if (!_.contains(fLocation.receivedItems[item], amount)) {
                                             fLocation.receivedItems[item].push(amount);
@@ -1303,11 +1330,11 @@ _или_
                                     }
                                 })
                             }
-        
+
                             if (!_.isEmpty(iLocation.receivedBonusItems)) {
                                 Object.keys(iLocation.receivedBonusItems).map((item) => {
                                     const amount = iLocation.receivedBonusItems[item];
-        
+
                                     if (!_.isEmpty(fLocation.receivedBonusItems)) {
                                         if (fLocation.receivedBonusItems[item]) {
                                             if (!_.contains(fLocation.receivedBonusItems[item], amount)) {
@@ -1319,9 +1346,9 @@ _или_
                                     }
                                 })
                             }
-        
+
                             dataProcessed += 1;
-        
+
                             fLocation.save().then(() => next());
                         }
                     });
@@ -1340,6 +1367,7 @@ _или_
         processLocations()
     ]).then(o => {
         let errors = '';
+        let dupesText = '';
 
         if (reportData.errors.length > 0) {
             errors = `
@@ -1347,7 +1375,11 @@ _или_
     ${reportData.errors.join('\n')}
             `;
         }
-    
+
+        if(dupes.battles > 0 || dupes.flees > 0) {
+            dupesText = 'Похоже ты скидывал некоторые форварды по второму разу. Я не начислял тебе за них очки'
+        }
+
         if (dataProcessed > 0) {
             // TODO: Move out shit to strings
             // TODO: Implement meaningfull report data regarding found usefull data
@@ -1355,16 +1387,17 @@ _или_
 
                 if(options.silent) {
                     reply = `
-Спасибо за форвард. Я перевёл ${userForwardPoints} 💎*Шмепселей* на твой счёт.`;
+Спасибо за форвард. Я перевёл ${userForwardPoints} 💎*Шмепселей* на твой счёт.\n_${dupesText}_`;
                 } else {
                     reply = `Фух, я со всём справился - спасибо тебе огромное за информацию!
 Ты заработал ${userForwardPoints} 💎*Шмепселей* за свои форварды!
+_${dupesText}_
 Всего я насчитал ${dataProcessed} данных!
 
 Если ты чего-то забыл докинуть - смело жми на \`[Скинуть лог 🏃]\` и _докидывай_
 ${errors}`;
                 }
-    
+
                 msg.reply.text(reply, {
                     replyMarkup: defaultKeyboard,
                     parseMode: 'markdown',
@@ -1386,7 +1419,7 @@ ${errors}`;
                 });
             }, 1500);
         }
-    
+
         createSession(msg.from.id);
     });
 }
@@ -1676,22 +1709,22 @@ bot.on("/mypipstats", msg => {
       if (person === null) {
         return msg.reply.text('Я не могу показать тебе твой график прогресса - ты мне ещё не скидывал своего пип-боя')
       }
-  
+
       let pips = person.history.pip.toObject();
       var pipsSize = pips.length;
       var limit = 10;
-  
+
       if (pips.length <= 1) {
         return msg.reply.text(
           "Я не видел что бы прокачивался в скилах. Скинь свой пип-бой когда прокачаешь какой-то скил",
           { asReply: true }
         );
       }
-  
+
       if (pipsSize > limit) {
         pips = pips.slice(pipsSize-limit, pipsSize)
       }
-  
+
       const whiteListKeys = [
         "health",
         "strength",
@@ -1699,7 +1732,7 @@ bot.on("/mypipstats", msg => {
         "charisma",
         "agility"
       ];
-  
+
       const systemToHumanKeysMap = {
         health: "Живучесть",
         strength: "Сила",
@@ -1707,47 +1740,47 @@ bot.on("/mypipstats", msg => {
         charisma: "Харизма",
         agility: "Ловкость"
       };
-  
+
       const history = {};
-  
+
       whiteListKeys.forEach(key => {
         history[key] = [];
       });
-  
+
       pips.forEach(pip => {
         Object.keys(pip).forEach(key => {
           if (_.contains(whiteListKeys, key)) {
             const value = pip[key];
-  
+
             history[key].push(value);
           }
         });
       });
-  
+
       const flattify = arr => {
         const maxIndex = arr.length - 1;
-  
+
         return arr.map((v, i) => {
           if (i !== maxIndex && i !== 0) {
             const prevValue = arr[i - 1];
             const nextValue = arr[i + 1];
-  
+
             if (prevValue < v && nextValue < v) {
               return prevValue;
             }
-  
+
             return v;
           } else if (i === 0 || i === maxIndex) {
             return v;
           }
         });
       };
-  
+
       Object.keys(history).forEach(key => {
         const arrayOfValues = history[key];
         history[key] = flattify(arrayOfValues);
       });
-  
+
       const colors = {
         health: "rgba(231, 76, 60,1.0)",
         strength: "rgba(241, 196, 15,1.0)",
@@ -1755,7 +1788,7 @@ bot.on("/mypipstats", msg => {
         charisma: "rgba(52, 73, 94,1.0)",
         agility: "rgba(189, 195, 199,1.0)"
       };
-  
+
       const createDataSets = history => {
         return whiteListKeys.map(key => {
           return {
@@ -1768,11 +1801,11 @@ bot.on("/mypipstats", msg => {
           };
         });
       };
-  
+
       const getDateLabels = pips => {
         return pips.map(pip => moment(pip.timeStamp * 1000).format("DD/MM"));
       };
-  
+
       var config = {
         type: "line",
         data: {
@@ -1809,7 +1842,7 @@ bot.on("/mypipstats", msg => {
           }
         }
       };
-  
+
       chartGeneration(config, buffer => {
         msg.reply.photo(buffer, {
           asReply: true,

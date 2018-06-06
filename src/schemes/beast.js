@@ -21,14 +21,16 @@ const beastScheme = new Schema({
             armor: Number,
             damage: Number
         },
-        healthOnStart: Number
+        healthOnStart: Number,
+        stamp: String
     }],
     flees: [{
         stats: {
             agility: Number
         },
         damageReceived: Number,
-        outcome: String
+        outcome: String,
+        stamp: String
     }],
     concussions: [{
         stats: {
