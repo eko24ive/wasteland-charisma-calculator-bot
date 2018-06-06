@@ -1136,11 +1136,11 @@ _или_
                                 }
 
 
-                        // TODO: Error logging for no stats object
-                        if (iBeast.concussions) {
-                            if (iBeast.concussions.length > 0) {
-                                isSameConcussionExists = fBeast.concussions.map(concussion => {
-                                    const existingConcussion = _.clone(concussion.toJSON());
+                                // TODO: Error logging for no stats object
+                                if (iBeast.concussions) {
+                                    if (iBeast.concussions.length > 0) {
+                                        isSameConcussionExists = fBeast.concussions.map(concussion => {
+                                            const existingConcussion = _.clone(concussion.toJSON());
 
                                             return existingConcussion.stats.agility === iBeast.concussions[0].stats.agility &&
                                                 existingConcussion.amount === iBeast.concussions[0].amount;
@@ -1286,7 +1286,6 @@ _или_
                             }
                         });
                     }
-
                 }, function (err) {
                     resolve();
                 });
@@ -1349,31 +1348,20 @@ _или_
                                 fLocation.healthInjuries.push(iLocation.healthInjuries);
                             }
 
-                            if (!_.isEmpty(iLocation.receivedItems)) {
-                                Object.keys(iLocation.receivedItems).map((item) => {
-                                    const amount = iLocation.receivedItems[item];
-
-                            if (!_.isEmpty(fLocation.receivedBonusItems)) {
-                                if (fLocation.receivedBonusItems[item]) {
-                                    // FIXME: TypeError: fLocation.receivedBonusItems[item].push is not a function
-                                    if (!_.contains(fLocation.receivedBonusItems[item], amount)) {
-                                        fLocation.receivedBonusItems[item].push(amount);
-                                    }
-                                })
-                            }
-
                             if (!_.isEmpty(iLocation.receivedBonusItems)) {
                                 Object.keys(iLocation.receivedBonusItems).map((item) => {
                                     const amount = iLocation.receivedBonusItems[item];
 
                                     if (!_.isEmpty(fLocation.receivedBonusItems)) {
                                         if (fLocation.receivedBonusItems[item]) {
+                                            // FIXME: TypeError: fLocation.receivedBonusItems[item].push is not a function
+
                                             if (!_.contains(fLocation.receivedBonusItems[item], amount)) {
                                                 fLocation.receivedBonusItems[item].push(amount);
                                             }
+                                        } else {
+                                            fLocation.receivedBonusItems[item] = [amount];
                                         }
-                                    } else {
-                                        fLocation.receivedBonusItems[item] = [amount];
                                     }
                                 })
                             }
@@ -1466,20 +1454,6 @@ const processUserData = (msg, options) => {
         reportData,
         updatesData
     } = processForwards(data);
-
-    if (reportData.criticalError) {
-        return msg.reply.text(`
-Произошла критическая ошибка! Отменяю форварды.
-
-_${reportData.criticalError}_
-        `, {
-            parseMode: 'markdown',
-            replyMarkup: defaultKeyboard
-            });
-        }, function (err) {
-            // console.log(err, 'iterating done');
-        });
-    }
 
     if (options.usePip && reportData.pipRequired) {
         userManager.findByTelegramId(msg.from.id).then(result => {
