@@ -46,6 +46,7 @@ const getRanges = require('./src/utils/getRanges');
 const tinyHash = require('./src/utils/tinyHash');
 const processMenu = require('./src/utils/processMenu');
 const menuItemHandler = require('./src/utils/menuItemHandler');
+const comparePips = require('./src/database/utils/comparePips');
 
 const routedBeastView = require('./src/views/routedBeastView');
 
@@ -1469,8 +1470,9 @@ const processUserData = (msg, options) => {
                     updatesData: updatesDataWithUserPip
                 } = processForwards(data);
 
-                if (reportDataWithUserPip.criticalError) {
+                if (reportDataWithUserPip.criticalError && reportDataWithUserPip.couldBeUpdated) {
                     sessions[msg.from.id].state = states.WAIT_FOR_PIP_FORWARD;
+                    
                     return msg.reply.text(`
 Твой пип-бой, который я когда-то сохранил - устарел.
 Пожалуйста скинь мне свой новый пип-бой.
@@ -1482,6 +1484,11 @@ const processUserData = (msg, options) => {
 `, {
                         parseMode: 'markdown',
                         replyMarkup: toGameKeyboard
+                    });
+                } else if (reportDataWithUserPip.criticalError && !reportDataWithUserPip.couldBeUpdated) {
+                    createSession(msg.from.id);
+                    return msg.reply.text('Твой пип не соответсвуют твоим статам из форвардам!\nПрости, я вынужден отменить твои форварды.', {
+                        replyMarkup: defaultKeyboard
                     });
                 } else {
                     updatesData = updatesDataWithUserPip;
@@ -1503,7 +1510,20 @@ const processUserData = (msg, options) => {
             }
         });
     } else {
-        actualProcessUserData(msg, reportData, updatesData, options);
+        userManager.findByTelegramId(msg.from.id).then(result => {
+            if(result.ok && result.reason === 'USER_FOUND') {
+                if(comparePips(reportData.lastPip, result.data.pip)) {
+                    actualProcessUserData(msg, reportData, updatesData, options);
+                } else {
+                    createSession(msg.from.id);
+                    return msg.reply.text('Твой пип не соответсвуют твоим статам из форвардам!\nПрости, я вынужден отменить твои форварды.', {
+                        replyMarkup: defaultKeyboard
+                    });
+                }
+            } else {
+                actualProcessUserData(msg, reportData, updatesData, options);
+            }
+        });
     }
 }
 
