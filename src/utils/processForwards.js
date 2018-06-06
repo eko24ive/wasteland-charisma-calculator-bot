@@ -123,7 +123,9 @@ const processForwards = (data, config) => {
         return 0;
     }).forEach(({
         data,
-        dataType
+        dataType,
+        date,
+        userId
     }) => {
         if(reportData.prcoessAllowed) {
             const lastDistance = _.last(reportData.distanceHistory);
@@ -227,6 +229,8 @@ const processForwards = (data, config) => {
                     armor: reportData.lastPip.armor,
                     damage: reportData.lastPip.damage
                 }
+
+
             } else {
                 reportData.recalculationRequired = true;
             }
@@ -256,6 +260,7 @@ const processForwards = (data, config) => {
             }
 
             beastData.battles[0].healthOnStart = data.currentHealth + beastData.battles[0].totalDamageReceived;
+            beastData.battles[0].stamp = `${date}${userId}`;
 
             if (data.fightResult === 'lose') {
                 if (!reportData.lastBeastSeen) {
@@ -343,7 +348,8 @@ const processForwards = (data, config) => {
                     beastData.name = reportData.lastBeastSeen.name;
 
                     beastData.flees = [{
-                        outcome: data.outcome
+                        outcome: data.outcome,
+                        stamp: `${date}${userId}`
                     }]
 
                     if (data.outcome === 'lose') {
