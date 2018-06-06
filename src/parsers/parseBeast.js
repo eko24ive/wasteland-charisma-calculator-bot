@@ -18,6 +18,7 @@ const parseRegularBeast = beast => {
     if (regexps.actionReceivedCapsRegExp.test(beast)) {
         [, capsReceived] = regexps.actionReceivedCapsRegExp.exec(beast);
     }
+
     if (regexps.actionReceivedMaterialsRegExp.test(beast)) {
         [, materialsReceived] = regexps.actionReceivedMaterialsRegExp.exec(beast);
     }

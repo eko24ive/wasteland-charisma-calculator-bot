@@ -171,6 +171,16 @@ const calculateAmountSpentOnCharisma = (
     return spentAmount;
 }
 
+const calculateSpentOnSkill = (
+    skillLevel
+) => {
+    const spentAmount = defaultSkillCost.filter(c => c.level <= skillLevel)
+        .map(c => c.caps)
+        .reduce((a, b) => a + b);
+
+    return spentAmount;
+}
+
 const calculateUpgrade = ({
     pip,
     upgradeSkill,
@@ -198,6 +208,8 @@ const calculateUpgrade = ({
         amountSpentOnCharisma: calculateAmountSpentOnCharisma(charismaLevel)
     };
 
+    const spentOnSkill = calculateSpentOnSkill(currentSkillLevel);
+
     /*
     При самом удачном стечении обсоятельств тебе необходимо сделать примерно ${Math.ceil(calculations.raidsInfo.bestCaseScenario.amountOfRaids)} 👣 ходок:
 За одну ходку ты получишь примерно:
@@ -208,15 +220,16 @@ const calculateUpgrade = ({
 
 */
 
+/* _Забавный факт #1: ты потратил на харизму ${formatNubmer(calculations.amountSpentOnCharisma)} 🕳 крышек_ */
     const res = `
-_Поздравляю, ты потратил на харизму ${formatNubmer(calculations.amountSpentOnCharisma)} 🕳 крышек_
+_Всего ты потратил ${formatNubmer(spentOnSkill)} 🕳 крышек на ${upgradeSkill}_
 
 Необходимо потратить ${formatNubmer(calculations.amountToSpend)} 🕳 крышек для прокачки навыка \`${upgradeSkill}\` от ${currentSkillLevel} уровня до ${upgradeTo} уровня
 
 Тебе необходимо сделать примерно *${Math.floor((calculations.raidsInfo.worstCaseScenario.amountOfRaids + 2) * 1.5)} 👣 ходок*:
 \`Из-за недавнего обновления Wasteland Wars данные для расчёта ходок работают в эксперементальном режиме\`
 `;
-/* 
+/*
 За одну ходку ты получишь примерно:
 - ${formatNubmer(calculations.raidsInfo.worstCaseScenario.caps)} 🕳 крышек
 - ${formatNubmer(calculations.raidsInfo.worstCaseScenario.res)} 📦 материалов

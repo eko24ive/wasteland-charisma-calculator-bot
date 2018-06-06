@@ -189,8 +189,8 @@ const askReachableKm = (msg) => {
         ],
         [
 
-            buttons['reachableKm50'].label,
-            buttons['reachableKm60'].label,
+            buttons['reachableKm56'].label,
+            buttons['reachableKm65'].label,
             buttons['reachableKm70'].label
         ]
     ], {
@@ -214,14 +214,11 @@ const getEffort = (msg, bot) => {
     sessions[msg.from.id].amountToUpgrade = msg.text;
 
     const effort = calculateUpgrade(sessions[msg.from.id]);
+    const { pip } = sessions[msg.from.id];
 
-    console.log(`
-------------------------------------------
-[REPLY]
-User: ${sessions[msg.from.id].pip.name} | ${sessions[msg.from.id].pip.faction} | ${msg.from.username}
-Reachable distance: ${sessions[msg.from.id].reachableKm}
-Amout to upgrade: ${sessions[msg.from.id].amountToUpgrade}
-`);
+
+
+    console.log(`[SKILL UPGRADE]: ${pip.faction} | ${pip.name} | ${msg.from.username}`)
 
     bot.sendMessage(msg.from.id, effort, {
         replyMarkup: defaultKeyboard,
@@ -366,14 +363,24 @@ _Учти, что я ещё нахожусь в бета-режиме, и ты �
 });
 
 bot.on('forward', (msg) => {
-    if (sessions[msg.from.id] === undefined) {
+    if(sessions[msg.from.id] === undefined) {
         createSession(msg.from.id);
     }
 
-    if(msg.forward_from.id !== 430930191 && sessions[msg.from.id].state !== states.WAIT_FOR_FORWARD_END) {
-        return msg.reply.text('Форварды принимаються только от @WastelandWarsBot', {
-            asReply: true
-        })
+    if(msg.forward_from.id !== 430930191) {
+        if (sessions[msg.from.id].state === states.WAIT_FOR_FORWARD_END) {
+            console.log(`[CULPRIT]: ${msg.from.id} | ${msg.from.first_name} | ${msg.from.username}`);
+
+            createSession(msg.from.id);
+
+            return msg.reply.text(`
+Форварды принимаються только от @WastelandWarsBot.
+Отменяю твои фоварды - нехуй выебываться.
+            `, {
+                asReply: true,
+                replyMarkup: defaultKeyboard
+            })
+        }
     }
 
     if (sessions[msg.from.id].state === states.WAIT_FOR_PIP_FORWARD) {
@@ -440,8 +447,11 @@ reply = `Шикардос, я обновил твой пип!
             });
         }
     } if (sessions[msg.from.id].state === states.WAIT_FOR_BEAST_FACE_FORWARD) {
+        // TODO: Validate forward date - should be greater that date of the first forward and less than date of last forward
+
         let data;
         let dataType;
+        let beastName;
 
         const isLocation = regExpSetMatcher(msg.text, {
             regexpSet: regexps.location
@@ -454,12 +464,23 @@ reply = `Шикардос, я обновил твой пип!
         if (isDungeonBeastFaced) {
             data = parseBeastFaced.parseDungeonBeastFaced(msg.text);
             dataType = 'dungeonBeastFaced';
+            beastName = data.name;
         } else if (isLocation) {
             data = parseLocation(msg.text);
             dataType = 'location';
+            beastName = data.beastFaced.name
         }
 
-        if (isLocation || isDungeonBeastFaced) {
+        if (beastName !== sessions[msg.from.id].beastToValidateName) {
+            return msg.reply.text(`
+Этот моб не похож на того с которым ты дрался. Ты чё - наебать меня вздумал?!
+
+Если ты передумал её кидать - жми /skipbeastforward
+*Но тогда я проигнорирую битву с этим мобом*
+            `, {
+                asReply: true
+            });
+        } else if (isLocation || isDungeonBeastFaced) {
             sessions[msg.from.id].data.push({
                 data,
                 dataType,
@@ -1001,6 +1022,7 @@ const actualProcessUserData = (msg, reportData, updatesData, options) => {
 
     if (options.useBeastFace && !_.isEmpty(reportData.beastToValidate)) {
         sessions[msg.from.id].state = states.WAIT_FOR_BEAST_FACE_FORWARD;
+        sessions[msg.from.id].beastToValidateName = reportData.beastToValidate[0].name;
         return msg.reply.text(`
 Слушай, я не могу понять кто тебе надрал задницу, ${reportData.beastToValidate[0].name} - это обычный моб или данжевый?
 
@@ -1037,7 +1059,7 @@ _или_
         userForwardPoints += amount;
     }
 
-    console.log({
+    /* console.log({
         reportData,
         updatesData,
         telegram: {
@@ -1045,7 +1067,13 @@ _или_
             firstName: msg.from.first_name,
             userName: msg.from.username
         }
-    });
+    }); */
+
+    try {
+        console.log(`[USAGE]: ${reportData.lastPip.faction} | ${reportData.lastPip.name} | ${msg.from.username}`)
+    } catch(e) {
+
+    }
 
     const isBeastUnderValidation = (name) => {
         return reportData.beastToValidate.filter(beast => {
@@ -1107,10 +1135,12 @@ _или_
                                     }
                                 }
 
-                                if (iBeast.concussions) {
-                                    if (iBeast.concussions.length > 0) {
-                                        isSameConcussionExists = fBeast.concussions.map(concussion => {
-                                            const existingConcussion = _.clone(concussion.toJSON());
+
+                        // TODO: Error logging for no stats object
+                        if (iBeast.concussions) {
+                            if (iBeast.concussions.length > 0) {
+                                isSameConcussionExists = fBeast.concussions.map(concussion => {
+                                    const existingConcussion = _.clone(concussion.toJSON());
 
                                             return existingConcussion.stats.agility === iBeast.concussions[0].stats.agility &&
                                                 existingConcussion.amount === iBeast.concussions[0].amount;
@@ -1263,6 +1293,8 @@ _или_
             } else {
                 resolve();
             }
+        }, function (err) {
+            // console.log('iterating done');
         });
     }
 
@@ -1321,12 +1353,11 @@ _или_
                                 Object.keys(iLocation.receivedItems).map((item) => {
                                     const amount = iLocation.receivedItems[item];
 
-                                    if (fLocation.receivedItems[item]) {
-                                        if (!_.contains(fLocation.receivedItems[item], amount)) {
-                                            fLocation.receivedItems[item].push(amount);
-                                        }
-                                    } else {
-                                        fLocation.receivedItems[item] = [amount];
+                            if (!_.isEmpty(fLocation.receivedBonusItems)) {
+                                if (fLocation.receivedBonusItems[item]) {
+                                    // FIXME: TypeError: fLocation.receivedBonusItems[item].push is not a function
+                                    if (!_.contains(fLocation.receivedBonusItems[item], amount)) {
+                                        fLocation.receivedBonusItems[item].push(amount);
                                     }
                                 })
                             }
@@ -1444,6 +1475,9 @@ _${reportData.criticalError}_
         `, {
             parseMode: 'markdown',
             replyMarkup: defaultKeyboard
+            });
+        }, function (err) {
+            // console.log(err, 'iterating done');
         });
     }
 
@@ -1500,7 +1534,21 @@ _${reportData.criticalError}_
 }
 
 bot.on('/journeyforwardend', msg => {
-    sessions[msg.from.id].state = states.WAIT_FOR_DATA_TO_PROCESS;
+    if(sessions[msg.from.id] === undefined) {
+        createSession(msg.from.id);
+
+        return msg.reply.text(`Чёрт, похоже что бот был перезагружен и твои форварды не сохранились, прости пожалуйста :с`, {
+            replyMarkup: defaultKeyboard
+        });
+    } else {
+        sessions[msg.from.id].state = states.WAIT_FOR_DATA_TO_PROCESS;
+
+        // console.log(JSON.stringify(sessions[msg.from.id].data));
+        processUserData(msg, {
+            usePip: sessions[msg.from.id].processDataConfig.usePip,
+            useBeastFace: sessions[msg.from.id].processDataConfig.useBeastFace
+        });
+    }
 
     processUserData(msg, {
         usePip: sessions[msg.from.id].processDataConfig.usePip,
@@ -1615,7 +1663,9 @@ bot.on('/dng', msg => {
 })
 
 bot.on('/cfl', msg => {
-    return msg.reply.text(commandsForLag);
+    return msg.reply.text(commandsForLag, {
+        paresMode: 'html'
+    });
 })
 
 bot.on('/skill_upgrade', msg => {
@@ -2060,6 +2110,13 @@ bot.on(/mob_(.+)/, msg => {
 });
 
 bot.on('/cancel', msg => {
+    if(sessions[msg.from.id] === undefined) {
+        createSession(msg.from.id);
+
+        return msg.reply.text('Ты вернусля в главное меню', {
+            replyMarkup: defaultKeyboard
+        });
+    }
     if(sessions[msg.from.id].state === states.WAIT_FOR_DATA_TO_PROCESS) {
         return msg.reply.text('Дождись результатов обработки форвардов', {
             asReply: true
@@ -2091,7 +2148,7 @@ bot.on('callbackQuery', msg => {
 
             const giantsReply = _.sortBy(giants, 'distance').map(giant => {
             const isDead = giant.health.current <= 0;
-            const time = moment(giant.forwardStamp, 'X').format('DD.MM HH:mm');
+            const time = moment(giant.forwardStamp, 'X').add(3, 'hour').format('DD.MM HH:mm');
 
             return `${giant.distance || '??'}км - *${giant.name}*\n${time} - ${isDead ? '💫 повержен' : `❤️${giant.health.current}`}`;
         });

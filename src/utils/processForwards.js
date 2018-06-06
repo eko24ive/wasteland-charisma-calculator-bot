@@ -51,7 +51,7 @@ const normalizeItems = items => {
 // TODO: Handle death
 // TODO: Typescript
 
-const processForwards = (data, config) => {
+const processForwards = (inputData, config) => {
     const reportData = {
         capsReceived: 0,
         capsLost: 0,
@@ -81,7 +81,7 @@ const processForwards = (data, config) => {
         beasts: []
     };
 
-    const dataPips = data.filter(({
+    const dataPips = inputData.filter(({
         dataType
     }) => dataType === 'pipboy').sort((first, second) => {
         if (first.date < second.date) {
@@ -107,13 +107,13 @@ const processForwards = (data, config) => {
     }
 
     // 1525607351
-    if(data.filter(({date}) => date < 1525607078).length > 0) {
+    if(inputData.filter(({date}) => date < 1525607078).length > 0) {
         reportData.criticalError = 'Был замечен форвард время которого меньше за время выкатки обновы Wasteland Wars';
 
         return {reportData};
     }
 
-    data.sort((first, second) => {
+    inputData.sort((first, second) => {
         if (first.date < second.date) {
             return -1;
         }
@@ -173,6 +173,7 @@ const processForwards = (data, config) => {
 
             delete locationData.beastFaced;
             updatesData.locations.push(locationData);
+            reportData.healthCapHistory.push(data.healthCap)
 
         }
 
@@ -185,6 +186,7 @@ const processForwards = (data, config) => {
 
             beastData.name = data.name;
             beastData.distanceRange = [data.distance];
+            reportData.distance = data.distance;
             reportData.distanceHistory.push(data.distance);
 
 
@@ -290,7 +292,8 @@ const processForwards = (data, config) => {
 
             beastData.name = data.name;
             beastData.distanceRange = [data.distance];
-
+            reportData.distance = data.distance;
+            reportData.distanceHistory.push(data.distance);
 
             if (data.fightResult === 'win') {
                 beastData.battles = [{
