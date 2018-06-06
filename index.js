@@ -1523,11 +1523,6 @@ bot.on('/journeyforwardend', msg => {
             useBeastFace: sessions[msg.from.id].processDataConfig.useBeastFace
         });
     }
-
-    processUserData(msg, {
-        usePip: sessions[msg.from.id].processDataConfig.usePip,
-        useBeastFace: sessions[msg.from.id].processDataConfig.useBeastFace
-    });
 });
 
 bot.on('/journeyforwardcancel', msg => {
@@ -1877,10 +1872,8 @@ bot.on("/mypipstats", msg => {
   });
 
 bot.on('/debug', msg => {
-    userManager.findByTelegramId(msg.from.id).then(result => {
-        return msg.reply.text(JSON.stringify(result), {
-            asReply: true
-        });
+    return msg.reply.text(sessions[msg.from.id].state, {
+        asReply: true
     });
 });
 
