@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
-// TODO: Add battle id
+// TODO: Add identificator of forward using id of user and timestamp of forward
 // TODO: Add detailed battle output (just like from the forward) (field: battlelog)
 
 const beastScheme = new Schema({
@@ -21,14 +21,16 @@ const beastScheme = new Schema({
             armor: Number,
             damage: Number
         },
-        healthOnStart: Number
+        healthOnStart: Number,
+        stamp: String
     }],
     flees: [{
         stats: {
             agility: Number
         },
         damageReceived: Number,
-        outcome: String
+        outcome: String,
+        stamp: String
     }],
     concussions: [{
         stats: {
