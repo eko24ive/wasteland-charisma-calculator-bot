@@ -142,7 +142,7 @@ const userManager = User => ({
     leaderboard: id => {
         return new Promise((resolve, reject) => {
             User.find().sort({
-                'points.score': 1
+                'points.score': -1
             }).then(users => {
                 if(users.length === 0) {
                     return resolve({
@@ -170,7 +170,7 @@ const userManager = User => ({
                         }
 
                         return reply;
-                    } else {
+                    } else if (userIndex === -1) {
                         return '\n\nУ меня ещё нет твоего профиля - скинь свой пип-бой и начни кидать форварды боту что бы получить очки!'
                     }
 
