@@ -1,3 +1,5 @@
+// TODO: Supply it with pip from database (with appropriate validation just like from the processForwards)
+
 require('dotenv').config();
 const uristring = process.env.MONGODB_URI;
 
@@ -10,13 +12,18 @@ const moment = require('moment-timezone');
 const objectDeepSearch = require('object-deep-search');
 
 const config = require('./package.json');
+
+const forwardPoints = require('./src/constants/forwardPoints');
+
 const regexps = require('./src/regexp/regexp');
+const PipRegexps = require('./src/regexp/pip');
 
 const beastSchema = require('./src/schemes/beast');
 const locationSchema = require('./src/schemes/location');
 const giantScheme = require('./src/schemes/giant');
 const userSchema = require('./src/schemes/user');
 
+const chartGeneration = require('./src/utils/chartGeneration');
 
 const parsePip = require('./src/parsers/parsePip');
 const beastParser = require('./src/parsers/parseBeast');
@@ -53,11 +60,16 @@ const {
     commandsForLag
 } = require('./src/strings/strings');
 
+const UserManager = require('./src/database/userManager');
+
 mongoose.connect(uristring);
+
 const Beast = mongoose.model('Beast', beastSchema);
 const Giant = mongoose.model('Giant', giantScheme);
 const Location = mongoose.model('Location', locationSchema);
-const User = mongoose.model('User', locationSchema);
+const User = mongoose.model('User', userSchema);
+
+const userManager = UserManager(User);
 
 program
     .version('0.1.0')
@@ -89,15 +101,31 @@ const states = {
     WAIT_FOR_DATA_TO_PROCESS
 };
 
-const sessionAbort = (msg) => {
-    const replyMarkup = bot.keyboard([
-        [buttons.sessionAbortYes.label, buttons.sessionAbortNo.label]
-    ], {
-        resize: true
-    });
+const updateOrCreate = (msg, pip, cb) => {
+    const telegramData = {
+        first_name: msg.from.first_name,
+        id: msg.from.id,
+        username: msg.from.username
+    }
 
-    return bot.sendMessage(msg.from.id, 'Ты хочешь обнулить данные своего пип-боя ?', {
-        replyMarkup
+    const pipData = {...pip, timeStamp: msg.forward_date};
+
+    userManager.findByTelegramId(msg.from.id).then(result => {
+        if (result.ok === false && result.reason === 'USER_NOT_FOUND') {
+            userManager.create({telegramData,pipData}).then(result => {
+                cb(result);
+            });
+        } else if (result.ok === true && result.reason === 'USER_FOUND') {
+            userManager.update({telegramData,pipData}).then(result => {
+                cb(result);
+            });
+        }
+    });
+};
+
+const findPip = (msg, cb) => {
+    userManager.findByTelegramId(msg.from.id).then(result => {
+        cb(result);
     });
 }
 
@@ -120,7 +148,7 @@ const askAmountOfLevels = (msg) => {
         resize: true
     });
 
-    return bot.sendMessage(msg.from.id, `
+    return msg.reply.text(`
 Выбери на сколько уровней ты хочешь прокачать *${sessions[msg.from.id].upgradeSkill}*
 \`Либо напиши своё количество (например: 17)\`
 `, {
@@ -188,23 +216,16 @@ const getEffort = (msg, bot) => {
     const effort = calculateUpgrade(sessions[msg.from.id]);
     const { pip } = sessions[msg.from.id];
 
+
+
+    console.log(`[SKILL UPGRADE]: ${pip.faction} | ${pip.name} | ${msg.from.username}`)
+
     bot.sendMessage(msg.from.id, effort, {
         replyMarkup: defaultKeyboard,
         parseMode: 'markdown'
     });
 
-    console.log(`[SKILL UPGRADE]: ${pip.faction} | ${pip.name} | ${msg.from.username}`)
-
-
-/*     console.log(`
-------------------------------------------
-[SKILL UPGRADE]
-User: ${sessions[msg.from.id].pip.name} | ${sessions[msg.from.id].pip.faction} | ${msg.from.username}
-Reachable distance: ${sessions[msg.from.id].reachableKm}
-Amout to upgrade: ${sessions[msg.from.id].amountToUpgrade}
-`); */
-
-    delete sessions[msg.from.id];
+    createSession(msg.from.id);
 }
 
 const createSession = id => {
@@ -214,7 +235,8 @@ const createSession = id => {
         data: [],
         processDataConfig: {
             usePip: true,
-            useBeastFace: true
+            useBeastFace: true,
+            silent: false
         }
     };
 };
@@ -263,7 +285,8 @@ const bot = new TeleBot({
 
 const defaultKeyboard = bot.keyboard([
     [
-        buttons['journeyForwardStart'].label
+        buttons['journeyForwardStart'].label,
+        buttons['skillUpgrade'].label
     ],
     [
         buttons['showGiants'].label,
@@ -287,6 +310,18 @@ const defaultKeyboard = bot.keyboard([
     resize: true
 });
 
+const toGameKeyboard = bot.inlineKeyboard([
+    [
+        bot.inlineButton('📟 Перейти в игру.', {url: 'https://t.me/WastelandWarsBot'})
+    ]
+]);
+
+const toSkillOMaticKeyboard = bot.inlineKeyboard([
+    [
+        bot.inlineButton('Запустить "🎓Скилокачатор"', {callback: 'initialize_skill_upgrade'})
+    ]
+]);
+
 
 const getBeastKeyboard = beastId => {
     return bot.inlineKeyboard([
@@ -301,26 +336,24 @@ const getBeastKeyboard = beastId => {
 
 
 bot.on('/start', (msg) => {
-    if (sessions[msg.from.id] === undefined) {
-        createSession(msg.from.id);
-    };
+    createSession(msg.from.id);
 
     return bot.sendMessage(
         msg.from.id,
         `
 Привет, меня зовут «*Wasteland Wars Assistant*», я - что-то на подобии "умной" энциклопедии.
 
-Как только ты перешлёшь мне свой *📟Пип-бой* - я помогу тебе узнать сколько нужно сделать заходов и крышек для прокачки твоих навыков.
-Если хочешь посмотреть что я знаю о мобе которого ты встретил - скинь форвард встречи с ним.
+⬦ Если хочешь посмотреть что я знаю о мобе которого ты встретил - скинь форвард встречи с ним.
 
-Если хочешь научить бота новому - нажими \`[Скинуть лог 🏃]\`, затем cкидывай все свои форварды, которые хочешь записать(я умею обрабатывать бои и побеги с монстрами и проход км) и в конце свежий пип. Затем жми \`[Стоп 🙅‍♂️]\` и жди моего ответа.
+⬦ Если хочешь что бы я помог тебе информацией о прокачке твоих скилов - жми кнопку \`[🎓Скилокачатор]\`
 
+⬦ Если хочешь отправить боту новые данные про мобов - нажими \`[Скинуть лог 🏃]\`
 
 КАНАЛ С НОВОСТЯМИ @wwAssistantBotNews
 ЧАТ БЫСТРОГО РЕАГИРОВАНИЯ @wwAssistantChat
 
 _Учти, что я ещё нахожусь в бета-режиме, и ты можешь наткнуться на большие и маленькие баги.
-Но, не переживай - они будут пофикшены_
+Не переживай - они будут пофикшены_
         `, {
             replyMarkup: defaultKeyboard,
             parseMode: 'markdown',
@@ -328,27 +361,6 @@ _Учти, что я ещё нахожусь в бета-режиме, и ты �
         }
     );
 });
-
-/* bot.on('/resetSession', (msg) => {
-    sessions[msg.from.id] = {
-        pip: null,
-        state: null
-    };
-
-    bot.sendMessage(
-        msg.from.id, 'Данные сброшены - можешь скинуть свой пип-бой снова.', {
-            replyMarkup: 'hide'
-        }
-    );
-});
-
-bot.on('/resetSessionAbort', (msg) => {
-    bot.sendMessage(
-        msg.from.id, 'Cброс данных отменён.', {
-            replyMarkup: 'hide'
-        }
-    );
-}); */
 
 bot.on('forward', (msg) => {
     if(sessions[msg.from.id] === undefined) {
@@ -369,38 +381,61 @@ bot.on('forward', (msg) => {
                 replyMarkup: defaultKeyboard
             })
         }
-
-        return msg.reply.text('Форварды принимаються только от @WastelandWarsBot', {
-            asReply: true,
-            replyMarkup: defaultKeyboard
-        });
-    }
-
-    if (sessions[msg.from.id] === undefined) {
-        createSession(msg.from.id);
     }
 
     if (sessions[msg.from.id].state === states.WAIT_FOR_PIP_FORWARD) {
-        const pip = parsePip(msg);
+        const isClassicPip = regExpSetMatcher(msg.text, {
+            regexpSet: PipRegexps.classicPip
+        });
 
-        if (_.isObject(pip)) {
-            data = pip;
+        const isSimplePip = regExpSetMatcher(msg.text, {
+            regexpSet: PipRegexps.simplePip
+        });
+
+        if (isClassicPip || isSimplePip) {
+            data = parsePip(msg, isClassicPip);
             dataType = 'pipboy';
 
+            updateOrCreate(msg,data, result => {
+                if(!result.ok && result.reason === 'PIP_VALIDATION_FAILED') {
+                    reply = `Я не вижу что бы ты прокачал какие-то скилы :c
+Скидывай пип-бой как только прокачаешься!`;
+                }
 
+                if(!result.ok && result.reason === 'PIP_OUTDATED') {
+                    reply = 'У меня в базе есть более актуальная запись про твой пип-бой';
+                }
 
+                if(result.ok && result.reason === 'USER_CREATED') {
+                    reply = `
+Супер, я сохранил твой пип!
+Не забывай скидывать мне свой пип-бой по мере того как будешь скидывать скилы!`;
+                }
 
-            msg.reply.text('Супер, я вижу твой пип - сейчас обработаю его вместе с твоими форвардами').then(res => {
-                sessions[msg.from.id].data.push({
-                    data,
-                    dataType,
-                    date: msg.forward_date
-                });
+                if(result.ok && result.reason === 'USER_UPDATED') {
+reply = `Шикардос, я обновил твой пип!
+Не забудь скинуть новый пип, когда качнешься!`;
+                }
 
-                processUserData(msg, {
-                    usePip: sessions[msg.from.id].processDataConfig.usePip,
-                    useBeastFace: sessions[msg.from.id].processDataConfig.useBeastFace
-                })
+                if(result.ok) {
+                    return msg.reply.text(`${reply}\nТеперь я займусь твоими форвардами`).then(res => {
+                        sessions[msg.from.id].data.push({
+                            data,
+                            dataType,
+                            date: msg.forward_date
+                        });
+
+                        processUserData(msg, {
+                            usePip: sessions[msg.from.id].processDataConfig.usePip,
+                            useBeastFace: sessions[msg.from.id].processDataConfig.useBeastFace
+                        })
+                    });
+
+                } else {
+                    return msg.reply.text(reply, {
+                        asReply: true
+                    })
+                }
             });
         } else {
             return msg.reply.text(`
@@ -468,6 +503,7 @@ bot.on('forward', (msg) => {
     } else if (sessions[msg.from.id].state === states.WAIT_FOR_FORWARD_END) {
         let data;
         let dataType;
+
         const isLocation = regExpSetMatcher(msg.text, {
             regexpSet: regexps.location
         });
@@ -492,13 +528,18 @@ bot.on('forward', (msg) => {
             regexpSet: regexps.dungeonBeastFaced
         });
 
-        const pip = parsePip(msg);
+        const isClassicPip = regExpSetMatcher(msg.text, {
+            regexpSet: PipRegexps.classicPip
+        });
 
-        /* if (isDungeonBeast) {
+        const isSimplePip = regExpSetMatcher(msg.text, {
+            regexpSet: PipRegexps.simplePip
+        });
+
+        if (isDungeonBeast) {
             data = beastParser.parseDungeonBeast(msg.text);
             dataType = 'dungeonBeast';
-        } */
-        if (isDungeonBeastFaced) {
+        } else if (isDungeonBeastFaced) {
             data = parseBeastFaced.parseDungeonBeastFaced(msg.text);
             dataType = 'dungeonBeastFaced';
         } else if (isFlee) {
@@ -513,18 +554,19 @@ bot.on('forward', (msg) => {
         } else if (isLocation) {
             data = parseLocation(msg.text);
             dataType = 'location';
-        } else if (_.isObject(pip)) {
-            data = pip;
+        } else if (isClassicPip || isSimplePip) {
+            data = parsePip(msg, isClassicPip);
             dataType = 'pipboy';
         }
 
 
         // isDungeonBeast ||
-        if (isRegularBeast || isLocation || isFlee || isDeathMessage || isDungeonBeastFaced || _.isObject(pip)) {
+        if (isRegularBeast || isLocation || isFlee || isDeathMessage || isDungeonBeastFaced || (isClassicPip || isSimplePip)) {
             sessions[msg.from.id].data.push({
                 data,
                 dataType,
-                date: msg.forward_date
+                date: msg.forward_date,
+                userId: msg.from.id
             });
         }
     } else if (
@@ -532,9 +574,15 @@ bot.on('forward', (msg) => {
         sessions[msg.from.id].state !== states.WAIT_FOR_BEAST_FACE_FORWARD &&
         sessions[msg.from.id].state !== states.WAIT_FOR_FORWARD_END
     ) {
-        const pip = parsePip(msg);
+        const isClassicPip = regExpSetMatcher(msg.text, {
+            regexpSet: PipRegexps.classicPip
+        });
 
-        const isRegularBeast = regExpSetMatcher(msg.text, {
+        const isSimplePip = regExpSetMatcher(msg.text, {
+            regexpSet: PipRegexps.simplePip
+        });
+
+        const isRegularBeastFaced = regExpSetMatcher(msg.text, {
             regexpSet: regexps.regularBeastFaced
         });
 
@@ -554,26 +602,50 @@ bot.on('forward', (msg) => {
             regexpSet: regexps.dungeonBeastFaced
         });
 
-        if (_.isObject(pip)) {
-            sessions[msg.from.id].pip = pip;
-            sessions[msg.from.id].state = states.WAIT_FOR_SKILL;
+        const isRegularBeast = regExpSetMatcher(msg.text, {
+            regexpSet: regexps.regularBeast
+        });
 
-            const replyMarkup = bot.keyboard([
-                [buttons.skillSelectStrength.label, buttons.skillSelectAccuracy.label, buttons.skillSelectAgility.label],
-                [buttons.skillSelectHealth.label, buttons.skillSelectCharisma.label],
-                [buttons.cancelAction.label]
-            ], {
-                resize: true
-            });
+        /* const isLocation = regExpSetMatcher(msg.text, {
+            regexpSet: regexps.location
+        });
 
-            return msg.reply.text(`
-Что качать будешь?
+        const isDungeonBeast = regExpSetMatcher(msg.text, {
+            regexpSet: regexps.dungeonBeast
+        });
 
-Что бы вернуться в меню - нажми кнопку <code>[↩️Назад]</code>.
-Либо, в любой момент напиши /cancel.
-            `, {
-                replyMarkup,
-                parseMode: 'html'
+        const isFlee = regExpSetMatcher(msg.text, {
+            regexpSet: regexps.flee
+        }); */
+
+        if (isClassicPip || isSimplePip) {
+            const pip = parsePip(msg, isClassicPip);
+            let reply;
+            updateOrCreate(msg,pip, result => {
+                if(!result.ok && result.reason === 'PIP_VALIDATION_FAILED') {
+                    reply = `Я не вижу что бы ты прокачал какие-то скилы :c
+Скидывай пип-бой как только прокачаешься!`;
+                }
+
+                if(!result.ok && result.reason === 'PIP_OUTDATED') {
+                    reply = 'У меня в базе есть более актуальная запись про твой пип-бой';
+                }
+
+                if(result.ok && result.reason === 'USER_CREATED') {
+                    reply = `
+Супер, я сохранил твой пип!
+Не забывай скидывать мне свой пип-бой по мере того как будешь скидывать скилы!`;
+                }
+
+                if(result.ok && result.reason === 'USER_UPDATED') {
+reply = `Шикардос, я обновил твой пип!
+Не забудь скинуть новый пип, когда качнешься!`;
+                }
+
+                return msg.reply.text(reply, {
+                    asReply: true,
+                    replyMarkup: toSkillOMaticKeyboard
+                });
             });
         } else if (isGiantFaced) {
             const giant = parseGiantFaced(msg.text);
@@ -638,6 +710,12 @@ bot.on('forward', (msg) => {
                     newGiant.save().then(res => {
                         return msg.reply.text('Спасибо за форвард! Я добавил его в базу!', {
                             asReply: true
+                        }).then(o => {
+                            userManager.addPoints(msg.from.id, userForwardPoints.newGiantData).then(result => {
+                                if(!result.ok) {
+                                    // console.log('userManager.addPoints: '+JSON.stringify(result));
+                                }
+                            });
                         });
                     })
                 } else {
@@ -654,6 +732,12 @@ bot.on('forward', (msg) => {
                         fGiant.save().then(res => {
                             return msg.reply.text(`Спасибо за форвард! Я обновил ${giant.name} в базе!`, {
                                 asReply: true
+                            }).then(o => {
+                                userManager.addPoints(msg.from.id, userForwardPoints.newGiantData).then(result => {
+                                    if(!result.ok) {
+                                        // console.log('userManager.addPoints: '+JSON.stringify(result));
+                                    }
+                                });
                             });
                         })
                     }
@@ -699,7 +783,7 @@ bot.on('forward', (msg) => {
                     }
                 }
             });
-        } else if (isRegularBeast) {
+        } else if (isRegularBeastFaced) {
             const beast = parseBeastFaced.parseRegularBeastFaced(msg.text);
 
             routedBeastView(Beast, {
@@ -744,6 +828,42 @@ bot.on('forward', (msg) => {
                     });
                 }
             }).catch(e => console.log(e));
+        } else if (isRegularBeast) {
+            // || isLocation || isDungeonBeast || isFlee
+            let data;
+            let dataType;
+
+            createSession(msg.from.id);
+
+            data = beastParser.parseRegularBeast(msg.text);
+            dataType = 'regularBeast';
+
+            /* if (isDungeonBeast) {
+                data = beastParser.parseDungeonBeast(msg.text);
+                dataType = 'dungeonBeast';
+            } else if (isFlee) {
+                data = parseFlee(msg.text);
+                dataType = 'flee';
+            } else if (isRegularBeast) {
+                data = beastParser.parseRegularBeast(msg.text);
+                dataType = 'regularBeast';
+            } else if (isLocation) {
+                data = parseLocation(msg.text);
+                dataType = 'location';
+            } */
+
+            sessions[msg.from.id].data.push({
+                data,
+                dataType,
+                date: msg.forward_date,
+                userId: msg.from.id
+            });
+
+            processUserData(msg, {
+                usePip: sessions[msg.from.id].processDataConfig.usePip,
+                useBeastFace: sessions[msg.from.id].processDataConfig.useBeastFace,
+                silent: true
+            });
         }
     }
 
@@ -856,7 +976,7 @@ bot.on('/upgradeSkill', msg => {
 bot.on('/journeyforwardstart', msg => {
     createSession(msg.from.id);
 
-    let inlineReplyMarkup = bot.inlineKeyboard([
+    const inlineReplyMarkup = bot.inlineKeyboard([
         [
             bot.inlineButton('📟 Перейти в игру.', {url: 'https://t.me/WastelandWarsBot'})
         ]
@@ -895,42 +1015,12 @@ bot.on('/journeyforwardstart', msg => {
 
 });
 
-const processUserData = (msg, options) => {
-    sessions[msg.from.id].state = states.WAIT_FOR_DATA_TO_PROCESS;
+const actualProcessUserData = (msg, reportData, updatesData, options) => {
+    updateOrCreate(msg, reportData.lastPip, result => {
+        console.log(result);
+    });
 
-    const {
-        data
-    } = sessions[msg.from.id];
-
-    const {
-        reportData,
-        updatesData
-    } = processForwards(data);
-
-    if (reportData.criticalError) {
-        return msg.reply.text(`
-Произошла критическая ошибка! Отменяю форварды.
-
-_${reportData.criticalError}_
-        `, {
-            parseMode: 'markdown',
-            replyMarkup: defaultKeyboard
-        });
-    }
-
-    if (options.usePip && reportData.pipRequired) {
-        sessions[msg.from.id].state = states.WAIT_FOR_PIP_FORWARD;
-        return msg.reply.text(`
-Я не заметил в форвардах твоего пип-боя, можешь мне его дослать?
-Если у тебя нет на это времени жми /skippipforward
-
-*ВНИМАНИЕ: ПРИ НАЖАТИИ НА /skippipforward - БОТ ПРОИГНОРИРУЕТ ТВОИ БИТВЫ И ПОБЕГИ ОТ МОБОВ И НЕ ЗАПИШЕТ ИХ В БАЗУ*
-`, {
-    parseMode: 'markdown',
-});
-    }
-
-    if(options.useBeastFace && !_.isEmpty(reportData.beastToValidate)) {
+    if (options.useBeastFace && !_.isEmpty(reportData.beastToValidate)) {
         sessions[msg.from.id].state = states.WAIT_FOR_BEAST_FACE_FORWARD;
         sessions[msg.from.id].beastToValidateName = reportData.beastToValidate[0].name;
         return msg.reply.text(`
@@ -945,17 +1035,29 @@ _или_
 
 *ВНИМАНИЕ: ПРИ НАЖАТИИ НА /skipbeastforward - БОТ ПРОИГНОРИРУЕТ ТОЛЬКО РЕЗУЛЬТАТ ТВОЕЙ БИТВЫ С ${reportData.beastToValidate[0].name} НЕ ЗАПИШЕТ ИХ В БАЗУ*
 `, {
-    parseMode: 'markdown',
-});
+            parseMode: 'markdown',
+        });
     }
 
 
+    if(!options.silent) {
+        msg.reply.text(`Перехожу в режим обработки данных, подожди пожалуйста немного :3`, {
+            replyMarkup: 'hide'
+        });
+    }
 
-    msg.reply.text(`Перехожу в режим обработки данных, подожди пожалуйста немного :3`, {
-        replyMarkup: 'hide'
-    });
 
     let amountOfData = updatesData.beasts.length + updatesData.locations.length;
+    let userForwardPoints = 0;
+    let dataProcessed = 0;
+    const dupes = {
+        battles: 0,
+        flees: 0
+    }
+
+    const addUserPoints = amount => {
+        userForwardPoints += amount;
+    }
 
     /* console.log({
         reportData,
@@ -973,28 +1075,6 @@ _или_
 
     }
 
-    /* User.findOne({
-        'telegram.id': msg.from.id
-    }, function (err, user) {
-        if (user === null) {
-            const newUser = new User({
-                telegram: {
-                    id: msg.from.id,
-                    firstName: msg.from.first_name,
-                    userName: msg.from.username
-                },
-                pip: reportData.lastPip
-            });
-
-            newUser.save().then(function (user, err) {
-                if (err) {
-                    console.log('#mongo_error User save error:' + err);
-                    return msg.reply.text('Ошибка при сохранении твоего пип-боя');
-                }
-            });
-        }
-    }); */
-
     const isBeastUnderValidation = (name) => {
         return reportData.beastToValidate.filter(beast => {
             return beast.name === name;
@@ -1005,42 +1085,56 @@ _или_
         amountOfData = updatesData.locations.length;
     }
 
-    if (updatesData.beasts.length > 0 && options.usePip === true) {
-
-        async.forEach(updatesData.beasts, function (iBeast, next) {
-            if (!options.useBeastFace) {
-                if (isBeastUnderValidation(iBeast.name)) {
-                    amountOfData -= 1;
-                    next();
-                }
-            } else {
-                Beast.findOne({
-                    name: iBeast.name,
-                    isDungeon: iBeast.isDungeon
-                }).then(function (fBeast) {
-                    if (fBeast === null) {
-                        const newBeast = new Beast(iBeast);
-
-                        newBeast.save().then(() => next());
-                    } else {
-                        let isSameFleeExists = true,
-                            isSameConcussionExists = true,
-                            isSameBattleExists = true;
-
-                        if (iBeast.battles) {
-                            if (iBeast.battles.length > 0) {
-                                isSameBattleExists = fBeast.battles.map(battle => {
-                                    if (iBeast.battles === undefined) {
-                                        return true;
-                                    }
-
-                                    const existingBattle = _.clone(battle.toJSON());
-
-                                    return existingBattle.totalDamageReceived === iBeast.battles[0].totalDamageReceived &&
-                                    existingBattle.totalDamageGiven === iBeast.battles[0].totalDamageGiven;
-                                }).some(result => result === true);
-                            }
+    const processBeasts = () => {
+        return new Promise((resolve, reject) => {
+            if (updatesData.beasts.length > 0 && options.usePip === true) {
+                async.forEach(updatesData.beasts, function (iBeast, next) {
+                    if (!options.useBeastFace) {
+                        if (isBeastUnderValidation(iBeast.name)) {
+                            amountOfData -= 1;
+                            next();
                         }
+                    } else {
+                        Beast.findOne({
+                            name: iBeast.name,
+                            isDungeon: iBeast.isDungeon
+                        }).then(function (fBeast) {
+                            if (fBeast === null) {
+                                const newBeast = new Beast(iBeast);
+
+                                dataProcessed += 1;
+                                userForwardPoints += forwardPoints.newMob;
+
+                                newBeast.save().then(() => next());
+                            } else {
+                                let isSameFleeExists = true,
+                                    isSameConcussionExists = true,
+                                    isSameBattleExists = true,
+                                    isBattleDupe = false,
+                                    isFleeDupe = false;
+
+                                if (iBeast.battles) {
+                                    if (iBeast.battles.length > 0) {
+                                        isSameBattleExists = fBeast.battles.map(battle => {
+                                            if (iBeast.battles === undefined) {
+                                                return true;
+                                            }
+
+                                            const existingBattle = _.clone(battle.toJSON());
+                                            const sameStatsBattle = existingBattle.totalDamageReceived === iBeast.battles[0].totalDamageReceived &&
+                                            existingBattle.totalDamageGiven === iBeast.battles[0].totalDamageGiven;
+                                            const sameStamp = iBeast.battles[0].stamp === battle.stamp;
+
+                                            if(sameStamp) {
+                                                isBattleDupe = true;
+                                                dupes.battles += 1;
+                                            }
+
+                                            return sameStatsBattle || sameStamp;
+                                        }).some(result => result === true);
+                                    }
+                                }
+
 
                         // TODO: Error logging for no stats object
                         if (iBeast.concussions) {
@@ -1048,157 +1142,216 @@ _или_
                                 isSameConcussionExists = fBeast.concussions.map(concussion => {
                                     const existingConcussion = _.clone(concussion.toJSON());
 
-                                    return existingConcussion.stats.agility === iBeast.concussions[0].stats.agility &&
-                                            existingConcussion.amount === iBeast.concussions[0].amount;
-                                }).some(result => result === true);
-                            }
-                        }
-
-                        if (iBeast.flees) {
-                            if (iBeast.flees.length === 1) {
-                                isSameFleeExists = fBeast.flees.map(flee => {
-                                    const existingFlee = _.clone(flee.toJSON());
-
-                                    if (iBeast.flees[0].outcome === 'win') {
-                                        return existingFlee.stats.agility === iBeast.flees[0].stats.agility &&
-                                            existingFlee.outcome === iBeast.flees[0].outcome
+                                            return existingConcussion.stats.agility === iBeast.concussions[0].stats.agility &&
+                                                existingConcussion.amount === iBeast.concussions[0].amount;
+                                        }).some(result => result === true);
                                     }
+                                }
 
-                                    return existingFlee.stats.agility === iBeast.flees[0].stats.agility &&
+                                if (iBeast.flees) {
+                                    if (iBeast.flees.length === 1) {
+                                        isSameFleeExists = fBeast.flees.map(flee => {
+                                            const existingFlee = _.clone(flee.toJSON());
+
+                                            if (iBeast.flees[0].outcome === 'win') {
+                                                return existingFlee.stats.agility === iBeast.flees[0].stats.agility &&
+                                                    existingFlee.outcome === iBeast.flees[0].outcome
+                                            }
+
+                                            const sameStatsFlee = existingFlee.stats.agility === iBeast.flees[0].stats.agility &&
                                             existingFlee.outcome === iBeast.flees[0].outcome &&
                                             existingFlee.damageReceived === iBeast.flees[0].damageReceived;
-                                }).some(result => result === true);
-                            }
-                        }
+                                            const sameStamp = iBeast.flees[0].stamp === flee.stamp;
 
-                        if (!_.isEmpty(iBeast.receivedItems)) {
+                                            if(sameStamp) {
+                                                isFleeDupe = true;
+                                                dupes.flees += 1;
+                                            }
 
-                            if (_.isEmpty(fBeast.receivedItems)) {
-                                fBeast.receivedItems = {};
-                            }
-
-                            Object.keys(iBeast.receivedItems).map((item) => {
-                                const amount = iBeast.receivedItems[item];
-
-                                if (fBeast.receivedItems[item]) {
-                                    if (!_.contains(fBeast.receivedItems[item], amount)) {
-                                        fBeast.receivedItems[item].push(amount);
+                                            return sameStatsFlee || sameStamp;
+                                        }).some(result => result === true);
                                     }
-                                    // TODO: Apply to similar
-                                    fBeast.markModified('receivedItems');
-                                } else {
-                                    fBeast.markModified('receivedItems');
-                                    fBeast.receivedItems[item] = [amount];
                                 }
-                            })
-                        }
 
-                        if (!_.contains(fBeast.distanceRange, iBeast.distanceRange[0])) {
-                            fBeast.distanceRange.push(iBeast.distanceRange[0]);
-                        }
+                                if (!_.isEmpty(iBeast.receivedItems)) {
+                                    if (_.isEmpty(fBeast.receivedItems)) {
+                                        fBeast.receivedItems = {};
+                                    }
 
-                        if (iBeast.capsReceived !== undefined) {
-                            if (!_.contains(fBeast.capsReceived, iBeast.capsReceived)) {
-                                fBeast.capsReceived.push(iBeast.capsReceived);
+                                    Object.keys(iBeast.receivedItems).map((item) => {
+                                        const amount = iBeast.receivedItems[item];
+
+                                        if (fBeast.receivedItems[item]) {
+                                            if (!_.contains(fBeast.receivedItems[item], amount)) {
+                                                fBeast.receivedItems[item].push(amount);
+                                            }
+                                            // TODO: Apply to similar
+                                            fBeast.markModified('receivedItems');
+                                        } else {
+                                            fBeast.markModified('receivedItems');
+                                            fBeast.receivedItems[item] = [amount];
+                                        }
+                                    })
+                                }
+
+                                if(!isBattleDupe) {
+                                    if (!_.contains(fBeast.distanceRange, iBeast.distanceRange[0])) {
+                                        userForwardPoints += forwardPoints.newDistance;
+
+                                        fBeast.distanceRange.push(iBeast.distanceRange[0]);
+                                    } else {
+                                        userForwardPoints += forwardPoints.sameGiantData;
+                                    }
+                                }
+
+                                if (iBeast.capsReceived !== undefined) {
+                                    if (!_.contains(fBeast.capsReceived, iBeast.capsReceived)) {
+                                        fBeast.capsReceived.push(iBeast.capsReceived);
+                                    }
+                                }
+
+                                if (iBeast.materialsReceived !== undefined) {
+                                    if (!_.contains(fBeast.materialsReceived, iBeast.materialsReceived)) {
+                                        fBeast.materialsReceived.push(iBeast.materialsReceived);
+                                    }
+                                }
+
+                                if(!isBattleDupe) {
+                                    if (!isSameBattleExists) {
+                                        const battle = iBeast.battles[0];
+
+                                        if (battle.damagesGiven.length === 1) {
+                                            userForwardPoints += forwardPoints.oneShotBattle;
+                                        } else {
+                                            if(battle.outcome === 'win') {
+                                                userForwardPoints += forwardPoints.newBattleWin;
+                                            } else {
+                                                userForwardPoints += forwardPoints.newBattleLose;
+                                            }
+                                        }
+
+                                        fBeast.battles.push(iBeast.battles[0]);
+                                    } else {
+                                        if(iBeast.battles !== undefined) {
+                                            const battle = iBeast.battles[0];
+
+                                            if (battle.damagesGiven.length === 1) {
+                                                userForwardPoints += forwardPoints.oneShotBattle;
+                                            } else {
+                                                if(battle.outcome === 'win') {
+                                                    userForwardPoints += forwardPoints.sameBattleWin;
+                                                } else {
+                                                    userForwardPoints += forwardPoints.sameBattleLose;
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+
+                                if (!isSameConcussionExists && !isBattleDupe) {
+                                    fBeast.concussions.push(iBeast.concussions[0]);
+                                }
+
+                                if (!isFleeDupe) {
+                                    if (!isSameFleeExists) {
+                                        const flee = iBeast.flees[0];
+
+                                        if(flee.outcome === 'win') {
+                                            userForwardPoints += forwardPoints.newFleeWin;
+                                        } else {
+                                            userForwardPoints += forwardPoints.newFleeLose;
+                                        }
+
+                                        fBeast.flees.push(iBeast.flees[0]);
+                                    } else {
+                                        if(iBeast.flees !== undefined) {
+                                            const flee = iBeast.flees[0];
+
+                                            if(flee.outcome === 'win') {
+                                                userForwardPoints += forwardPoints.sameFleeWin;
+                                            } else {
+                                                userForwardPoints += forwardPoints.sameFleeLose;
+                                            }
+                                        }
+
+                                    }
+                                }
+
+                                dataProcessed += 1;
+
+                                // TODO: Concussion
+                                // TODO: Received items
+
+                                fBeast.save().then(() => next()).catch(e => console.log(e));
                             }
-                        }
-
-                        if (iBeast.materialsReceived !== undefined) {
-                            if (!_.contains(fBeast.materialsReceived, iBeast.materialsReceived)) {
-                                fBeast.materialsReceived.push(iBeast.materialsReceived);
-                            }
-                        }
-
-                        if (!isSameBattleExists) {
-                            fBeast.battles.push(iBeast.battles[0]);
-                        }
-
-                        if (!isSameConcussionExists) {
-                            fBeast.concussions.push(iBeast.concussions[0]);
-                        }
-
-                        if (!isSameFleeExists) {
-                            fBeast.flees.push(iBeast.flees[0]);
-                        }
-
-
-                        // TODO: Concussion
-                        // TODO: Received items
-
-                        fBeast.save().then(() => next()).catch(e => console.log(e));
+                        });
                     }
-                });
-            }
 
+                }, function (err) {
+                    resolve();
+                });
+            } else {
+                resolve();
+            }
         }, function (err) {
             // console.log('iterating done');
         });
     }
 
-    if (updatesData.locations.length > 0) {
-        async.forEach(updatesData.locations, function (iLocation, next) {
-            Location.findOne({
-                distance: iLocation.distance
-            }).then(function (fLocation) {
-                if (fLocation === null) {
-                    const newLocation = new Location({
-                        distance: iLocation.distance,
-                        name: iLocation.name,
-                        type: iLocation.type,
-                        isRaid: iLocation.isRaid,
-                        effects: [iLocation.effect],
-                        capsReceived: [iLocation.capsReceived],
-                        materialsReceived: [iLocation.materialsReceived],
-                        capsLost: [iLocation.capsLost],
-                        materialsLost: [iLocation.materialsLost],
-                        receivedItems: [iLocation.receivedItems],
-                        receivedBonusItems: [iLocation.receivedBonusItems],
-                        healthInjuries: [iLocation.healthInjuries]
-                    });
+    const processLocations = () => {
+        return new Promise((resolve, reject) => {
+            if (updatesData.locations.length > 0) {
+                async.forEach(updatesData.locations, function (iLocation, next) {
+                    Location.findOne({
+                        distance: iLocation.distance
+                    }).then(function (fLocation) {
+                        if (fLocation === null) {
+                            const newLocation = new Location({
+                                distance: iLocation.distance,
+                                name: iLocation.name,
+                                type: iLocation.type,
+                                isRaid: iLocation.isRaid,
+                                effects: [iLocation.effect],
+                                capsReceived: [iLocation.capsReceived],
+                                materialsReceived: [iLocation.materialsReceived],
+                                capsLost: [iLocation.capsLost],
+                                materialsLost: [iLocation.materialsLost],
+                                receivedItems: [iLocation.receivedItems],
+                                receivedBonusItems: [iLocation.receivedBonusItems],
+                                healthInjuries: [iLocation.healthInjuries]
+                            });
 
-                    newLocation.save().then(() => next())
-                } else {
-                    if (!_.contains(fLocation.effects, iLocation.effect)) {
-                        fLocation.effects.push(iLocation.effect);
-                    }
+                            dataProcessed += 1;
 
-                    if (!_.contains(fLocation.capsReceived, iLocation.capsReceived)) {
-                        fLocation.capsReceived.push(iLocation.capsReceived);
-                    }
-
-                    if (!_.contains(fLocation.materialsReceived, iLocation.materialsReceived)) {
-                        fLocation.materialsReceived.push(iLocation.materialsReceived);
-                    }
-
-                    if (!_.contains(fLocation.capsLost, iLocation.capsLost)) {
-                        fLocation.capsLost.push(iLocation.capsLost);
-                    }
-
-                    if (!_.contains(fLocation.materialsLost, iLocation.materialsLost)) {
-                        fLocation.materialsLost.push(iLocation.materialsLost);
-                    }
-
-                    if (!_.contains(fLocation.healthInjuries, iLocation.healthInjuries)) {
-                        fLocation.healthInjuries.push(iLocation.healthInjuries);
-                    }
-
-                    if (!_.isEmpty(iLocation.receivedItems)) {
-                        Object.keys(iLocation.receivedItems).map((item) => {
-                            const amount = iLocation.receivedItems[item];
-
-                            if (fLocation.receivedItems[item]) {
-                                if (!_.contains(fLocation.receivedItems[item], amount)) {
-                                    fLocation.receivedItems[item].push(amount);
-                                }
-                            } else {
-                                fLocation.receivedItems[item] = [amount];
+                            newLocation.save().then(() => next())
+                        } else {
+                            if (!_.contains(fLocation.effects, iLocation.effect)) {
+                                fLocation.effects.push(iLocation.effect);
                             }
-                        })
-                    }
 
-                    if (!_.isEmpty(iLocation.receivedBonusItems)) {
-                        Object.keys(iLocation.receivedBonusItems).map((item) => {
-                            const amount = iLocation.receivedBonusItems[item];
+                            if (!_.contains(fLocation.capsReceived, iLocation.capsReceived)) {
+                                fLocation.capsReceived.push(iLocation.capsReceived);
+                            }
+
+                            if (!_.contains(fLocation.materialsReceived, iLocation.materialsReceived)) {
+                                fLocation.materialsReceived.push(iLocation.materialsReceived);
+                            }
+
+                            if (!_.contains(fLocation.capsLost, iLocation.capsLost)) {
+                                fLocation.capsLost.push(iLocation.capsLost);
+                            }
+
+                            if (!_.contains(fLocation.materialsLost, iLocation.materialsLost)) {
+                                fLocation.materialsLost.push(iLocation.materialsLost);
+                            }
+
+                            if (!_.contains(fLocation.healthInjuries, iLocation.healthInjuries)) {
+                                fLocation.healthInjuries.push(iLocation.healthInjuries);
+                            }
+
+                            if (!_.isEmpty(iLocation.receivedItems)) {
+                                Object.keys(iLocation.receivedItems).map((item) => {
+                                    const amount = iLocation.receivedItems[item];
 
                             if (!_.isEmpty(fLocation.receivedBonusItems)) {
                                 if (fLocation.receivedBonusItems[item]) {
@@ -1206,64 +1359,178 @@ _или_
                                     if (!_.contains(fLocation.receivedBonusItems[item], amount)) {
                                         fLocation.receivedBonusItems[item].push(amount);
                                     }
-                                }
-                            } else {
-                                fLocation.receivedBonusItems[item] = [amount];
+                                })
                             }
-                        })
-                    }
 
-                    fLocation.save().then(() => next());
+                            if (!_.isEmpty(iLocation.receivedBonusItems)) {
+                                Object.keys(iLocation.receivedBonusItems).map((item) => {
+                                    const amount = iLocation.receivedBonusItems[item];
+
+                                    if (!_.isEmpty(fLocation.receivedBonusItems)) {
+                                        if (fLocation.receivedBonusItems[item]) {
+                                            if (!_.contains(fLocation.receivedBonusItems[item], amount)) {
+                                                fLocation.receivedBonusItems[item].push(amount);
+                                            }
+                                        }
+                                    } else {
+                                        fLocation.receivedBonusItems[item] = [amount];
+                                    }
+                                })
+                            }
+
+                            dataProcessed += 1;
+
+                            fLocation.save().then(() => next());
+                        }
+                    });
+                }, function (err) {
+                    resolve();
+                });
+            } else {
+                resolve();
+            }
+        })
+    };
+
+
+    Promise.all([
+        processBeasts(),
+        processLocations()
+    ]).then(o => {
+        let errors = '';
+        let dupesText = '';
+
+        if (reportData.errors.length > 0) {
+            errors = `
+    *Также я заметил такие вещи*:
+    ${reportData.errors.join('\n')}
+            `;
+        }
+
+        if(dupes.battles > 0 || dupes.flees > 0) {
+            dupesText = 'Похоже ты скидывал некоторые форварды по второму разу. Я не начислял тебе за них очки'
+        }
+
+        if (dataProcessed > 0) {
+            // TODO: Move out shit to strings
+            // TODO: Implement meaningfull report data regarding found usefull data
+            setTimeout(() => {
+
+                if(options.silent) {
+                    reply = `
+Спасибо за форвард. Я перевёл ${userForwardPoints} 💎*Шмепселей* на твой счёт.\n_${dupesText}_`;
+                } else {
+                    reply = `Фух, я со всём справился - спасибо тебе огромное за информацию!
+Ты заработал ${userForwardPoints} 💎*Шмепселей* за свои форварды!
+_${dupesText}_
+Всего я насчитал ${dataProcessed} данных!
+
+Если ты чего-то забыл докинуть - смело жми на \`[Скинуть лог 🏃]\` и _докидывай_
+${errors}`;
                 }
+
+                msg.reply.text(reply, {
+                    replyMarkup: defaultKeyboard,
+                    parseMode: 'markdown',
+                    asReply: options.silent
+                }).then(res => {
+                    userManager.addPoints(msg.from.id, userForwardPoints).then(result => {
+                        if(!result.ok) {
+                            console.log('userManager.addPoints: '+JSON.stringify(result));
+                        }
+                    });
+                });
+            }, 1500);
+        } else {
+            setTimeout(() => {
+                msg.reply.text(`
+К сожалению я ничего не смог узнать из твоих форвардов :сx`, {
+                    replyMarkup: defaultKeyboard,
+                    parseMode: 'markdown'
+                });
+            }, 1500);
+        }
+
+        createSession(msg.from.id);
+    });
+}
+
+const processUserData = (msg, options) => {
+    sessions[msg.from.id].state = states.WAIT_FOR_DATA_TO_PROCESS;
+
+    const {
+        data
+    } = sessions[msg.from.id];
+
+    let {
+        reportData,
+        updatesData
+    } = processForwards(data);
+
+    if (reportData.criticalError) {
+        return msg.reply.text(`
+Произошла критическая ошибка! Отменяю форварды.
+
+_${reportData.criticalError}_
+        `, {
+            parseMode: 'markdown',
+            replyMarkup: defaultKeyboard
             });
         }, function (err) {
             // console.log(err, 'iterating done');
         });
     }
 
+    if (options.usePip && reportData.pipRequired) {
+        userManager.findByTelegramId(msg.from.id).then(result => {
+            if (result.ok && result.reason === 'USER_FOUND') {
+                sessions[msg.from.id].data.push({
+                    data: result.data.pip,
+                    dataType: 'pipboy',
+                    date: result.data.pip.timeStamp
+                });
 
-    // if PIP exist - try to apply it to given data
-    // if not - request recent PIP
-    // try to apply PIP to given data
-    // if PIP not applyible throw error and update data which is not relies on PIP
+                const {
+                    reportData: reportDataWithUserPip,
+                    updatesData: updatesDataWithUserPip
+                } = processForwards(data);
 
-    let errors = '';
+                if (reportDataWithUserPip.criticalError) {
+                    sessions[msg.from.id].state = states.WAIT_FOR_PIP_FORWARD;
+                    return msg.reply.text(`
+Твой пип-бой, который я когда-то сохранил - устарел.
+Пожалуйста скинь мне свой новый пип-бой.
+Либо же это форвард с статами, отличными от твоих.
 
-    if (reportData.errors.length > 0) {
-        errors = `
-*Также я заметил такие вещи*:
-${reportData.errors.join('\n')}
-        `;
-    }
+Если у тебя нет на это времени жми /skippipforward
 
-    if (amountOfData > 0) {
-        // TODO: Move out shit to strings
-        // TODO: Implement meaningfull report data regarding found usefull data
-        setTimeout(() => {
-    // Я насчитал ${amountOfData} данных!
+*ВНИМАНИЕ: ПРИ НАЖАТИИ НА /skippipforward - БОТ ПРОИГНОРИРУЕТ ТВОИ БИТВЫ И ПОБЕГИ ОТ МОБОВ И НЕ ЗАПИШЕТ ИХ В БАЗУ*
+`, {
+                        parseMode: 'markdown',
+                        replyMarkup: toGameKeyboard
+                    });
+                } else {
+                    updatesData = updatesDataWithUserPip;
+                    reportData = reportDataWithUserPip;
 
-            msg.reply.text(`
-Фух, я со всём справился - спасибо тебе огромное за информацию!
-Теперь ты опять можешь пользоваться функционалом *Скилокачатора*.
-Если ты чего-то забыл докинуть - смело жми на \`[Скинуть лог 🏃]\` и _докидывай_
-${errors}
-    `, {
-                replyMarkup: defaultKeyboard,
-                parseMode: 'markdown'
-            });
-        }, 1500);
+                    actualProcessUserData(msg, reportData, updatesData, options);
+                }
+            } else {
+                sessions[msg.from.id].state = states.WAIT_FOR_PIP_FORWARD;
+                return msg.reply.text(`
+Похоже ты мне ещё не скидывал пип бой
+Если у тебя нет на это времени жми /skippipforward
+
+*ВНИМАНИЕ: ПРИ НАЖАТИИ НА /skippipforward - БОТ ПРОИГНОРИРУЕТ ТВОИ БИТВЫ И ПОБЕГИ ОТ МОБОВ И НЕ ЗАПИШЕТ ИХ В БАЗУ*
+`, {
+                    parseMode: 'markdown',
+                    replyMarkup: toGameKeyboard
+                });
+            }
+        });
     } else {
-        setTimeout(() => {
-            msg.reply.text(`
-К сожалению я ничего не смог узнать из твоих форвардов :с
-    `, {
-                replyMarkup: defaultKeyboard,
-                parseMode: 'markdown'
-            });
-        }, 1500);
+        actualProcessUserData(msg, reportData, updatesData, options);
     }
-
-    delete sessions[msg.from.id];
 }
 
 bot.on('/journeyforwardend', msg => {
@@ -1283,6 +1550,10 @@ bot.on('/journeyforwardend', msg => {
         });
     }
 
+    processUserData(msg, {
+        usePip: sessions[msg.from.id].processDataConfig.usePip,
+        useBeastFace: sessions[msg.from.id].processDataConfig.useBeastFace
+    });
 });
 
 bot.on('/journeyforwardcancel', msg => {
@@ -1339,7 +1610,6 @@ bot.on('/eqp', msg => {
 })
 
 bot.on('/locations', msg => {
-    // TODO: Inline button resize
     const buttons = processMenu(locationsMenu).map(menuItem => {
         return bot.inlineButton(menuItem.title, {callback: `locations_menu-${menuItem.name}`});
     });
@@ -1353,7 +1623,6 @@ bot.on('/locations', msg => {
 })
 
 bot.on('/sppl', msg => {
-    // TODO: Inline button resize
     const buttons = processMenu(suppliesMenu).map(menuItem => {
         return bot.inlineButton(menuItem.title, {callback: `supplies_menu-${menuItem.name}`});
     });
@@ -1399,11 +1668,247 @@ bot.on('/cfl', msg => {
     });
 })
 
-bot.on('/debug', msg => {
-    return msg.reply.text('fuck off', {
-        asReply: true
-    })
+bot.on('/skill_upgrade', msg => {
+    const skillOMaticText = `
+В «<b>🎓 Скилокачаторе</b>» я могу помочь тебе посчитать финансовые затраты на прокачку твоих скилов.`;
+
+    findPip(msg, result => {
+        if(result.ok && result.reason === 'USER_FOUND') {
+            if(sessions[msg.from.id] === undefined) {
+                createSession(msg.from.id);
+            }
+
+            sessions[msg.from.id].pip = result.data.pip;
+            sessions[msg.from.id].state = states.WAIT_FOR_SKILL;
+
+            const replyMarkup = bot.keyboard([
+                [buttons.skillSelectStrength.label, buttons.skillSelectAccuracy.label, buttons.skillSelectAgility.label],
+                [buttons.skillSelectHealth.label, buttons.skillSelectCharisma.label],
+                [buttons.cancelAction.label]
+            ], {
+                resize: true
+            });
+
+            const skillMap = {
+                "health": "❤ Живучесть",
+                "strength": "💪 Сила",
+                "precision": "🔫 Меткость",
+                "charisma": "🗣 Харизма",
+                "agility": "🤸‍♀️ Ловкость"
+            };
+
+            const userSkills = Object.keys(skillMap).map(key => {
+                const skillName = skillMap[key];
+
+                return `<b>${skillName}</b>: ${result.data.pip[key]}`;
+            })
+
+            return msg.reply.text(`
+${skillOMaticText}
+
+Вот что я знаю про твои скилы:
+${userSkills.join('\n')}
+<i>(Если они не актуальные - просто отправь мне свой новый пип-бой)</i>
+
+
+<b>Выбери какой скил ты хочешь прокачать</b>
+
+Что бы вернуться в меню - нажми кнопку <code>[↩️Назад]</code>.
+Либо, в любой момент напиши /cancel.
+            `, {
+                replyMarkup,
+                parseMode: 'html'
+            });
+        }
+
+        return msg.reply.text(`
+${skillOMaticText}
+
+Оу, похоже я ещё ничего не знаю про твой пип :с
+Перейди в игру по кнопке внизу и перешли мне его пожалуйста!
+        `, {
+            replyMarkup: toGameKeyboard,
+            parseMode: 'html'
+        });
+    });
 })
+
+bot.on('/leaderboard', msg => {
+    userManager.leaderboard(msg.from.id).then(result => {
+        if (result.ok && result.reason === 'LEADERBOARD_GENERATED') {
+            return msg.reply.text(`<i>Топ игроков отпраляющих форварды:</i> \n\n`+result.data, {
+                parseMode: 'html'
+            });
+        } else {
+            if(result.reason === 'NO_USERS_FOUND') {
+                return msg.reply.text('В базе пока что нет юзеров :с');
+            }
+
+            return msg.reply.text(JSON.stringify(result))
+        }
+    });
+});
+
+bot.on("/mypipstats", msg => {
+    User.findOne({ "telegram.id": msg.from.id }, function(err, person) {
+      if (err) {
+        console.log(err);
+        return;
+      }
+
+      if (person === null) {
+        return msg.reply.text('Я не могу показать тебе твой график прогресса - ты мне ещё не скидывал своего пип-боя')
+      }
+
+      let pips = person.history.pip.toObject();
+      var pipsSize = pips.length;
+      var limit = 10;
+
+      if (pips.length <= 1) {
+        return msg.reply.text(
+          "Я не видел что бы прокачивался в скилах. Скинь свой пип-бой когда прокачаешь какой-то скил",
+          { asReply: true }
+        );
+      }
+
+      if (pipsSize > limit) {
+        pips = pips.slice(pipsSize-limit, pipsSize)
+      }
+
+      const whiteListKeys = [
+        "health",
+        "strength",
+        "precision",
+        "charisma",
+        "agility"
+      ];
+
+      const systemToHumanKeysMap = {
+        health: "Живучесть",
+        strength: "Сила",
+        precision: "Меткость",
+        charisma: "Харизма",
+        agility: "Ловкость"
+      };
+
+      const history = {};
+
+      whiteListKeys.forEach(key => {
+        history[key] = [];
+      });
+
+      pips.forEach(pip => {
+        Object.keys(pip).forEach(key => {
+          if (_.contains(whiteListKeys, key)) {
+            const value = pip[key];
+
+            history[key].push(value);
+          }
+        });
+      });
+
+      const flattify = arr => {
+        const maxIndex = arr.length - 1;
+
+        return arr.map((v, i) => {
+          if (i !== maxIndex && i !== 0) {
+            const prevValue = arr[i - 1];
+            const nextValue = arr[i + 1];
+
+            if (prevValue < v && nextValue < v) {
+              return prevValue;
+            }
+
+            return v;
+          } else if (i === 0 || i === maxIndex) {
+            return v;
+          }
+        });
+      };
+
+      Object.keys(history).forEach(key => {
+        const arrayOfValues = history[key];
+        history[key] = flattify(arrayOfValues);
+      });
+
+      const colors = {
+        health: "rgba(231, 76, 60,1.0)",
+        strength: "rgba(241, 196, 15,1.0)",
+        precision: "rgba(39, 174, 96,1.0)",
+        charisma: "rgba(52, 73, 94,1.0)",
+        agility: "rgba(189, 195, 199,1.0)"
+      };
+
+      const createDataSets = history => {
+        return whiteListKeys.map(key => {
+          return {
+            label: systemToHumanKeysMap[key],
+            backgroundColor: colors[key],
+            borderColor: colors[key],
+            data: history[key],
+            fill: false,
+            lineTension: 0
+          };
+        });
+      };
+
+      const getDateLabels = pips => {
+        return pips.map(pip => moment(pip.timeStamp * 1000).format("DD/MM"));
+      };
+
+      var config = {
+        type: "line",
+        data: {
+          labels: getDateLabels(pips),
+          datasets: createDataSets(history)
+        },
+        options: {
+          scales: {
+            xAxes: [
+              {
+                display: true,
+                scaleLabel: {
+                  display: true,
+                  labelString: "Дата"
+                }
+              }
+            ],
+            yAxes: [
+              {
+                display: true,
+                scaleLabel: {
+                  display: true,
+                  labelString: "Уровень"
+                }
+              }
+            ]
+          },
+          legend: {
+            position: 'bottom'
+          },
+          title: {
+            display: true,
+            text: 'Прогрес по Пип-Бою'
+          }
+        }
+      };
+
+      chartGeneration(config, buffer => {
+        msg.reply.photo(buffer, {
+          asReply: true,
+          caption: `Получи и распишись!`
+        }).catch(e => console.log(e));
+      })
+    });
+  });
+
+bot.on('/debug', msg => {
+    userManager.findByTelegramId(msg.from.id).then(result => {
+        return msg.reply.text(JSON.stringify(result), {
+            asReply: true
+        });
+    });
+});
 
 bot.on(/^\d+$/, msg => {
     switch (sessions[msg.from.id].state) {
@@ -1885,7 +2390,70 @@ ${beastsList}
         }, 2500);
 
         handler();
+    } else if (msg.data === 'initialize_skill_upgrade') {
+        const skillOMaticText = `
+В «<b>🎓 Скилокачаторе</b>» я могу помочь тебе посчитать финансовые затраты на прокачку твоих скилов.`;
 
+    findPip(msg, result => {
+        bot.answerCallbackQuery(msg.id);
+        if(result.ok && result.reason === 'USER_FOUND') {
+            if(sessions[msg.from.id] === undefined) {
+                createSession(msg.from.id);
+            }
+
+            sessions[msg.from.id].pip = result.data.pip;
+            sessions[msg.from.id].state = states.WAIT_FOR_SKILL;
+
+            const replyMarkup = bot.keyboard([
+                [buttons.skillSelectStrength.label, buttons.skillSelectAccuracy.label, buttons.skillSelectAgility.label],
+                [buttons.skillSelectHealth.label, buttons.skillSelectCharisma.label],
+                [buttons.cancelAction.label]
+            ], {
+                resize: true
+            });
+
+            const skillMap = {
+                "health": "❤ Живучесть",
+                "strength": "💪 Сила",
+                "precision": "🔫 Меткость",
+                "charisma": "🗣 Харизма",
+                "agility": "🤸‍♀️ Ловкость"
+            };
+
+            const userSkills = Object.keys(skillMap).map(key => {
+                const skillName = skillMap[key];
+
+                return `<b>${skillName}</b>: ${result.data.pip[key]}`;
+            })
+
+            return bot.sendMessage(msg.from.id, `
+${skillOMaticText}
+
+Вот что я знаю про твои скилы:
+${userSkills.join('\n')}
+<i>(Если они не акутальные - просто отправь мне свой новый пип-бой)</i>
+
+
+<b>Выбери какой скил ты хочешь прокачать</b>
+
+Что бы вернуться в меню - нажми кнопку <code>[↩️Назад]</code>.
+Либо, в любой момент напиши /cancel.
+            `, {
+                replyMarkup,
+                parseMode: 'html'
+            });
+        }
+
+        return bot.sendMessage(msg.from.id, `
+${skillOMaticText}
+
+Оу, похоже я ещё ничего не знаю про твой пип :с
+Перейди в игру по кнопке внизу и перешли мне его пожалуйста!
+        `, {
+            replyMarkup: toGameKeyboard,
+            parseMode: 'html'
+        });
+    });
     }
 });
 

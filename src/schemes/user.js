@@ -1,26 +1,17 @@
 const mongoose = require("mongoose");
 
-/*
-meta: {
-    score: Number,
-    forwards: {
-        beast: {
-            wins: Number,
-            loss: Number,
-            flee: Number
-        },
-        locations: Number,
-        giants: Number
-
-    }
-}
-*/
+// TODO: Refactor points structure
 
 const userSchema = mongoose.Schema({
+    restricted: {
+        type: Boolean,
+        default: false
+    },
     telegram: {
         firstName: String,
         id: Number,
-        userName: String
+        userName: String,
+        userNamesHistory: [String]
     },
     pip: {
         version: Number,
@@ -35,7 +26,37 @@ const userSchema = mongoose.Schema({
         endurance: Number,
         damage: Number,
         armor: Number,
-        timeStamp: Date
+        timeStamp: Number
+    },
+    points: {
+        score: {
+            type: Number,
+            default: 0
+        },
+        forwards: {
+            beast: {
+                wins: {
+                    type: Number,
+                    default: 0
+                },
+                loss: {
+                    type: Number,
+                    default: 0
+                },
+                flee: {
+                    type: Number,
+                    default: 0
+                }
+            },
+            locations: {
+                type: Number,
+                default: 0
+            },
+            giants: {
+                type: Number,
+                default: 0
+            }
+        }
     },
     history: {
         pip: [{
