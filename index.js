@@ -1133,7 +1133,7 @@ _или_
                                             const existingBattle = _.clone(battle.toJSON());
                                             const sameStatsBattle = existingBattle.totalDamageReceived === iBeast.battles[0].totalDamageReceived &&
                                             existingBattle.totalDamageGiven === iBeast.battles[0].totalDamageGiven;
-                                            const sameStamp = iBeast.battles[0].stamp === battle.stamp;
+                                            const sameStamp = iBeast.battles[0].stamp === existingBattle.stamp;
 
                                             if(sameStamp) {
                                                 isBattleDupe = true;
