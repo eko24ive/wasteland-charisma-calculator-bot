@@ -94,14 +94,14 @@ const parseDungeonBeast = beast => {
     const [, distance] = regexps.campDistanceRegExp.exec(beast);
     const [, name] = regexps.beastNameRegExp.exec(beast);
 
-    const damageReceived = splitted.map(row => {
+    const damagesReceived = splitted.map(row => {
         if (regexps.beastAttackRegExp.test(row)) {
             var [, dmg] = regexps.beastAttackRegExp.exec(row);
 
-            return dmg;
+            return Number(dmg);
         }
 
-        return false;
+        return false
     }).filter(dmg => dmg !== false);
 
     const damagesGiven = splitted.map(row => {
@@ -122,16 +122,29 @@ const parseDungeonBeast = beast => {
         return false;
     }).filter(dmg => dmg !== false);
 
-    const [, currentHealth] = regexps.currentHealthRegExp.exec(beast);
+    if (regexps.beastVictoryRegExp.test(beast)) {
+        fightResult = 'win';
+    } else if (regexps.beastDefeatMaterialsLostRegExp.test(beast)) {
+        fightResult = 'lose';
+    }
+
+    const [, negativePrefix, currentHealth, healthCap] = regexps.healthRegExp.exec(beast);
 
     return {
-        distance,
+        distance: Number(distance),
         name,
         isDungeon,
-        damageReceived,
+        fightResult,
+        capsReceived: 0,
+        materialsReceived: 0,
+        receivedItems: [],
+        damagesReceived,
         damagesGiven,
         currentHealth,
-        amountOfConcussions
+        amountOfConcussions,
+        meta: {
+            healthCap: Number(healthCap)
+        }
     }
 };
 
