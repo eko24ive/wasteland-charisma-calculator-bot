@@ -1733,7 +1733,7 @@ ${skillOMaticText}
     });
 })
 
-bot.on('/leaderboard', msg => {
+bot.on(['/leaderboard','/top'], msg => {
     userManager.leaderboard(msg.from.id).then(result => {
         if (result.ok && result.reason === 'LEADERBOARD_GENERATED') {
             return msg.reply.text(`<i>Топ игроков отпраляющих форварды:</i> \n\n`+result.data, {
