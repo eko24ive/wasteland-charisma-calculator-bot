@@ -81,6 +81,13 @@ const processForwards = (inputData, config) => {
         beasts: []
     };
 
+    if (inputData.length === 0) {
+        return {
+            reportData,
+            updatesData
+        }
+    }
+
     const dataPips = inputData.filter(({
         dataType
     }) => dataType === 'pipboy').sort((first, second) => {
