@@ -7,27 +7,6 @@
         {
             "type": "node",
             "request": "launch",
-            "name": "Ranges",
-            "program": "${workspaceFolder}/src/utils/getRanges.js"
-        },
-        {
-            "type": "node",
-            "request": "launch",
-            "name": "Runner",
-            "program": "${workspaceFolder}/src/database/runner.js"
-        },
-        {
-            "type": "node",
-            "request": "launch",
-            "name": "Prod",
-            "args": [
-                "-P"
-            ],
-            "program": "${workspaceFolder}\\index.js"
-        },
-        {
-            "type": "node",
-            "request": "launch",
             "name": "Dev",
             "args": [
                 "-D"
