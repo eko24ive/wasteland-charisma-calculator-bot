@@ -1534,7 +1534,7 @@ bot.on('/journeyforwardend', msg => {
     if(sessions[msg.from.id] === undefined) {
         createSession(msg.from.id);
 
-        return msg.reply.text(`Чёрт, похоже что бот был перезагружен и твои форварды не сохранились, прости пожалуйста :с`, {
+        return msg.reply.text(`Чёрт, похоже меня перезагрузил какой-то мудак и твои форварды не сохранились, прости пожалуйста :с`, {
             replyMarkup: defaultKeyboard
         });
     } else {
