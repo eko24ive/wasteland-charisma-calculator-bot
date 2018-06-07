@@ -374,10 +374,10 @@ const processForwards = (inputData, config) => {
 
                     updatesData.beasts.push(beastData);
                 } else {
-                    reportData.errors.push(`Не могу найти в форвардах монстра от которого ты сбежал на ${data.distance}`);
+                    reportData.beastToValidate.push({name: '???', distance: data.distance});
                 }
             } else {
-                reportData.errors.push(`Не могу найти в форвардах монстра от которого ты сбежал на ${data.distance}`);
+                reportData.beastToValidate.push({name: '???', distance: data.distance});
             }
         }
 
