@@ -1489,7 +1489,11 @@ const processUserData = (msg, options) => {
 
                 if (reportDataWithUserPip.criticalError && reportDataWithUserPip.couldBeUpdated) {
                     sessions[msg.from.id].state = states.WAIT_FOR_PIP_FORWARD;
+<<<<<<< HEAD
 
+=======
+
+>>>>>>> d7e8bcdea19c9674328ae4585a91d693f5e9fdf6
                     return msg.reply.text(`
 Твой пип-бой, который я когда-то сохранил - устарел.
 Пожалуйста скинь мне свой новый пип-бой.
