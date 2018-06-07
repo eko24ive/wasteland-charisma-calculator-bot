@@ -336,10 +336,31 @@ const processForwards = (inputData, config) => {
                 reportData.recalculationRequired = true;
             }
 
-            beastData.battles[0].totalDamageGiven = data.damagesGiven.reduce((a, b) => a + b);
-            beastData.battles[0].totalDamageReceived = data.damagesReceived.reduce((a, b) => a + b);
-            beastData.battles[0].damagesGiven = data.damagesGiven;
-            beastData.battles[0].damagesReceived = data.damagesReceived;
+            if(data.damagesGiven.length === 0) {
+                beastData.battles[0].totalDamageGiven = 0;
+            } else {
+                beastData.battles[0].totalDamageGiven = data.damagesGiven.reduce((a, b) => a + b);
+            }
+
+            if(data.damagesReceived.length === 0) {
+                beastData.battles[0].totalDamageReceived = 0;
+            } else {
+                beastData.battles[0].totalDamageReceived = data.damagesReceived.reduce((a, b) => a + b);
+            }
+
+            if(data.damagesGiven.length === 0) {
+                beastData.battles[0].damagesGiven = [0];
+            } else {
+                beastData.battles[0].damagesGiven = data.damagesGiven;
+            }
+
+            if(data.damagesReceived.length === 0) {
+                beastData.battles[0].damagesReceived = [0];
+            } else {
+                beastData.battles[0].damagesReceived = data.damagesReceived;
+            }
+
+            beastData.battles[0].stamp = `${date}${userId}`;
             beastData.battles[0].healthOnStart = data.currentHealth + beastData.battles[0].totalDamageReceived;
 
             updatesData.beasts.push(beastData);
