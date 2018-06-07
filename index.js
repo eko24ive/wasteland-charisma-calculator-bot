@@ -1465,6 +1465,14 @@ const processUserData = (msg, options) => {
         updatesData
     } = processForwards(data);
 
+    if(updatesData.locations.length === 0 && updatesData.beasts.length === 0) {
+        return msg.reply.text(`
+К сожалению я ничего не смог узнать из твоих форвардов :с`, {
+                replyMarkup: defaultKeyboard,
+            parseMode: 'markdown'
+        });
+    }
+
     if (options.usePip && reportData.pipRequired) {
         userManager.findByTelegramId(msg.from.id).then(result => {
             if (result.ok && result.reason === 'USER_FOUND') {
