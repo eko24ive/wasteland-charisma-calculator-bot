@@ -1416,10 +1416,10 @@ _или_
 
                 if(options.silent) {
                     reply = `
-Спасибо за форвард. Я перевёл ${Math.floor(userForwardPoints)} 💎*Шмепселей* на твой счёт.\n_${dupesText}_`;
+Спасибо за форвард. Я перевёл ${userForwardPoints.toFixed(1)} 💎*Шмепселей* на твой счёт.\n_${dupesText}_`;
                 } else {
                     reply = `Фух, я со всём справился - спасибо тебе огромное за информацию!
-Ты заработал ${Math.floor(userForwardPoints)} 💎*Шмепселей* за свои форварды!
+Ты заработал ${userForwardPoints.toFixed(1)} 💎*Шмепселей* за свои форварды!
 _${dupesText}_
 Всего я насчитал ${dataProcessed} данных!
 
@@ -1489,7 +1489,7 @@ const processUserData = (msg, options) => {
 
                 if (reportDataWithUserPip.criticalError && reportDataWithUserPip.couldBeUpdated) {
                     sessions[msg.from.id].state = states.WAIT_FOR_PIP_FORWARD;
-                    
+
                     return msg.reply.text(`
 Твой пип-бой, который я когда-то сохранил - устарел.
 Пожалуйста скинь мне свой новый пип-бой.
