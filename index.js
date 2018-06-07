@@ -1484,7 +1484,7 @@ const processUserData = (msg, options) => {
 `, {
                         parseMode: 'markdown',
                         replyMarkup: toGameKeyboard
-                    });
+                    });4
                 } else if (reportDataWithUserPip.criticalError && !reportDataWithUserPip.couldBeUpdated) {
                     createSession(msg.from.id);
                     return msg.reply.text('Твой пип не соответсвуют твоим статам из форвардам!\nПрости, я вынужден отменить твои форварды.', {
@@ -1511,15 +1511,9 @@ const processUserData = (msg, options) => {
         });
     } else {
         userManager.findByTelegramId(msg.from.id).then(result => {
+            // BOOK
             if(result.ok && result.reason === 'USER_FOUND') {
-                if(comparePips(reportData.lastPip, result.data.pip)) {
                     actualProcessUserData(msg, reportData, updatesData, options);
-                } else {
-                    createSession(msg.from.id);
-                    return msg.reply.text('Твой пип не соответсвуют твоим статам из форвардам!\nПрости, я вынужден отменить твои форварды.', {
-                        replyMarkup: defaultKeyboard
-                    });
-                }
             } else {
                 actualProcessUserData(msg, reportData, updatesData, options);
             }
