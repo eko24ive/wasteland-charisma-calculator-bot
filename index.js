@@ -472,7 +472,7 @@ reply = `Шикардос, я обновил твой пип!
             beastName = data.beastFaced.name
         }
 
-        if (beastName !== sessions[msg.from.id].beastToValidateName) {
+        if (beastName !== sessions[msg.from.id].beastToValidateName && sessions[msg.from.id].beastToValidateName !== '???') {
             return msg.reply.text(`
 Этот моб не похож на того с которым ты дрался. Ты чё - наебать меня вздумал?!
 
@@ -605,6 +605,10 @@ reply = `Шикардос, я обновил твой пип!
 
         const isRegularBeast = regExpSetMatcher(msg.text, {
             regexpSet: regexps.regularBeast
+        });
+
+        const isFlee = regExpSetMatcher(msg.text, {
+            regexpSet: regexps.flee
         });
 
         /* const isLocation = regExpSetMatcher(msg.text, {
@@ -829,15 +833,20 @@ reply = `Шикардос, я обновил твой пип!
                     });
                 }
             }).catch(e => console.log(e));
-        } else if (isRegularBeast) {
+        } else if (isRegularBeast || isFlee) {
             // || isLocation || isDungeonBeast || isFlee
             let data;
             let dataType;
 
             createSession(msg.from.id);
 
-            data = beastParser.parseRegularBeast(msg.text);
-            dataType = 'regularBeast';
+            if (isFlee) {
+                data = parseFlee(msg.text);
+                dataType = 'flee';
+            } else if (isRegularBeast) {
+                data = beastParser.parseRegularBeast(msg.text);
+                dataType = 'regularBeast';
+            }
 
             /* if (isDungeonBeast) {
                 data = beastParser.parseDungeonBeast(msg.text);
@@ -1433,7 +1442,7 @@ ${errors}`;
         } else {
             setTimeout(() => {
                 msg.reply.text(`
-К сожалению я ничего не смог узнать из твоих форвардов :сx`, {
+К сожалению я ничего не смог узнать из твоих форвардов :с`, {
                     replyMarkup: defaultKeyboard,
                     parseMode: 'markdown'
                 });
