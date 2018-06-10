@@ -127,4 +127,4 @@ const uniqueAccessories = _.sortBy(accessories, accessory => accessory.title).ma
 
 const uniqueAccessoriesText = `${header}\n${uniqueAccessories}`;
 
-module.exports = uniqueAccessories;
+module.exports = uniqueAccessoriesText;
