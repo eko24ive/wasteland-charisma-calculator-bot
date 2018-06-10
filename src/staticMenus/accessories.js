@@ -97,3 +97,8 @@ accs.sort(function (a, b) {
   }
   return 0;
 });
+
+var newtext = Description + "</br>";
+accs.forEach(function(element) {
+  newtext += element.icon + element.title + '</br>';
+});
