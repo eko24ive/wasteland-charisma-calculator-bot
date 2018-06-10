@@ -438,7 +438,7 @@ const dungeonText = `
 Награда: ❇️Плазмакастер🔆(329⚔️), 💪Сила +40, ❤️Живучесть +30
 `;
 
-import { unicAccessories } from './accessories.js';
+const unicAccessoriesText = require('./accessories.js');
 const accessoryText = `*🏺Аксессуары*, которые можно купить у *Старьёвщика*, встретив его в Пустоши:
 
 👔*Костюм-тройка* — 🕳2500
@@ -471,7 +471,7 @@ const accessoryText = `*🏺Аксессуары*, которые можно к�
      ❤️Здоровье: +60
 
 -----
-${unicAccessories}`;
+${unicAccessoriesText}`;
 
 const inventionsText = `
 Улучшить оружие и броню можно в *⛺️Лагере* на *🛠Верстаке*.
@@ -766,4 +766,4 @@ const equipmentMenu = {
   ]
 };
 
-export default equipmentMenu;
+module.exports = equipmentMenu;
