@@ -98,7 +98,8 @@ accs.sort(function (a, b) {
   return 0;
 });
 
-var unic = Description + "</br>";
+var unic = `${Description}</br>`;
 accs.forEach(function(element) {
-  unic += element.icon + element.title + '</br>';
+  if (element.comment == undefined) {element.comment = ''}
+  unic += `${element.icon} ${element.title} ${element.comment}</br>`;
 });
