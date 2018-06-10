@@ -472,6 +472,7 @@ const accessoryText = `*🏺Аксессуары*, которые можно к�
      ❤️Здоровье: +60
 
 -----
+
 ${uniqueAccessoriesText}`;
 
 const inventionsText = `

@@ -122,7 +122,9 @@ const uniqueAccessories = _.sortBy(accessories, accessory => accessory.title).ma
   title,
   comment
 }) => {
-  return `${icon} ${title} ${comment ? comment : ''}`;
+  return `${icon} *${title}* ${comment ? `(${comment})` : ''}`;
 }).join('\n');
 
 const uniqueAccessoriesText = `${header}\n${uniqueAccessories}`;
+
+module.exports = uniqueAccessories;
