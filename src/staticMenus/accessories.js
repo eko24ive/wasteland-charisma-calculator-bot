@@ -1,5 +1,7 @@
-const description = "*Уникальные 🏺Аксессуары*, которые можно получить за заслуги в игре, видимых эффектов не дают:"
-const accs = [
+const _ = require('underscore');
+
+const header = "*Уникальные 🏺Аксессуары*, которые можно получить за заслуги в игре, видимых эффектов не дают:"
+const accessories = [
   {
   icon: "🎸",
   title: "Радиоактивная гитара",
@@ -115,7 +117,7 @@ const accs = [
   }
 ]
 
-const unicAccessories = _.sortBy(accs, acc => acc.title).map(({
+const uniqueAccessories = _.sortBy(accessories, accessory => accessory.title).map(({
   icon,
   title,
   comment
@@ -123,4 +125,4 @@ const unicAccessories = _.sortBy(accs, acc => acc.title).map(({
   return `${icon} ${title} ${comment ? comment : ''}`;
 }).join('\n');
 
-const unicAccessoriesText = `${description}\n${unicAccessories}`;
+const uniqueAccessoriesText = `${header}\n${uniqueAccessories}`;
