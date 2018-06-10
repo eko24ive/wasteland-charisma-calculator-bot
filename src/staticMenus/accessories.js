@@ -98,7 +98,7 @@ accs.sort(function (a, b) {
   return 0;
 });
 
-var newtext = Description + "</br>";
+var unic = Description + "</br>";
 accs.forEach(function(element) {
-  newtext += element.icon + element.title + '</br>';
+  unic += element.icon + element.title + '</br>';
 });
