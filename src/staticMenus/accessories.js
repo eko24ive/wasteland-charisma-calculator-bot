@@ -98,7 +98,7 @@ accs.sort(function (a, b) {
   return 0;
 });
 
-var unic = `${Description}</br>`;
+let unic = `${Description}</br>`;
 accs.forEach(function(element) {
   if (element.comment == undefined) {element.comment = ''}
   unic += `${element.icon} ${element.title} ${element.comment}</br>`;
