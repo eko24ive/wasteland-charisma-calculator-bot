@@ -125,6 +125,8 @@ const uniqueAccessories = _.sortBy(accessories, accessory => accessory.title).ma
   return `${icon} *${title}* ${comment ? `(${comment})` : ''}`;
 }).join('\n');
 
-const uniqueAccessoriesText = `${header}\n${uniqueAccessories}`;
+const uniqueAccessoriesText = `${header}
 
-module.exports = uniqueAccessories;
+${uniqueAccessories}`;
+
+module.exports = uniqueAccessoriesText;
