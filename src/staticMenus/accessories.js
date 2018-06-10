@@ -98,8 +98,7 @@ accs.sort(function (a, b) {
   return 0;
 });
 
-let unic = `${Description}</br>`;
-accs.forEach(function(element) {
-  if (element.comment == undefined) {element.comment = ''}
-  unic += `${element.icon} ${element.title} ${element.comment}</br>`;
-});
+let unic = `${Description}\n`;
+const unicAccessories = accs.map(elem => {
+  return `${elem.icon} ${elem.title} ${elem.comment !== undefined ? elem.comment : ''}`;
+}).join('\n');
