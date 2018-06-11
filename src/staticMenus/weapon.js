@@ -1,154 +1,160 @@
-const weapon = [
+const merchant = '🏚Торгаш';
+const craftingTable = '🛠Верстак';
+const engineer = '👓Инженер';
+const core = '🕎Ядро';
+const cozyBasement = '🚪Уютный подвальчик';
+
+const weapons = [
     {
         icon: false,
-		title: "Бейсбольная бита",
+        title: "Бейсбольная бита",
         cost: { caps: 30, },
         amount: 1,
-        place: "🏚Торгаш",
+        place: merchant,
     },
     {
         icon: false,
-		title: "Ржавый нож",
+        title: "Ржавый нож",
         cost: { caps: 30, },
         amount: 3,
-        place: "🏚Торгаш",
+        place: merchant,
     },
     {
         icon: false,
-		title: "Разводной ключ",
+        title: "Разводной ключ",
         cost: { caps: 30, },
         amount: 5,
-        place: "🏚Торгаш",
+        place: merchant,
     },
     {
         icon: false,
-		title: "Топор",
+        title: "Топор",
         cost: { caps: 30, },
         amount: 7,
-        place: "🏚Торгаш",
+        place: merchant,
     },
     {
         icon: false,
-		title: "Кинжал",
+        title: "Кинжал",
         cost: { caps: 30, },
         amount: 9,
-        place: "🏚Торгаш",
+        place: merchant,
     },
     {
         icon: false,
-		title: "Мачете",
+        title: "Мачете",
         cost: { caps: 30, },
         amount: 11,
-        place: "🏚Торгаш",
+        place: merchant,
     },
     {
         icon: false,
-		title: "Хлыст",
+        title: "Хлыст",
         cost: { caps: 30, },
         amount: 13,
-        place: "🏚Торгаш",
+        place: merchant,
     },
     {
         icon: false,
-		title: "Стальная бита",
+        title: "Стальная бита",
         cost: { caps: 30, },
         amount: 16,
-        place: "🏚Торгаш",
+        place: merchant,
     },
     {
         icon: "⚡",
-		title: "⚡️Прочная бита",
+        title: "⚡️Прочная бита",
         cost: { materials: 200, },
         amount: 2,
-        place: "🛠Верстак",
+        place: craftingTable,
     },
     {
         icon: "⚡",
-		title: "Копье",
+        title: "Копье",
         cost: { materials: 600, },
         amount: 4,
-        place: "🛠Верстак",
+        place: craftingTable,
     },
     {
         icon: "⚡",
-		title: "⚡Кистень",
+        title: "⚡Кистень",
         cost: { materials: 1300, },
         amount: 6,
-        place: "🛠Верстак",
+        place: craftingTable,
     },
     {
         icon: "⚡",
-		title: "Электромеч",
+        title: "Электромеч",
         cost: { materials: 3900, },
         amount: 9,
-        place: "🛠Верстак",
+        place: craftingTable,
     },
     {
         icon: "💥",
-		title: "Лазерный тесак",
+        title: "Лазерный тесак",
         cost: {
             materials: 5600,
             quartz: 4,
         },
         amount: 12,
-        place: "🛠Верстак",
+        place: craftingTable,
     },
     {
         icon: "💥",
-		title: "BFGzzv-4000",
+        title: "BFGzzv-4000",
         cost: {
             materials: 12000,
             quartz: 30,
         },
         amount: 20,
-        place: "🛠Верстак",
+        place: craftingTable,
     },
     {
         icon: "💥",
-		title: "BFGzzv-4000",
+        title: "BFGzzv-4000",
         cost: {
             materials: 12000,
             quartz: 30,
         },
         amount: 20,
-        place: "🛠Верстак",
+        place: craftingTable,
     },
     {
         icon: "🔗",
-		title: "Силовой кастет",
+        title: "Силовой кастет",
         cost: {
             materials: 14000,
             quartz: 20,
             generators: 5,
         },
         amount: 25,
-        place: "🛠Верстак",
+        place: craftingTable,
     },
     {
         icon: "💥",
-		title: "Колыбель Пустоши",
+        title: "Колыбель Пустоши",
         cost: {
             materials: 19990,
             quartz: 35,
             generators: 5,
         },
         amount: 29,
-        place: "🛠Верстак",
+        place: craftingTable,
     },
     {
         icon: "💥",
-		title: "Tyrant-PDR",
+        title: "Tyrant-PDR",
         cost: {
             materials: 29990,
             quartz: 60,
             generators: 25,
         },
         amount: 38,
-        place: "🛠Верстак",
+        place: craftingTable,
     },
     {
         icon: "☄️",
-		title: "Огнемёд",
+        title: "Огнемёд",
         cost: {
             materials: 45900,
             quartz: 90,
@@ -156,11 +162,11 @@ const weapon = [
             microchip: 5,
         },
         amount: 49,
-        place: "🛠Верстак",
+        place: craftingTable,
     },
     {
         icon: "☄",
-		title: "️Больверизатор",
+        title: "️Больверизатор",
         cost: {
             materials: 59990,
             quartz: 100,
@@ -168,11 +174,11 @@ const weapon = [
             microchip: 45,
         },
         amount: 56,
-        place: "🛠Верстак",
+        place: craftingTable,
     },
     {
         icon: "🔮",
-		title: "Энергосфера",
+        title: "Энергосфера",
         cost: {
             materials: 78990,
             generators: 120,
@@ -180,11 +186,11 @@ const weapon = [
             iridium: 20,
         },
         amount: 65,
-        place: "🛠Верстак",
+        place: craftingTable,
     },
     {
         icon: "🌟",
-		title: "Армагеддец",
+        title: "Армагеддец",
         cost: {
             materials: 129990,
             generators: 150,
@@ -192,11 +198,11 @@ const weapon = [
             iridium: 40,
         },
         amount: 79,
-        place: "🛠Верстак",
+        place: craftingTable,
     },
     {
         icon: "☣️",
-		title: "Потрошитель",
+        title: "Потрошитель",
         cost: {
             materials: 158990,
             generators: 220,
@@ -204,11 +210,11 @@ const weapon = [
             iridium: 88,
         },
         amount: 92,
-        place: "👓Инженер",
+        place: engineer,
     },
     {
         icon: "☣️",
-		title: "Жиробас",
+        title: "Жиробас",
         cost: {
             materials: 191000,
             generators: 250,
@@ -216,11 +222,11 @@ const weapon = [
             iridium: 112,
         },
         amount: 125,
-        place: "👓Инженер",
+        place: engineer,
     },
     {
         icon: "🌟",
-		title: "Гравипушка",
+        title: "Гравипушка",
         cost: {
             materials: 241900,
             generators: 310,
@@ -228,11 +234,11 @@ const weapon = [
             iridium: 145,
         },
         amount: 159,
-        place: "👓Инженер",
+        place: engineer,
     },
     {
         icon: "💿",
-		title: "DVD-VCH",
+        title: "DVD-VCH",
         cost: {
             materials: 269000,
             generators: 330,
@@ -240,11 +246,11 @@ const weapon = [
             iridium: 180,
         },
         amount: 187,
-        place: "👓Инженер",
+        place: engineer,
     },
     {
         icon: "♻️",
-		title: "Рандомган",
+        title: "Рандомган",
         cost: {
             materials: 281300,
             generators: 350,
@@ -252,11 +258,11 @@ const weapon = [
             iridium: 197,
         },
         amount: 'random',
-        place: "👓Инженер",
+        place: engineer,
     },
     {
         icon: "🐱",
-		title: "Ракетенок☄",
+        title: "Ракетенок☄",
         cost: {
             materials: 349900,
             generators: 410,
@@ -264,11 +270,11 @@ const weapon = [
             iridium: 250,
         },
         amount: 266,
-        place: "👓Инженер",
+        place: engineer,
     },
     {
         icon: "✳️",
-		title: "Протонный топор",
+        title: "Протонный топор",
         cost: {
             materials: 359900,
             quartz: 2990,
@@ -276,11 +282,11 @@ const weapon = [
             iridium: 275,
         },
         amount: false,
-        place: "🕎Ядро",
+        place: core,
     },
     {
         icon: "❇️",
-		title: "Плазмакастер",
+        title: "Плазмакастер",
         cost: {
             materials: 349900,
             generators: 410,
@@ -288,11 +294,11 @@ const weapon = [
             iridium: 310,
         },
         amount: 291,
-        place: "🕎Ядро",
+        place: core,
     },
     {
         icon: "💣",
-		title: "Судный день",
+        title: "Судный день",
         cost: {
             materials: 325900,
             generators: 680,
@@ -300,11 +306,11 @@ const weapon = [
             iridium: 390,
         },
         amount: false,
-        place: "🕎Ядро",
+        place: core,
     },
     {
         icon: "💥",
-		title: "Маленький друг",
+        title: "Маленький друг",
         cost: {
             materials: 399400,
             generators: 750,
@@ -312,32 +318,32 @@ const weapon = [
             iridium: 329,
         },
         amount: 325,
-        place: "🕎Ядро",
+        place: core,
     },
     {
         icon: "🧠",
-		title: "Брейналайзер",
+        title: "Брейналайзер",
         cost: {
             materials: 656900,
             cubonite: 38990,
         },
         amount: 344,
-        place: "🚪Уютный подвальчик",
+        place: cozyBasement,
     },
     {
         icon: "🌡",
-		title: "Плюмбус",
+        title: "Плюмбус",
         cost: {
             materials: 957900,
             cubonite: 54990,
             osmium: 30290,
         },
         amount: 416,
-        place: "🚪Уютный подвальчик",
+        place: cozyBasement,
     },
     {
         icon: "💢",
-		title: "Плазмолив",
+        title: "Плазмолив",
         cost: {
             materials: 1135900,
             cubonite: 68490,
@@ -345,11 +351,11 @@ const weapon = [
             titanium: 43930,
         },
         amount: false,
-        place: "🚪Уютный подвальчик",
+        place: cozyBasement,
     },
     {
         icon: "❇️",
-		title: "γ-Дезинтегратор",
+        title: "γ-Дезинтегратор",
         cost: {
             materials: 1426900,
             cubonite: 99990,
@@ -357,6 +363,21 @@ const weapon = [
             titanium: 66980,
         },
         amount: 507,
-        place: "🚪Уютный подвальчик",
+        place: cozyBasement,
     }
 ];
+
+function getWeaponsByPlace(place) {
+    const placeWeapon = weapons.filter(weapon => weapon.place === place);
+    let placeText = _.sortBy(placeWeapon, weapon => weapon.amount).map(({
+        icon,
+        title,
+        cost,
+        amount
+    }) => {
+        return `${icon} *${title}* \n${cost} \nУрон: +${amount ? `${amount}` : '???'}`;
+    }).join('\n');
+    return placeText;
+};
+
+module.exports = getWeaponsByPlace;
