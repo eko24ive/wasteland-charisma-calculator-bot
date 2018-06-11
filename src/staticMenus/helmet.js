@@ -117,7 +117,10 @@ const helmets = [
 ];
 
 function costText(cost) {
-    const costText = cost;
+    let costText = '';
+    Object.keys(cost).forEach(element => {
+        costText += `${cost[element]}`;
+    });  
     return costText;
 };
 
