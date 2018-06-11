@@ -11,9 +11,9 @@ function costText(cost) {
     return costText;
 };
 
-function getHelmetsByPlace(place) {
-    const placeHelmet = helmets.filter(helmet => helmet.place === place);
-    let placeText = _.sortBy(placeHelmet, helmet => helmet.amount).map(({
+function getItemsByPlace(place, items) {
+    const placeItem = items.filter(item => item.place === place);
+    let placeText = _.sortBy(placeItem, item => item.amount).map(({
         icon,
         title,
         cost,
@@ -21,32 +21,21 @@ function getHelmetsByPlace(place) {
     }) => {
         return `${icon ? `${icon}` : ''} *${title}*\n${costText(cost)}\nУрон: +${amount ? `${amount}` : '???'}`;
     }).join('\n');
+    return placeText;
+};
+
+function getHelmetsByPlace(place) {
+    let placeText = getItemsByPlace(place, helmets); 
     return placeText;
 };
 
 function getWeaponsByPlace(place) {
-    const placeWeapon = weapons.filter(weapon => weapon.place === place);
-    let placeText = _.sortBy(placeWeapon, weapon => weapon.amount).map(({
-        icon,
-        title,
-        cost,
-        amount
-    }) => {
-        return `${icon ? `${icon}` : ''} *${title}*\n${costText(cost)}\nУрон: +${amount ? `${amount}` : '???'}`;
-    }).join('\n');
+    let placeText = getItemsByPlace(place, weapons); 
     return placeText;
 };
 
 function getArmorsByPlace(place) {
-    const placeArmor = armors.filter(armor => armor.place === place);
-    let placeText = _.sortBy(placeArmor, armor => armor.amount).map(({
-        icon,
-        title,
-        cost,
-        amount
-    }) => {
-        return `${icon ? `${icon}` : ''} *${title}*\n${costText(cost)}\nУрон: +${amount ? `${amount}` : '???'}`;
-    }).join('\n');
+    let placeText = getItemsByPlace(place, armors); 
     return placeText;
 };
 
