@@ -1,5 +1,6 @@
 const helmets = require('./helmet.js');
 const weapons = require('./weapon.js');
+const armors = require('./armor.js');
 const bills = require('./places&bills.js');
 
 function costText(cost) {
@@ -31,10 +32,24 @@ function getWeaponsByPlace(place) {
         cost,
         amount
     }) => {
-        return `$${icon ? `${icon}` : ''} *${title}*\n${costText(cost)}\nУрон: +${amount ? `${amount}` : '???'}`;
+        return `${icon ? `${icon}` : ''} *${title}*\n${costText(cost)}\nУрон: +${amount ? `${amount}` : '???'}`;
+    }).join('\n');
+    return placeText;
+};
+
+function getArmorsByPlace(place) {
+    const placeArmor = armors.filter(armor => armor.place === place);
+    let placeText = _.sortBy(placeArmor, armor => armor.amount).map(({
+        icon,
+        title,
+        cost,
+        amount
+    }) => {
+        return `${icon ? `${icon}` : ''} *${title}*\n${costText(cost)}\nУрон: +${amount ? `${amount}` : '???'}`;
     }).join('\n');
     return placeText;
 };
 
 module.exports = getHelmetsByPlace;
 module.exports = getWeaponsByPlace;
+module.exports = getArmorsByPlace;
