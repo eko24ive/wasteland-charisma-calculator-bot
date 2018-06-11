@@ -1,5 +1,5 @@
 const uniqueAccessoriesText = require('./accessories.js');
-const getWeaponsByPlace = require('./weapon.js');
+const getWeaponsByPlace = require('./itemsFunctions.js');
 
 const equipmentText = `
 Выберите тип вещей:
