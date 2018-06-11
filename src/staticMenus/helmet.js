@@ -129,7 +129,7 @@ function getHelmetsByPlace(place) {
         cost,
         amount
     }) => {
-        return `${icon} *${title}* \n${costText(cost)} \nУрон: +${amount ? `${amount}` : '???'}`;
+        return `${icon ? `${icon}` : ''} *${title}*\n${costText(cost)}\nУрон: +${amount ? `${amount}` : '???'}`;
     }).join('\n');
     return placeText;
 };
