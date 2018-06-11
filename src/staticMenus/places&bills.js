@@ -4,62 +4,53 @@ const engineer = '👓Инженер';
 const core = '🕎Ядро';
 const cozyBasement = '🚪Уютный подвальчик';
 
-const bills = [
-    {
+const bills = {
+    caps: {
         value: 1,
         title: 'крышки',
-        name: caps,
         icon: '🕳',
     },
-    {
+    materials: {
         value: 2,
         title: 'материалы',
-        name: materials,
         icon: '📦',
     },
-    {
+    quartz: {
         value: 3,
         title: 'квартц',
-        name: quartz,
         icon: '🔹',
     },
-    {
+    generators: {
         value: 4,
         title: 'генераторы',
-        name: generators,
         icon: '💡',
     },
-    {
+    microchip: {
         value: 5,
         title: 'микрочипы',
-        name: microchip,
         icon: '💾',
     },
-    {
+    iridium: {
         value: 6,
         title: 'иридий',
-        name: iridium,
         icon: '🔩',
     },
-    {
+    cubonite: {
         value: 7,
         title: 'кубонит',
-        name: cubonite,
         icon: '🔗',
     },
-    {
+    osmium: {
         value: 8,
         title: 'осмий',
-        name: osmium,
         icon: '🔗',
     },
-    {
+    titanium: {
         value: 9,
         title: 'β-Ti3Au',
-        name: titanium,
         icon: '🔗',
     }
-];
+};
 
 
 module.exports = merchant;
