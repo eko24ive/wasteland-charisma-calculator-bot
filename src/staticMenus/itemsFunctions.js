@@ -1,6 +1,7 @@
 const helmets = require('./helmet.js');
 const weapons = require('./weapon.js');
 const armors = require('./armor.js');
+const meds = require('./meds.js');
 const bills = require('./places&bills.js');
 
 function costText(cost) {
@@ -40,7 +41,7 @@ function getArmorsByPlace(place) {
 };
 
 function getMedsByPlace(place) {
-    let placeText = getItemsByPlace(place, armors); 
+    let placeText = getItemsByPlace(place, meds); 
     return placeText;
 };
 
