@@ -193,5 +193,77 @@ const weapon = [
         },
         amount: 79,
         place: "🛠Верстак",
+    },
+    {
+        icon: "☣️",
+		title: "Потрошитель",
+        cost: {
+            materials: 158990,
+            generators: 220,
+            microchip: 99,
+            iridium: 88,
+        },
+        amount: 92,
+        place: "👓Инженер",
+    },
+    {
+        icon: "☣️",
+		title: "Жиробас",
+        cost: {
+            materials: 191000,
+            generators: 250,
+            microchip: 135,
+            iridium: 112,
+        },
+        amount: 125,
+        place: "👓Инженер",
+    },
+    {
+        icon: "🌟",
+		title: "Гравипушка",
+        cost: {
+            materials: 241900,
+            generators: 310,
+            microchip: 185,
+            iridium: 145,
+        },
+        amount: 159,
+        place: "👓Инженер",
+    },
+    {
+        icon: "💿",
+		title: "DVD-VCH",
+        cost: {
+            materials: 269000,
+            generators: 330,
+            microchip: 200,
+            iridium: 180,
+        },
+        amount: 187,
+        place: "👓Инженер",
+    },
+    {
+        icon: "♻️",
+		title: "Рандомган",
+        cost: {
+            materials: 281300,
+            generators: 350,
+            microchip: 223,
+            iridium: 197,
+        },
+        amount: 'random',
+        place: "👓Инженер",
+    },
+    {
+        icon: "🐱",
+		title: "Ракетенок☄",
+        cost: {
+            materials: 349900,
+            generators: 410,
+            microchip: 299,
+            iridium: 250,
+        },
+        amount: 266,
+        place: "👓Инженер",
     }
 ];
