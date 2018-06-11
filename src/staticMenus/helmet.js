@@ -1,5 +1,6 @@
-const merchant = require('./place.js');
-const engineer = require('./place.js');
+const merchant = require('./places&bills.js');
+const engineer = require('./places&bills.js');
+const bills = require('./places&bills.js');
 
 const helmets = [
     {
@@ -115,6 +116,11 @@ const helmets = [
     }
 ];
 
+function costText(cost) {
+    const costText = cost;
+    return costText;
+};
+
 function getHelmetsByPlace(place) {
     const placeHelmet = helmets.filter(helmet => helmet.place === place);
     let placeText = _.sortBy(placeHelmet, helmet => helmet.amount).map(({
@@ -123,7 +129,7 @@ function getHelmetsByPlace(place) {
         cost,
         amount
     }) => {
-        return `${icon} *${title}* \n${cost} \nУрон: +${amount ? `${amount}` : '???'}`;
+        return `${icon} *${title}* \n${costText(cost)} \nУрон: +${amount ? `${amount}` : '???'}`;
     }).join('\n');
     return placeText;
 };
