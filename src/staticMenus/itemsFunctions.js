@@ -39,6 +39,12 @@ function getArmorsByPlace(place) {
     return placeText;
 };
 
+function getMedsByPlace(place) {
+    let placeText = getItemsByPlace(place, armors); 
+    return placeText;
+};
+
 module.exports = getHelmetsByPlace;
 module.exports = getWeaponsByPlace;
 module.exports = getArmorsByPlace;
+module.exports = getMedsByPlace;
