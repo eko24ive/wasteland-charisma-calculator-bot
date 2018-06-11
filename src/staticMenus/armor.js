@@ -1,8 +1,6 @@
-const merchant = '🏚Торгаш';
-const craftingTable = '🛠Верстак';
-const engineer = '👓Инженер';
-const core = '🕎Ядро';
-const cozyBasement = '🚪Уютный подвальчик';
+const merchant = require('./places&bills.js');
+const engineer = require('./places&bills.js');
+const craftingTable = require('./places&bills.js');
 
 const armors = [
     {
@@ -191,17 +189,4 @@ const armors = [
     }
 ];
 
-function getArmorsByPlace(place) {
-    const placeArmor = armors.filter(armor => armor.place === place);
-    let placeText = _.sortBy(placeArmor, armor => armor.amount).map(({
-        icon,
-        title,
-        cost,
-        amount
-    }) => {
-        return `${icon} *${title}* \n${cost} \nУрон: +${amount ? `${amount}` : '???'}`;
-    }).join('\n');
-    return placeText;
-};
-
-module.exports = getArmorsByPlace;
+module.exports = armors;
