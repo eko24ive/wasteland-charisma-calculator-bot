@@ -1,8 +1,5 @@
-const merchant = '🏚Торгаш';
-const craftingTable = '🛠Верстак';
-const engineer = '👓Инженер';
-const core = '🕎Ядро';
-const cozyBasement = '🚪Уютный подвальчик';
+const merchant = require('./place.js');
+const engineer = require('./place.js');
 
 const helmets = [
     {
