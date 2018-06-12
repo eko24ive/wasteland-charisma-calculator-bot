@@ -1,6 +1,6 @@
 const merchant = require('./places&bills.js');
 const engineer = require('./places&bills.js');
-const craftingTable = require('./places&bills.js');
+const workbench = require('./places&bills.js');
 
 const armorsComment = '🛡Защита: +';
 const armors = [
@@ -72,21 +72,21 @@ const armors = [
         title: "Портупея",
         cost: { materials: 390, },
         amount: 3,
-        place: craftingTable,
+        place: workbench,
     },
     {
         icon: "👕",
         title: "Кожаный жилет",
         cost: { materials: 890, },
         amount: 6,
-        place: craftingTable,
+        place: workbench,
     },
     {
         icon: "👕",
         title: "Титановые щитки",
         cost: { materials: 5200, },
         amount: 16,
-        place: craftingTable,
+        place: workbench,
     },
     {
         icon: "⚙️",
@@ -96,7 +96,7 @@ const armors = [
             generators: 5,
         },
         amount: 25,
-        place: craftingTable,
+        place: workbench,
     },
     {
         icon: "⚙️",
@@ -106,7 +106,7 @@ const armors = [
             generators: 15,
         },
         amount: 35,
-        place: craftingTable,
+        place: workbench,
     },
     {
         icon: "⚙️",
@@ -116,7 +116,7 @@ const armors = [
             generators: 35,
         },
         amount: 45,
-        place: craftingTable,
+        place: workbench,
     },
     {
         icon: "⚙️",
@@ -127,7 +127,7 @@ const armors = [
             microchip: 10,
         },
         amount: 55,
-        place: craftingTable,
+        place: workbench,
     },
     {
         icon: "⚙️",
@@ -138,7 +138,7 @@ const armors = [
             microchip: 21,
         },
         amount: 66,
-        place: craftingTable,
+        place: workbench,
     },
     {
         icon: "🦇",

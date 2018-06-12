@@ -1,6 +1,6 @@
 const merchant = require('./places&bills.js');
 const engineer = require('./places&bills.js');
-const craftingTable = require('./places&bills.js');
+const workbench = require('./places&bills.js');
 const core = require('./places&bills.js');
 const cozyBasement = require('./places&bills.js');
 
@@ -67,28 +67,28 @@ const weapons = [
         title: "⚡️Прочная бита",
         cost: { materials: 200, },
         amount: 2,
-        place: craftingTable,
+        place: workbench,
     },
     {
         icon: "⚡",
         title: "Копье",
         cost: { materials: 600, },
         amount: 4,
-        place: craftingTable,
+        place: workbench,
     },
     {
         icon: "⚡",
         title: "⚡Кистень",
         cost: { materials: 1300, },
         amount: 6,
-        place: craftingTable,
+        place: workbench,
     },
     {
         icon: "⚡",
         title: "Электромеч",
         cost: { materials: 3900, },
         amount: 9,
-        place: craftingTable,
+        place: workbench,
     },
     {
         icon: "💥",
@@ -98,7 +98,7 @@ const weapons = [
             quartz: 4,
         },
         amount: 12,
-        place: craftingTable,
+        place: workbench,
     },
     {
         icon: "💥",
@@ -108,7 +108,7 @@ const weapons = [
             quartz: 30,
         },
         amount: 20,
-        place: craftingTable,
+        place: workbench,
     },
     {
         icon: "💥",
@@ -118,7 +118,7 @@ const weapons = [
             quartz: 30,
         },
         amount: 20,
-        place: craftingTable,
+        place: workbench,
     },
     {
         icon: "🔗",
@@ -129,7 +129,7 @@ const weapons = [
             generators: 5,
         },
         amount: 25,
-        place: craftingTable,
+        place: workbench,
     },
     {
         icon: "💥",
@@ -140,7 +140,7 @@ const weapons = [
             generators: 5,
         },
         amount: 29,
-        place: craftingTable,
+        place: workbench,
     },
     {
         icon: "💥",
@@ -151,7 +151,7 @@ const weapons = [
             generators: 25,
         },
         amount: 38,
-        place: craftingTable,
+        place: workbench,
     },
     {
         icon: "☄️",
@@ -163,7 +163,7 @@ const weapons = [
             microchip: 5,
         },
         amount: 49,
-        place: craftingTable,
+        place: workbench,
     },
     {
         icon: "☄",
@@ -175,7 +175,7 @@ const weapons = [
             microchip: 45,
         },
         amount: 56,
-        place: craftingTable,
+        place: workbench,
     },
     {
         icon: "🔮",
@@ -187,7 +187,7 @@ const weapons = [
             iridium: 20,
         },
         amount: 65,
-        place: craftingTable,
+        place: workbench,
     },
     {
         icon: "🌟",
@@ -199,7 +199,7 @@ const weapons = [
             iridium: 40,
         },
         amount: 79,
-        place: craftingTable,
+        place: workbench,
     },
     {
         icon: "☣️",
