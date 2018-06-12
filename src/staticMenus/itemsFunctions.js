@@ -80,9 +80,44 @@ const getMedsByPlace = place => {
     return placeText;
 };
 
+const getAllItemsWithPlace = (items, itemsGlobalComment = '') => {
+    const getItemIcon = icon => {
+        if(icon) {
+            return icon;
+        } 
+        
+        return '';
+    }
+
+    const getItemAmount = amount => {
+        if(amount) {
+            return amount;
+        } 
+        
+        return '???';
+    }
+
+    return _.sortBy(items, item => item.amount).map(({
+        icon,
+        title,
+        cost,
+        effect,
+        amount,
+        place,
+        comment
+    }) => {
+        return `${getItemIcon(icon)} *${title}*
+        ${costText(cost)}
+        ${effect ? effect : ''}${itemsGlobalComment}${getItemAmount(amount)}
+        ${comment ? comment : ''}
+        Место покупки: ${place}`;
+    }).join('\n');
+};
+
 module.exports = {
     getHelmetsByPlace,
     getWeaponsByPlace,
     getArmorsByPlace,
-    getMedsByPlace
+    getMedsByPlace,
+    getAllItemsWithPlace
 };
