@@ -717,6 +717,9 @@ reply = `Шикардос, я обновил твой пип!
                         }).then(o => {
                             userManager.addPoints(msg.from.id, userForwardPoints.newGiantData).then(result => {
                                 if(!result.ok) {
+                                    if(result.reason === 'USER_NOT_FOUND') {
+                                        msg.reply.text('Не могу начислить тебе шмепсели пока ты не скинешь мне свой пип-бой :с')
+                                    }
                                     // console.log('userManager.addPoints: '+JSON.stringify(result));
                                 }
                             });
@@ -739,6 +742,9 @@ reply = `Шикардос, я обновил твой пип!
                             }).then(o => {
                                 userManager.addPoints(msg.from.id, userForwardPoints.newGiantData).then(result => {
                                     if(!result.ok) {
+                                        if(result.reason === 'USER_NOT_FOUND') {
+                                            msg.reply.text('Не могу начислить тебе шмепсели пока ты не скинешь мне свой пип-бой :с')
+                                        }
                                         // console.log('userManager.addPoints: '+JSON.stringify(result));
                                     }
                                 });
@@ -1025,9 +1031,11 @@ bot.on('/journeyforwardstart', msg => {
 });
 
 const actualProcessUserData = (msg, reportData, updatesData, options) => {
-    updateOrCreate(msg, reportData.lastPip, result => {
-        console.log(result);
-    });
+    if(reportData.lastPip !== null) {
+        updateOrCreate(msg, reportData.lastPip, result => {
+            console.log(result);
+        });
+    }
 
     if (options.useBeastFace && !_.isEmpty(reportData.beastToValidate)) {
         sessions[msg.from.id].state = states.WAIT_FOR_BEAST_FACE_FORWARD;
@@ -1433,6 +1441,9 @@ ${errors}`;
                 }).then(res => {
                     userManager.addPoints(msg.from.id, userForwardPoints).then(result => {
                         if(!result.ok) {
+                            if(result.reason === 'USER_NOT_FOUND') {
+                                msg.reply.text('Не могу начислить тебе шмепсели пока ты не скинешь мне свой пип-бой :с')
+                            }
                             console.log('userManager.addPoints: '+JSON.stringify(result));
                         }
                     });
