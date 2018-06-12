@@ -372,11 +372,10 @@ bot.on('forward', (msg) => {
         if (sessions[msg.from.id].state !== states.WAIT_FOR_FORWARD_END) {
             console.log(`[CULPRIT]: ${msg.from.id} | ${msg.from.first_name} | ${msg.from.username}`);
 
-            createSession(msg.from.id);
+            // createSession(msg.from.id);
 
             return msg.reply.text(`
 Форварды принимаються только от @WastelandWarsBot.
-Отменяю твои фоварды - нехуй выебываться.
             `, {
                 asReply: true,
                 replyMarkup: defaultKeyboard
