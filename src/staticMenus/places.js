@@ -24,6 +24,5 @@ module.exports = {
     workbench,
     engineer,
     core,
-    basement,
-    bills
+    basement
 }

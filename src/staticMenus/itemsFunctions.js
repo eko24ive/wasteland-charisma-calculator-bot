@@ -16,7 +16,8 @@ function costText(cost) {
 };
 
 function getItemsByPlace(place, placeComment, items) {
-    const placeItem = items.filter(item => item.place === place);
+    if (placeComment == undefined) placeComment = '';
+    const placeItem = items.filter(item => item.title === `${place}`);
     let placeText = _.sortBy(placeItem, item => item.amount).map(({
         icon,
         title,
