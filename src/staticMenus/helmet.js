@@ -1,6 +1,7 @@
 const merchant = require('./places&bills.js');
 const engineer = require('./places&bills.js');
 
+const helmetsComment = '🛡Защита: +';
 const helmets = [
     {
         icon: false,
@@ -116,3 +117,4 @@ const helmets = [
 ];
 
 module.exports = helmets;
+module.exports = helmetsComment;
