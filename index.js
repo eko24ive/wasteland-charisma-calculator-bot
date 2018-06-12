@@ -1475,11 +1475,14 @@ const processUserData = (msg, options) => {
     if (options.usePip && reportData.pipRequired) {
         userManager.findByTelegramId(msg.from.id).then(result => {
             if (result.ok && result.reason === 'USER_FOUND') {
-                sessions[msg.from.id].data.push({
-                    data: result.data.pip,
-                    dataType: 'pipboy',
-                    date: result.data.pip.timeStamp
-                });
+                if(result.data.pip !== undefined) {
+                    sessions[msg.from.id].data.push({
+                        data: result.data.pip,
+                        dataType: 'pipboy',
+                        date: result.data.pip.timeStamp
+                    });
+                }
+
 
                 const {
                     reportData: reportDataWithUserPip,
@@ -1901,8 +1904,9 @@ bot.on("/mypipstats", msg => {
   });
 
 bot.on('/debug', msg => {
-    return msg.reply.text(sessions[msg.from.id].state, {
-        asReply: true
+    return msg.reply.text(`Форварды принимаються только от @WastelandWarsBot.
+Отменяю твои фоварды - нехуй выебываться.`, {
+        asReply: false
     });
 });
 
