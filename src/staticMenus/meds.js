@@ -1,6 +1,6 @@
-const merchant = require('./places&bills.js');
-const engineer = require('./places&bills.js');
-const craftingTable = require('./places&bills.js');
+const merchant = require('./places.js');
+const engineer = require('./places.js');
+const workbench = require('./places.js');
 
 const meds = [
     {
@@ -9,7 +9,7 @@ const meds = [
         cost: { materials: 30, },
         effect: '❤️',
         amount: 3,
-        place: craftingTable,
+        place: workbench,
     },
     {
         icon: '💊',
@@ -20,7 +20,7 @@ const meds = [
          },
         effect: '🔋',
         amount: 5,
-        place: craftingTable,
+        place: workbench,
         comment: 'на время',
     },
     {
@@ -31,7 +31,7 @@ const meds = [
          },
         effect: '❤️',
         amount: 30,
-        place: craftingTable,
+        place: workbench,
         comment: 'на время',
     },
     {
@@ -43,7 +43,7 @@ const meds = [
          },
         effect: 'полное здоровье + 20%',
         amount: false,
-        place: craftingTable,
+        place: workbench,
         comment: 'Необходимое колчичество 📦Материалов = \`Уровень вашего ❤️Здоровья * 7.2\`',
     },
     {

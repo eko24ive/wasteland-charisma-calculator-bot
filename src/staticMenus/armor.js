@@ -1,6 +1,6 @@
-const merchant = require('./places&bills.js');
-const engineer = require('./places&bills.js');
-const workbench = require('./places&bills.js');
+const merchant = require('./places.js');
+const engineer = require('./places.js');
+const workbench = require('./places.js');
 
 const armorsComment = '🛡Защита: +';
 const armors = [

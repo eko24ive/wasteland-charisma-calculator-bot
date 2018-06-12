@@ -5,7 +5,7 @@ const weaponsComment = require('./weapon.js');
 const armors = require('./armor.js');
 const armorsComment = require('./armor.js');
 const meds = require('./meds.js');
-const bills = require('./places&bills.js');
+const bills = require('./prices.js');
 
 function costText(cost) {
     let costText = '';
