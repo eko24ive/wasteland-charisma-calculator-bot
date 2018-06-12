@@ -26,8 +26,8 @@ const costText = cost => {
     return costText;
 };
 
-const getItemsByPlace = (place, items, placeComment = '') => {
-    const placeItem = items.filter(item => item.place === place);
+const getItemsByPlace = (place, items, itemsGlobalComment = '') => {
+    const itemsFromPlace = items.filter(item => item.place === place);
 
     const getItemIcon = icon => {
         if(icon) {
@@ -45,15 +45,18 @@ const getItemsByPlace = (place, items, placeComment = '') => {
         return '???';
     }
 
-    return _.sortBy(placeItem, item => item.amount).map(({
+    return _.sortBy(itemsFromPlace, item => item.amount).map(({
         icon,
         title,
         cost,
-        amount
+        effect,
+        amount,
+        comment
     }) => {
         return `${getItemIcon(icon)} *${title}*
         ${costText(cost)}
-        ${placeComment}${getItemAmount(amount)}`;
+        ${effect ? effect : ''}${itemsGlobalComment}${getItemAmount(amount)}
+        ${comment ? comment : ''}`;
     }).join('\n');
 };
 
