@@ -10,8 +10,8 @@ const bills = require('./places&bills.js');
 function costText(cost) {
     let costText = '';
     Object.keys(cost).forEach(element => {
-        costText += `${bills[element].icon}${cost[element]} `;    
-    });  
+        costText += `${bills[element].icon}${cost[element]} `;
+    });
     return costText;
 };
 
@@ -29,26 +29,28 @@ function getItemsByPlace(place, placeComment, items) {
 };
 
 function getHelmetsByPlace(place) {
-    let placeText = getItemsByPlace(place, helmetsComment, helmets); 
+    let placeText = getItemsByPlace(place, helmetsComment, helmets);
     return placeText;
 };
 
 function getWeaponsByPlace(place) {
-    let placeText = getItemsByPlace(place, weaponsComment, weapons); 
+    let placeText = getItemsByPlace(place, weaponsComment, weapons);
     return placeText;
 };
 
 function getArmorsByPlace(place) {
-    let placeText = getItemsByPlace(place, armorsComment, armors); 
+    let placeText = getItemsByPlace(place, armorsComment, armors);
     return placeText;
 };
 
 function getMedsByPlace(place) {
-    let placeText = getItemsByPlace(place, meds); 
+    let placeText = getItemsByPlace(place, meds);
     return placeText;
 };
 
-module.exports = getHelmetsByPlace;
-module.exports = getWeaponsByPlace;
-module.exports = getArmorsByPlace;
-module.exports = getMedsByPlace;
+module.exports = {
+    getHelmetsByPlace,
+    getWeaponsByPlace,
+    getArmorsByPlace,
+    getMedsByPlace
+};
