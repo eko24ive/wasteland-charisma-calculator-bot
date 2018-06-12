@@ -19,11 +19,10 @@ const meds = require('./meds.js');
 const bills = require('./prices.js');
 
 const costText = cost => {
-    let costText = '';
-    Object.keys(cost).forEach(element => {
-        costText += `${bills[element].icon}${cost[element]} `;
-    });
-    return costText;
+    return _.forEach(cost, 
+        function(price){ 
+            return `${bills[element].icon}${cost[element]}` 
+        }).join(' ');
 };
 
 const getItemsByPlace = (place, items, itemsGlobalComment = '') => {
