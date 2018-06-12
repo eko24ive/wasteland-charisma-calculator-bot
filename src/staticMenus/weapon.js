@@ -66,7 +66,7 @@ const weapons = [
     },
     {
         icon: "⚡",
-        title: "⚡️Прочная бита",
+        title: "Прочная бита",
         cost: { materials: 200, },
         amount: 2,
         place: workbench,
@@ -80,7 +80,7 @@ const weapons = [
     },
     {
         icon: "⚡",
-        title: "⚡Кистень",
+        title: "Кистень",
         cost: { materials: 1300, },
         amount: 6,
         place: workbench,
