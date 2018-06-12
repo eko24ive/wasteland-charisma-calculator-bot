@@ -1,9 +1,20 @@
-const helmets = require('./helmet.js');
-const helmetsComment = require('./helmet.js');
-const weapons = require('./weapon.js');
-const weaponsComment = require('./weapon.js');
-const armors = require('./armor.js');
-const armorsComment = require('./armor.js');
+const _ = require('underscore');
+
+const {
+    helmets,
+    helmetsComment
+} = require('./helmet.js');
+
+const {
+    weapons,
+    weaponsComment
+} = require('./weapon.js');
+
+const {
+    armors,
+    armorsComment
+} = require('./armor.js');
+
 const meds = require('./meds.js');
 const bills = require('./prices.js');
 
