@@ -9,91 +9,91 @@ const armors = [
     {
         icon: false,
         title: "Плотная куртка",
-        cost: { caps: 30, },
+        price: { caps: 30, },
         amount: 1,
         place: merchant,
     },
     {
         icon: false,
         title: "Комбинезон убежища",
-        cost: { caps: 30, },
+        price: { caps: 30, },
         amount: 3,
         place: merchant,
     },
     {
         icon: false,
         title: "Кожанный нагрудник",
-        cost: { caps: 30, },
+        price: { caps: 30, },
         amount: 6,
         place: merchant,
     },
     {
         icon: false,
         title: "Мото-защита",
-        cost: { caps: 30, },
+        price: { caps: 30, },
         amount: 9,
         place: merchant,
     },
     {
         icon: false,
         title: "Легкий кевлар",
-        cost: { caps: 30, },
+        price: { caps: 30, },
         amount: 10,
         place: merchant,
     },
     {
         icon: false,
         title: "Крепкий кевлар",
-        cost: { caps: 30, },
+        price: { caps: 30, },
         amount: 10,
         place: merchant,
     },
     {
         icon: false,
         title: "Броня братства",
-        cost: { caps: 30, },
+        price: { caps: 30, },
         amount: 15,
         place: merchant,
     },
     {
         icon: false,
         title: "Боевая броня",
-        cost: { caps: 680, },
+        price: { caps: 680, },
         amount: 25,
         place: merchant,
     },
     {
         icon: false,
         title: "Броня Когтей",
-        cost: { caps: 1580, },
+        price: { caps: 1580, },
         amount: 32,
         place: merchant,
     },
     {
         icon: "👕",
         title: "Портупея",
-        cost: { materials: 390, },
+        price: { materials: 390, },
         amount: 3,
         place: workbench,
     },
     {
         icon: "👕",
         title: "Кожаный жилет",
-        cost: { materials: 890, },
+        price: { materials: 890, },
         amount: 6,
         place: workbench,
     },
     {
         icon: "👕",
         title: "Титановые щитки",
-        cost: { materials: 5200, },
+        price: { materials: 5200, },
         amount: 16,
         place: workbench,
     },
     {
         icon: "⚙️",
         title: "Силовая броня",
-        cost: {
+        price: {
             materials: 12990,
             generators: 5,
         },
@@ -103,7 +103,7 @@ const armors = [
     {
         icon: "⚙️",
         title: "Силовая броня🎖",
-        cost: {
+        price: {
             materials: 22990,
             generators: 15,
         },
@@ -113,7 +113,7 @@ const armors = [
     {
         icon: "⚙️",
         title: "Силовая броня🎖🎖",
-        cost: {
+        price: {
             materials: 35990,
             generators: 35,
         },
@@ -123,7 +123,7 @@ const armors = [
     {
         icon: "⚙️",
         title: "Броня 'Тесла'",
-        cost: {
+        price: {
             materials: 40990,
             generators: 40,
             microchip: 10,
@@ -134,7 +134,7 @@ const armors = [
     {
         icon: "⚙️",
         title: "Броня 'Геенна'",
-        cost: {
+        price: {
             materials: 52990,
             generators: 80,
             microchip: 21,
@@ -145,7 +145,7 @@ const armors = [
     {
         icon: "🦇",
         title: "Бэткостюм",
-        cost: {
+        price: {
             materials: 72900,
             generators: 120,
             microchip: 54,
@@ -157,7 +157,7 @@ const armors = [
     {
         icon: "⚛️",
         title: "Нановолокно",
-        cost: {
+        price: {
             materials: 98000,
             generators: 150,
             microchip: 85,
@@ -169,7 +169,7 @@ const armors = [
     {
         icon: "🛠",
         title: "Мультизащита",
-        cost: {
+        price: {
             materials: 141900,
             generators: 190,
             microchip: 125,
@@ -181,7 +181,7 @@ const armors = [
     {
         icon: "⚡️",
         title: "Тесла-мех",
-        cost: {
+        price: {
             materials: 179990,
             generators: 210,
             microchip: 145,

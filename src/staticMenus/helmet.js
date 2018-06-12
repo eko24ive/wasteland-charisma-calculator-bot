@@ -8,70 +8,70 @@ const helmets = [
     {
         icon: false,
         title: "Вязаная шапка",
-        cost: { caps: 30, },
+        price: { caps: 30, },
         amount: 1,
         place: merchant,
     },
     {
         icon: false,
         title: "Ушанка",
-        cost: { caps: 30, },
+        price: { caps: 30, },
         amount: 1,
         place: merchant,
     },
     {
         icon: false,
         title: "Боевой шлем",
-        cost: { caps: 30, },
+        price: { caps: 30, },
         amount: 5,
         place: merchant,
     },
     {
         icon: false,
         title: "Деловая шляпа",
-        cost: { caps: 480, },
+        price: { caps: 480, },
         amount: 1,
         place: merchant,
     },
     {
         icon: false,
         title: "Берет",
-        cost: { caps: 40, },
+        price: { caps: 40, },
         amount: 1,
         place: merchant,
     },
     {
         icon: false,
         title: "Колпак повара",
-        cost: { caps: 880, },
+        price: { caps: 880, },
         amount: 1,
         place: merchant,
     },
     {
         icon: false,
         title: "Шляпа минитмена",
-        cost: { caps: 980, },
+        price: { caps: 980, },
         amount: 15,
         place: merchant,
     },
     {
         icon: false,
         title: "Противогаз",
-        cost: { caps: 1620, },
+        price: { caps: 1620, },
         amount: 15,
         place: merchant,
     },
     {
         icon: false,
         title: "Плотный капюшон",
-        cost: { caps: 1510, },
+        price: { caps: 1510, },
         amount: 9,
         place: merchant,
     },
     {
         icon: "⚙️",
         title: "Шлем синта",
-        cost: {
+        price: {
             materials: 21990,
             quartz: 250,
             generators: 90,
@@ -83,7 +83,7 @@ const helmets = [
     {
         icon: "⚙️",
         title: "Шлем Рейдер-пес",
-        cost: {
+        price: {
             materials: 45990,
             quartz: 330,
             generators: 140,
@@ -95,7 +95,7 @@ const helmets = [
     {
         icon: "⚙️",
         title: "Шлем Тесла",
-        cost: {
+        price: {
             materials: 87990,
             generators: 450,
             microchip: 210,
@@ -107,7 +107,7 @@ const helmets = [
     {
         icon: "🛠",
         title: "Костяной шлем",
-        cost: {
+        price: {
             materials: 157990,
             generators: 590,
             microchip: 345,

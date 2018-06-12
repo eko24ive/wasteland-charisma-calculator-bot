@@ -1,5 +1,4 @@
 const {
-    merchant,
     engineer,
     workbench
 } = require('./places.js');
@@ -8,7 +7,7 @@ const meds = [
     {
         icon: '💧',
         title: "Чистая вода",
-        cost: { materials: 30, },
+        price: { materials: 30, },
         effect: '❤️',
         amount: 3,
         place: workbench,
@@ -16,7 +15,7 @@ const meds = [
     {
         icon: '💊',
         title: "Speed-ы",
-        cost: { 
+        price: { 
             materials: 200,
             ephedrine: 1,
          },
@@ -28,7 +27,7 @@ const meds = [
     {
         icon: '💉',
         title: "Стимулятор",
-        cost: { 
+        price: { 
             materials: 80,
          },
         effect: '❤️',
@@ -39,7 +38,7 @@ const meds = [
     {
         icon: '💉',
         title: "++ Суперстим",
-        cost: { 
+        price: { 
             materials: 200,
             ephedrine: 1,
          },
@@ -51,7 +50,7 @@ const meds = [
     {
         icon: '💌',
         title: "Медпак",
-        cost: { 
+        price: { 
             materials: 630,
             ephedrine: 1,
          },
@@ -64,7 +63,7 @@ const meds = [
     {
         icon: '💉',
         title: "Мед-Х детский",
-        cost: { 
+        price: { 
             materials: 410,
          },
         effect: '❤️',
@@ -75,7 +74,7 @@ const meds = [
     {
         icon: '❣️',
         title: "Баффаут",
-        cost: { 
+        price: { 
             materials: 280,
          },
         effect: '❤️',

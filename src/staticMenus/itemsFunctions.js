@@ -16,12 +16,12 @@ const {
 } = require('./armor.js');
 
 const meds = require('./meds.js');
-const bills = require('./prices.js');
+const prices = require('./prices.js');
 
-const costText = cost => {
-    return _.forEach(cost, 
-        function(price){ 
-            return `${bills[price].icon}${cost[price]}` 
+const priceText = price => {
+    return _.forEach(price, 
+        function(pricesItem){ 
+            return `${prices[pricesItem].icon}${price[pricesItem]}` 
         }).join(' ');
 };
 
@@ -47,13 +47,13 @@ const getItemsByPlace = (place, items, itemsGlobalComment = '') => {
     return _.sortBy(itemsFromPlace, item => item.amount).map(({
         icon,
         title,
-        cost,
+        price,
         effect,
         amount,
         comment
     }) => {
         return `${getItemIcon(icon)} *${title}*
-        ${costText(cost)}
+        ${priceText(price)}
         ${effect ? effect : ''}${itemsGlobalComment}${getItemAmount(amount)}
         ${comment ? comment : ''}`;
     }).join('\n');
@@ -99,14 +99,14 @@ const getAllItemsWithPlace = (items, itemsGlobalComment = '') => {
     return _.sortBy(items, item => item.amount).map(({
         icon,
         title,
-        cost,
+        price,
         effect,
         amount,
         place,
         comment
     }) => {
         return `${getItemIcon(icon)} *${title}*
-        ${costText(cost)}
+        ${priceText(price)}
         ${effect ? effect : ''}${itemsGlobalComment}${getItemAmount(amount)}
         ${comment ? comment : ''}
         Место покупки: ${place}`;

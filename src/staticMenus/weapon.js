@@ -11,91 +11,91 @@ const weapons = [
     {
         icon: false,
         title: "Бейсбольная бита",
-        cost: { caps: 30, },
+        price: { caps: 30, },
         amount: 1,
         place: merchant,
     },
     {
         icon: false,
         title: "Ржавый нож",
-        cost: { caps: 30, },
+        price: { caps: 30, },
         amount: 3,
         place: merchant,
     },
     {
         icon: false,
         title: "Разводной ключ",
-        cost: { caps: 30, },
+        price: { caps: 30, },
         amount: 5,
         place: merchant,
     },
     {
         icon: false,
         title: "Топор",
-        cost: { caps: 30, },
+        price: { caps: 30, },
         amount: 7,
         place: merchant,
     },
     {
         icon: false,
         title: "Кинжал",
-        cost: { caps: 30, },
+        price: { caps: 30, },
         amount: 9,
         place: merchant,
     },
     {
         icon: false,
         title: "Мачете",
-        cost: { caps: 30, },
+        price: { caps: 30, },
         amount: 11,
         place: merchant,
     },
     {
         icon: false,
         title: "Хлыст",
-        cost: { caps: 30, },
+        price: { caps: 30, },
         amount: 13,
         place: merchant,
     },
     {
         icon: false,
         title: "Стальная бита",
-        cost: { caps: 30, },
+        price: { caps: 30, },
         amount: 16,
         place: merchant,
     },
     {
         icon: "⚡",
         title: "Прочная бита",
-        cost: { materials: 200, },
+        price: { materials: 200, },
         amount: 2,
         place: workbench,
     },
     {
         icon: "⚡",
         title: "Копье",
-        cost: { materials: 600, },
+        price: { materials: 600, },
         amount: 4,
         place: workbench,
     },
     {
         icon: "⚡",
         title: "Кистень",
-        cost: { materials: 1300, },
+        price: { materials: 1300, },
         amount: 6,
         place: workbench,
     },
     {
         icon: "⚡",
         title: "Электромеч",
-        cost: { materials: 3900, },
+        price: { materials: 3900, },
         amount: 9,
         place: workbench,
     },
     {
         icon: "💥",
         title: "Лазерный тесак",
-        cost: {
+        price: {
             materials: 5600,
             quartz: 4,
         },
@@ -105,7 +105,7 @@ const weapons = [
     {
         icon: "💥",
         title: "BFGzzv-4000",
-        cost: {
+        price: {
             materials: 12000,
             quartz: 30,
         },
@@ -115,7 +115,7 @@ const weapons = [
     {
         icon: "💥",
         title: "BFGzzv-4000",
-        cost: {
+        price: {
             materials: 12000,
             quartz: 30,
         },
@@ -125,7 +125,7 @@ const weapons = [
     {
         icon: "🔗",
         title: "Силовой кастет",
-        cost: {
+        price: {
             materials: 14000,
             quartz: 20,
             generators: 5,
@@ -136,7 +136,7 @@ const weapons = [
     {
         icon: "💥",
         title: "Колыбель Пустоши",
-        cost: {
+        price: {
             materials: 19990,
             quartz: 35,
             generators: 5,
@@ -147,7 +147,7 @@ const weapons = [
     {
         icon: "💥",
         title: "Tyrant-PDR",
-        cost: {
+        price: {
             materials: 29990,
             quartz: 60,
             generators: 25,
@@ -158,7 +158,7 @@ const weapons = [
     {
         icon: "☄️",
         title: "Огнемёд",
-        cost: {
+        price: {
             materials: 45900,
             quartz: 90,
             generators: 75,
@@ -170,7 +170,7 @@ const weapons = [
     {
         icon: "☄",
         title: "️Больверизатор",
-        cost: {
+        price: {
             materials: 59990,
             quartz: 100,
             generators: 90,
@@ -182,7 +182,7 @@ const weapons = [
     {
         icon: "🔮",
         title: "Энергосфера",
-        cost: {
+        price: {
             materials: 78990,
             generators: 120,
             microchip: 60,
@@ -194,7 +194,7 @@ const weapons = [
     {
         icon: "🌟",
         title: "Армагеддец",
-        cost: {
+        price: {
             materials: 129990,
             generators: 150,
             microchip: 70,
@@ -206,7 +206,7 @@ const weapons = [
     {
         icon: "☣️",
         title: "Потрошитель",
-        cost: {
+        price: {
             materials: 158990,
             generators: 220,
             microchip: 99,
@@ -218,7 +218,7 @@ const weapons = [
     {
         icon: "☣️",
         title: "Жиробас",
-        cost: {
+        price: {
             materials: 191000,
             generators: 250,
             microchip: 135,
@@ -230,7 +230,7 @@ const weapons = [
     {
         icon: "🌟",
         title: "Гравипушка",
-        cost: {
+        price: {
             materials: 241900,
             generators: 310,
             microchip: 185,
@@ -242,7 +242,7 @@ const weapons = [
     {
         icon: "💿",
         title: "DVD-VCH",
-        cost: {
+        price: {
             materials: 269000,
             generators: 330,
             microchip: 200,
@@ -254,7 +254,7 @@ const weapons = [
     {
         icon: "♻️",
         title: "Рандомган",
-        cost: {
+        price: {
             materials: 281300,
             generators: 350,
             microchip: 223,
@@ -266,7 +266,7 @@ const weapons = [
     {
         icon: "🐱",
         title: "Ракетенок☄",
-        cost: {
+        price: {
             materials: 349900,
             generators: 410,
             microchip: 299,
@@ -278,7 +278,7 @@ const weapons = [
     {
         icon: "✳️",
         title: "Протонный топор",
-        cost: {
+        price: {
             materials: 359900,
             quartz: 2990,
             microchip: 289,
@@ -290,7 +290,7 @@ const weapons = [
     {
         icon: "❇️",
         title: "Плазмакастер",
-        cost: {
+        price: {
             materials: 349900,
             generators: 410,
             microchip: 359,
@@ -302,7 +302,7 @@ const weapons = [
     {
         icon: "💣",
         title: "Судный день",
-        cost: {
+        price: {
             materials: 325900,
             generators: 680,
             microchip: 399,
@@ -314,7 +314,7 @@ const weapons = [
     {
         icon: "💥",
         title: "Маленький друг",
-        cost: {
+        price: {
             materials: 399400,
             generators: 750,
             microchip: 435,
@@ -326,7 +326,7 @@ const weapons = [
     {
         icon: "🧠",
         title: "Брейналайзер",
-        cost: {
+        price: {
             materials: 656900,
             cubonite: 38990,
         },
@@ -336,7 +336,7 @@ const weapons = [
     {
         icon: "🌡",
         title: "Плюмбус",
-        cost: {
+        price: {
             materials: 957900,
             cubonite: 54990,
             osmium: 30290,
@@ -347,7 +347,7 @@ const weapons = [
     {
         icon: "💢",
         title: "Плазмолив",
-        cost: {
+        price: {
             materials: 1135900,
             cubonite: 68490,
             osmium: 45590,
@@ -359,7 +359,7 @@ const weapons = [
     {
         icon: "❇️",
         title: "γ-Дезинтегратор",
-        cost: {
+        price: {
             materials: 1426900,
             cubonite: 99990,
             osmium: 79560,
