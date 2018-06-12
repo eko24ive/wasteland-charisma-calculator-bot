@@ -1,4 +1,4 @@
-const bills = {
+const prices = {
     caps: {
         rarity: 1,
         title: 'крышки',
@@ -46,4 +46,4 @@ const bills = {
     }
 };
 
-module.exports = bills;
+module.exports = prices;
