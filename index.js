@@ -2101,7 +2101,7 @@ bot.on(/mob_(.+)/, msg => {
                 replyMarkup: beastReplyMarkup
             });
         } else {
-            return msg.reply.text(`Прости, я никогда не слышал про этого ${beast.name} :c`, {
+            return msg.reply.text(`Прости, я никогда не слышал про этого моба :c`, {
                 asReply: true
             })
         }
