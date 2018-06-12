@@ -21,7 +21,7 @@ const bills = require('./prices.js');
 const costText = cost => {
     return _.forEach(cost, 
         function(price){ 
-            return `${bills[element].icon}${cost[element]}` 
+            return `${bills[price].icon}${cost[price]}` 
         }).join(' ');
 };
 
