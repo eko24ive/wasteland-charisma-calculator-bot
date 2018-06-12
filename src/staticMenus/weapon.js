@@ -4,6 +4,7 @@ const craftingTable = require('./places&bills.js');
 const core = require('./places&bills.js');
 const cozyBasement = require('./places&bills.js');
 
+const weaponsComment = '💪Урон: +';
 const weapons = [
     {
         icon: false,
@@ -368,3 +369,4 @@ const weapons = [
 ];
 
 module.exports = weapons;
+module.exports = weaponsComment;
