@@ -1,5 +1,5 @@
 const merchant = {
-    name: '',
+    name: 'merchant',
     title: '🏚Торгаш'
 };
 const workbench = {
