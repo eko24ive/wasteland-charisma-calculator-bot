@@ -18,7 +18,7 @@ const {
 const meds = require('./meds.js');
 const bills = require('./prices.js');
 
-function costText(cost) {
+const costText = cost => {
     let costText = '';
     Object.keys(cost).forEach(element => {
         costText += `${bills[element].icon}${cost[element]} `;
@@ -26,36 +26,53 @@ function costText(cost) {
     return costText;
 };
 
-function getItemsByPlace(place, placeComment, items) {
-    if (placeComment == undefined) placeComment = '';
-    const placeItem = items.filter(item => item.title === `${place}`);
-    let placeText = _.sortBy(placeItem, item => item.amount).map(({
+const getItemsByPlace = (place, items, placeComment = '') => {
+    const placeItem = items.filter(item => item.title === place);
+
+    const getItemIcon = icon => {
+        if(icon) {
+            return icon;
+        } 
+        
+        return '';
+    }
+
+    const getItemAmount = amount => {
+        if(amount) {
+            return amount;
+        } 
+        
+        return '???';
+    }
+
+    return _.sortBy(placeItem, item => item.amount).map(({
         icon,
         title,
         cost,
         amount
     }) => {
-        return `${icon ? `${icon}` : ''} *${title}*\n${costText(cost)}\n${placeComment}${amount ? `${amount}` : '???'}`;
+        return `${getItemIcon(icon)} *${title}*
+        ${costText(cost)}
+        ${placeComment}${getItemAmount(amount)}`;
     }).join('\n');
+};
+
+const getHelmetsByPlace = place => {
+    let placeText = getItemsByPlace(place, helmets, helmetsComment);
     return placeText;
 };
 
-function getHelmetsByPlace(place) {
-    let placeText = getItemsByPlace(place, helmetsComment, helmets);
+const getWeaponsByPlace = place => {
+    let placeText = getItemsByPlace(place, weapons, weaponsComment);
     return placeText;
 };
 
-function getWeaponsByPlace(place) {
-    let placeText = getItemsByPlace(place, weaponsComment, weapons);
+const getArmorsByPlace = place => {
+    let placeText = getItemsByPlace(place, armors, armorsComment);
     return placeText;
 };
 
-function getArmorsByPlace(place) {
-    let placeText = getItemsByPlace(place, armorsComment, armors);
-    return placeText;
-};
-
-function getMedsByPlace(place) {
+const getMedsByPlace = place => {
     let placeText = getItemsByPlace(place, meds);
     return placeText;
 };
