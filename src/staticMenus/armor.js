@@ -91,7 +91,7 @@ const armors = [
     {
         icon: "⚙️",
         title: "Силовая броня",
-        cost: { 
+        cost: {
             materials: 12990,
             generators: 5,
         },
@@ -190,5 +190,7 @@ const armors = [
     }
 ];
 
-module.exports = armors;
-module.exports = armorsComment;
+module.exports = {
+    armors,
+    armorsComment
+};

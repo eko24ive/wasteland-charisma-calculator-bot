@@ -368,5 +368,7 @@ const weapons = [
     }
 ];
 
-module.exports = weapons;
-module.exports = weaponsComment;
+module.exports = {
+    weapons,
+    weaponsComment
+};

@@ -116,5 +116,7 @@ const helmets = [
     }
 ];
 
-module.exports = helmets;
-module.exports = helmetsComment;
+module.exports = {
+    helmets,
+    helmetsComment
+};
