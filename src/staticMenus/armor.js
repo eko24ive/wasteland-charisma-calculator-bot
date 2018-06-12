@@ -2,6 +2,7 @@ const merchant = require('./places&bills.js');
 const engineer = require('./places&bills.js');
 const craftingTable = require('./places&bills.js');
 
+const armorsComment = '🛡Защита: +';
 const armors = [
     {
         icon: false,
@@ -190,3 +191,4 @@ const armors = [
 ];
 
 module.exports = armors;
+module.exports = armorsComment;
