@@ -7,7 +7,7 @@ const bills = require('./places&bills.js');
 function costText(cost) {
     let costText = '';
     Object.keys(cost).forEach(element => {
-        costText += `${cost[element]}`;
+        costText += `${bills[element].icon}${cost[element]} `;    
     });  
     return costText;
 };
