@@ -1,8 +1,11 @@
+const {
+  getArmorsByPlace,
+  getHelmetsByPlace,
+  getMedsByPlace,
+  getWeaponsByPlace
+} = require('./itemsFunctions.js');
+
 const uniqueAccessoriesText = require('./accessories.js');
-const getArmorsByPlace = require('./itemsFunctions.js');
-const getHelmetsByPlace = require('./itemsFunctions.js');
-const getMedsByPlace = require('./itemsFunctions.js');
-const getWeaponsByPlace = require('./itemsFunctions.js');
 
 const equipmentText = `
 Выберите тип вещей:

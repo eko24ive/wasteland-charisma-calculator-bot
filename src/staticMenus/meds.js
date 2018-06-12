@@ -1,6 +1,8 @@
-const merchant = require('./places.js');
-const engineer = require('./places.js');
-const workbench = require('./places.js');
+const {
+    merchant,
+    engineer,
+    workbench
+} = require('./places.js');
 
 const meds = [
     {

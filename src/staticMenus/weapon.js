@@ -1,8 +1,10 @@
-const merchant = require('./places.js');
-const engineer = require('./places.js');
-const workbench = require('./places.js');
-const core = require('./places.js');
-const cozyBasement = require('./places.js');
+const {
+    merchant,
+    engineer,
+    workbench,
+    core,
+    cozyBasement
+} = require('./places.js');
 
 const weaponsComment = '💪Урон: +';
 const weapons = [
