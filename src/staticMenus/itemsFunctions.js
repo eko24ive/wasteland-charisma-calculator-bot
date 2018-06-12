@@ -27,7 +27,7 @@ const costText = cost => {
 };
 
 const getItemsByPlace = (place, items, placeComment = '') => {
-    const placeItem = items.filter(item => item.title === place);
+    const placeItem = items.filter(item => item.place === place);
 
     const getItemIcon = icon => {
         if(icon) {
