@@ -260,7 +260,7 @@ const weapons = [
             microchip: 223,
             iridium: 197,
         },
-        amount: 'random',
+        amount: 206,
         place: engineer,
     },
     {
