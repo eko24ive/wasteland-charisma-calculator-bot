@@ -1374,7 +1374,7 @@ _или_
                                             // FIXME: TypeError: fLocation.receivedBonusItems[item].push is not a function
 
                                             if (!_.contains(fLocation.receivedBonusItems[item], amount)) {
-                                                fLocation.receivedBonusItems[item].push(amount);
+                                                // fLocation.receivedBonusItems[item].push(amount);
                                             }
                                         } else {
                                             fLocation.receivedBonusItems[item] = [amount];
