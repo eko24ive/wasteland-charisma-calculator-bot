@@ -3,7 +3,7 @@ const {
     engineer,
     workbench,
     core,
-    cozyBasement
+    basement
 } = require('./places.js');
 
 const weaponsComment = '💪Урон: +';
@@ -331,7 +331,7 @@ const weapons = [
             cubonite: 38990,
         },
         amount: 344,
-        place: cozyBasement,
+        place: basement,
     },
     {
         icon: "🌡",
@@ -342,7 +342,7 @@ const weapons = [
             osmium: 30290,
         },
         amount: 416,
-        place: cozyBasement,
+        place: basement,
     },
     {
         icon: "💢",
@@ -354,7 +354,7 @@ const weapons = [
             titanium: 43930,
         },
         amount: false,
-        place: cozyBasement,
+        place: basement,
     },
     {
         icon: "❇️",
@@ -366,7 +366,7 @@ const weapons = [
             titanium: 66980,
         },
         amount: 507,
-        place: cozyBasement,
+        place: basement,
     }
 ];
 

@@ -5,6 +5,14 @@ const {
   getWeaponsByPlace
 } = require('./itemsFunctions.js');
 
+const {
+    merchant,
+    engineer,
+    workbench,
+    core,
+    basement
+} = require('./places.js');
+
 const uniqueAccessoriesText = require('./accessories.js');
 
 const equipmentText = `
@@ -40,7 +48,7 @@ const vendorText = `
 const vendorWeapon = `
 *⚔️ Оружие у 🏚Торгаша:*
 
-${getWeaponsByPlace('🏚Торгаш')}
+${getWeaponsByPlace(merchant)}
 -----
 
 🔫Стрелковое оружие:
@@ -53,13 +61,13 @@ ${getWeaponsByPlace('🏚Торгаш')}
 const vendorArmor = `
 *🛡️Броня у 🏚Торгаша:*
 
-${getArmorsByPlace('🏚Торгаш')}
+${getArmorsByPlace(merchant)}
 `;
 
 const vendorHelmets = `
 *🛡️Шлемы у 🏚Торгаша:*
 
-${getHelmetsByPlace('🏚Торгаш')}
+${getHelmetsByPlace(merchant)}
 `;
 
 const workbenchText = `
@@ -72,7 +80,7 @@ const workbenchText = `
 const workbenchWeapon = `
 *⚔️Оружие на верстаке:*
 
-${getWeaponsByPlace('🛠Верстак')}
+${getWeaponsByPlace(workbench)}
 
 Все оружие, начиная с *💥BFGzzv-4000* не ломается от времени и может использоваться вечно
 `;
@@ -80,13 +88,13 @@ ${getWeaponsByPlace('🛠Верстак')}
 const workbenchArmor = `
 *🛡Броня на верстаке:*
 
-${getArmorsByPlace('🛠Верстак')}
+${getArmorsByPlace(workbench)}
 `;
 
 const workbenchFirstAid = `
 *⛑Аптечка на верстаке:*
 
-${getMedsByPlace('🛠Верстак')}
+${getMedsByPlace(workbench)}
 `;
 
 const engineerText = `
@@ -102,19 +110,19 @@ const engineerText = `
 const engineerWeapon = `
 *⚔️Оружие у 👓Инженера:*
 
-${getWeaponsByPlace('👓Инженер')}
+${getWeaponsByPlace(engineer)}
 `;
 
 const engineerArmor = `
 *🛡Броня у 👓Инженера:*
 
-${getArmorsByPlace('👓Инженер')}
+${getArmorsByPlace(engineer)}
 `;
 
 const engineerHelmets = `
 *🛡Шлемы у 👓Инженера:*
 
-${getHelmetsByPlace('👓Инженер')}
+${getHelmetsByPlace(engineer)}
 `;
 
 const engineerModules = `
@@ -151,13 +159,13 @@ const engineerModules = `
 const engineerFirstAid = `
 *⛑Аптечка* у 👓Инженера. Дает возможность восстановить здоровье в пустоши:
 
-${getMedsByPlace('👓Инженер')}
+${getMedsByPlace(engineer)}
 `;
 
 const basementText = `
 Вещи в *🚪Уютном подвальчике*, который расположен на расстоянии 👣43км от лагеря:
 
-${getWeaponsByPlace('🚪Уютный подвальчик')}
+${getWeaponsByPlace(basement)}
 `;
 
 const madmanText = `Вещи у *👴Безумного старика*, который живет на расстоянии 👣8км от лагеря. Все вещи у него делаются по "цепочке":
@@ -184,6 +192,7 @@ const madmanText = `Вещи у *👴Безумного старика*, кот�
 
 const coreText = `⚔️Оружие в *🕎Ядре*, который расположен на расстоянии 👣30км от лагеря:
 
+${getWeaponsByPlace(core)}
 `;
 
 const dungeonText = `

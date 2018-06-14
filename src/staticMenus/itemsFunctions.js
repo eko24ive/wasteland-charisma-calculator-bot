@@ -19,28 +19,29 @@ const meds = require('./meds.js');
 const prices = require('./prices.js');
 
 const priceText = price => {
-    return _.forEach(price, 
-        function(pricesItem){ 
-            return `${prices[pricesItem].icon}${price[pricesItem]}` 
-        }).join(' ');
+    let text = '';
+    Object.keys(price).forEach(function(element) {
+        text += `${prices[element].icon}${(element === 'ephedrine') ? `(${price[element]})` : `${price[element]}`} `;
+    });
+    return text;
 };
 
 const getItemsByPlace = (place, items, itemsGlobalComment = '') => {
     const itemsFromPlace = items.filter(item => item.place === place);
 
     const getItemIcon = icon => {
-        if(icon) {
+        if (icon) {
             return icon;
-        } 
-        
+        }
+
         return '';
     }
 
     const getItemAmount = amount => {
-        if(amount) {
+        if (amount) {
             return amount;
-        } 
-        
+        }
+
         return '???';
     }
 
@@ -53,9 +54,9 @@ const getItemsByPlace = (place, items, itemsGlobalComment = '') => {
         comment
     }) => {
         return `${getItemIcon(icon)} *${title}*
-        ${priceText(price)}
-        ${effect ? effect : ''}${itemsGlobalComment}${getItemAmount(amount)}
-        ${comment ? comment : ''}`;
+${priceText(price)}
+${effect ? effect : ''}${itemsGlobalComment}${getItemAmount(amount)}
+${comment ? `${comment}\n` : ''}`;
     }).join('\n');
 };
 
@@ -81,18 +82,18 @@ const getMedsByPlace = place => {
 
 const getAllItemsWithPlace = (items, itemsGlobalComment = '') => {
     const getItemIcon = icon => {
-        if(icon) {
+        if (icon) {
             return icon;
-        } 
-        
+        }
+
         return '';
     }
 
     const getItemAmount = amount => {
-        if(amount) {
+        if (amount) {
             return amount;
-        } 
-        
+        }
+
         return '???';
     }
 

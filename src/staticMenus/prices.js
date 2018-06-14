@@ -32,17 +32,22 @@ const prices = {
     cubonite: {
         rarity: 7,
         title: 'кубонит',
-        icon: '🔗',
+        icon: '🔗(Кубонит)',
     },
     osmium: {
         rarity: 8,
         title: 'осмий',
-        icon: '🔗',
+        icon: '🔗(Осмий)',
     },
     titanium: {
         rarity: 9,
         title: 'β-Ti3Au',
-        icon: '🔗',
+        icon: '🔗(β-Ti3Au)',
+    },
+    ephedrine: {
+        rarity: 0,
+        title: 'Эфедрин',
+        icon: 'Эфедрин',
     }
 };
 
