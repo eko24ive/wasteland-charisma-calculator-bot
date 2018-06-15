@@ -25,7 +25,7 @@ const userManager = User => ({
                             pip: [pipData]
                         }
                     });
-        
+
                     newUser.save().then(databaseUser => {
                         return resolve({
                             ok: true,
@@ -34,6 +34,26 @@ const userManager = User => ({
                         });
                     });
                 }
+            });
+        });
+    },
+    delete: id => {
+        return new Promise((resolve, reject) => {
+            User.findOne({'telegram.id': id}).then(databaseUser => {
+                if(databaseUser === null) {
+                    return resolve({
+                        ok: false,
+                        reason: 'USER_NOT_FOUND'
+                    });
+                }
+
+                databaseUser.remove().then(databaseUser => {
+                    return resolve({
+                        ok: true,
+                        reason: 'USER_DELETED',
+                        data: databaseUser.toJSON()
+                    });
+                });
             });
         });
     },
