@@ -369,14 +369,13 @@ bot.on('forward', (msg) => {
     }
 
     if(msg.forward_from.id !== 430930191) {
-        if (sessions[msg.from.id].state === states.WAIT_FOR_FORWARD_END) {
+        if (sessions[msg.from.id].state !== states.WAIT_FOR_FORWARD_END) {
             console.log(`[CULPRIT]: ${msg.from.id} | ${msg.from.first_name} | ${msg.from.username}`);
 
-            createSession(msg.from.id);
+            // createSession(msg.from.id);
 
             return msg.reply.text(`
 Форварды принимаються только от @WastelandWarsBot.
-Отменяю твои фоварды - нехуй выебываться.
             `, {
                 asReply: true,
                 replyMarkup: defaultKeyboard
@@ -537,10 +536,7 @@ reply = `Шикардос, я обновил твой пип!
             regexpSet: PipRegexps.simplePip
         });
 
-        if (isDungeonBeast) {
-            data = beastParser.parseDungeonBeast(msg.text);
-            dataType = 'dungeonBeast';
-        } else if (isDungeonBeastFaced) {
+        if (isDungeonBeastFaced) {
             data = parseBeastFaced.parseDungeonBeastFaced(msg.text);
             dataType = 'dungeonBeastFaced';
         } else if (isFlee) {
@@ -558,6 +554,9 @@ reply = `Шикардос, я обновил твой пип!
         } else if (isClassicPip || isSimplePip) {
             data = parsePip(msg, isClassicPip);
             dataType = 'pipboy';
+        } else if (isDungeonBeast) {
+            data = beastParser.parseDungeonBeast(msg.text);
+            dataType = 'dungeonBeast';
         }
 
 
@@ -718,6 +717,9 @@ reply = `Шикардос, я обновил твой пип!
                         }).then(o => {
                             userManager.addPoints(msg.from.id, userForwardPoints.newGiantData).then(result => {
                                 if(!result.ok) {
+                                    if(result.reason === 'USER_NOT_FOUND') {
+                                        msg.reply.text('Не могу начислить тебе шмепсели пока ты не скинешь мне свой пип-бой :с')
+                                    }
                                     // console.log('userManager.addPoints: '+JSON.stringify(result));
                                 }
                             });
@@ -740,6 +742,9 @@ reply = `Шикардос, я обновил твой пип!
                             }).then(o => {
                                 userManager.addPoints(msg.from.id, userForwardPoints.newGiantData).then(result => {
                                     if(!result.ok) {
+                                        if(result.reason === 'USER_NOT_FOUND') {
+                                            msg.reply.text('Не могу начислить тебе шмепсели пока ты не скинешь мне свой пип-бой :с')
+                                        }
                                         // console.log('userManager.addPoints: '+JSON.stringify(result));
                                     }
                                 });
@@ -1026,9 +1031,11 @@ bot.on('/journeyforwardstart', msg => {
 });
 
 const actualProcessUserData = (msg, reportData, updatesData, options) => {
-    updateOrCreate(msg, reportData.lastPip, result => {
-        console.log(result);
-    });
+    if(reportData.lastPip !== null) {
+        updateOrCreate(msg, reportData.lastPip, result => {
+            console.log(result);
+        });
+    }
 
     if (options.useBeastFace && !_.isEmpty(reportData.beastToValidate)) {
         sessions[msg.from.id].state = states.WAIT_FOR_BEAST_FACE_FORWARD;
@@ -1367,7 +1374,7 @@ _или_
                                             // FIXME: TypeError: fLocation.receivedBonusItems[item].push is not a function
 
                                             if (!_.contains(fLocation.receivedBonusItems[item], amount)) {
-                                                fLocation.receivedBonusItems[item].push(amount);
+                                                // fLocation.receivedBonusItems[item].push(amount);
                                             }
                                         } else {
                                             fLocation.receivedBonusItems[item] = [amount];
@@ -1434,6 +1441,9 @@ ${errors}`;
                 }).then(res => {
                     userManager.addPoints(msg.from.id, userForwardPoints).then(result => {
                         if(!result.ok) {
+                            if(result.reason === 'USER_NOT_FOUND') {
+                                msg.reply.text('Не могу начислить тебе шмепсели пока ты не скинешь мне свой пип-бой :с')
+                            }
                             console.log('userManager.addPoints: '+JSON.stringify(result));
                         }
                     });
@@ -1476,11 +1486,14 @@ const processUserData = (msg, options) => {
     if (options.usePip && reportData.pipRequired) {
         userManager.findByTelegramId(msg.from.id).then(result => {
             if (result.ok && result.reason === 'USER_FOUND') {
-                sessions[msg.from.id].data.push({
-                    data: result.data.pip,
-                    dataType: 'pipboy',
-                    date: result.data.pip.timeStamp
-                });
+                if(result.data.pip !== undefined) {
+                    sessions[msg.from.id].data.push({
+                        data: result.data.pip,
+                        dataType: 'pipboy',
+                        date: result.data.pip.timeStamp
+                    });
+                }
+
 
                 const {
                     reportData: reportDataWithUserPip,
@@ -1902,8 +1915,9 @@ bot.on("/mypipstats", msg => {
   });
 
 bot.on('/debug', msg => {
-    return msg.reply.text(sessions[msg.from.id].state, {
-        asReply: true
+    return msg.reply.text(`Форварды принимаються только от @WastelandWarsBot.
+Отменяю твои фоварды - нехуй выебываться.`, {
+        asReply: false
     });
 });
 
@@ -2014,6 +2028,8 @@ https://t.me/trust_42/57
     webPreview: false
 }));
 
+
+
 const giantsKeyboard = bot.inlineKeyboard([
     [
         bot.inlineButton('🔄 Обновить', {callback: 'update_giants'}),
@@ -2099,7 +2115,7 @@ bot.on(/mob_(.+)/, msg => {
                 replyMarkup: beastReplyMarkup
             });
         } else {
-            return msg.reply.text(`Прости, я никогда не слышал про этого ${beast.name} :c`, {
+            return msg.reply.text(`Прости, я никогда не слышал про этого моба :c`, {
                 asReply: true
             })
         }
@@ -2127,6 +2143,51 @@ bot.on('/cancel', msg => {
     }
 
 })
+
+bot.on('/delete_accaunt', msg => {
+    if(process.env.ENV === 'STAGING') {
+        userManager.delete(msg.from.id).then(result => {
+            if(!result.ok && result.reason === 'USER_NOT_FOUND') {
+                return msg.reply.text('Я не смог найти твою запись в базе', {
+                    asReply: true
+                })
+            }
+
+            if(result.ok && result.reason === 'USER_DELETED') {
+                return msg.reply.text('Я удалил твою запись в базе', {
+                    asReply: true
+                })
+            }
+        })
+    }
+});
+
+bot.on('/delete_beasts', msg => {
+    if(process.env.ENV === 'STAGING') {
+        Beast.find({'battles.stamp': {$regex: `.+${msg.from.id}`}}).then(beasts => {
+            if(beasts.length === 0) {
+                return msg.reply.text('Я не нашёл твоих битв', {
+                    asReply: true
+                });
+            } else {
+                async.forEach(beasts, function (databaseBeast, next) {
+                    const stampRegexp = new RegExp(`.+${msg.from.id}`);
+                    databaseBeast.battles = databaseBeast.battles.filter(battle => {
+                        return !stampRegexp.test(battle.stamp);
+                    });
+
+                    databaseBeast.save().then(res => {
+                        next();
+                    });
+                }, function (err) {
+                    return msg.reply.text('Я удалил твои битвы', {
+                        asReply: true
+                    });
+                });
+            }
+        });
+    }
+});
 
 bot.on('callbackQuery', msg => {
     const chatId = msg.from.id;

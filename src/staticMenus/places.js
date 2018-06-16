@@ -1,28 +1,28 @@
 const merchant = {
-    name: 'merchant',
-    title: '🏚Торгаш'
+  name: 'merchant',
+  title: '🏚Торгаш'
 };
 const workbench = {
-    name: 'workbench',
-    title: '🛠Верстак',
+  name: 'workbench',
+  title: '🛠Верстак',
 };
 const engineer = {
-    name: 'engineer',
-    title: '👓Инженер',
+  name: 'engineer',
+  title: '👓Инженер',
 };
 const core = {
-    name: 'core',
-    title: '🕎Ядро',
+  name: 'core',
+  title: '🕎Ядро',
 };
 const basement = {
-    name: 'basement',
-    title: '🚪Уютный подвальчик',
+  name: 'basement',
+  title: '🚪Уютный подвальчик',
 };
 
 module.exports = {
-    merchant,
-    workbench,
-    engineer,
-    core,
-    basement
+  merchant,
+  workbench,
+  engineer,
+  core,
+  basement
 }
