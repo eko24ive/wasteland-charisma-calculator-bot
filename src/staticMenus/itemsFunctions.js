@@ -26,24 +26,24 @@ const priceText = price => {
     return text;
 };
 
+const getItemIcon = icon => {
+    if (icon) {
+        return icon;
+    }
+
+    return '';
+}
+
+const getItemCharacteristic = characteristic => {
+    if (characteristic) {
+        return characteristic;
+    }
+
+    return '???';
+}
+
 const getItemsByPlace = (place, items, itemsGlobalComment = '') => {
     const itemsFromPlace = items.filter(item => item.place === place);
-
-    const getItemIcon = icon => {
-        if (icon) {
-            return icon;
-        }
-
-        return '';
-    }
-
-    const getItemCharacteristic = characteristic => {
-        if (characteristic) {
-            return characteristic;
-        }
-
-        return '???';
-    }
 
     return _.sortBy(itemsFromPlace, item => item.characteristic).map(({
         icon,
