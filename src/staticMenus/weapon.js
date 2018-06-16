@@ -12,85 +12,85 @@ const weapons = [
         icon: false,
         title: "Бейсбольная бита",
         price: { caps: 30, },
-        amount: 1,
-        place: merchant,
+        characteristic: 1,
+        place: merchant
     },
     {
         icon: false,
         title: "Ржавый нож",
         price: { caps: 30, },
-        amount: 3,
-        place: merchant,
+        characteristic: 3,
+        place: merchant
     },
     {
         icon: false,
         title: "Разводной ключ",
         price: { caps: 30, },
-        amount: 5,
-        place: merchant,
+        characteristic: 5,
+        place: merchant
     },
     {
         icon: false,
         title: "Топор",
         price: { caps: 30, },
-        amount: 7,
-        place: merchant,
+        characteristic: 7,
+        place: merchant
     },
     {
         icon: false,
         title: "Кинжал",
         price: { caps: 30, },
-        amount: 9,
-        place: merchant,
+        characteristic: 9,
+        place: merchant
     },
     {
         icon: false,
         title: "Мачете",
         price: { caps: 30, },
-        amount: 11,
-        place: merchant,
+        characteristic: 11,
+        place: merchant
     },
     {
         icon: false,
         title: "Хлыст",
         price: { caps: 30, },
-        amount: 13,
-        place: merchant,
+        characteristic: 13,
+        place: merchant
     },
     {
         icon: false,
         title: "Стальная бита",
         price: { caps: 30, },
-        amount: 16,
-        place: merchant,
+        characteristic: 16,
+        place: merchant
     },
     {
         icon: "⚡",
         title: "Прочная бита",
         price: { materials: 200, },
-        amount: 2,
-        place: workbench,
+        characteristic: 2,
+        place: workbench
     },
     {
         icon: "⚡",
         title: "Копье",
         price: { materials: 600, },
-        amount: 4,
-        place: workbench,
+        characteristic: 4,
+        place: workbench
     },
     {
         icon: "⚡",
         title: "Кистень",
         price: { materials: 1300, },
-        amount: 6,
-        place: workbench,
+        characteristic: 6,
+        place: workbench
     },
     {
         icon: "⚡",
         title: "Электромеч",
         price: { materials: 3900, },
-        amount: 9,
-        place: workbench,
+        characteristic: 9,
+        place: workbench
     },
     {
         icon: "💥",
@@ -99,8 +99,8 @@ const weapons = [
             materials: 5600,
             quartz: 4,
         },
-        amount: 12,
-        place: workbench,
+        characteristic: 12,
+        place: workbench
     },
     {
         icon: "💥",
@@ -109,8 +109,8 @@ const weapons = [
             materials: 12000,
             quartz: 30,
         },
-        amount: 20,
-        place: workbench,
+        characteristic: 20,
+        place: workbench
     },
     {
         icon: "💥",
@@ -119,8 +119,8 @@ const weapons = [
             materials: 12000,
             quartz: 30,
         },
-        amount: 20,
-        place: workbench,
+        characteristic: 20,
+        place: workbench
     },
     {
         icon: "🔗",
@@ -130,8 +130,8 @@ const weapons = [
             quartz: 20,
             generators: 5,
         },
-        amount: 25,
-        place: workbench,
+        characteristic: 25,
+        place: workbench
     },
     {
         icon: "💥",
@@ -141,8 +141,8 @@ const weapons = [
             quartz: 35,
             generators: 5,
         },
-        amount: 29,
-        place: workbench,
+        characteristic: 29,
+        place: workbench
     },
     {
         icon: "💥",
@@ -152,8 +152,8 @@ const weapons = [
             quartz: 60,
             generators: 25,
         },
-        amount: 38,
-        place: workbench,
+        characteristic: 38,
+        place: workbench
     },
     {
         icon: "☄️",
@@ -164,8 +164,8 @@ const weapons = [
             generators: 75,
             microchip: 5,
         },
-        amount: 49,
-        place: workbench,
+        characteristic: 49,
+        place: workbench
     },
     {
         icon: "☄",
@@ -176,8 +176,8 @@ const weapons = [
             generators: 90,
             microchip: 45,
         },
-        amount: 56,
-        place: workbench,
+        characteristic: 56,
+        place: workbench
     },
     {
         icon: "🔮",
@@ -188,8 +188,8 @@ const weapons = [
             microchip: 60,
             iridium: 20,
         },
-        amount: 65,
-        place: workbench,
+        characteristic: 65,
+        place: workbench
     },
     {
         icon: "🌟",
@@ -200,8 +200,8 @@ const weapons = [
             microchip: 70,
             iridium: 40,
         },
-        amount: 79,
-        place: workbench,
+        characteristic: 79,
+        place: workbench
     },
     {
         icon: "☣️",
@@ -212,8 +212,8 @@ const weapons = [
             microchip: 99,
             iridium: 88,
         },
-        amount: 92,
-        place: engineer,
+        characteristic: 92,
+        place: engineer
     },
     {
         icon: "☣️",
@@ -224,8 +224,8 @@ const weapons = [
             microchip: 135,
             iridium: 112,
         },
-        amount: 125,
-        place: engineer,
+        characteristic: 125,
+        place: engineer
     },
     {
         icon: "🌟",
@@ -236,8 +236,8 @@ const weapons = [
             microchip: 185,
             iridium: 145,
         },
-        amount: 159,
-        place: engineer,
+        characteristic: 159,
+        place: engineer
     },
     {
         icon: "💿",
@@ -248,8 +248,8 @@ const weapons = [
             microchip: 200,
             iridium: 180,
         },
-        amount: 187,
-        place: engineer,
+        characteristic: 187,
+        place: engineer
     },
     {
         icon: "♻️",
@@ -260,8 +260,8 @@ const weapons = [
             microchip: 223,
             iridium: 197,
         },
-        amount: 206,
-        place: engineer,
+        characteristic: 206,
+        place: engineer
     },
     {
         icon: "🐱",
@@ -272,8 +272,8 @@ const weapons = [
             microchip: 299,
             iridium: 250,
         },
-        amount: 266,
-        place: engineer,
+        characteristic: 266,
+        place: engineer
     },
     {
         icon: "✳️",
@@ -284,8 +284,8 @@ const weapons = [
             microchip: 289,
             iridium: 275,
         },
-        amount: false,
-        place: core,
+        characteristic: false,
+        place: core
     },
     {
         icon: "❇️",
@@ -296,8 +296,8 @@ const weapons = [
             microchip: 359,
             iridium: 310,
         },
-        amount: 291,
-        place: core,
+        characteristic: 291,
+        place: core
     },
     {
         icon: "💣",
@@ -308,8 +308,8 @@ const weapons = [
             microchip: 399,
             iridium: 390,
         },
-        amount: false,
-        place: core,
+        characteristic: false,
+        place: core
     },
     {
         icon: "💥",
@@ -320,8 +320,8 @@ const weapons = [
             microchip: 435,
             iridium: 329,
         },
-        amount: 325,
-        place: core,
+        characteristic: 325,
+        place: core
     },
     {
         icon: "🧠",
@@ -330,8 +330,8 @@ const weapons = [
             materials: 656900,
             cubonite: 38990,
         },
-        amount: 344,
-        place: basement,
+        characteristic: 344,
+        place: basement
     },
     {
         icon: "🌡",
@@ -341,8 +341,8 @@ const weapons = [
             cubonite: 54990,
             osmium: 30290,
         },
-        amount: 416,
-        place: basement,
+        characteristic: 416,
+        place: basement
     },
     {
         icon: "💢",
@@ -353,8 +353,8 @@ const weapons = [
             osmium: 45590,
             titanium: 43930,
         },
-        amount: false,
-        place: basement,
+        characteristic: false,
+        place: basement
     },
     {
         icon: "❇️",
@@ -365,8 +365,8 @@ const weapons = [
             osmium: 79560,
             titanium: 66980,
         },
-        amount: 507,
-        place: basement,
+        characteristic: 507,
+        place: basement
     }
 ];
 

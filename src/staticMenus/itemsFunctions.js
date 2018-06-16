@@ -37,25 +37,25 @@ const getItemsByPlace = (place, items, itemsGlobalComment = '') => {
         return '';
     }
 
-    const getItemAmount = amount => {
-        if (amount) {
-            return amount;
+    const getItemCharacteristic = characteristic => {
+        if (characteristic) {
+            return characteristic;
         }
 
         return '???';
     }
 
-    return _.sortBy(itemsFromPlace, item => item.amount).map(({
+    return _.sortBy(itemsFromPlace, item => item.characteristic).map(({
         icon,
         title,
         price,
         effect,
-        amount,
+        characteristic,
         comment
     }) => {
         return `${getItemIcon(icon)} *${title}*
 ${priceText(price)}
-${effect ? effect : ''}${itemsGlobalComment}${getItemAmount(amount)}
+${effect ? effect : ''}${itemsGlobalComment}${getItemCharacteristic(characteristic)}
 ${comment ? `${comment}\n` : ''}`;
     }).join('\n');
 };
@@ -89,26 +89,26 @@ const getAllItemsWithPlace = (items, itemsGlobalComment = '') => {
         return '';
     }
 
-    const getItemAmount = amount => {
-        if (amount) {
-            return amount;
+    const getItemCharacteristic = characteristic => {
+        if (characteristic) {
+            return characteristic;
         }
 
         return '???';
     }
 
-    return _.sortBy(items, item => item.amount).map(({
+    return _.sortBy(items, item => item.characteristic).map(({
         icon,
         title,
         price,
         effect,
-        amount,
+        characteristic,
         place,
         comment
     }) => {
         return `${getItemIcon(icon)} *${title}*
         ${priceText(price)}
-        ${effect ? effect : ''}${itemsGlobalComment}${getItemAmount(amount)}
+        ${effect ? effect : ''}${itemsGlobalComment}${getItemCharacteristic(characteristic)}
         ${comment ? comment : ''}
         Место покупки: ${place}`;
     }).join('\n');
@@ -118,6 +118,5 @@ module.exports = {
     getHelmetsByPlace,
     getWeaponsByPlace,
     getArmorsByPlace,
-    getMedsByPlace,
-    getAllItemsWithPlace
+    getMedsByPlace
 };
