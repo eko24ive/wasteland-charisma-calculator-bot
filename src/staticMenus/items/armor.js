@@ -2,7 +2,7 @@ const {
     merchant,
     engineer,
     workbench
-} = require('./places.js');
+} = require('./../places.js');
 
 const armorsComment = '🛡Защита: +';
 const armors = [

@@ -1,7 +1,7 @@
 const {
     engineer,
     workbench
-} = require('./places.js');
+} = require('./../places.js');
 
 const meds = [
     {

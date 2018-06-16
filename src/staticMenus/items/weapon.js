@@ -4,7 +4,7 @@ const {
     workbench,
     core,
     basement
-} = require('./places.js');
+} = require('./../places.js');
 
 const weaponsComment = '💪Урон: +';
 const weapons = [

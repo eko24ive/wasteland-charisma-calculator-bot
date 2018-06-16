@@ -3,7 +3,7 @@ const {
   getHelmetsByPlace,
   getMedsByPlace,
   getWeaponsByPlace
-} = require('./itemsFunctions.js');
+} = require('./items/itemsFunctions.js');
 
 const {
     merchant,
@@ -13,7 +13,7 @@ const {
     basement
 } = require('./places.js');
 
-const uniqueAccessoriesText = require('./accessories.js');
+const uniqueAccessoriesText = require('./items/accessories.js');
 
 const equipmentText = `
 Выберите тип вещей:
