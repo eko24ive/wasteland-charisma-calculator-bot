@@ -19,12 +19,9 @@ const meds = require('./meds.js');
 const prices = require('./../prices.js');
 
 const priceText = price => {
-
-    let text = '';
-    Object.keys(price).forEach(function(element) {
-        text += `${prices[element].icon}${(element === 'ephedrine') ? `(${price[element]})` : `${price[element]}`} `;
-    });
-    return text;
+    return Object.keys(price).map(element => {
+        return `${prices[element].icon}${(element === 'ephedrine') ? `(${price[element]})` : `${price[element]}`} `;
+    }).join(' ');
 };
 
 const getItemIcon = icon => {
