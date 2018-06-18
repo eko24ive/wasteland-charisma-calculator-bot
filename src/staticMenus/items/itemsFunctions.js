@@ -52,8 +52,8 @@ const getItemsByPlace = (place, items, itemsGlobalComment = '') => {
         comment
     }) => {
         return `${getItemIcon(icon)} *${title}*
-${priceText(price)}
 ${effect ? effect : ''}${itemsGlobalComment}${getItemCharacteristic(characteristic)}
+💰: ${priceText(price)}
 ${comment ? `${comment}\n` : ''}`;
     }).join('\n');
 };
