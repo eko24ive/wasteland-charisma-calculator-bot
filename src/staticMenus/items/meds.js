@@ -22,7 +22,7 @@ const meds = [
         effect: '🔋',
         characteristic: 5,
         place: workbench,
-        comment: 'на время',
+        comment: 'временный эффект',
     },
     {
         icon: '💉',
@@ -33,19 +33,18 @@ const meds = [
         effect: '❤️',
         characteristic: 30,
         place: workbench,
-        comment: 'на время',
     },
     {
         icon: '💉',
         title: "++ Суперстим",
         price: { 
-            materials: 'see comment +',
+            materials: '*',
             ephedrine: 1,
          },
         effect: '❤️',
         characteristic: 'полное здоровье + 20%',
         place: workbench,
-        comment: '📦Материалы считаются по формуле = \`Ваше ❤️Здоровье * 7.2\`',
+        comment: '* 📦Материалы считаются по формуле = \`Ваше ❤️Здоровье * 7.2\`',
     },
     {
         icon: '💌',
