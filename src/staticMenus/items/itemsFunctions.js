@@ -21,7 +21,7 @@ const prices = require('./../prices.js');
 const priceText = price => {
     return Object.keys(price).map(element => {
         return `${prices[element].icon}${(element === 'ephedrine') ? `(${price[element]})` : `${price[element]}`} `;
-    }).join(' ');
+    }).join(', ');
 };
 
 const getItemIcon = icon => {
@@ -52,8 +52,8 @@ const getItemsByPlace = (place, items, itemsGlobalComment = '') => {
         comment
     }) => {
         return `${getItemIcon(icon)} *${title}*
-${priceText(price)}
 ${effect ? effect : ''}${itemsGlobalComment}${getItemCharacteristic(characteristic)}
+💰: ${priceText(price)}
 ${comment ? `${comment}\n` : ''}`;
     }).join('\n');
 };
