@@ -6,7 +6,7 @@ const {
     basement
 } = require('./../places.js');
 
-const weaponsComment = '💪Урон: +';
+const weaponsComment = '💪 Урон: +';
 const weapons = [
     {
         icon: false,

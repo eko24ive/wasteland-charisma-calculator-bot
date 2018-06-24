@@ -11,7 +11,7 @@ const prices = {
     },
     quartz: {
         rarity: 3,
-        title: 'квартц',
+        title: 'кварц',
         icon: '🔹',
     },
     generators: {
