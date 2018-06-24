@@ -168,7 +168,7 @@ const weapons = [
         place: workbench
     },
     {
-        icon: "☄",
+        icon: "☄️",
         title: "️Больверизатор",
         price: {
             materials: 59990,
