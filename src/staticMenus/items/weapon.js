@@ -169,7 +169,7 @@ const weapons = [
     },
     {
         icon: "☄️",
-        title: "️Больверизатор",
+        title: "Больверизатор",
         price: {
             materials: 59990,
             quartz: 100,
