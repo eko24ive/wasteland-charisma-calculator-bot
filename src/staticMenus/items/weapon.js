@@ -7,6 +7,7 @@ const {
 } = require('./../places.js');
 
 const weaponsComment = '💪 Урон: +';
+const inventionWeaponIcon = '⚔️';
 const weapons = [
     {
         icon: false,
@@ -100,7 +101,17 @@ const weapons = [
             quartz: 4,
         },
         characteristic: 12,
-        place: workbench
+        place: workbench,
+    },
+    {
+        icon: "💥",
+        title: "Лазерный тесак",
+        price: {
+            'Минизаряд': 7,
+            'Провода': 5,
+        },
+        characteristic: false,
+        rarity: '🏅',
     },
     {
         icon: "💥",
@@ -110,17 +121,17 @@ const weapons = [
             quartz: 30,
         },
         characteristic: 20,
-        place: workbench
+        place: workbench,
     },
     {
         icon: "💥",
         title: "BFGzzv-4000",
         price: {
-            materials: 12000,
-            quartz: 30,
+            'Транзистор': 5,
+            'Изолента': 6,
         },
-        characteristic: 20,
-        place: workbench
+        characteristic: 29,
+        rarity: '🏅',
     },
     {
         icon: "🔗",
@@ -142,7 +153,17 @@ const weapons = [
             generators: 5,
         },
         characteristic: 29,
-        place: workbench
+        place: workbench,
+    },
+    {
+        icon: "💥",
+        title: "Колыбель Пустоши",
+        price: {
+            'Транзистор': 9,
+            'Что-то чугунное': 10,
+        },
+        characteristic: false,
+        rarity: '🏅',
     },
     {
         icon: "💥",
@@ -153,7 +174,18 @@ const weapons = [
             generators: 25,
         },
         characteristic: 38,
-        place: workbench
+        place: workbench,
+
+    },
+    {
+        icon: "💥",
+        title: "Tyrant-PDR",
+        price: {
+            'Вольфрам': 9,
+            'Тряпка': 12,
+        },
+        characteristic: 46,
+        rarity: '🏅',
     },
     {
         icon: "☄️",
@@ -180,6 +212,17 @@ const weapons = [
         place: workbench
     },
     {
+        icon: "☄️",
+        title: "Больверизатор",
+        price: {
+            'Фольга!': 3,
+            'Провода': 15,
+            'Изолента': 12,
+        },
+        characteristic: 46,
+        rarity: '🏅',
+    },
+    {
         icon: "🔮",
         title: "Энергосфера",
         price: {
@@ -202,6 +245,17 @@ const weapons = [
         },
         characteristic: 79,
         place: workbench
+    },
+    {
+        icon: "🌟",
+        title: "Армагеддец",
+        price: {
+            'Что-то чугунное': 9,
+            'Провода': 30,
+            'Изолента': 25,
+        },
+        characteristic: 90,
+        rarity: '🏅'
     },
     {
         icon: "☣️",
@@ -372,5 +426,6 @@ const weapons = [
 
 module.exports = {
     weapons,
-    weaponsComment
+    weaponsComment,
+    inventionWeaponIcon
 };
