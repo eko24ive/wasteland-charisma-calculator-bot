@@ -101,7 +101,7 @@ const weapons = [
             quartz: 4,
         },
         characteristic: 12,
-        place: workbench,
+        place: workbench
     },
     {
         icon: "💥",
@@ -121,7 +121,7 @@ const weapons = [
             quartz: 30,
         },
         characteristic: 20,
-        place: workbench,
+        place: workbench
     },
     {
         icon: "💥",
@@ -131,7 +131,7 @@ const weapons = [
             'Изолента': 6,
         },
         characteristic: 29,
-        rarity: '🏅',
+        rarity: '🏅'
     },
     {
         icon: "🔗",
@@ -153,7 +153,7 @@ const weapons = [
             generators: 5,
         },
         characteristic: 29,
-        place: workbench,
+        place: workbench
     },
     {
         icon: "💥",
@@ -163,7 +163,7 @@ const weapons = [
             'Что-то чугунное': 10,
         },
         characteristic: false,
-        rarity: '🏅',
+        rarity: '🏅'
     },
     {
         icon: "💥",
@@ -174,7 +174,7 @@ const weapons = [
             generators: 25,
         },
         characteristic: 38,
-        place: workbench,
+        place: workbench
 
     },
     {
@@ -185,7 +185,7 @@ const weapons = [
             'Тряпка': 12,
         },
         characteristic: 46,
-        rarity: '🏅',
+        rarity: '🏅'
     },
     {
         icon: "☄️",
@@ -220,7 +220,7 @@ const weapons = [
             'Изолента': 12,
         },
         characteristic: 46,
-        rarity: '🏅',
+        rarity: '🏅'
     },
     {
         icon: "🔮",
@@ -336,9 +336,9 @@ const weapons = [
             materials: 359900,
             quartz: 2990,
             microchip: 289,
-            iridium: 275,
+            iridium: 250,
         },
-        characteristic: false,
+        characteristic: 278,
         place: core
     },
     {
@@ -363,6 +363,18 @@ const weapons = [
             iridium: 390,
         },
         characteristic: false,
+        place: core
+    },
+    {
+        icon: "✝️",
+        title: "Святое пламя",
+        price: {
+            materials: 385900,
+            generators: 720,
+            microchip: 419,
+            iridium: 300,
+        },
+        characteristic: 318,
         place: core
     },
     {
