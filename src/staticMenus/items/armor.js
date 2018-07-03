@@ -4,7 +4,7 @@ const {
     workbench
 } = require('./../places.js');
 
-const armorsComment = '🛡Защита: +';
+const armorsComment = '🛡 Защита: +';
 const armors = [
     {
         icon: false,

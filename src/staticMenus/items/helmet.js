@@ -3,7 +3,7 @@ const {
     engineer
 } = require('./../places.js');
 
-const helmetsComment = '🛡Защита: +';
+const helmetsComment = '🛡 Защита: +';
 const helmets = [
     {
         icon: false,
