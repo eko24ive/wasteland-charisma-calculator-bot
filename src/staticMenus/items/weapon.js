@@ -362,7 +362,7 @@ const weapons = [
             microchip: 399,
             iridium: 280,
         },
-        characteristic: false,
+        characteristic: 305,
         place: core
     },
     {
