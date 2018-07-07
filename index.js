@@ -339,8 +339,7 @@ const getBeastKeyboard = beastId => {
 bot.on('/start', (msg) => {
     createSession(msg.from.id);
 
-    return bot.sendMessage(
-        msg.from.id,
+    return msg.reply.text(
         `
 Привет, меня зовут «*Wasteland Wars Assistant*», я - что-то на подобии "умной" энциклопедии.
 
@@ -649,7 +648,7 @@ reply = `Шикардос, я обновил твой пип!
                 return msg.reply.text(reply, {
                     asReply: true,
                     replyMarkup: toSkillOMaticKeyboard
-                });
+                }).catch(e => console.log(e));;
             });
         } else if (isGiantFaced) {
             const giant = parseGiantFaced(msg.text);
@@ -673,7 +672,7 @@ reply = `Шикардос, я обновил твой пип!
                         return msg.reply.text('Спасибо за форвард! Я добавил его в базу!', {
                             asReply: true
                         });
-                    })
+                    }).catch(e => console.log(e));
                 } else {
                     const time = Number(moment.tz(moment().valueOf(), "Europe/Moscow").format('X'));
 
@@ -691,7 +690,7 @@ reply = `Шикардос, я обновил твой пип!
                             return msg.reply.text(`Спасибо за форвард! Я обновил ${giant.name} в базе!`, {
                                 asReply: true
                             });
-                        })
+                        }).catch(e => console.log(e));
                     }
                 }
             })
@@ -724,7 +723,7 @@ reply = `Шикардос, я обновил твой пип!
                                 }
                             });
                         });
-                    })
+                    }).catch(e => console.log(e));
                 } else {
                     if (fGiant.forwardStamp >= msg.forward_date) {
                         return msg.reply.text(`Прости, у меня есть более свежая иформация про *${giant.name}*`, {
@@ -749,7 +748,7 @@ reply = `Шикардос, я обновил твой пип!
                                     }
                                 });
                             });
-                        })
+                        }).catch(e => console.log(e));
                     }
                 }
             });
@@ -773,7 +772,7 @@ reply = `Шикардос, я обновил твой пип!
                         return msg.reply.text('Спасибо за форвард! Я добавил его в базу!', {
                             asReply: true
                         });
-                    })
+                    }).catch(e => console.log(e));
                 } else {
                     if (fGiant.forwardStamp >= msg.forward_date) {
                         return msg.reply.text(`Прости, у меня есть более свежая иформация про *${giant.name}*`, {
@@ -789,7 +788,7 @@ reply = `Шикардос, я обновил твой пип!
                             return msg.reply.text(`Спасибо за форвард! Я обновил ${giant.name} в базе!`, {
                                 asReply: true
                             });
-                        })
+                        }).catch(e => console.log(e));
                     }
                 }
             });
@@ -810,7 +809,7 @@ reply = `Шикардос, я обновил твой пип!
                 } else {
                     return msg.reply.text(`Прости, я никогда не слышал про этого моба :c`, {
                         asReply: true
-                    });
+                    }).catch(e => console.log(e));;
                 }
             }).catch(e => console.log(e));
         } else if (isDungeonBeastFaced) {
@@ -830,12 +829,12 @@ reply = `Шикардос, я обновил твой пип!
                     msg.reply.text(`Хей, у меня есть данные про *${oBeast.name}*, но я пока что не умею их выводить, прости :с`,{
                         asReply: true,
                         parseMode: 'markdown'
-                    })
+                    }).catch(e => console.log(e));
                 } else {
                     return msg.reply.text(`Чёрт, я никогда не слышал про *${oBeast.name}*, прости :с`, {
                         asReply: true,
                         parseMode: 'markdown'
-                    });
+                    }).catch(e => console.log(e));;
                 }
             }).catch(e => console.log(e));
         } else if (isRegularBeast || isFlee) {
@@ -1026,7 +1025,7 @@ bot.on('/journeyforwardstart', msg => {
                 replyMarkup: inlineReplyMarkup,
                 parseMode: 'markdown'
             })
-    })
+    }).catch(e => console.log(e));
 
 });
 
@@ -1053,14 +1052,14 @@ _или_
 *ВНИМАНИЕ: ПРИ НАЖАТИИ НА /skipbeastforward - БОТ ПРОИГНОРИРУЕТ ТОЛЬКО РЕЗУЛЬТАТ ТВОЕЙ БИТВЫ С ${reportData.beastToValidate[0].name} НЕ ЗАПИШЕТ ИХ В БАЗУ*
 `, {
             parseMode: 'markdown',
-        });
+        }).catch(e => console.log(e));;
     }
 
 
     if(!options.silent) {
         msg.reply.text(`Перехожу в режим обработки данных, подожди пожалуйста немного :3`, {
             replyMarkup: 'hide'
-        });
+        }).catch(e => console.log(e));;
     }
 
 
@@ -1447,7 +1446,7 @@ ${errors}`;
                             console.log('userManager.addPoints: '+JSON.stringify(result));
                         }
                     });
-                });
+                }).catch(e => console.log(e));;
             }, 1500);
         } else {
             setTimeout(() => {
@@ -1460,7 +1459,7 @@ ${errors}`;
         }
 
         createSession(msg.from.id);
-    });
+    }).catch(e => console.log(e));;
 }
 
 const processUserData = (msg, options) => {
@@ -1537,7 +1536,7 @@ const processUserData = (msg, options) => {
                     replyMarkup: toGameKeyboard
                 });
             }
-        });
+        }).catch(e => console.log(e));;
     } else {
         userManager.findByTelegramId(msg.from.id).then(result => {
             // BOOK
@@ -1618,7 +1617,7 @@ bot.on('/eqp', msg => {
     return msg.reply.text(equipmentMenu.text, {
         parseMode: 'markdown',
         replyMarkup: inlineReplyMarkup
-    });
+    }).catch(e => console.log(e));;
 })
 
 bot.on('/locations', msg => {
@@ -1631,7 +1630,7 @@ bot.on('/locations', msg => {
     return msg.reply.text(locationsMenu.text, {
         parseMode: 'html',
         replyMarkup: inlineReplyMarkup
-    });
+    }).catch(e => console.log(e));;
 })
 
 bot.on('/sppl', msg => {
@@ -1644,7 +1643,7 @@ bot.on('/sppl', msg => {
     return msg.reply.text(suppliesMenu.text, {
         parseMode: 'html',
         replyMarkup: inlineReplyMarkup
-    });
+    }).catch(e => console.log(e));;
 })
 
 bot.on('/achv', msg => {
@@ -1657,7 +1656,7 @@ bot.on('/achv', msg => {
     return msg.reply.text(achievementsMenu.text, {
         parseMode: 'markdown',
         replyMarkup: inlineReplyMarkup
-    });
+    }).catch(e => console.log(e));;
 })
 
 bot.on('/dng', msg => {
@@ -1671,13 +1670,13 @@ bot.on('/dng', msg => {
         parseMode: 'html',
         replyMarkup: inlineReplyMarkup,
         webPreview: false
-    });
+    }).catch(e => console.log(e));;
 })
 
 bot.on('/cfl', msg => {
     return msg.reply.text(commandsForLag, {
         paresMode: 'html'
-    });
+    }).catch(e => console.log(e));;
 })
 
 bot.on('/skill_upgrade', msg => {
@@ -2077,7 +2076,7 @@ _Если гиганта нет в списке - значит его ещё н�
             parseMode: 'markdown',
             replyMarkup: giantsKeyboard
         });
-    });
+    }).catch(e => console.log(e));;
 });
 
 bot.on('/show_beasts', msg => {
@@ -2113,11 +2112,11 @@ bot.on(/mob_(.+)/, msg => {
                 asReply: true,
                 parseMode: 'html',
                 replyMarkup: beastReplyMarkup
-            });
+            }).catch(e => console.log(e));;
         } else {
             return msg.reply.text(`Прости, я никогда не слышал про этого моба :c`, {
                 asReply: true
-            })
+            }).catch(e => console.log(e));
         }
     });
 });
@@ -2128,18 +2127,18 @@ bot.on('/cancel', msg => {
 
         return msg.reply.text('Ты вернусля в главное меню', {
             replyMarkup: defaultKeyboard
-        });
+        }).catch(e => console.log(e));;
     }
     if(sessions[msg.from.id].state === states.WAIT_FOR_DATA_TO_PROCESS) {
         return msg.reply.text('Дождись результатов обработки форвардов', {
             asReply: true
-        });
+        }).catch(e => console.log(e));;
     } else {
         createSession(msg.from.id);
 
         return msg.reply.text('Ты вернусля в главное меню', {
             replyMarkup: defaultKeyboard
-        });
+        }).catch(e => console.log(e));;
     }
 
 })
@@ -2150,13 +2149,13 @@ bot.on('/delete_accaunt', msg => {
             if(!result.ok && result.reason === 'USER_NOT_FOUND') {
                 return msg.reply.text('Я не смог найти твою запись в базе', {
                     asReply: true
-                })
+                }).catch(e => console.log(e));
             }
 
             if(result.ok && result.reason === 'USER_DELETED') {
                 return msg.reply.text('Я удалил твою запись в базе', {
                     asReply: true
-                })
+                }).catch(e => console.log(e));
             }
         })
     }
@@ -2168,7 +2167,7 @@ bot.on('/delete_beasts', msg => {
             if(beasts.length === 0) {
                 return msg.reply.text('Я не нашёл твоих битв', {
                     asReply: true
-                });
+                }).catch(e => console.log(e));;
             } else {
                 async.forEach(beasts, function (databaseBeast, next) {
                     const stampRegexp = new RegExp(`.+${msg.from.id}`);
@@ -2182,7 +2181,7 @@ bot.on('/delete_beasts', msg => {
                 }, function (err) {
                     return msg.reply.text('Я удалил твои битвы', {
                         asReply: true
-                    });
+                    }).catch(e => console.log(e));;
                 });
             }
         });
@@ -2247,7 +2246,7 @@ _Если гиганта нет в списке - значит его ещё н�
         return bot.editMessageText({chatId, messageId}, reply,{
             replyMarkup: giantsKeyboard,
             parseMode: 'markdown'
-        });
+        }).catch(e => console.log(e));;
     } else if (showMobRegExp.test(msg.data)) {
         const [, from, to] = showMobRegExp.exec(msg.data);
 
@@ -2324,7 +2323,7 @@ ${beastsList}
         return bot.editMessageText({chatId, messageId}, chosenMenu.text, {
             parseMode: 'markdown',
             replyMarkup: inlineReplyMarkup
-        });
+        }).catch(e => console.log(e));;
     } else if (showLocationsKeyboardRegExp.test(msg.data)) {
         bot.answerCallbackQuery(msg.id);
         const submenuRegExp = /locations_menu-(.+)+/;
@@ -2352,7 +2351,7 @@ ${beastsList}
         return bot.editMessageText({chatId, messageId}, chosenMenu.text, {
             parseMode: locationsMenu.config.parseMode,
             replyMarkup: inlineReplyMarkup
-        });
+        }).catch(e => console.log(e));;
     } else if (showSuppliesKeyboardRegExp.test(msg.data)) {
         bot.answerCallbackQuery(msg.id);
 
@@ -2382,7 +2381,7 @@ ${beastsList}
         return bot.editMessageText({chatId, messageId}, chosenMenu.text, {
             parseMode: suppliesMenu.config.parseMode,
             replyMarkup: inlineReplyMarkup
-        });
+        }).catch(e => console.log(e));;
     } else if (showAchievementsKeyboardRegExp.test(msg.data)) {
         bot.answerCallbackQuery(msg.id);
         showAchievementsKeyboardRegExp
@@ -2413,41 +2412,36 @@ ${beastsList}
         return bot.editMessageText({chatId, messageId}, chosenMenu.text, {
             parseMode: achievementsMenu.config.parseMode,
             replyMarkup: inlineReplyMarkup
-        });
+        }).catch(e => console.log(e));;
     } else if (showDungeonsKeyboardRegExp.test(msg.data)) {
+        bot.answerCallbackQuery(msg.id);
 
-        const handler =  _.throttle(() => {
-            bot.answerCallbackQuery(msg.id);
+        const submenuRegExp = /dungeons_menu-(.+)+/;
+        const [, menu_route] = showDungeonsKeyboardRegExp.exec(msg.data);
+        const chosenMenu = objectDeepSearch.findFirst(dungeonMenu, {name: menu_route});
+        let buttonsMenu = chosenMenu;
 
-            const submenuRegExp = /dungeons_menu-(.+)+/;
-            const [, menu_route] = showDungeonsKeyboardRegExp.exec(msg.data);
-            const chosenMenu = objectDeepSearch.findFirst(dungeonMenu, {name: menu_route});
-            let buttonsMenu = chosenMenu;
+        if(submenuRegExp.test(msg.data)) {
+            const [, parentMenuName] = submenuRegExp.exec(msg.data);
+            buttonsMenu = objectDeepSearch.findFirst(dungeonMenu, {name: parentMenuName});
+        }
 
-            if(submenuRegExp.test(msg.data)) {
-                const [, parentMenuName] = submenuRegExp.exec(msg.data);
-                buttonsMenu = objectDeepSearch.findFirst(dungeonMenu, {name: parentMenuName});
-            }
+        let chosenMenuButtons = processMenu(buttonsMenu).map(menuItem => {
+            return bot.inlineButton(menuItem.title, {callback: `dungeons_menu-${menuItem.name}`});
+        });
 
-            let chosenMenuButtons = processMenu(buttonsMenu).map(menuItem => {
+        if (_.isEmpty(chosenMenuButtons)) {
+            chosenMenuButtons = processMenu(dungeonMenu).map(menuItem => {
                 return bot.inlineButton(menuItem.title, {callback: `dungeons_menu-${menuItem.name}`});
             });
+        }
 
-            if (_.isEmpty(chosenMenuButtons)) {
-                chosenMenuButtons = processMenu(dungeonMenu).map(menuItem => {
-                    return bot.inlineButton(menuItem.title, {callback: `dungeons_menu-${menuItem.name}`});
-                });
-            }
+        let inlineReplyMarkup = bot.inlineKeyboard(_.chunk(chosenMenuButtons, 2));
 
-            let inlineReplyMarkup = bot.inlineKeyboard(_.chunk(chosenMenuButtons, 2));
-
-            return bot.editMessageText({chatId, messageId}, chosenMenu.text, {
-                parseMode: dungeonMenu.config.parseMode,
-                replyMarkup: inlineReplyMarkup
-            });
-        }, 2500);
-
-        handler();
+        return bot.editMessageText({chatId, messageId}, chosenMenu.text, {
+            parseMode: dungeonMenu.config.parseMode,
+            replyMarkup: inlineReplyMarkup
+        }).catch(e => console.log(e));
     } else if (msg.data === 'initialize_skill_upgrade') {
         const skillOMaticText = `
 В «<b>🎓 Скилокачаторе</b>» я могу помочь тебе посчитать финансовые затраты на прокачку твоих скилов.`;
@@ -2499,7 +2493,7 @@ ${userSkills.join('\n')}
             `, {
                 replyMarkup,
                 parseMode: 'html'
-            });
+            }).catch(e => console.log(e));;
         }
 
         return bot.sendMessage(msg.from.id, `
@@ -2510,11 +2504,9 @@ ${skillOMaticText}
         `, {
             replyMarkup: toGameKeyboard,
             parseMode: 'html'
-        });
+        }).catch(e => console.log(e));;
     });
     }
 });
-
-
 
 bot.start();
