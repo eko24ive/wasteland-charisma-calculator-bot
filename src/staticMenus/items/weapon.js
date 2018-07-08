@@ -345,10 +345,10 @@ const weapons = [
         icon: "❇️",
         title: "Плазмакастер",
         price: {
-            materials: 349900,
+            materials: 379900,
             generators: 410,
             microchip: 359,
-            iridium: 310,
+            iridium: 265,
         },
         characteristic: 291,
         place: core
@@ -360,9 +360,9 @@ const weapons = [
             materials: 325900,
             generators: 680,
             microchip: 399,
-            iridium: 390,
+            iridium: 280,
         },
-        characteristic: false,
+        characteristic: 305,
         place: core
     },
     {
