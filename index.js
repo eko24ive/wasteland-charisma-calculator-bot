@@ -1,5 +1,9 @@
 // TODO: Supply it with pip from database (with appropriate validation just like from the processForwards)
 
+process.on('unhandledRejection', (reason, promise) => {
+    console.log('Unhandled Rejection at:', reason.stack || reason)
+})
+
 require('dotenv').config();
 const uristring = process.env.MONGODB_URI;
 
