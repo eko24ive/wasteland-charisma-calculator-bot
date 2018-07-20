@@ -22,7 +22,9 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "node ./index.js -D",
-    "prod": "node ./index.js -P"
+    "prod": "node ./index.js -P",
+    "deploy-staging": "git checkout master && git pull && git push heroku-staging master --force",
+    "deploy-production": "git checkout master && git pull && git push heroku master"
   },
   "repository": {
     "type": "git",
