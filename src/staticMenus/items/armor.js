@@ -1,7 +1,8 @@
 const {
     merchant,
     engineer,
-    workbench
+    workbench,
+    madman
 } = require('./../places.js');
 
 const armorsComment = '🛡 Защита: +';
@@ -143,6 +144,28 @@ const armors = [
         place: workbench,
     },
     {
+        icon: "⚙️",
+        title: "Броня 'Геенна'",
+        price: {
+            'Вольфрам': 9,
+            'Тряпка': 12,
+        },
+        characteristic: 87,
+        place: workbench,
+        rarity: first
+    },
+    {
+        icon: "⚙️",
+        title: "Броня 'Геенна'",
+        price: {
+            'Вольфрам': 19,
+            'Тряпка': 22,
+        },
+        characteristic: 96,
+        place: workbench,
+        rarity: second
+    },
+    {
         icon: "🦇",
         title: "Бэткостюм",
         price: {
@@ -153,6 +176,18 @@ const armors = [
         },
         characteristic: 76,
         place: engineer,
+    },
+    {
+        icon: "🦇",
+        title: "Бэткостюм",
+        price: {
+            'Фольга!': 3,
+            'Изолента': 12,
+            'Провода': 15,
+        },
+        characteristic: 95,
+        place: engineer,
+        rarity: first
     },
     {
         icon: "⚛️",
@@ -167,6 +202,19 @@ const armors = [
         place: engineer,
     },
     {
+        icon: "⚛️",
+        title: "Нановолокно",
+        price: {
+            'Фольга!': 3,
+            'Вольфрам': 13,
+            'Изолента': 12,
+            'Провода': 16,
+        },
+        characteristic: 113,
+        place: engineer,
+        rarity: first
+    },
+    {
         icon: "🛠",
         title: "Мультизащита",
         price: {
@@ -179,6 +227,34 @@ const armors = [
         place: engineer,
     },
     {
+        icon: "🛠",
+        title: "Мультизащита",
+        price: {
+            'Фольга!': 12,
+            'Плазма': 14,
+            'Сердце трога': 11,
+            'Потенциометр': 23,
+            'Сталь': 24,
+        },
+        characteristic: 157,
+        place: engineer,
+        rarity: first
+    },
+    {
+        icon: "🛠",
+        title: "Мультизащита",
+        price: {
+            'Фольга!': 32,
+            'Плазма': 29,
+            'Сердце трога': 21,
+            'Потенциометр': 33,
+            'Сталь': 39,
+        },
+        characteristic: false,
+        place: engineer,
+        rarity: second
+    },
+    {
         icon: "⚡️",
         title: "Тесла-мех",
         price: {
@@ -189,6 +265,104 @@ const armors = [
         },
         characteristic: 161,
         place: engineer,
+    },
+    {
+        icon: "⚡️",
+        title: "Тесла-мех",
+        price: {
+            'Минизаряд': 31,
+            'Батарейка BIOS': 4,
+            'Магнит': 5,
+            'Подорожник': 16,
+        },
+        characteristic: 187,
+        place: engineer,
+        rarity: first
+    },
+    {
+        icon: "⚡️",
+        title: "Тесла-мех",
+        price: {
+            'Минизаряд': 46,
+            'Батарейка BIOS': 15,
+            'Магнит': 35,
+            'Подорожник': 36,
+        },
+        characteristic: 198,
+        place: engineer,
+        rarity: second
+    },
+    {
+        icon: '⚙️',
+        title: 'Броня Безумца',
+        price: {
+            'Провода': 17,
+            'Плазма': 7,
+            'Изолента': 9,
+        },
+        characteristic: 58,
+        place: madman
+    },
+    {
+        icon: false,
+        title: 'Броня Безумца',
+        price: {
+            'Фольга!': 2,
+            'Сердце трога': 11,
+            'Потенциометр': 3,
+            'Сталь': 4,
+        },
+        characteristic: 58,
+        place: madman,
+        rarity: first
+    },
+    {
+        icon: false,
+        title: 'Броня Безумца',
+        price: {
+            'Фольга!': 12,
+            'Сердце трога': 21,
+            'Потенциометр': 13,
+            'Сталь': 14,
+        },
+        characteristic: false,
+        place: madman,
+        rarity: second
+    },
+    {
+        icon: '⚙️',
+        title: 'Экзокостюм',
+        price: {
+            'Крахмал': 6,
+            'Воздушный фильтр': 5,
+            'Эфедрин': 15,
+        },
+        characteristic: 68,
+        place: madman
+    },
+    {
+        icon: '⚛️',
+        title: 'Экзокостюм',
+        price: {
+            'Минизаряд': 4,
+            'Изолента': 6,
+            'Топаз': 5,
+        },
+        characteristic: 89,
+        place: madman,
+        rarity: first
+    },
+    {
+        icon: '⚙️',
+        title: 'Экзокостюм',
+        price: {
+            'Минизаряд': 14,
+            'Изолента': 16,
+            'Топаз': 15,
+        },
+        characteristic: 95,
+        place: madman,
+        rarity: second
     }
 ];
 

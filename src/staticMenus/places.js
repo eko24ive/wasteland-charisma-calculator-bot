@@ -18,11 +18,16 @@ const basement = {
   name: 'basement',
   title: '🚪Уютный подвальчик',
 };
+const madman = {
+  name: 'madman',
+  title: 'Безумный старик',
+}
 
 module.exports = {
   merchant,
   workbench,
   engineer,
   core,
-  basement
+  basement,
+  madman
 }
