@@ -94,6 +94,20 @@ const weapons = [
         place: workbench
     },
     {
+        icon: "⚡",
+        title: "Электромеч",
+        price: { 'Провода': 7, },
+        characteristic: 15,
+        rarity: first
+    },
+    {
+        icon: "⚡",
+        title: "Электромеч",
+        price: { 'Провода': 17, },
+        characteristic: 21,
+        rarity: second
+    },
+    {
         icon: "💥",
         title: "Лазерный тесак",
         price: {
@@ -110,8 +124,18 @@ const weapons = [
             'Минизаряд': 7,
             'Провода': 5,
         },
-        characteristic: false,
-        rarity: '🏅',
+        characteristic: 20,
+        rarity: first
+    },
+    {
+        icon: "💥",
+        title: "Лазерный тесак",
+        price: {
+            'Минизаряд': 17,
+            'Провода': 15,
+        },
+        characteristic: 28,
+        rarity: second
     },
     {
         icon: "💥",
@@ -131,7 +155,7 @@ const weapons = [
             'Изолента': 6,
         },
         characteristic: 29,
-        rarity: '🏅'
+        rarity: first
     },
     {
         icon: "🔗",
@@ -143,6 +167,28 @@ const weapons = [
         },
         characteristic: 25,
         place: workbench
+    },
+    {
+        icon: "🔗",
+        title: "Силовой кастет",
+        price: {
+            'Минизаряд': 4,
+            'Изолента': 6,
+            'Топаз': 5,
+        },
+        characteristic: 25,
+        rarity: first
+    },
+    {
+        icon: "🔗",
+        title: "Силовой кастет",
+        price: {
+            'Минизаряд': 14,
+            'Изолента': 16,
+            'Топаз': 15,
+        },
+        characteristic: 32,
+        rarity: second
     },
     {
         icon: "💥",
@@ -162,8 +208,8 @@ const weapons = [
             'Транзистор': 9,
             'Что-то чугунное': 10,
         },
-        characteristic: false,
-        rarity: '🏅'
+        characteristic: 29,
+        rarity: first
     },
     {
         icon: "💥",
@@ -185,7 +231,17 @@ const weapons = [
             'Тряпка': 12,
         },
         characteristic: 46,
-        rarity: '🏅'
+        rarity: first
+    },
+    {
+        icon: "💥",
+        title: "Tyrant-PDR",
+        price: {
+            'Вольфрам': 19,
+            'Тряпка': 22,
+        },
+        characteristic: 51,
+        rarity: second
     },
     {
         icon: "☄️",
@@ -198,6 +254,30 @@ const weapons = [
         },
         characteristic: 49,
         place: workbench
+    },
+    {
+        icon: "☄️",
+        title: "Огнемёд",
+        price: {
+            'Фольга!': 2,
+            'Сердце трога': 11,
+            'Потенциометр': 3,
+            'Сталь': 4,
+        },
+        characteristic: 58,
+        rarity: first
+    },
+    {
+        icon: "☄️",
+        title: "Огнемёд",
+        price: {
+            'Фольга!': 12,
+            'Сердце трога': 21,
+            'Потенциометр': 13,
+            'Сталь': 14,
+        },
+        characteristic: 65,
+        rarity: second
     },
     {
         icon: "☄️",
@@ -219,8 +299,19 @@ const weapons = [
             'Провода': 15,
             'Изолента': 12,
         },
-        characteristic: 46,
-        rarity: '🏅'
+        characteristic: 69,
+        rarity: first
+    },
+    {
+        icon: "☄️",
+        title: "Больверизатор",
+        price: {
+            'Фольга!': 19,
+            'Провода': 25,
+            'Изолента': 28,
+        },
+        characteristic: 76,
+        rarity: second
     },
     {
         icon: "🔮",
@@ -233,6 +324,16 @@ const weapons = [
         },
         characteristic: 65,
         place: workbench
+    },
+    {
+        icon: "🔮",
+        title: "Энергосфера",
+        price: {
+            'Сердце трога': 20,
+            'Детская кукла': 3,
+        },
+        characteristic: 78,
+        rarity: first
     },
     {
         icon: "🌟",
@@ -255,7 +356,7 @@ const weapons = [
             'Изолента': 25,
         },
         characteristic: 90,
-        rarity: '🏅'
+        rarity: first
     },
     {
         icon: "☣️",
@@ -271,6 +372,28 @@ const weapons = [
     },
     {
         icon: "☣️",
+        title: "Потрошитель",
+        price: {
+            'Минизаряд': 11,
+            'Потенциометр': 14,
+            'Сталь': 5,
+        },
+        characteristic: 122,
+        rarity: first
+    },
+    {
+        icon: "☣️",
+        title: "Потрошитель",
+        price: {
+            'Минизаряд': 23,
+            'Потенциометр': 24,
+            'Сталь': 15,
+        },
+        characteristic: 141,
+        rarity: second
+    },
+    {
+        icon: "☣️",
         title: "Жиробас",
         price: {
             materials: 191000,
@@ -280,6 +403,28 @@ const weapons = [
         },
         characteristic: 125,
         place: engineer
+    },
+    {
+        icon: "☣️",
+        title: "Жиробас",
+        price: {
+            'Минизаряд': 10,
+            'Плазма': 8,
+            'Изолента': 4,
+        },
+        characteristic: 155,
+        rarity: first
+    },
+    {
+        icon: "☣️",
+        title: "Жиробас",
+        price: {
+            'Минизаряд': 23,
+            'Плазма': 21,
+            'Изолента': 24,
+        },
+        characteristic: 163,
+        rarity: first
     },
     {
         icon: "🌟",
@@ -294,6 +439,30 @@ const weapons = [
         place: engineer
     },
     {
+        icon: "🌟",
+        title: "Гравипушка",
+        price: {
+            'Фольга!': 2,
+            'Сердце трога': 11,
+            'Потенциометр': 6,
+            'Сталь': 7,
+        },
+        characteristic: 189,
+        rarity: first
+    },
+    {
+        icon: "🌟",
+        title: "Гравипушка",
+        price: {
+            'Фольга!': 12,
+            'Сердце трога': 21,
+            'Потенциометр': 26,
+            'Сталь': 17,
+        },
+        characteristic: 194,
+        rarity: second
+    },
+    {
         icon: "💿",
         title: "DVD-VCH",
         price: {
@@ -304,6 +473,20 @@ const weapons = [
         },
         characteristic: 187,
         place: engineer
+    },
+    {
+        icon: "💿",
+        title: "DVD-VCH",
+        price: { 'Тряпка': 30, },
+        characteristic: 207,
+        rarity: first
+    },
+    {
+        icon: "💿",
+        title: "DVD-VCH",
+        price: { 'Тряпка': 50, },
+        characteristic: false,
+        rarity: second
     },
     {
         icon: "♻️",
@@ -318,6 +501,30 @@ const weapons = [
         place: engineer
     },
     {
+        icon: "♻️",
+        title: "Рандомган",
+        price: {
+            'Фольга!': 3,
+            'Вольфрам': 13,
+            'Изолента': 12,
+            'Провода': 15,
+        },
+        characteristic: 231,
+        rarity: first
+    },
+    {
+        icon: "♻️",
+        title: "Рандомган",
+        price: {
+            'Фольга!': 13,
+            'Вольфрам': 19,
+            'Изолента': 32,
+            'Провода': 25,
+        },
+        characteristic: 242,
+        rarity: second
+    },
+    {
         icon: "🐱",
         title: "Ракетенок☄",
         price: {
@@ -328,6 +535,32 @@ const weapons = [
         },
         characteristic: 266,
         place: engineer
+    },
+    {
+        icon: "🐱",
+        title: "Ракетенок☄",
+        price: {
+            'Фольга!': 12,
+            'Плазма': 14,
+            'Сердце трога': 21,
+            'Потенциометр': 21,
+            'Сталь': 24,
+        },
+        characteristic: 284,
+        rarity: first
+    },
+    {
+        icon: "🐱",
+        title: "Ракетенок☄",
+        price: {
+            'Фольга!': 32,
+            'Плазма': 44,
+            'Сердце трога': 31,
+            'Потенциометр': 31,
+            'Сталь': 44,
+        },
+        characteristic: 298,
+        rarity: second
     },
     {
         icon: "✳️",
@@ -352,6 +585,28 @@ const weapons = [
         },
         characteristic: 291,
         place: core
+    },
+    {
+        icon: "❇️",
+        title: "Плазмакастер",
+        price: {
+            'Фольга!': 23,
+            'Изолента': 22,
+            'Провода': 25,
+        },
+        characteristic: 314,
+        rarity: first
+    },
+    {
+        icon: "❇️",
+        title: "Плазмакастер",
+        price: {
+            'Фольга!': 43,
+            'Изолента': 49,
+            'Провода': 55,
+        },
+        characteristic: 329,
+        rarity: second
     },
     {
         icon: "💣",
