@@ -98,6 +98,7 @@ const weapons = [
         title: "Электромеч",
         price: { 'Провода': 7, },
         characteristic: 15,
+        place: workbench,
         rarity: first
     },
     {
@@ -105,6 +106,7 @@ const weapons = [
         title: "Электромеч",
         price: { 'Провода': 17, },
         characteristic: 21,
+        place: workbench,
         rarity: second
     },
     {
@@ -125,6 +127,7 @@ const weapons = [
             'Провода': 5,
         },
         characteristic: 20,
+        place: workbench,
         rarity: first
     },
     {
@@ -135,6 +138,7 @@ const weapons = [
             'Провода': 15,
         },
         characteristic: 28,
+        place: workbench,
         rarity: second
     },
     {
@@ -155,6 +159,7 @@ const weapons = [
             'Изолента': 6,
         },
         characteristic: 29,
+        place: workbench,
         rarity: first
     },
     {
@@ -177,6 +182,7 @@ const weapons = [
             'Топаз': 5,
         },
         characteristic: 25,
+        place: workbench,
         rarity: first
     },
     {
@@ -188,6 +194,7 @@ const weapons = [
             'Топаз': 15,
         },
         characteristic: 32,
+        place: workbench,
         rarity: second
     },
     {
@@ -209,6 +216,7 @@ const weapons = [
             'Что-то чугунное': 10,
         },
         characteristic: 29,
+        place: workbench,
         rarity: first
     },
     {
@@ -231,6 +239,7 @@ const weapons = [
             'Тряпка': 12,
         },
         characteristic: 46,
+        place: workbench,
         rarity: first
     },
     {
@@ -241,6 +250,7 @@ const weapons = [
             'Тряпка': 22,
         },
         characteristic: 51,
+        place: workbench,
         rarity: second
     },
     {
@@ -265,6 +275,7 @@ const weapons = [
             'Сталь': 4,
         },
         characteristic: 58,
+        place: workbench,
         rarity: first
     },
     {
@@ -277,6 +288,7 @@ const weapons = [
             'Сталь': 14,
         },
         characteristic: 65,
+        place: workbench,
         rarity: second
     },
     {
@@ -300,6 +312,7 @@ const weapons = [
             'Изолента': 12,
         },
         characteristic: 69,
+        place: workbench,
         rarity: first
     },
     {
@@ -311,6 +324,7 @@ const weapons = [
             'Изолента': 28,
         },
         characteristic: 76,
+        place: workbench,
         rarity: second
     },
     {
@@ -333,6 +347,7 @@ const weapons = [
             'Детская кукла': 3,
         },
         characteristic: 78,
+        place: workbench,
         rarity: first
     },
     {
@@ -356,6 +371,7 @@ const weapons = [
             'Изолента': 25,
         },
         characteristic: 90,
+        place: workbench,
         rarity: first
     },
     {
@@ -379,6 +395,7 @@ const weapons = [
             'Сталь': 5,
         },
         characteristic: 122,
+        place: engineer,
         rarity: first
     },
     {
@@ -390,6 +407,7 @@ const weapons = [
             'Сталь': 15,
         },
         characteristic: 141,
+        place: engineer,
         rarity: second
     },
     {
@@ -413,6 +431,7 @@ const weapons = [
             'Изолента': 4,
         },
         characteristic: 155,
+        place: engineer,
         rarity: first
     },
     {
@@ -424,6 +443,7 @@ const weapons = [
             'Изолента': 24,
         },
         characteristic: 163,
+        place: engineer,
         rarity: first
     },
     {
@@ -448,6 +468,7 @@ const weapons = [
             'Сталь': 7,
         },
         characteristic: 189,
+        place: engineer,
         rarity: first
     },
     {
@@ -460,6 +481,7 @@ const weapons = [
             'Сталь': 17,
         },
         characteristic: 194,
+        place: engineer,
         rarity: second
     },
     {
@@ -479,6 +501,7 @@ const weapons = [
         title: "DVD-VCH",
         price: { 'Тряпка': 30, },
         characteristic: 207,
+        place: engineer,
         rarity: first
     },
     {
@@ -486,6 +509,7 @@ const weapons = [
         title: "DVD-VCH",
         price: { 'Тряпка': 50, },
         characteristic: false,
+        place: engineer,
         rarity: second
     },
     {
@@ -510,6 +534,7 @@ const weapons = [
             'Провода': 15,
         },
         characteristic: 231,
+        place: engineer,
         rarity: first
     },
     {
@@ -522,6 +547,7 @@ const weapons = [
             'Провода': 25,
         },
         characteristic: 242,
+        place: engineer,
         rarity: second
     },
     {
@@ -547,6 +573,7 @@ const weapons = [
             'Сталь': 24,
         },
         characteristic: 284,
+        place: engineer,
         rarity: first
     },
     {
@@ -560,6 +587,7 @@ const weapons = [
             'Сталь': 44,
         },
         characteristic: 298,
+        place: engineer,
         rarity: second
     },
     {
@@ -595,6 +623,7 @@ const weapons = [
             'Провода': 25,
         },
         characteristic: 314,
+        place: core,
         rarity: first
     },
     {
@@ -606,6 +635,7 @@ const weapons = [
             'Провода': 55,
         },
         characteristic: 329,
+        place: core,
         rarity: second
     },
     {
