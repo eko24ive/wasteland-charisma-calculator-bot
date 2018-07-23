@@ -78,6 +78,22 @@ const getMedsByPlace = place => {
     return placeText;
 };
 
+const getInventionsByPlace = (place, items, itemsGlobalComment) => {
+    const inventionsFromPlace = items.filter(item => (item.place === place)&&(!!item.rarity));
+
+    return _.sortBy(inventionsFromPlace, item => item.title).map(({
+        icon,
+        title,
+        price,
+        characteristic,
+        rarity
+    }) => {
+        return `${getItemIcon(icon)} *${title}*
+${rarity} ${itemsGlobalComment}${getItemCharacteristic(characteristic)}
+💰: ${priceText(price)}`;
+    }).join('\n');
+};
+
 const getAllItemsWithPlace = (items, itemsGlobalComment = '') => {
     const getItemIcon = icon => {
         if (icon) {
@@ -116,5 +132,6 @@ module.exports = {
     getHelmetsByPlace,
     getWeaponsByPlace,
     getArmorsByPlace,
-    getMedsByPlace
+    getMedsByPlace,
+    getInventionsByPlace
 };
