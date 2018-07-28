@@ -85,7 +85,7 @@ const getRarityIcon = (name) => {
     return rarity.icon;
 };
 
-module.export = {
+module.exports = {
     CAPS,
     getResource,
     getRarityIcon,
