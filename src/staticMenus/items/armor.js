@@ -2,7 +2,9 @@ const {
     merchant,
     engineer,
     workbench,
-    madman
+    madman,
+    hexagon,
+    siencelab
 } = require('./../places.js');
 
 const armorsComment = '🛡 Защита: +';
@@ -152,7 +154,7 @@ const armors = [
         },
         characteristic: 87,
         place: workbench,
-        rarity: first
+        rarity: 'first'
     },
     {
         icon: "⚙️",
@@ -163,7 +165,7 @@ const armors = [
         },
         characteristic: 96,
         place: workbench,
-        rarity: second
+        rarity: 'second'
     },
     {
         icon: "🦇",
@@ -187,7 +189,7 @@ const armors = [
         },
         characteristic: 95,
         place: engineer,
-        rarity: first
+        rarity: 'first'
     },
     {
         icon: "⚛️",
@@ -212,7 +214,7 @@ const armors = [
         },
         characteristic: 113,
         place: engineer,
-        rarity: first
+        rarity: 'first'
     },
     {
         icon: "🛠",
@@ -238,7 +240,7 @@ const armors = [
         },
         characteristic: 157,
         place: engineer,
-        rarity: first
+        rarity: 'first'
     },
     {
         icon: "🛠",
@@ -252,7 +254,7 @@ const armors = [
         },
         characteristic: false,
         place: engineer,
-        rarity: second
+        rarity: 'second'
     },
     {
         icon: "⚡️",
@@ -276,8 +278,8 @@ const armors = [
             'Подорожник': 16,
         },
         characteristic: 187,
-        place: engineer,
-        rarity: first
+        place: { engineer, siencelab },
+        rarity: 'first'
     },
     {
         icon: "⚡️",
@@ -290,7 +292,7 @@ const armors = [
         },
         characteristic: 198,
         place: engineer,
-        rarity: second
+        rarity: 'second'
     },
     {
         icon: '⚙️',
@@ -314,7 +316,7 @@ const armors = [
         },
         characteristic: 58,
         place: madman,
-        rarity: first
+        rarity: 'first'
     },
     {
         icon: false,
@@ -327,7 +329,7 @@ const armors = [
         },
         characteristic: false,
         place: madman,
-        rarity: second
+        rarity: 'second'
     },
     {
         icon: '⚙️',
@@ -350,7 +352,7 @@ const armors = [
         },
         characteristic: 89,
         place: madman,
-        rarity: first
+        rarity: 'first'
     },
     {
         icon: '⚙️',
@@ -362,7 +364,21 @@ const armors = [
         },
         characteristic: 95,
         place: madman,
-        rarity: second
+        rarity: 'second'
+    },
+    {
+        icon: '💠',
+        title: 'Алмазная броня',
+        price: false,
+        characteristic: 149,
+        place: hexagon
+    },
+    {
+        icon: 'Ⓜ️',
+        title: 'Модульная броня',
+        price: false,
+        characteristic: 149,
+        place: hexagon
     }
 ];
 

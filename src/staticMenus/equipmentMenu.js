@@ -18,12 +18,12 @@ const {
 const {
   weapons,
   weaponsComment
-} = require('./weapon.js');
+} = require('./items/weapon.js');
 
 const {
   armors,
   armorsComment
-} = require('./armor.js');
+} = require('./items/armor.js');
 
 const uniqueAccessoriesText = require('./items/accessories.js');
 
