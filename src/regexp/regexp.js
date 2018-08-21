@@ -12,6 +12,8 @@ const injuryRegExp = /Ты ранен: 💔-(\d+)/;
 const capsLostRegExp = /Ты потерял: 🕳(\d+)/;
 const materialsLostRegExp = /Проебано: 📦(\d+)/;
 
+const darkZone = /🚷/;
+
 const actionReceivedCapsRegExp = /Получено крышек: 🕳(\d+)/;
 const actionReceivedMaterialsRegExp = /Получено материалов: 📦(\d+)/;
 
@@ -72,7 +74,8 @@ const location = {
         receivedItemRegExp,
         actionReceivedCapsRegExp,
         actionReceivedMaterialsRegExp,
-        beastFacedRegExp
+        beastFacedRegExp,
+        darkZone
     ],
     excludes: [beastNameRegExp]
 };
@@ -89,7 +92,8 @@ const regularBeast = {
         beastDefeatCapsLostRegExp,
         beastDefeatMaterialsLostRegExp,
         actionReceivedCapsRegExp,
-        actionReceivedMaterialsRegExp
+        actionReceivedMaterialsRegExp,
+        darkZone
     ]
 };
 
@@ -208,7 +212,8 @@ const regexps = {
     beastDefeatFleeRegExp,
     giantHealthRegExp,
     giantNameOnField,
-    giantHealthOnField
+    giantHealthOnField,
+    darkZone
 }
 
 module.exports = {
