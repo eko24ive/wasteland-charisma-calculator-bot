@@ -295,7 +295,8 @@ const defaultKeyboard = bot.keyboard([
     ],
     [
         buttons['showGiants'].label,
-        buttons['showBeasts'].label,
+        buttons['showRegularBeasts'].label,
+        buttons['showDarkZoneBeasts'].label,
         buttons['showEquipment'].label,
     ],
     [
@@ -1117,7 +1118,8 @@ _или_
                     } else {
                         Beast.findOne({
                             name: iBeast.name,
-                            isDungeon: iBeast.isDungeon
+                            isDungeon: iBeast.isDungeon,
+                            type: iBeast.type
                         }).then(function (fBeast) {
                             if (fBeast === null) {
                                 const newBeast = new Beast(iBeast);
@@ -2046,11 +2048,25 @@ const beastRangesKeyboard = bot.inlineKeyboard(_.chunk(getRanges.map(range => {
 
     if (first !== last) {
         return bot.inlineButton(`${first}-${last}`, {
-            callback: `show_beast_${first}-${last}`
+            callback: `show_beast_${first}-${last}+regular`
         });
     }
     return bot.inlineButton(`${first}`, {
-        callback: `show_beast_${first}-${first}`
+        callback: `show_beast_${first}-${first}+regular`
+    });
+}), 5));
+
+const beastRangesDarkZoneKeyboard = bot.inlineKeyboard(_.chunk(getRanges.map(range => {
+    const first = _.min(range);
+    const last = _.max(range);
+
+    if (first !== last) {
+        return bot.inlineButton(`${first}-${last}`, {
+            callback: `show_beast_${first}-${last}+dark`
+        });
+    }
+    return bot.inlineButton(`${first}`, {
+        callback: `show_beast_${first}-${first}+dark`
     });
 }), 5));
 
@@ -2083,9 +2099,9 @@ _Если гиганта нет в списке - значит его ещё н�
     }).catch(e => console.log(e));
 });
 
-bot.on('/show_beasts', msg => {
+bot.on(['/show_beasts(regular)','/show_beasts(darkzone)'], msg => {
     const reply = `
-Это каталог всех мобов в Пустоши <i>(не данжевых)</i>
+Это каталог всех ${msg.text === "💀Мобы" ? 'обычных' : ''} мобов в Пустоши ${msg.text !== "💀Мобы" ? 'из 🚷Тёмной Зоны' : ''} <i>(не данжевых)</i>
 Каталог наполняется посредством форвардов от игроков (бои, побеги и оглушения)
 
 Выбери интересующий диапазон километров, после вам будет доступен список мобов, которые были замечены на этом километре.
@@ -2096,7 +2112,7 @@ bot.on('/show_beasts', msg => {
 Гайд тут: https://teletype.in/@eko24/Sy4pCyiRM
 `;
     msg.reply.text(reply, {
-        replyMarkup: beastRangesKeyboard,
+        replyMarkup: msg.text === "💀Мобы" ? beastRangesKeyboard : beastRangesDarkZoneKeyboard,
         parseMode: 'html',
         webPreview: false
     }).catch(e => console.log(e))
@@ -2195,7 +2211,7 @@ bot.on('/delete_beasts', msg => {
 bot.on('callbackQuery', msg => {
     const chatId = msg.from.id;
     const messageId = msg.message.message_id;
-    const showMobRegExp = /show_beast_(\d+)-(\d+)/;
+    const showMobRegExp = /show_beast_(\d+)-(\d+)\+(.+)/;
     const showEquipmentKeyboardRegExp = /equipment_menu-(.+)/;
     const showLocationsKeyboardRegExp = /locations_menu-(.+)/;
     const showSuppliesKeyboardRegExp = /supplies_menu-(.+)/;
@@ -2252,10 +2268,10 @@ _Если гиганта нет в списке - значит его ещё н�
             parseMode: 'markdown'
         }).catch(e => console.log(e));
     } else if (showMobRegExp.test(msg.data)) {
-        const [, from, to] = showMobRegExp.exec(msg.data);
+        const [, from, to, type] = showMobRegExp.exec(msg.data);
+        const beastType = type === 'regular' ? 'Regular' : 'DarkZone';
 
-
-        Beast.find({isDungeon: false, distanceRange: {$gte: Number(from), $lte: Number(to)}}, 'battles.totalDamageReceived name id').then(beasts => {
+        Beast.find({isDungeon: false, distanceRange: {$gte: Number(from), $lte: Number(to)}, type: beastType}, 'battles.totalDamageReceived name id').then(beasts => {
             bot.answerCallbackQuery(msg.id);
 
             const jsonBeasts = beasts.map(b => {
@@ -2276,7 +2292,7 @@ ${beast.name}
             }).join('\n');
 
             const reply = `
-<b>Мобы на ${from}-${to}км</b>
+<b>Мобы(${type === 'regular' ? '💀' : '🚷'}) на ${from}-${to}км</b>
 <i>Отсортированы от слабым к сильным</i>
 ${beastsList}
 `;
