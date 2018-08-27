@@ -2298,7 +2298,7 @@ ${beastsList}
 `;
 
             return bot.editMessageText({chatId, messageId}, reply,{
-                replyMarkup: beastRangesKeyboard,
+                replyMarkup: type === 'regular' ? beastRangesKeyboard : beastRangesDarkZoneKeyboard,
                 parseMode: 'html'
             }).catch(e => console.log(e));
         }).catch(e => console.log(e));
