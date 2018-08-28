@@ -456,6 +456,7 @@ reply = `Шикардос, я обновил твой пип!
         let data;
         let dataType;
         let beastName;
+        let beastType;
 
         const isLocation = regExpSetMatcher(msg.text, {
             regexpSet: regexps.location
@@ -473,9 +474,10 @@ reply = `Шикардос, я обновил твой пип!
             data = parseLocation(msg.text);
             dataType = 'location';
             beastName = data.beastFaced.name
+            beastType = data.beastFaced.type
         }
 
-        if (beastName !== sessions[msg.from.id].beastToValidateName && sessions[msg.from.id].beastToValidateName !== '???') {
+        if (beastName !== sessions[msg.from.id].beastToValidateName && sessions[msg.from.id].beastToValidateName !== '???' && beastName !== sessions[msg.from.id].beastToValidateName) {
             return msg.reply.text(`
 Этот моб не похож на того с которым ты дрался. Ты чё - наебать меня вздумал?!
 
@@ -1044,6 +1046,7 @@ const actualProcessUserData = (msg, reportData, updatesData, options) => {
     if (options.useBeastFace && !_.isEmpty(reportData.beastToValidate)) {
         sessions[msg.from.id].state = states.WAIT_FOR_BEAST_FACE_FORWARD;
         sessions[msg.from.id].beastToValidateName = reportData.beastToValidate[0].name;
+        sessions[msg.from.id].beastToValidateType = reportData.beastToValidate[0].type;
         return msg.reply.text(`
 Слушай, я не могу понять кто тебе надрал задницу, ${reportData.beastToValidate[0].name} - это обычный моб или данжевый?
 
