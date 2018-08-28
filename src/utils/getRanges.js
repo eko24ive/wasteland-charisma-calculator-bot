@@ -362,6 +362,6 @@ const ranges = [
   [75,78],
   [79,84],
   [85,90],
-  [91,93]
+  [91,95]
 ]
 module.exports = ranges;

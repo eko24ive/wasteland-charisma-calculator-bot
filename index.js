@@ -1134,7 +1134,12 @@ _или_
                                 const newBeast = new Beast(iBeast);
 
                                 dataProcessed += 1;
-                                userForwardPoints += forwardPoints.newMob;
+
+                                if(iBeast.type === 'DarkZone') {
+                                    userForwardPoints += forwardPoints.newMob * forwardPoints.darkZoneBattle;
+                                } else {
+                                    userForwardPoints += forwardPoints.newMob * forwardPoints.regularZoneBattle;
+                                }
 
                                 newBeast.save().then(() => next());
                             } else {
@@ -1142,7 +1147,8 @@ _или_
                                     isSameConcussionExists = true,
                                     isSameBattleExists = true,
                                     isBattleDupe = false,
-                                    isFleeDupe = false;
+                                    isFleeDupe = false,
+                                    beastPoints = 0;
 
                                 if (iBeast.battles) {
                                     if (iBeast.battles.length > 0) {
@@ -1227,11 +1233,11 @@ _или_
 
                                 if(!isBattleDupe) {
                                     if (!_.contains(fBeast.distanceRange, iBeast.distanceRange[0])) {
-                                        userForwardPoints += forwardPoints.newDistance;
+                                        beastPoints += forwardPoints.newDistance;
 
                                         fBeast.distanceRange.push(iBeast.distanceRange[0]);
                                     } else {
-                                        userForwardPoints += forwardPoints.sameGiantData;
+                                        beastPoints += forwardPoints.sameGiantData;
                                     }
                                 }
 
@@ -1252,12 +1258,12 @@ _или_
                                         const battle = iBeast.battles[0];
 
                                         if (battle.damagesGiven.length === 1) {
-                                            userForwardPoints += forwardPoints.oneShotBattle;
+                                            beastPoints += forwardPoints.oneShotBattle;
                                         } else {
                                             if(battle.outcome === 'win') {
-                                                userForwardPoints += forwardPoints.newBattleWin;
+                                                beastPoints += forwardPoints.newBattleWin;
                                             } else {
-                                                userForwardPoints += forwardPoints.newBattleLose;
+                                                beastPoints += forwardPoints.newBattleLose;
                                             }
                                         }
 
@@ -1267,12 +1273,12 @@ _или_
                                             const battle = iBeast.battles[0];
 
                                             if (battle.damagesGiven.length === 1) {
-                                                userForwardPoints += forwardPoints.oneShotBattle;
+                                                beastPoints += forwardPoints.oneShotBattle;
                                             } else {
                                                 if(battle.outcome === 'win') {
-                                                    userForwardPoints += forwardPoints.sameBattleWin;
+                                                    beastPoints += forwardPoints.sameBattleWin;
                                                 } else {
-                                                    userForwardPoints += forwardPoints.sameBattleLose;
+                                                    beastPoints += forwardPoints.sameBattleLose;
                                                 }
                                             }
                                         }
@@ -1288,9 +1294,9 @@ _или_
                                         const flee = iBeast.flees[0];
 
                                         if(flee.outcome === 'win') {
-                                            userForwardPoints += forwardPoints.newFleeWin;
+                                            beastPoints += forwardPoints.newFleeWin;
                                         } else {
-                                            userForwardPoints += forwardPoints.newFleeLose;
+                                            beastPoints += forwardPoints.newFleeLose;
                                         }
 
                                         fBeast.flees.push(iBeast.flees[0]);
@@ -1299,9 +1305,9 @@ _или_
                                             const flee = iBeast.flees[0];
 
                                             if(flee.outcome === 'win') {
-                                                userForwardPoints += forwardPoints.sameFleeWin;
+                                                beastPoints += forwardPoints.sameFleeWin;
                                             } else {
-                                                userForwardPoints += forwardPoints.sameFleeLose;
+                                                beastPoints += forwardPoints.sameFleeLose;
                                             }
                                         }
 
@@ -1312,6 +1318,12 @@ _или_
 
                                 // TODO: Concussion
                                 // TODO: Received items
+
+                                if(iBeast.type === 'DarkZone') {
+                                    userForwardPoints += beastPoints * forwardPoints.darkZoneBattle;
+                                } else {
+                                    userForwardPoints += beastPoints * forwardPoints.regularZoneBattle;
+                                }
 
                                 fBeast.save().then(() => next()).catch(e => console.log(e));
                             }
