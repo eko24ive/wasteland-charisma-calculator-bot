@@ -2046,32 +2046,40 @@ const giantsKeyboard = bot.inlineKeyboard([
     ]
 ]);
 
-const beastRangesKeyboard = bot.inlineKeyboard(_.chunk(getRanges.map(range => {
+const beastRangesKeyboard = bot.keyboard(_.chunk(getRanges.map(range => {
     const first = _.min(range);
     const last = _.max(range);
 
     if (first !== last) {
-        return bot.inlineButton(`${first}-${last}`, {
+        return `${first}-${last}`;
+        /* return bot.inlineButton(`${first}-${last}`, {
             callback: `show_beast_${first}-${last}+regular`
-        });
+        }); */
     }
-    return bot.inlineButton(`${first}`, {
-        callback: `show_beast_${first}-${first}+regular`
-    });
+
+    return `${first}-${last}`;
+    // return bot.inlineButton(`${first}`, {
+    //     callback: `show_beast_${first}-${first}+regular`
+    // });
 }), 5));
 
-const beastRangesDarkZoneKeyboard = bot.inlineKeyboard(_.chunk(getRanges.map(range => {
+const beastRangesDarkZoneKeyboard = bot.keyboard(_.chunk(getRanges.map(range => {
     const first = _.min(range);
     const last = _.max(range);
 
     if (first !== last) {
-        return bot.inlineButton(`${first}-${last}`, {
-            callback: `show_beast_${first}-${last}+dark`
-        });
+        return `${first}--${last}`;
+
+        // return bot.inlineButton(`${first}-${last}`, {
+        //     callback: `show_beast_${first}-${last}+dark`
+        // });
     }
-    return bot.inlineButton(`${first}`, {
-        callback: `show_beast_${first}-${first}+dark`
-    });
+
+    return `${first}--${last}`;
+
+    // return bot.inlineButton(`${first}`, {
+    //     callback: `show_beast_${first}-${first}+dark`
+    // });
 }), 5));
 
 
@@ -2532,5 +2540,55 @@ ${skillOMaticText}
     });
     }
 });
+
+bot.on('text', msg => {
+    const regularZoneBeastsRequestRegExp = /(\d+)-(\d+)/;
+    const rangeRegExp = /(\d+)(-|--)(\d+)/;
+
+    if(!rangeRegExp.test(msg.text)) {
+        return;
+    }
+
+    const [, from,, to] = rangeRegExp.exec(msg.text);
+    const beastType = regularZoneBeastsRequestRegExp.test(msg.text) ? 'Regular' : 'DarkZone';
+
+    Beast.find({
+        isDungeon: false,
+        distanceRange: {
+            $gte: Number(from),
+            $lte: Number(to)
+        },
+        type: beastType
+    }, 'battles.totalDamageReceived name id').then(beasts => {
+
+        const jsonBeasts = beasts.map(b => {
+            const jsoned = b.toJSON();
+
+            return {
+                id: b.id,
+                ...jsoned
+            }
+        });
+
+        const beastsByDamage = _.sortBy(jsonBeasts, v => v.battles.totalDamageReceived);
+
+        const beastsList = beastsByDamage.map(beast => {
+            return `
+${beast.name}
+/mob_${beast.id}`;
+        }).join('\n');
+
+        const reply = `
+<b>Мобы(${beastType === 'Regular' ? '💀' : '🚷'}) на ${from}-${to}км</b>
+<i>Отсортированы от слабым к сильным</i>
+${beastsList}
+`;
+
+        return msg.reply.text(reply, {
+            replyMarkup: beastType === 'Regular' ? beastRangesKeyboard : beastRangesDarkZoneKeyboard,
+            parseMode: 'html'
+        }).catch(e => console.log(e));
+    }).catch(e => console.log(e));
+})
 
 bot.start();
