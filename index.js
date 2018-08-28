@@ -810,6 +810,7 @@ reply = `Шикардос, я обновил твой пип!
 
             routedBeastView(Beast, {
                 name: beast.name,
+                type: beast.type,
                 isDungeon: false
             }).then(({reply, beast}) => {
                 if(reply !== false) {
