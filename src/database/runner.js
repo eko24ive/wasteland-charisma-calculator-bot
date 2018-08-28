@@ -26,11 +26,13 @@ const possibleDzRange = (distances, dzRange) => {
 
 let amount = 0;
 let total = 0;
+let totalBeasts = 0;
 
 Beast.find().then(beasts => {
   console.log('===START===');
 
   async.forEach(beasts, function (beast, next) {
+    totalBeasts++;
     if (!beast.battles) {
       next();
       return;
@@ -71,11 +73,12 @@ Beast.find().then(beasts => {
     });
 
     beast.battles = newBatlles;
+    beast.type = 'Regular';
     beast.markModified('battles');
     beast.save().then(() => {next()});
   }, () => {
+    console.log(`Total beasts: ${totalBeasts}\nTotal battles: ${total}\nAmount: ${amount}\nPost purge: ${total-amount}`);
+    mongoose.disconnect();
   console.log('===END===');
-  console.log(`Total: ${total}\nAmount: ${amount}\nLoss: ${total-amount}`);
-  mongoose.disconnect();
 });
 });
