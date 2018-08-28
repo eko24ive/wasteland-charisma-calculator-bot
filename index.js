@@ -2056,7 +2056,7 @@ const beastRangesKeyboard = withBackButton(bot.keyboard, _.chunk(getRanges.map(r
     }
 
     return `${first}-${last}`;
-}), 6));
+}), 5));
 
 const beastRangesDarkZoneKeyboard = withBackButton(bot.keyboard, _.chunk(getRanges.map(range => {
     const first = _.min(range);
@@ -2067,7 +2067,7 @@ const beastRangesDarkZoneKeyboard = withBackButton(bot.keyboard, _.chunk(getRang
     }
 
     return `${first}—${last}`;
-}), 6));
+}), 5));
 
 
 
