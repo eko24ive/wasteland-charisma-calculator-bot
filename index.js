@@ -64,6 +64,7 @@ const buttons = require('./src/ui/buttons');
 const {
     commandsForLag
 } = require('./src/strings/strings');
+const withBackButton = require('./src/utils/withBackButton');
 
 const UserManager = require('./src/database/userManager');
 
@@ -2046,41 +2047,27 @@ const giantsKeyboard = bot.inlineKeyboard([
     ]
 ]);
 
-const beastRangesKeyboard = bot.keyboard(_.chunk(getRanges.map(range => {
+const beastRangesKeyboard = withBackButton(bot.keyboard, _.chunk(getRanges.map(range => {
     const first = _.min(range);
     const last = _.max(range);
 
     if (first !== last) {
         return `${first}-${last}`;
-        /* return bot.inlineButton(`${first}-${last}`, {
-            callback: `show_beast_${first}-${last}+regular`
-        }); */
     }
 
     return `${first}-${last}`;
-    // return bot.inlineButton(`${first}`, {
-    //     callback: `show_beast_${first}-${first}+regular`
-    // });
-}), 5));
+}), 6));
 
-const beastRangesDarkZoneKeyboard = bot.keyboard(_.chunk(getRanges.map(range => {
+const beastRangesDarkZoneKeyboard = withBackButton(bot.keyboard, _.chunk(getRanges.map(range => {
     const first = _.min(range);
     const last = _.max(range);
 
     if (first !== last) {
-        return `${first}--${last}`;
-
-        // return bot.inlineButton(`${first}-${last}`, {
-        //     callback: `show_beast_${first}-${last}+dark`
-        // });
+        return `${first}—${last}`;
     }
 
-    return `${first}--${last}`;
-
-    // return bot.inlineButton(`${first}`, {
-    //     callback: `show_beast_${first}-${first}+dark`
-    // });
-}), 5));
+    return `${first}—${last}`;
+}), 6));
 
 
 
@@ -2549,7 +2536,7 @@ const validateRange = (_from, _to) => {
 
 bot.on('text', msg => {
     const regularZoneBeastsRequestRegExp = /(\d+)-(\d+)/;
-    const rangeRegExp = /(\d+)(-|--|—)(\d+)/;
+    const rangeRegExp = /(\d+)(-|—)(\d+)/;
 
     if(!rangeRegExp.test(msg.text)) {
         return;
