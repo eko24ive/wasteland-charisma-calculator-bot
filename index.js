@@ -2597,13 +2597,13 @@ ${beast.name}
         }).join('\n');
 
         const reply = `
-<b>Мобы(${beastType === 'Regular' ? '💀' : '🚷'}) на ${from}-${to}км</b>
+<b>Мобы(${beastType === 'DarkZone' ? '🚷' : '💀'}) на ${from}-${to}км</b>
 <i>Отсортированы от слабым к сильным</i>
 ${beastsList}
 `;
 
         return msg.reply.text(reply, {
-            replyMarkup: beastType === 'Regular' ? beastRangesKeyboard : beastRangesDarkZoneKeyboard,
+            replyMarkup: beastType === 'DarkZone' ? beastRangesDarkZoneKeyboard : beastRangesKeyboard,
             parseMode: 'html'
         }).catch(e => console.log(e));
     }).catch(e => console.log(e));

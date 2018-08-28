@@ -205,7 +205,7 @@ ${processedFlees.failFlees}
 `;
 
 const headerReply = `<b>${beast.name}</b>
-👣${beast.type === 'Regular' ? '💀' : '🚷'} ${minMax(beast.distanceRange)}км
+👣${beast.type === 'DarkZone' ? '🚷' : '💀'} ${minMax(beast.distanceRange)}км
 `;
 
         switch(route) {
