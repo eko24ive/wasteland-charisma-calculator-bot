@@ -292,22 +292,13 @@ const bot = new TeleBot({
 const defaultKeyboard = bot.keyboard([
     [
         buttons['journeyForwardStart'].label,
-        buttons['skillUpgrade'].label
+        buttons['skillUpgrade'].label,
+        buttons['showEncyclopedia'].label
     ],
     [
-        buttons['showGiants'].label,
         buttons['showRegularBeasts'].label,
         buttons['showDarkZoneBeasts'].label,
-        buttons['showEquipment'].label,
-    ],
-    [
-        buttons['showLocations'].label,
-        buttons['showSupplies'].label,
-        buttons['showAchievments'].label
-    ],
-    [
-        buttons['showDungeons'].label,
-        buttons['showInGameCommands'].label
+        buttons['showGiants'].label
     ],
     [
         buttons['hallOfFame'].label,
@@ -316,6 +307,20 @@ const defaultKeyboard = bot.keyboard([
 ], {
     resize: true
 });
+
+const encyclopediaKeyboard = [
+    [
+
+        buttons['showEquipment'].label,
+        buttons['showSupplies'].label,
+        buttons['showDrones'].label
+    ],
+    [
+        buttons['showDungeons'].label,
+        buttons['showLocations'].label,
+        buttons['showAchievments'].label
+    ]
+];
 
 const toGameKeyboard = bot.inlineKeyboard([
     [
@@ -2590,6 +2595,24 @@ ${beastsList}
             parseMode: 'html'
         }).catch(e => console.log(e));
     }).catch(e => console.log(e));
+})
+
+bot.on('/show_encyclopedia', msg => {
+    msg.reply.text(`В <b>📔Энциклопедии</b> вы можете просмотреть информацию о мире Wasteland Wars
+
+<b>🎒Экипировка</b> - Оружие, броня и тому подобное.
+<b>🗃Припасы</b> - Еда, баффы и медицина
+<b>🛰Дроны</b> - Характеристики ваших верных спутников
+<b>⚠️Подземелья</b> - Рекомендации к прохождению, инфа о луте и мобах
+<b>🏜️Локации</b> - Рейдовые и обычные локации
+<b>✅Достижения</b> - За что выдают награды
+`, {
+        replyMarkup: withBackButton(bot.keyboard,encyclopediaKeyboard, {
+            resize: true,
+            position: 'bottom'
+        }),
+        parseMode: 'html'
+    });
 })
 
 bot.start();

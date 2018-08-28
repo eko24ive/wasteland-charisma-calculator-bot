@@ -154,5 +154,9 @@ module.exports = {
     skillUpgrade: {
         label: "🎓Скилокачатор",
         command: "/skill_upgrade"
+    },
+    showEncyclopedia: {
+        label: "📔Энциклопедия",
+        command: "/show_encyclopedia"
     }
 };
