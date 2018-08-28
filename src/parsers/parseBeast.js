@@ -29,6 +29,12 @@ const parseRegularBeast = beast => {
         fightResult = 'lose';
     }
 
+    if (regexps.darkZone.test(beast)) {
+        type = 'DarkZone';
+    } else {
+        type = 'Regular';
+    }
+
     const damagesReceived = splitted.map(row => {
         if (regexps.beastAttackRegExp.test(row)) {
             var [, dmg] = regexps.beastAttackRegExp.exec(row);
@@ -83,7 +89,8 @@ const parseRegularBeast = beast => {
         amountOfConcussions,
         meta: {
             healthCap: Number(healthCap)
-        }
+        },
+        type
     }
 };
 

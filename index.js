@@ -64,6 +64,7 @@ const buttons = require('./src/ui/buttons');
 const {
     commandsForLag
 } = require('./src/strings/strings');
+const withBackButton = require('./src/utils/withBackButton');
 
 const UserManager = require('./src/database/userManager');
 
@@ -295,7 +296,8 @@ const defaultKeyboard = bot.keyboard([
     ],
     [
         buttons['showGiants'].label,
-        buttons['showBeasts'].label,
+        buttons['showRegularBeasts'].label,
+        buttons['showDarkZoneBeasts'].label,
         buttons['showEquipment'].label,
     ],
     [
@@ -455,6 +457,7 @@ reply = `Шикардос, я обновил твой пип!
         let data;
         let dataType;
         let beastName;
+        let beastType;
 
         const isLocation = regExpSetMatcher(msg.text, {
             regexpSet: regexps.location
@@ -472,9 +475,10 @@ reply = `Шикардос, я обновил твой пип!
             data = parseLocation(msg.text);
             dataType = 'location';
             beastName = data.beastFaced.name
+            beastType = data.beastFaced.type
         }
 
-        if (beastName !== sessions[msg.from.id].beastToValidateName && sessions[msg.from.id].beastToValidateName !== '???') {
+        if (beastName !== sessions[msg.from.id].beastToValidateName && sessions[msg.from.id].beastToValidateName !== '???' && beastName !== sessions[msg.from.id].beastToValidateName) {
             return msg.reply.text(`
 Этот моб не похож на того с которым ты дрался. Ты чё - наебать меня вздумал?!
 
@@ -1043,6 +1047,7 @@ const actualProcessUserData = (msg, reportData, updatesData, options) => {
     if (options.useBeastFace && !_.isEmpty(reportData.beastToValidate)) {
         sessions[msg.from.id].state = states.WAIT_FOR_BEAST_FACE_FORWARD;
         sessions[msg.from.id].beastToValidateName = reportData.beastToValidate[0].name;
+        sessions[msg.from.id].beastToValidateType = reportData.beastToValidate[0].type;
         return msg.reply.text(`
 Слушай, я не могу понять кто тебе надрал задницу, ${reportData.beastToValidate[0].name} - это обычный моб или данжевый?
 
@@ -1117,7 +1122,8 @@ _или_
                     } else {
                         Beast.findOne({
                             name: iBeast.name,
-                            isDungeon: iBeast.isDungeon
+                            isDungeon: iBeast.isDungeon,
+                            type: iBeast.type
                         }).then(function (fBeast) {
                             if (fBeast === null) {
                                 const newBeast = new Beast(iBeast);
@@ -1963,7 +1969,8 @@ _Бот работает в бета режиме._
 
 Если хочешь научить бота новому - нажимаешь скинуть лог, затем кидаешь все свои форварды, которые хочешь записать( бои с монстрами и проход км бот распознает) и в конце свежий пип. Затем нажимаешь стоп и ждешь реакции бота.
 
-Если что, вот гайд - https://teletype.in/@eko24/SkUiLkzCz;
+Канал, где появляется инфа об обновлениях - @wwAssistantBotNews
+Связь с создателем - @eko24
 `, {
     parseMode: 'markdown'
 }));
@@ -2040,18 +2047,26 @@ const giantsKeyboard = bot.inlineKeyboard([
     ]
 ]);
 
-const beastRangesKeyboard = bot.inlineKeyboard(_.chunk(getRanges.map(range => {
+const beastRangesKeyboard = withBackButton(bot.keyboard, _.chunk(getRanges.map(range => {
     const first = _.min(range);
     const last = _.max(range);
 
     if (first !== last) {
-        return bot.inlineButton(`${first}-${last}`, {
-            callback: `show_beast_${first}-${last}`
-        });
+        return `${first}-${last}`;
     }
-    return bot.inlineButton(`${first}`, {
-        callback: `show_beast_${first}-${first}`
-    });
+
+    return `${first}-${last}`;
+}), 5));
+
+const beastRangesDarkZoneKeyboard = withBackButton(bot.keyboard, _.chunk(getRanges.map(range => {
+    const first = _.min(range);
+    const last = _.max(range);
+
+    if (first !== last) {
+        return `${first}—${last}`;
+    }
+
+    return `${first}—${last}`;
 }), 5));
 
 
@@ -2083,9 +2098,9 @@ _Если гиганта нет в списке - значит его ещё н�
     }).catch(e => console.log(e));
 });
 
-bot.on('/show_beasts', msg => {
+bot.on(['/show_beasts(regular)','/show_beasts(darkzone)'], msg => {
     const reply = `
-Это каталог всех мобов в Пустоши <i>(не данжевых)</i>
+Это каталог всех ${msg.text === "💀Мобы" ? 'обычных' : ''} мобов в Пустоши ${msg.text !== "💀Мобы" ? 'из 🚷Тёмной Зоны' : ''} <i>(не данжевых)</i>
 Каталог наполняется посредством форвардов от игроков (бои, побеги и оглушения)
 
 Выбери интересующий диапазон километров, после вам будет доступен список мобов, которые были замечены на этом километре.
@@ -2096,7 +2111,7 @@ bot.on('/show_beasts', msg => {
 Гайд тут: https://teletype.in/@eko24/Sy4pCyiRM
 `;
     msg.reply.text(reply, {
-        replyMarkup: beastRangesKeyboard,
+        replyMarkup: msg.text === "💀Мобы" ? beastRangesKeyboard : beastRangesDarkZoneKeyboard,
         parseMode: 'html',
         webPreview: false
     }).catch(e => console.log(e))
@@ -2195,7 +2210,7 @@ bot.on('/delete_beasts', msg => {
 bot.on('callbackQuery', msg => {
     const chatId = msg.from.id;
     const messageId = msg.message.message_id;
-    const showMobRegExp = /show_beast_(\d+)-(\d+)/;
+    const showMobRegExp = /show_beast_(\d+)-(\d+)\+(.+)/;
     const showEquipmentKeyboardRegExp = /equipment_menu-(.+)/;
     const showLocationsKeyboardRegExp = /locations_menu-(.+)/;
     const showSuppliesKeyboardRegExp = /supplies_menu-(.+)/;
@@ -2252,10 +2267,10 @@ _Если гиганта нет в списке - значит его ещё н�
             parseMode: 'markdown'
         }).catch(e => console.log(e));
     } else if (showMobRegExp.test(msg.data)) {
-        const [, from, to] = showMobRegExp.exec(msg.data);
+        const [, from, to, type] = showMobRegExp.exec(msg.data);
+        const beastType = type === 'regular' ? 'Regular' : 'DarkZone';
 
-
-        Beast.find({isDungeon: false, distanceRange: {$gte: Number(from), $lte: Number(to)}}, 'battles.totalDamageReceived name id').then(beasts => {
+        Beast.find({isDungeon: false, distanceRange: {$gte: Number(from), $lte: Number(to)}, type: beastType}, 'battles.totalDamageReceived name id').then(beasts => {
             bot.answerCallbackQuery(msg.id);
 
             const jsonBeasts = beasts.map(b => {
@@ -2276,13 +2291,13 @@ ${beast.name}
             }).join('\n');
 
             const reply = `
-<b>Мобы на ${from}-${to}км</b>
+<b>Мобы(${type === 'regular' ? '💀' : '🚷'}) на ${from}-${to}км</b>
 <i>Отсортированы от слабым к сильным</i>
 ${beastsList}
 `;
 
             return bot.editMessageText({chatId, messageId}, reply,{
-                replyMarkup: beastRangesKeyboard,
+                replyMarkup: type === 'regular' ? beastRangesKeyboard : beastRangesDarkZoneKeyboard,
                 parseMode: 'html'
             }).catch(e => console.log(e));
         }).catch(e => console.log(e));
@@ -2512,5 +2527,69 @@ ${skillOMaticText}
     });
     }
 });
+
+const validateRange = (_from, _to) => {
+    const from = Number(_from);
+    const to = Number(_to);
+    return getRanges.filter(range => range[0] === from && range[1] === to).length === 1;
+}
+
+bot.on('text', msg => {
+    const regularZoneBeastsRequestRegExp = /(\d+)-(\d+)/;
+    const rangeRegExp = /(\d+)(-|—|--)(\d+)/;
+
+    if(!rangeRegExp.test(msg.text)) {
+        return;
+    }
+
+
+    const [, from,, to] = rangeRegExp.exec(msg.text);
+
+    if(!validateRange(from, to)) {
+        return msg.reply.text('Да, очень умно с твоей стороны. Начислил тебе <i>нихуя</i> 💎<b>Шмепселей</b> за смекалочку, а теперь иди нахуй и используй кнопки внизу.', {
+            parseMode: 'html'
+        });
+    }
+
+    const beastType = regularZoneBeastsRequestRegExp.test(msg.text) ? 'Regular' : 'DarkZone';
+
+    Beast.find({
+        isDungeon: false,
+        distanceRange: {
+            $gte: Number(from),
+            $lte: Number(to)
+        },
+        type: beastType
+    }, 'battles.totalDamageReceived name id').then(beasts => {
+
+        const jsonBeasts = beasts.map(b => {
+            const jsoned = b.toJSON();
+
+            return {
+                id: b.id,
+                ...jsoned
+            }
+        });
+
+        const beastsByDamage = _.sortBy(jsonBeasts, v => v.battles.totalDamageReceived);
+
+        const beastsList = beastsByDamage.map(beast => {
+            return `
+${beast.name}
+/mob_${beast.id}`;
+        }).join('\n');
+
+        const reply = `
+<b>Мобы(${beastType === 'Regular' ? '💀' : '🚷'}) на ${from}-${to}км</b>
+<i>Отсортированы от слабым к сильным</i>
+${beastsList}
+`;
+
+        return msg.reply.text(reply, {
+            replyMarkup: beastType === 'Regular' ? beastRangesKeyboard : beastRangesDarkZoneKeyboard,
+            parseMode: 'html'
+        }).catch(e => console.log(e));
+    }).catch(e => console.log(e));
+})
 
 bot.start();

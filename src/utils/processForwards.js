@@ -192,6 +192,7 @@ const processForwards = (inputData, config) => {
             };
 
             beastData.name = data.name;
+            beastData.type = data.type;
             beastData.distanceRange = [data.distance];
             reportData.distance = data.distance;
             reportData.distanceHistory.push(data.distance);
@@ -275,12 +276,12 @@ const processForwards = (inputData, config) => {
                 if (!reportData.lastBeastSeen) {
                     beastData.battles = [];
 
-                    reportData.beastToValidate.push({name: data.name, distance: data.distance});
+                    reportData.beastToValidate.push({name: data.name, distance: data.distance, type: data.type});
                 } else {
                     if(data.name !== reportData.lastBeastSeen.name && reportData.lastBeastSeenType !== 'regular' && data.fightResult === 'lose') {
                         beastData.battles = [];
 
-                        reportData.beastToValidate.push({name: data.name, distance: data.distance});
+                        reportData.beastToValidate.push({name: data.name, distance: data.distance, type: data.type});
                     }
                 }
             }

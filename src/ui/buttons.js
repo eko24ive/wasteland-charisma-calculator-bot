@@ -135,9 +135,13 @@ module.exports = {
         label: "🦂Гиганты",
         command: "/show_giants"
     },
-    showBeasts: {
+    showRegularBeasts: {
         label: "💀Мобы",
-        command: "/show_beasts"
+        command: "/show_beasts(regular)"
+    },
+    showDarkZoneBeasts: {
+        label: "🚷Мобы",
+        command: "/show_beasts(darkzone)"
     },
     cancelAction: {
         label: "↩️Назад",
