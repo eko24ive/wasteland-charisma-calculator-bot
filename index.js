@@ -298,15 +298,9 @@ const defaultKeyboard = bot.keyboard([
         buttons['showGiants'].label,
         buttons['showRegularBeasts'].label,
         buttons['showDarkZoneBeasts'].label,
-        buttons['showEquipment'].label,
     ],
     [
-        buttons['showLocations'].label,
-        buttons['showSupplies'].label,
-        buttons['showAchievments'].label
-    ],
-    [
-        buttons['showDungeons'].label,
+        buttons['showEncyclopedia'].label,
         buttons['showInGameCommands'].label
     ],
     [
@@ -316,6 +310,19 @@ const defaultKeyboard = bot.keyboard([
 ], {
     resize: true
 });
+
+const encyclopediaKeyboard = [
+    [
+
+        buttons['showEquipment'].label,
+        buttons['showDungeons'].label,
+        buttons['showSupplies'].label,
+    ],
+    [
+        buttons['showLocations'].label,
+        buttons['showAchievments'].label
+    ]
+];
 
 const toGameKeyboard = bot.inlineKeyboard([
     [
@@ -2590,6 +2597,15 @@ ${beastsList}
             parseMode: 'html'
         }).catch(e => console.log(e));
     }).catch(e => console.log(e));
+})
+
+bot.on('/show_encyclopedia', msg => {
+    msg.reply.text('lorem', {
+        replyMarkup: withBackButton(bot.keyboard,encyclopediaKeyboard, {
+            resize: true,
+            position: 'bottom'
+        })
+    })
 })
 
 bot.start();
