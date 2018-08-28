@@ -292,16 +292,13 @@ const bot = new TeleBot({
 const defaultKeyboard = bot.keyboard([
     [
         buttons['journeyForwardStart'].label,
-        buttons['skillUpgrade'].label
+        buttons['skillUpgrade'].label,
+        buttons['showEncyclopedia'].label
     ],
     [
-        buttons['showGiants'].label,
         buttons['showRegularBeasts'].label,
         buttons['showDarkZoneBeasts'].label,
-    ],
-    [
-        buttons['showEncyclopedia'].label,
-        buttons['showInGameCommands'].label
+        buttons['showGiants'].label
     ],
     [
         buttons['hallOfFame'].label,
@@ -323,7 +320,8 @@ const encyclopediaKeyboard = [
         buttons['showLocations'].label
     ],
     [
-        buttons['showAchievments'].label
+        buttons['showAchievments'].label,
+        buttons['showInGameCommands'].label
     ]
 ];
 
@@ -2611,7 +2609,7 @@ bot.on('/show_encyclopedia', msg => {
 <b>⚠️Подземелья</b> - Рекомендации к прохождению, инфа о луте и мобах
 <b>🏜️Локации</b> - Рейдовые и обычные локации
 <b>✅Достижения</b> - За что выдают награды
-
+<b>🔄Команды при лагах</b> - На тот редкий случай если WW лаганёт
 
     `, {
         replyMarkup: withBackButton(bot.keyboard,encyclopediaKeyboard, {
