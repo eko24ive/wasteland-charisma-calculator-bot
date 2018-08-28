@@ -2536,7 +2536,7 @@ const validateRange = (_from, _to) => {
 
 bot.on('text', msg => {
     const regularZoneBeastsRequestRegExp = /(\d+)-(\d+)/;
-    const rangeRegExp = /(\d+)(-|—)(\d+)/;
+    const rangeRegExp = /(\d+)(-|—|--)(\d+)/;
 
     if(!rangeRegExp.test(msg.text)) {
         return;

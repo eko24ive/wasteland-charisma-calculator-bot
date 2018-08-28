@@ -5,6 +5,6 @@ module.exports = (keyboard, buttonsSet) => {
     [buttons.cancelAction.label],
     ...buttonsSet
   ], {
-    resize: true
+    resize: false
   });
 }
