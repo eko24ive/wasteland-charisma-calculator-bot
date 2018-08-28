@@ -2541,15 +2541,29 @@ ${skillOMaticText}
     }
 });
 
+const validateRange = (_from, _to) => {
+    const from = Number(_from);
+    const to = Number(_to);
+    return getRanges.filter(range => range[0] === from && range[1] === to).length === 1;
+}
+
 bot.on('text', msg => {
     const regularZoneBeastsRequestRegExp = /(\d+)-(\d+)/;
-    const rangeRegExp = /(\d+)(-|--)(\d+)/;
+    const rangeRegExp = /(\d+)(-|--|—)(\d+)/;
 
     if(!rangeRegExp.test(msg.text)) {
         return;
     }
 
+
     const [, from,, to] = rangeRegExp.exec(msg.text);
+
+    if(!validateRange(from, to)) {
+        return msg.reply.text('Да, очень умно с твоей стороны. Начислил тебе <i>нихуя</i> 💎<b>Шмепселей</b> за смекалочку, а теперь иди нахуй и используй кнопки внизу.', {
+            parseMode: 'html'
+        });
+    }
+
     const beastType = regularZoneBeastsRequestRegExp.test(msg.text) ? 'Regular' : 'DarkZone';
 
     Beast.find({
