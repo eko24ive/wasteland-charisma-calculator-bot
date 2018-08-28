@@ -317,11 +317,8 @@ const encyclopediaKeyboard = [
     ],
     [
         buttons['showDungeons'].label,
-        buttons['showLocations'].label
-    ],
-    [
-        buttons['showAchievments'].label,
-        buttons['showInGameCommands'].label
+        buttons['showLocations'].label,
+        buttons['showAchievments'].label
     ]
 ];
 
@@ -2609,9 +2606,7 @@ bot.on('/show_encyclopedia', msg => {
 <b>⚠️Подземелья</b> - Рекомендации к прохождению, инфа о луте и мобах
 <b>🏜️Локации</b> - Рейдовые и обычные локации
 <b>✅Достижения</b> - За что выдают награды
-<b>🔄Команды при лагах</b> - На тот редкий случай если WW лаганёт
-
-    `, {
+`, {
         replyMarkup: withBackButton(bot.keyboard,encyclopediaKeyboard, {
             resize: true,
             position: 'bottom'
