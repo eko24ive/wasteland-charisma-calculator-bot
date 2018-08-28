@@ -1685,7 +1685,7 @@ bot.on('/dng', msg => {
 
 bot.on('/cfl', msg => {
     return msg.reply.text(commandsForLag, {
-        paresMode: 'html'
+        parseMode: 'html'
     }).catch(e => console.log(e));
 })
 
