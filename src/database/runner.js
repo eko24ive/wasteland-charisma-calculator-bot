@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const async = require('async');
 const moment = require('moment');
 const beastSchema = require('../schemes/beast');
 const Beast = mongoose.model('Beast', beastSchema);
@@ -7,14 +8,12 @@ mongoose.connect(process.env.MONGODB_URI);
 
 const dzRangeStageOne = [ //20.06
   [21, 34],
-  [50, 62],
-  [74, 95]
+  [50, 62]
 ];
 
 const dzRangeStageTwo = [ //01.07
   [23, 39],
-  [52, 64],
-  [74, 95]
+  [52, 64]
 ]
 
 const possibleDzRange = (distances, dzRange) => {
@@ -31,12 +30,16 @@ let total = 0;
 Beast.find().then(beasts => {
   console.log('===START===');
 
-  beasts.forEach(beast => {
+  async.forEach(beasts, function (beast, next) {
     if (!beast.battles) {
+      next();
       return;
     }
 
-    beast.battles.forEach(battle => {
+    const jBeast = beast.toJSON();
+    const bos = jBeast.battles.length;
+
+    const newBatlles = jBeast.battles.filter(battle => {
       total++;
       if (battle.stamp) {
         const date = moment(Number(battle.stamp.slice(0, 13)));
@@ -46,24 +49,33 @@ Beast.find().then(beasts => {
 
         if (year !== 2018) {
           console.log('SLICE ERROR');
+          return true;
         } else {
           if ((day >= 20 && month >= 6) || (month >= 7)) { //Stage one
             if (possibleDzRange(beast.distanceRange, dzRangeStageOne)) {
               amount++;
+              return false;
             }
           } else if (day >= 1 && month >= 7 || month >= 8) { //Stage two
             if (possibleDzRange(beast.distanceRange, dzRangeStageTwo)) {
               amount++;
+              return false;
             }
           }
+          
+          return true;
         }
       }
-    })
-  })
-}).then(() => {
+
+      return true;
+    });
+
+    beast.battles = newBatlles;
+    beast.markModified('battles');
+    beast.save().then(() => {next()});
+  }, () => {
   console.log('===END===');
   console.log(`Total: ${total}\nAmount: ${amount}\nLoss: ${total-amount}`);
   mongoose.disconnect();
 });
-
-moment(15312107523 * 100).calendar()
+});
