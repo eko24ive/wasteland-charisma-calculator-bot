@@ -105,7 +105,7 @@ module.exports = {
     },
     showInGameCommands: {
         label: "🔄Команды при лагах",
-        command: "/cfl"
+        command: "/commands_for_lag"
     },
     showEquipment: {
         label: "🎒Экипировка",

@@ -1688,7 +1688,7 @@ bot.on('/dng', msg => {
     }).catch(e => console.log(e));
 })
 
-bot.on('/cfl', msg => {
+bot.on('/commands_for_lag', msg => {
     return msg.reply.text(commandsForLag, {
         parseMode: 'html'
     }).catch(e => console.log(e));
