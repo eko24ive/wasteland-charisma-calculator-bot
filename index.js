@@ -114,7 +114,7 @@ const updateOrCreate = (msg, pip, cb) => {
         username: msg.from.username
     }
 
-    const pipData = {...pip, timeStamp: msg.forward_date};
+    const pipData = {...pip, timeStamp: pip.date};
 
     userManager.findByTelegramId(msg.from.id).then(result => {
         if (result.ok === false && result.reason === 'USER_NOT_FOUND') {
@@ -564,7 +564,7 @@ reply = `Шикардос, я обновил твой пип!
             data = parseLocation(msg.text);
             dataType = 'location';
         } else if (isClassicPip || isSimplePip) {
-            data = parsePip(msg, isClassicPip);
+            data = {...parsePip(msg, isClassicPip)};
             dataType = 'pipboy';
         } else if (isDungeonBeast) {
             data = beastParser.parseDungeonBeast(msg.text);
