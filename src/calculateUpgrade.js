@@ -48,9 +48,11 @@ const amountToSpend = (
         return costWithDiscount;
     }).slice(skillRangeFrom, skillRangeTo);
 
+    const skillCostWithoutDiscount = skillCost.slice(skillRangeFrom, skillRangeTo).map(level => level.caps).reduce((a, b) => a + b);
+
     const sum = skillCostWithDiscount.reduce((a, b) => a + b);
 
-    return sum;
+    return skill === 'charisma' ? skillCostWithoutDiscount : sum;
 }
 
 /* const skillCostWithDiscount = (
