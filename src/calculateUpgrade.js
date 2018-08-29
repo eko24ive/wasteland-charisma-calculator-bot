@@ -29,13 +29,17 @@ const calculatePerkDiscount = (charismaLevel) => {
 }
 
 const amountToSpend = (
+    skillToUpgrade,
     charismaLevel,
     skillRangeFrom,
     skillRangeTo
 ) => {
     const discount = calculatePerkDiscount(charismaLevel);
+    const skill = skillMap[skillToUpgrade];
 
-    const skillCostWithDiscount = defaultSkillCost.map(level => {
+    const skillCost = skill === 'charisma' ? defaultCharismaCost : defaultSkillCost
+
+    const skillCostWithDiscount = skillCost.map(level => {
         const costWithDiscount = level.caps - discount;
         if (costWithDiscount < 10) {
             return 10;
@@ -91,12 +95,14 @@ var calculateAmountOfRaids = (
     reachableDistance,
     charismaLevel,
     skillRangeFrom,
-    skillRangeTo
+    skillRangeTo,
+    upgradeSkill
 ) => {
     const distanceOfRanges = {};
     const mobsFillment = [];
 
     const totalSpend = amountToSpend(
+        upgradeSkill,
         charismaLevel,
         skillRangeFrom,
         skillRangeTo
@@ -195,6 +201,7 @@ const calculateUpgrade = ({
     const calculations = {
         amountOfSavedFunds: calculatePerkDiscount(charismaLevel),
         amountToSpend: amountToSpend(
+            upgradeSkill,
             charismaLevel,
             currentSkillLevel,
             upgradeTo
@@ -203,7 +210,8 @@ const calculateUpgrade = ({
             reachableDistance,
             charismaLevel,
             currentSkillLevel,
-            upgradeTo
+            upgradeTo,
+            upgradeSkill
         ),
         amountSpentOnCharisma: calculateAmountSpentOnCharisma(charismaLevel)
     };
