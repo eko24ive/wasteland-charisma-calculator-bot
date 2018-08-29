@@ -1595,15 +1595,6 @@ bot.on('/journeyforwardend', msg => {
     }
 });
 
-bot.on('/journeyforwardcancel', msg => {
-    createSession(msg.from.id);
-
-    return msg.reply.text('Окей, теперь можешь кинуть пип-бой для помощи в прокачке скилов либо же перейти в меню  [`Скинуть лог 🏃`]', {
-        replyMarkup: defaultKeyboard,
-        parseMode: 'markdown'
-    });
-});
-
 bot.on('/skippipforward', msg => {
     msg.reply.text('Окей, сейчас попробую обработать что смогу');
 
@@ -2158,12 +2149,15 @@ bot.on(/mob_(.+)/, msg => {
     });
 });
 
-bot.on('/cancel', msg => {
+bot.on(['/cancel', '/journeyforwardcancel'], msg => {
+    const backMessage = _.random(0,100) >= 90 ? 'Ты вернусля в главное меню\n<i>Вернусля - почётный член этого сообщения, не обижайте её</i>' : 'Ты вернусля в главное меню';
+
     if(sessions[msg.from.id] === undefined) {
         createSession(msg.from.id);
-
-        return msg.reply.text('Ты вернусля в главное меню', {
-            replyMarkup: defaultKeyboard
+        
+        return msg.reply.text(backMessage, {
+            replyMarkup: defaultKeyboard,
+            parseMode: 'html'
         }).catch(e => console.log(e));
     }
     if(sessions[msg.from.id].state === states.WAIT_FOR_DATA_TO_PROCESS) {
@@ -2173,8 +2167,9 @@ bot.on('/cancel', msg => {
     } else {
         createSession(msg.from.id);
 
-        return msg.reply.text('Ты вернусля в главное меню', {
-            replyMarkup: defaultKeyboard
+        return msg.reply.text(backMessage, {
+            replyMarkup: defaultKeyboard,
+            parseMode: 'html'
         }).catch(e => console.log(e));
     }
 
