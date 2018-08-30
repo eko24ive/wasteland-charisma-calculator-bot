@@ -8,6 +8,20 @@ const CUBONITE = 'CUBONITE';
 const OSMIUM = 'OSMIUM';
 const TITANIUM = 'TITANIUM';
 const EPHEDRINE = 'EPHEDRINE';
+const WIRES = 'WIRES';
+const MINICHARGE = 'MINICHARGE';
+const TRANSISTOR = 'TRANSISTOR';
+const TOPAZ = 'TOPAZ';
+const DUSTER = 'DUSTER';
+const WOLFRAM = 'WOLFRAM';
+const FOIL = 'FOIL';
+const TAPE = 'TAPE';
+const IRONTHING = 'IRONTHING';
+const THROGHEART = 'THROGHEART';
+const POTENTIOMETER = 'POTENTIOMETER';
+const STEEL = 'STEEL';
+const PLASMA = 'PLASMA';
+const DOLL = 'DOLL';
 
 const resources = {
     CAPS: {
@@ -58,8 +72,78 @@ const resources = {
     },
     EPHEDRINE: {
         title: 'Эфедрин',
-        icon: 'Эфедрин',
+        icon: '',
         description: ''
+    },
+    WIRES: {
+        title: 'Провода',
+        icon: '',
+        description: ''
+    },
+    MINICHARGE: {
+        title: 'Минизаряд',
+        icon: '',
+        description: ''
+    },
+    TRANSISTOR: {
+        title: 'Транзистор',
+        icon: '',
+        description: ''
+    },
+    TOPAZ: {
+        title: 'Топаз',
+        icon: '',
+        description: ''
+    },
+    DUSTER: {
+        title: 'Тряпка',
+        icon: '',
+        description: ''
+    },
+    WOLFRAM: {
+        title: 'Вольфрам',
+        icon: '',
+        description: ''
+    },
+    FOIL: {
+        title: 'Фольга!',
+        icon: '',
+        description: ''
+    },
+    TAPE: {
+        title: 'Изолента',
+        icon: '',
+        description: ''
+    },
+    IRONTHING: {
+        title: 'Что-то чугунное',
+        icon: '',
+        description: ''
+    },
+    THROGHEART: {
+        title: 'Сердце трога',
+        icon: '',
+        description: ''
+    },
+    POTENTIOMETER: {
+        title: 'Потенциометр',
+        icon: '',
+        description: ''
+    },
+    STEEL: {
+        title: 'Сталь',
+        icon: '',
+        description: ''
+    },
+    PLASMA: {
+        title: 'Плазма',
+        icon: '',
+        description: ''
+    },
+    DOLL: {
+        title: 'Детская кукла',
+        icon: '',
+        description: '' 
     }
 };
 
@@ -71,7 +155,7 @@ const getResource = (name,amount) => {
 const FIRST = 'FIRST';
 const SECOND = 'SECOND';
 
-const rarity = {
+const rarities = {
     FIRST: {
         icon: '🔆'
     },
@@ -81,13 +165,37 @@ const rarity = {
 }
 
 const getRarityIcon = (name) => {
-    const rarity = rarity[name];
-    return rarity.icon;
+    const rarity = rarities[name];
+    return `${rarity.icon}`;
 };
 
 module.exports = {
     CAPS,
+    MATERIALS,
+    QUARZ,
+    GENERATORS,
+    MICROCHIPS,
+    IRIDIUM,
+    CUBONITE,
+    OSMIUM,
+    TITANIUM,
+    EPHEDRINE,
+    WIRES,
+    MINICHARGE,
+    TRANSISTOR,
+    TOPAZ,
+    DUSTER,
+    WOLFRAM,
+    FOIL,
+    TAPE,
+    IRONTHING,
+    THROGHEART,
+    POTENTIOMETER,
+    STEEL,
+    PLASMA,
+    DOLL,
     getResource,
-    getRarityIcon,
-    rarity
+    FIRST,
+    SECOND,
+    getRarityIcon
 }

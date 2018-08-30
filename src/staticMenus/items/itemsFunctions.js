@@ -7,7 +7,8 @@ const {
 
 const {
     weapons,
-    weaponsComment
+    showWeaponItem,
+    showWeaponInvention
 } = require('./weapon.js');
 
 const {
@@ -16,21 +17,20 @@ const {
 } = require('./armor.js');
 
 const meds = require('./meds.js');
-const prices = require('./../prices.js');
 
-const priceText = price => {
-    return Object.keys(price).map(element => {
-        return `${prices[element].icon ? prices[element].icon : ''}${(element === 'ephedrine') ? `(${price[element]})` : `${price[element]}`} `;
-    }).join(', ');
-};
+//const priceText = price => {
+//    return Object.keys(price).map(element => {
+//        return `${prices[element].icon ? prices[element].icon : ''}${(element === 'ephedrine') ? `(${price[element]})` : `${price[element]}`} `;
+//    }).join(', ');
+//};
 
-const getItemIcon = icon => {
-    if (icon) {
-        return icon;
-    }
-
-    return '';
-}
+//const getItemIcon = icon => {
+//    if (icon) {
+//       return icon;
+//    }
+//
+//   return '';
+//}
 
 const getItemCharacteristic = characteristic => {
     if (characteristic) {
@@ -64,8 +64,10 @@ const getHelmetsByPlace = place => {
 };
 
 const getWeaponsByPlace = place => {
-    let placeText = getItemsByPlace(place, weapons, weaponsComment);
-    return placeText;
+    const itemsFromPlace = weapons.filter(item => (item.place === place)&&(!!item.price));
+    return Object.keys(itemsFromPlace).map(element => {
+        showWeaponItem(element);
+    }).join('\n');
 };
 
 const getArmorsByPlace = place => {
@@ -77,6 +79,13 @@ const getMedsByPlace = place => {
     let placeText = getItemsByPlace(place, meds);
     return placeText;
 };
+
+//const getInventionsByPlace = (place, items, showItem) => {
+//    const inventionsFromPlace = items.filter(item => (item.place === place)&&(!!item.rarity));
+//    return _.sortBy(inventionsFromPlace, item => item.title).map() => {
+//        return showItem(item);
+//    }
+//}
 
 const getInventionsByPlace = (place, items, itemsGlobalComment) => {
     const inventionsFromPlace = items.filter(item => (item.place === place)&&(!!item.rarity));

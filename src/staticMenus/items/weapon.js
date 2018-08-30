@@ -12,11 +12,43 @@ const {
 
 const {
     CAPS,
-    getResource
+    MATERIALS,
+    QUARZ,
+    GENERATORS,
+    MICROCHIPS,
+    IRIDIUM,
+    CUBONITE,
+    OSMIUM,
+    TITANIUM,
+    WIRES,
+    MINICHARGE,
+    TRANSISTOR,
+    TOPAZ,
+    DUSTER,
+    WOLFRAM,
+    FOIL,
+    TAPE,
+    IRONTHING,
+    THROGHEART,
+    POTENTIOMETER,
+    STEEL,
+    PLASMA,
+    DOLL,
+    getResource,
+    FIRST,
+    SECOND,
+    getRarityIcon
 } = require('./resources.js');
 
-const weaponsComment = '💪 Урон: +';
-const inventionWeaponIcon = '⚔️';
+//const weaponsComment = '💪 Урон: +';
+//const inventionWeaponIcon = '⚔️';
+const getItemIcon = icon => {
+    if (icon) {
+       return icon;
+    }
+
+   return '';
+}
 const weapons = [
     {
         icon: false,
@@ -105,18 +137,18 @@ const weapons = [
     {
         icon: "⚡",
         title: "Электромеч",
-        price: [getResource('Провода', 7)],
+        price: [getResource(WIRES, 7)],
         characteristic: 15,
         place: workbench,
-        rarity: 'first'
+        rarity: FIRST
     },
     {
         icon: "⚡",
         title: "Электромеч",
-        price: [getResource('Провода', 17)],
+        price: [getResource(WIRES, 17)],
         characteristic: 21,
         place: workbench,
-        rarity: 'second'
+        rarity: SECOND
     },
     {
         icon: "💥",
@@ -128,18 +160,18 @@ const weapons = [
     {
         icon: "💥",
         title: "Лазерный тесак",
-        price: [getResource('Минизаряд', 7), getResource('Провода', 5)],
+        price: [getResource(MINICHARGE, 7), getResource(WIRES, 5)],
         characteristic: 20,
         place: workbench,
-        rarity: 'first'
+        rarity: FIRST
     },
     {
         icon: "💥",
         title: "Лазерный тесак",
-        price: [getResource('Минизаряд', 17), getResource('Провода', 15)],
+        price: [getResource(MINICHARGE, 17), getResource(WIRES, 15)],
         characteristic: 28,
         place: workbench,
-        rarity: 'second'
+        rarity: SECOND
     },
     {
         icon: "💥",
@@ -151,10 +183,10 @@ const weapons = [
     {
         icon: "💥",
         title: "BFGzzv-4000",
-        price: [getResource('Транзистор', 5), getResource('Изолента', 6)],
+        price: [getResource(TRANSISTOR, 5), getResource(TAPE, 6)],
         characteristic: 29,
         place: workbench,
-        rarity: 'first'
+        rarity: FIRST
     },
     {
         icon: "🔗",
@@ -166,18 +198,18 @@ const weapons = [
     {
         icon: "🔗",
         title: "Силовой кастет",
-        price: [getResource('Минизаряд', 4), getResource('Изолента', 6), getResource('Топаз', 5)],
+        price: [getResource(MINICHARGE, 4), getResource(TAPE, 6), getResource(TOPAZ, 5)],
         characteristic: 25,
         place: workbench,
-        rarity: 'first'
+        rarity: FIRST
     },
     {
         icon: "🔗",
         title: "Силовой кастет",
-        price: [getResource('Минизаряд', 14), getResource('Изолента', 16), getResource('Топаз', 15)],
+        price: [getResource(MINICHARGE, 14), getResource(TAPE, 16), getResource(TOPAZ, 15)],
         characteristic: 32,
         place: workbench,
-        rarity: 'second'
+        rarity: SECOND
     },
     {
         icon: "💥",
@@ -189,10 +221,10 @@ const weapons = [
     {
         icon: "💥",
         title: "Колыбель Пустоши",
-        price: [getResource('Транзистор', 9), getResource('Что-то чугунное', 10)],
+        price: [getResource(TRANSISTOR, 9), getResource(IRONTHING, 10)],
         characteristic: 29,
         place: workbench,
-        rarity: 'first'
+        rarity: FIRST
     },
     {
         icon: "💥",
@@ -205,18 +237,18 @@ const weapons = [
     {
         icon: "💥",
         title: "Tyrant-PDR",
-        price: [getResource('Вольфрам', 9), getResource('Тряпка', 12)],
+        price: [getResource(WOLFRAM, 9), getResource(DUSTER, 12)],
         characteristic: 46,
         place: workbench,
-        rarity: 'first'
+        rarity: FIRST
     },
     {
         icon: "💥",
         title: "Tyrant-PDR",
-        price: [getResource('Вольфрам', 19), getResource('Тряпка', 22)],
+        price: [getResource(WOLFRAM, 19), getResource(DUSTER, 22)],
         characteristic: 51,
         place: workbench,
-        rarity: 'second'
+        rarity: SECOND
     },
     {
         icon: "☄️",
@@ -229,20 +261,20 @@ const weapons = [
     {
         icon: "☄️",
         title: "Огнемёд",
-        price: [getResource('Фольга!', 2), getResource('Сердце трога', 11),
-        getResource('Потенциометр', 3), getResource('Сталь', 4)],
+        price: [getResource(FOIL, 2), getResource(THROGHEART, 11),
+        getResource(POTENTIOMETER, 3), getResource(STEEL, 4)],
         characteristic: 58,
         place: workbench,
-        rarity: 'first'
+        rarity: FIRST
     },
     {
         icon: "☄️",
         title: "Огнемёд",
-        price: [getResource('Фольга!', 12), getResource('Сердце трога', 21),
-        getResource('Потенциометр', 13), getResource('Сталь', 14)],
+        price: [getResource(FOIL, 12), getResource(THROGHEART, 21),
+        getResource(POTENTIOMETER, 13), getResource(STEEL, 14)],
         characteristic: 65,
         place: workbench,
-        rarity: 'second'
+        rarity: SECOND
     },
     {
         icon: "☄️",
@@ -255,18 +287,18 @@ const weapons = [
     {
         icon: "☄️",
         title: "Больверизатор",
-        price: [getResource('Фольга!', 3), getResource('Провода', 15), getResource('Изолента', 12)],
+        price: [getResource(FOIL, 3), getResource(WIRES, 15), getResource(TAPE, 12)],
         characteristic: 69,
         place: workbench,
-        rarity: 'first'
+        rarity: FIRST
     },
     {
         icon: "☄️",
         title: "Больверизатор",
-        price: [getResource('Фольга!', 19), getResource('Провода', 25), getResource('Изолента', 28)],
+        price: [getResource(FOIL, 19), getResource(WIRES, 25), getResource(TAPE, 28)],
         characteristic: 76,
         place: workbench,
-        rarity: 'second'
+        rarity: SECOND
     },
     {
         icon: "🔮",
@@ -279,10 +311,10 @@ const weapons = [
     {
         icon: "🔮",
         title: "Энергосфера",
-        price: [getResource('Сердце трога', 20), getResource('Детская кукла', 3)],
+        price: [getResource(THROGHEART, 20), getResource(DOLL, 3)],
         characteristic: 78,
         place: workbench,
-        rarity: 'first'
+        rarity: FIRST
     },
     {
         icon: "🌟",
@@ -295,10 +327,10 @@ const weapons = [
     {
         icon: "🌟",
         title: "Армагеддец",
-        price: [getResource('Провода', 30), getResource('Что-то чугунное', 9), getResource('Изолента', 25)],
+        price: [getResource(WIRES, 30), getResource(IRONTHING, 9), getResource(TAPE, 25)],
         characteristic: 90,
         place: workbench,
-        rarity: 'first'
+        rarity: FIRST
     },
     {
         icon: "☣️",
@@ -311,18 +343,18 @@ const weapons = [
     {
         icon: "☣️",
         title: "Потрошитель",
-        price: [getResource('Минизаряд', 11), getResource('Потенциометр', 14), getResource('Сталь', 5)],
+        price: [getResource(MINICHARGE, 11), getResource(POTENTIOMETER, 14), getResource(STEEL, 5)],
         characteristic: 122,
         place: engineer,
-        rarity: 'first'
+        rarity: FIRST
     },
     {
         icon: "☣️",
         title: "Потрошитель",
-        price: [getResource('Минизаряд', 23), getResource('Потенциометр', 24), getResource('Сталь', 15)],
+        price: [getResource(MINICHARGE, 23), getResource(POTENTIOMETER, 24), getResource(STEEL, 15)],
         characteristic: 141,
         place: engineer,
-        rarity: 'second'
+        rarity: SECOND
     },
     {
         icon: "☣️",
@@ -335,68 +367,68 @@ const weapons = [
     {
         icon: "☣️",
         title: "Жиробас",
-        price: [getResource('Минизаряд', 10), getResource('Плазма', 8), getResource('Изолента', 4)],
+        price: [getResource(MINICHARGE, 10), getResource(PLASMA, 8), getResource(TAPE, 4)],
         characteristic: 155,
         place: engineer,
-        rarity: 'first'
+        rarity: FIRST
     },
     {
         icon: "☣️",
         title: "Жиробас",
-        price: [getResource('Минизаряд', 23), getResource('Плазма', 21), getResource('Изолента', 24)],
+        price: [getResource(MINICHARGE, 23), getResource(PLASMA, 21), getResource(TAPE, 24)],
         characteristic: 163,
         place: engineer,
-        rarity: 'first'
+        rarity: FIRST
     },
     {
         icon: "🌟",
         title: "Гравипушка",
         price: [getResource(MATERIALS, 241900), getResource(GENERATORS, 310), 
-            getResource(MICROCHIPSS, 185), getResource(IRIDIUM, 145)],
+            getResource(MICROCHIPS, 185), getResource(IRIDIUM, 145)],
         characteristic: 159,
         place: engineer
     },
     {
         icon: "🌟",
         title: "Гравипушка",
-        price: [getResource('Фольга!', 2), getResource('Сердце трога', 11),
-        getResource('Потенциометр', 6), getResource('Сталь', 7)],
+        price: [getResource(FOIL, 2), getResource(THROGHEART, 11),
+        getResource(POTENTIOMETER, 6), getResource(STEEL, 7)],
         characteristic: 189,
         place: engineer,
-        rarity: 'first'
+        rarity: FIRST
     },
     {
         icon: "🌟",
         title: "Гравипушка",
-        price: [getResource('Фольга!', 12), getResource('Сердце трога', 21),
-        getResource('Потенциометр', 26), getResource('Сталь', 17)],
+        price: [getResource(FOIL, 12), getResource(THROGHEART, 21),
+        getResource(POTENTIOMETER, 26), getResource(STEEL, 17)],
         characteristic: 194,
         place: engineer,
-        rarity: 'second'
+        rarity: SECOND
     },
     {
         icon: "💿",
         title: "DVD-VCH",
         price: [getResource(MATERIALS, 269000), getResource(GENERATORS, 330), 
-            getResource(MICROCHIPSS, 200), getResource(IRIDIUM, 180)],
+            getResource(MICROCHIPS, 200), getResource(IRIDIUM, 180)],
         characteristic: 187,
         place: engineer
     },
     {
         icon: "💿",
         title: "DVD-VCH",
-        price: [getResource('Тряпка', 30)],
+        price: [getResource(DUSTER, 30)],
         characteristic: 207,
         place: engineer,
-        rarity: 'first'
+        rarity: FIRST
     },
     {
         icon: "💿",
         title: "DVD-VCH",
-        price: [getResource('Тряпка', 50)],
+        price: [getResource(DUSTER, 50)],
         characteristic: false,
         place: engineer,
-        rarity: 'second'
+        rarity: SECOND
     },
     {
         icon: "♻️",
@@ -409,20 +441,20 @@ const weapons = [
     {
         icon: "♻️",
         title: "Рандомган",
-        price: [getResource('Фольга!', 3), getResource('Вольфрам', 13),
-        getResource('Изолента', 12), getResource('Провода', 15)],
+        price: [getResource(FOIL, 3), getResource(WOLFRAM, 13),
+        getResource(TAPE, 12), getResource(WIRES, 15)],
         characteristic: 231,
         place: engineer,
-        rarity: 'first'
+        rarity: FIRST
     },
     {
         icon: "♻️",
         title: "Рандомган",
-        price: [getResource('Фольга!', 13), getResource('Вольфрам', 19),
-        getResource('Изолента', 32), getResource('Провода', 25)],
+        price: [getResource(FOIL, 13), getResource(WOLFRAM, 19),
+        getResource(TAPE, 32), getResource(WIRES, 25)],
         characteristic: 242,
         place: engineer,
-        rarity: 'second'
+        rarity: SECOND
     },
     {
         icon: "🐱",
@@ -435,20 +467,20 @@ const weapons = [
     {
         icon: "🐱",
         title: "Ракетенок☄",
-        price: [getResource('Фольга!', 12), getResource('Плазма', 14),
-        getResource('Сердце трога', 21), getResource('Потенциометр', 21), getResource('Сталь', 24)],
+        price: [getResource(FOIL, 12), getResource(PLASMA, 14),
+        getResource(THROGHEART, 21), getResource(POTENTIOMETER, 21), getResource(STEEL, 24)],
         characteristic: 284,
         place: engineer,
-        rarity: 'first'
+        rarity: FIRST
     },
     {
         icon: "🐱",
         title: "Ракетенок☄",
-        price: [getResource('Фольга!', 32), getResource('Плазма', 44),
-        getResource('Сердце трога', 31), getResource('Потенциометр', 31), getResource('Сталь', 44)],
+        price: [getResource(FOIL, 32), getResource(PLASMA, 44),
+        getResource(THROGHEART, 31), getResource(POTENTIOMETER, 31), getResource(STEEL, 44)],
         characteristic: 298,
         place: engineer,
-        rarity: 'second'
+        rarity: SECOND
     },
     {
         icon: "✳️",
@@ -469,18 +501,18 @@ const weapons = [
     {
         icon: "❇️",
         title: "Плазмакастер",
-        price: [getResource('Фольга!', 23), getResource('Изолента', 22), getResource('Провода', 25)],
+        price: [getResource(FOIL, 23), getResource(TAPE, 22), getResource(WIRES, 25)],
         characteristic: 314,
         place: core,
-        rarity: 'first'
+        rarity: FIRST
     },
     {
         icon: "❇️",
         title: "Плазмакастер",
-        price: [getResource('Фольга!', 43), getResource('Изолента', 49), getResource('Провода', 55)],
+        price: [getResource(FOIL, 43), getResource(TAPE, 49), getResource(WIRES, 55)],
         characteristic: 329,
         place: core,
-        rarity: 'second'
+        rarity: SECOND
     },
     {
         icon: "💣",
@@ -566,8 +598,23 @@ const weapons = [
     }
 ];
 
+const showWeaponItem = (weaponItem) => {
+    return `
+    ${getItemIcon(weaponItem.icon)}${weaponItem.title}
+    💪 Урон: +: ${weaponItem.characteristic}
+    💰: ${weaponItem.price.join(',')}
+    `;
+}
+
+const showWeaponInvention = (weaponItem) => {
+    return `
+    ${weaponItem.icon}${weaponItem.title}
+    ${getRarityIcon(weaponItem.rarity)} (${weaponItem.characteristic}⚔️) - ${weaponItem.price.join(',')}
+    `;
+}
+
 module.exports = {
     weapons,
-    weaponsComment,
-    inventionWeaponIcon
+    showWeaponItem,
+    showWeaponInvention
 };
