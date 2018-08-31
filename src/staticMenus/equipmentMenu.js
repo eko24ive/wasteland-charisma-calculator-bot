@@ -3,7 +3,8 @@ const {
   getHelmetsByPlace,
   getMedsByPlace,
   getWeaponsByPlace,
-  getInventionsByPlace
+  getWeaponInventionsByPlace,
+  getArmorInventionsByPlace
 } = require('./items/itemsFunctions.js');
 
 const {
@@ -14,16 +15,6 @@ const {
     basement,
     madman
 } = require('./places.js');
-
-const {
-  weapons,
-  weaponsComment
-} = require('./items/weapon.js');
-
-const {
-  armors,
-  armorsComment
-} = require('./items/armor.js');
 
 const uniqueAccessoriesText = require('./items/accessories.js');
 
@@ -299,30 +290,30 @@ const inventionsWeapon = `
 Улучшение *Оружия*
 *ВЕРСТАК:*
 
-${getInventionsByPlace(workbench, weapons, weaponsComment)}
+${getWeaponInventionsByPlace(workbench)}
 
 *ИНЖЕНЕР:*
 
-${getInventionsByPlace(engineer, weapons, weaponsComment)}
+${getWeaponInventionsByPlace(engineer)}
 
 *ЯДРО:*
 
-${getInventionsByPlace(core, weapons, weaponsComment)}
+${getWeaponInventionsByPlace(core)}
 `;
 
 const inventionsArmor = `
 Улучшение *Брони*
 *ВЕРСТАК:*
 
-${getInventionsByPlace(workbench, armors, armorsComment)}
+${getArmorInventionsByPlace(workbench)}
 
 *ИНЖЕНЕР:*
 
-${getInventionsByPlace(engineer, armors, armorsComment)}
+${getArmorInventionsByPlace(engineer)}
 
 *БЕЗУМНЫЙ СТАРИК:*
 
-${getInventionsByPlace(madman, armors, armorsComment)}
+${getArmorInventionsByPlace(madman)}
 `;
 
 const dronesText = `

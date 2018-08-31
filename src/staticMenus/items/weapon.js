@@ -40,15 +40,9 @@ const {
     getRarityIcon
 } = require('./resources.js');
 
-//const weaponsComment = '💪 Урон: +';
-//const inventionWeaponIcon = '⚔️';
-const getItemIcon = icon => {
-    if (icon) {
-       return icon;
-    }
+const weaponsComment = '💪 Урон: +';
+const inventionWeaponIcon = '⚔️';
 
-   return '';
-}
 const weapons = [
     {
         icon: false,
@@ -140,7 +134,7 @@ const weapons = [
         price: [getResource(WIRES, 7)],
         characteristic: 15,
         place: workbench,
-        rarity: FIRST
+        rarity: getRarityIcon(FIRST)
     },
     {
         icon: "⚡",
@@ -148,7 +142,7 @@ const weapons = [
         price: [getResource(WIRES, 17)],
         characteristic: 21,
         place: workbench,
-        rarity: SECOND
+        rarity: getRarityIcon(SECOND)
     },
     {
         icon: "💥",
@@ -163,7 +157,7 @@ const weapons = [
         price: [getResource(MINICHARGE, 7), getResource(WIRES, 5)],
         characteristic: 20,
         place: workbench,
-        rarity: FIRST
+        rarity: getRarityIcon(FIRST)
     },
     {
         icon: "💥",
@@ -171,7 +165,7 @@ const weapons = [
         price: [getResource(MINICHARGE, 17), getResource(WIRES, 15)],
         characteristic: 28,
         place: workbench,
-        rarity: SECOND
+        rarity: getRarityIcon(SECOND)
     },
     {
         icon: "💥",
@@ -186,7 +180,7 @@ const weapons = [
         price: [getResource(TRANSISTOR, 5), getResource(TAPE, 6)],
         characteristic: 29,
         place: workbench,
-        rarity: FIRST
+        rarity: getRarityIcon(FIRST)
     },
     {
         icon: "🔗",
@@ -201,7 +195,7 @@ const weapons = [
         price: [getResource(MINICHARGE, 4), getResource(TAPE, 6), getResource(TOPAZ, 5)],
         characteristic: 25,
         place: workbench,
-        rarity: FIRST
+        rarity: getRarityIcon(FIRST)
     },
     {
         icon: "🔗",
@@ -209,7 +203,7 @@ const weapons = [
         price: [getResource(MINICHARGE, 14), getResource(TAPE, 16), getResource(TOPAZ, 15)],
         characteristic: 32,
         place: workbench,
-        rarity: SECOND
+        rarity: getRarityIcon(SECOND)
     },
     {
         icon: "💥",
@@ -224,7 +218,7 @@ const weapons = [
         price: [getResource(TRANSISTOR, 9), getResource(IRONTHING, 10)],
         characteristic: 29,
         place: workbench,
-        rarity: FIRST
+        rarity: getRarityIcon(FIRST)
     },
     {
         icon: "💥",
@@ -240,7 +234,7 @@ const weapons = [
         price: [getResource(WOLFRAM, 9), getResource(DUSTER, 12)],
         characteristic: 46,
         place: workbench,
-        rarity: FIRST
+        rarity: getRarityIcon(FIRST)
     },
     {
         icon: "💥",
@@ -248,7 +242,7 @@ const weapons = [
         price: [getResource(WOLFRAM, 19), getResource(DUSTER, 22)],
         characteristic: 51,
         place: workbench,
-        rarity: SECOND
+        rarity: getRarityIcon(SECOND)
     },
     {
         icon: "☄️",
@@ -265,7 +259,7 @@ const weapons = [
         getResource(POTENTIOMETER, 3), getResource(STEEL, 4)],
         characteristic: 58,
         place: workbench,
-        rarity: FIRST
+        rarity: getRarityIcon(FIRST)
     },
     {
         icon: "☄️",
@@ -274,7 +268,7 @@ const weapons = [
         getResource(POTENTIOMETER, 13), getResource(STEEL, 14)],
         characteristic: 65,
         place: workbench,
-        rarity: SECOND
+        rarity: getRarityIcon(SECOND)
     },
     {
         icon: "☄️",
@@ -290,7 +284,7 @@ const weapons = [
         price: [getResource(FOIL, 3), getResource(WIRES, 15), getResource(TAPE, 12)],
         characteristic: 69,
         place: workbench,
-        rarity: FIRST
+        rarity: getRarityIcon(FIRST)
     },
     {
         icon: "☄️",
@@ -298,7 +292,7 @@ const weapons = [
         price: [getResource(FOIL, 19), getResource(WIRES, 25), getResource(TAPE, 28)],
         characteristic: 76,
         place: workbench,
-        rarity: SECOND
+        rarity: getRarityIcon(SECOND)
     },
     {
         icon: "🔮",
@@ -314,7 +308,7 @@ const weapons = [
         price: [getResource(THROGHEART, 20), getResource(DOLL, 3)],
         characteristic: 78,
         place: workbench,
-        rarity: FIRST
+        rarity: getRarityIcon(FIRST)
     },
     {
         icon: "🌟",
@@ -330,7 +324,7 @@ const weapons = [
         price: [getResource(WIRES, 30), getResource(IRONTHING, 9), getResource(TAPE, 25)],
         characteristic: 90,
         place: workbench,
-        rarity: FIRST
+        rarity: getRarityIcon(FIRST)
     },
     {
         icon: "☣️",
@@ -346,7 +340,7 @@ const weapons = [
         price: [getResource(MINICHARGE, 11), getResource(POTENTIOMETER, 14), getResource(STEEL, 5)],
         characteristic: 122,
         place: engineer,
-        rarity: FIRST
+        rarity: getRarityIcon(FIRST)
     },
     {
         icon: "☣️",
@@ -354,7 +348,7 @@ const weapons = [
         price: [getResource(MINICHARGE, 23), getResource(POTENTIOMETER, 24), getResource(STEEL, 15)],
         characteristic: 141,
         place: engineer,
-        rarity: SECOND
+        rarity: getRarityIcon(SECOND)
     },
     {
         icon: "☣️",
@@ -370,7 +364,7 @@ const weapons = [
         price: [getResource(MINICHARGE, 10), getResource(PLASMA, 8), getResource(TAPE, 4)],
         characteristic: 155,
         place: engineer,
-        rarity: FIRST
+        rarity: getRarityIcon(FIRST)
     },
     {
         icon: "☣️",
@@ -378,7 +372,7 @@ const weapons = [
         price: [getResource(MINICHARGE, 23), getResource(PLASMA, 21), getResource(TAPE, 24)],
         characteristic: 163,
         place: engineer,
-        rarity: FIRST
+        rarity: getRarityIcon(FIRST)
     },
     {
         icon: "🌟",
@@ -395,7 +389,7 @@ const weapons = [
         getResource(POTENTIOMETER, 6), getResource(STEEL, 7)],
         characteristic: 189,
         place: engineer,
-        rarity: FIRST
+        rarity: getRarityIcon(FIRST)
     },
     {
         icon: "🌟",
@@ -404,7 +398,7 @@ const weapons = [
         getResource(POTENTIOMETER, 26), getResource(STEEL, 17)],
         characteristic: 194,
         place: engineer,
-        rarity: SECOND
+        rarity: getRarityIcon(SECOND)
     },
     {
         icon: "💿",
@@ -420,7 +414,7 @@ const weapons = [
         price: [getResource(DUSTER, 30)],
         characteristic: 207,
         place: engineer,
-        rarity: FIRST
+        rarity: getRarityIcon(FIRST)
     },
     {
         icon: "💿",
@@ -428,7 +422,7 @@ const weapons = [
         price: [getResource(DUSTER, 50)],
         characteristic: false,
         place: engineer,
-        rarity: SECOND
+        rarity: getRarityIcon(SECOND)
     },
     {
         icon: "♻️",
@@ -445,7 +439,7 @@ const weapons = [
         getResource(TAPE, 12), getResource(WIRES, 15)],
         characteristic: 231,
         place: engineer,
-        rarity: FIRST
+        rarity: getRarityIcon(FIRST)
     },
     {
         icon: "♻️",
@@ -454,7 +448,7 @@ const weapons = [
         getResource(TAPE, 32), getResource(WIRES, 25)],
         characteristic: 242,
         place: engineer,
-        rarity: SECOND
+        rarity: getRarityIcon(SECOND)
     },
     {
         icon: "🐱",
@@ -471,7 +465,7 @@ const weapons = [
         getResource(THROGHEART, 21), getResource(POTENTIOMETER, 21), getResource(STEEL, 24)],
         characteristic: 284,
         place: engineer,
-        rarity: FIRST
+        rarity: getRarityIcon(FIRST)
     },
     {
         icon: "🐱",
@@ -480,7 +474,7 @@ const weapons = [
         getResource(THROGHEART, 31), getResource(POTENTIOMETER, 31), getResource(STEEL, 44)],
         characteristic: 298,
         place: engineer,
-        rarity: SECOND
+        rarity: getRarityIcon(SECOND)
     },
     {
         icon: "✳️",
@@ -504,7 +498,7 @@ const weapons = [
         price: [getResource(FOIL, 23), getResource(TAPE, 22), getResource(WIRES, 25)],
         characteristic: 314,
         place: core,
-        rarity: FIRST
+        rarity: getRarityIcon(FIRST)
     },
     {
         icon: "❇️",
@@ -512,7 +506,7 @@ const weapons = [
         price: [getResource(FOIL, 43), getResource(TAPE, 49), getResource(WIRES, 55)],
         characteristic: 329,
         place: core,
-        rarity: SECOND
+        rarity: getRarityIcon(SECOND)
     },
     {
         icon: "💣",
@@ -598,23 +592,8 @@ const weapons = [
     }
 ];
 
-const showWeaponItem = (weaponItem) => {
-    return `
-    ${getItemIcon(weaponItem.icon)}${weaponItem.title}
-    💪 Урон: +: ${weaponItem.characteristic}
-    💰: ${weaponItem.price.join(',')}
-    `;
-}
-
-const showWeaponInvention = (weaponItem) => {
-    return `
-    ${weaponItem.icon}${weaponItem.title}
-    ${getRarityIcon(weaponItem.rarity)} (${weaponItem.characteristic}⚔️) - ${weaponItem.price.join(',')}
-    `;
-}
-
 module.exports = {
     weapons,
-    showWeaponItem,
-    showWeaponInvention
+    weaponsComment,
+    inventionWeaponIcon
 };

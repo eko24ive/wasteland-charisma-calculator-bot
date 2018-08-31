@@ -22,6 +22,11 @@ const POTENTIOMETER = 'POTENTIOMETER';
 const STEEL = 'STEEL';
 const PLASMA = 'PLASMA';
 const DOLL = 'DOLL';
+const BIOS = 'BIOS';
+const MAGNET = 'MAGNET';
+const PLANTAIN = 'PLANTAIN';
+const STARCH = 'STARCH';
+const AIRFILTER = 'AIRFILTER';
 
 const resources = {
     CAPS: {
@@ -144,10 +149,35 @@ const resources = {
         title: 'Детская кукла',
         icon: '',
         description: '' 
-    }
+    },
+    BIOS: {
+        title: 'Батарейка BIOS',
+        icon: '',
+        description: '' 
+    },
+    MAGNET: {
+        title: 'Магнит',
+        icon: '',
+        description: '' 
+    },
+    PLANTAIN: {
+        title: 'Подорожник',
+        icon: '',
+        description: '' 
+    },
+    STARCH: {
+        title: 'Крахмал',
+        icon: '',
+        description: '' 
+    },
+    AIRFILTER: {
+        title: 'Воздушный фильтр',
+        icon: '',
+        description: '' 
+    },
 };
 
-const getResource = (name,amount) => {
+const getResource = (name, amount) => {
     const resource = resources[name];
     return `${resource.icon}${resource.title}: ${amount}`;
 }
@@ -157,7 +187,7 @@ const SECOND = 'SECOND';
 
 const rarities = {
     FIRST: {
-        icon: '🔆'
+        icon: '🏅'
     },
     SECOND: {
         icon: '🔆'
@@ -194,6 +224,11 @@ module.exports = {
     STEEL,
     PLASMA,
     DOLL,
+    BIOS,
+    PLANTAIN,
+    MAGNET,
+    STARCH,
+    AIRFILTER,
     getResource,
     FIRST,
     SECOND,
