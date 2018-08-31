@@ -1,6 +1,6 @@
 const _ = require('underscore');
 
-const routedBeastView = (Beast, seachParams, route) => {
+const routedBeastView = (Beast, seachParams, route = null, config) => {
     return new Promise((resolve, reject) => {
         Beast.findOne(seachParams).then(fBeast => {
             if (fBeast !== null) {
@@ -98,7 +98,7 @@ const routedBeastView = (Beast, seachParams, route) => {
                     return mappedConcussions.join('\n');
                 }
 
-                const getBattles = (battles, trim, small) => {
+                const getBattles = (battles, trim, small, withLinks = false) => {
                     if (_.isEmpty(battles)) {
                         return {
                             successBattles: 'Нет данных об удачных битвах',
@@ -118,24 +118,25 @@ const routedBeastView = (Beast, seachParams, route) => {
                     }
 
                     battles.forEach(battle => {
+                        let battleReply;
+                        const battleLink = `\n/battle_${battle._id}`;
+
                         if (battle.outcome === 'win') {
                             // TODO: Fix battle parse
                             if (battle.stats !== undefined) {
-                                let battleReply;
                                 if(small) {
-                                    battleReply = `💔${battle.totalDamageReceived} урона за ${battle.damagesGiven.length} удар(а)`;
+                                    battleReply = `💔${battle.totalDamageReceived} урона за ${battle.damagesGiven.length} удар(а)${battleLink}`;
                                 } else {
-                                    battleReply = `▫️ Успешно при уроне мобу ${battle.totalDamageGiven}.\nСтаты игрока: ⚔️Урон: ${battle.stats.damage} 🛡Броня: ${battle.stats.armor}.\nВсего урона от моба получено -${damageReceived(battle)}`;
+                                    battleReply = `▫️ Успешно при уроне мобу ${battle.totalDamageGiven}.\nСтаты игрока: ⚔️Урон: ${battle.stats.damage} 🛡Броня: ${battle.stats.armor}.\nВсего урона от моба получено -${damageReceived(battle)}${battleLink}`;
                                 }
                                 successBattles.push({battleReply, totalDamageGiven: battle.totalDamageGiven})
                             }
                         } else {
                             if (battle.stats !== undefined) {
-                                let battleReply;
                                 if(small) {
-                                    battleReply = `💥${battle.totalDamageGiven} не хватило мобу за ${battle.damagesGiven.length} удар(а)`;
+                                    battleReply = `💥${battle.totalDamageGiven} не хватило мобу за ${battle.damagesGiven.length} удар(а)${battleLink}`;
                                 } else {
-                                    battleReply = `▫️ Неудача при уроне мобу ${battle.totalDamageGiven}.\nСтаты игрока:⚔️Урон: ${battle.stats.damage} 🛡Броня: ${battle.stats.armor}.\nВсего урона от моба получено -${damageReceived(battle)}`;
+                                    battleReply = `▫️ Неудача при уроне мобу ${battle.totalDamageGiven}.\nСтаты игрока:⚔️Урон: ${battle.stats.damage} 🛡Броня: ${battle.stats.armor}.\nВсего урона от моба получено -${damageReceived(battle)}${battleLink}`;
                                 }
 
                                 failBattles.push({battleReply, totalDamageReceived: battle.totalDamageReceived})
@@ -163,12 +164,12 @@ const routedBeastView = (Beast, seachParams, route) => {
                 const {
                     successBattles: successBattlesLong,
                     failBattles: failBattlesLong
-                } = getBattles(beast.battles,5, false);
+                } = getBattles(beast.battles,5, false, config.env === 'STAGING');
 
                 const {
                     successBattles: successBattlesShort,
                     failBattles: failBattlesShort
-                } = getBattles(beast.battles, 1, false);
+                } = getBattles(beast.battles, 1, false, config.env === 'STAGING');
 
                 const processedFlees = getFlees(beast.flees);
 

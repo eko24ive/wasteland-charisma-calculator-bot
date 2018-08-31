@@ -53,6 +53,7 @@ const menuItemHandler = require('./src/utils/menuItemHandler');
 const comparePips = require('./src/database/utils/comparePips');
 
 const routedBeastView = require('./src/views/routedBeastView');
+const routedBattleView = require('./src/views/routedBattleView');
 
 const equipmentMenu = require('./src/staticMenus/equipmentMenu');
 const locationsMenu = require('./src/staticMenus/locationsMenu');
@@ -812,6 +813,8 @@ reply = `Шикардос, я обновил твой пип!
                 name: beast.name,
                 type: beast.type,
                 isDungeon: false
+            },null,{
+                env: process.env.ENV
             }).then(({reply, beast}) => {
                 if(reply !== false) {
                     const beastReplyMarkup = getBeastKeyboard(beast._id.toJSON());
@@ -832,6 +835,8 @@ reply = `Шикардос, я обновил твой пип!
             routedBeastView(Beast, {
                 name: oBeast.name,
                 isDungeon: true
+            },{
+                env: process.env.ENV
             }).then(({reply, beast}) => {
                 if(reply !== false) {
                     /* const beastReplyMarkup = getBeastKeyboard(beast._id.toJSON());
@@ -2132,6 +2137,8 @@ bot.on(/mob_(.+)/, msg => {
     routedBeastView(Beast, {
         _id: id,
         isDungeon: false
+    },null,{
+        env: process.env.ENV
     }).then(({reply,beast}) => {
         if(reply != false) {
             const beastReplyMarkup = getBeastKeyboard(beast._id.toJSON());
@@ -2322,7 +2329,9 @@ ${beastsList}
         routedBeastView(Beast, {
             _id: beastId,
             isDungeon: false
-        }, route).then(({reply, beast}) => {
+        }, route,{
+            env: process.env.ENV
+        }).then(({reply, beast}) => {
             // TODO: Fix keyboard for dungeon beasts
             const beastReplyMarkup = getBeastKeyboard(beast._id.toJSON());
 
@@ -2621,6 +2630,27 @@ bot.on('/show_encyclopedia', msg => {
         }),
         parseMode: 'html'
     });
+});
+
+bot.on(/\/battle_(.+)/, msg => {
+
+    const [,battleId] = /\/battle_(.+)/.exec(msg.text);
+    // msg.reply.text('neat!');    
+
+    routedBattleView(Beast, {
+        battleId: mongoose.Types.ObjectId(battleId)
+    }).then(({reply, beast}) => {
+        if(reply !== false) {
+
+            return msg.reply.text(reply,{
+                parseMode: 'html'
+            }).catch(e => console.log(e));
+        } else {
+            return msg.reply.text(`Прости, я ничего не знаю про эту битву :c`, {
+                asReply: true
+            }).catch(e => console.log(e));
+        }
+    }).catch(e => console.log(e));
 })
 
 bot.start();
