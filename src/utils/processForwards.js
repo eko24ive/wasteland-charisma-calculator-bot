@@ -114,7 +114,7 @@ const processForwards = (inputData, config) => {
     }
 
     // 1525607351
-    if(inputData.filter(({date}) => date < 1525607078).length > 0) {
+    if(inputData.filter(({date}) => date < 1529787600).length > 0) {
         reportData.criticalError = 'Был замечен форвард время которого меньше за время выкатки обновы Wasteland Wars';
 
         return {reportData};
