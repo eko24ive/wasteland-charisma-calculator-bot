@@ -1502,6 +1502,15 @@ const processUserData = (msg, options) => {
         updatesData
     } = processForwards(data);
 
+    if (reportData.criticalError) {
+        return msg.reply.text(`<b>❌ЗАМЕЧЕНА КРИТИЧЕСКАЯ ОШИБКА❌</b>\n\n${reportData.criticalError}\n\n<i>Форварды были отменены.</i>`, {
+            replyMarkup: defaultKeyboard,
+            parseMode: 'html'
+        });
+    }
+
+
+
     if(updatesData.locations.length === 0 && updatesData.beasts.length === 0) {
         return msg.reply.text(`
 К сожалению я ничего не смог узнать из твоих форвардов :с`, {
@@ -2154,7 +2163,7 @@ bot.on(['/cancel', '/journeyforwardcancel'], msg => {
 
     if(sessions[msg.from.id] === undefined) {
         createSession(msg.from.id);
-        
+
         return msg.reply.text(backMessage, {
             replyMarkup: defaultKeyboard,
             parseMode: 'html'
