@@ -28,7 +28,10 @@ let amount = 0;
 let total = 0;
 let totalBeasts = 0;
 
-Beast.find().then(beasts => {
+Beast.find({
+  type: 'Regular',
+  isDungeon: false
+}).then(beasts => {
   console.log('===START===');
 
   async.forEach(beasts, function (beast, next) {
@@ -45,26 +48,22 @@ Beast.find().then(beasts => {
       total++;
       if (battle.stamp) {
         const date = moment(Number(battle.stamp.slice(0, 13)));
-        const day = date.day();
-        const month = date.month();
+        const day = Number(date.format('DD'));
+        const month = Number(date.format('MM'));
         const year = date.year();
 
         if (year !== 2018) {
           console.log('SLICE ERROR');
           return true;
         } else {
-          if ((day >= 20 && month >= 6) || (month >= 7)) { //Stage one
-            if (possibleDzRange(beast.distanceRange, dzRangeStageOne)) {
-              amount++;
-              return false;
-            }
-          } else if (day >= 1 && month >= 7 || month >= 8) { //Stage two
-            if (possibleDzRange(beast.distanceRange, dzRangeStageTwo)) {
-              amount++;
-              return false;
-            }
+          if (((day >= 20 && month >= 6) || (month >= 7)) && possibleDzRange(beast.distanceRange, dzRangeStageOne)) { //Stage one
+            amount++;
+            return false;
+          } else if (((day >= 1 && month >= 7) || month >= 8) && possibleDzRange(beast.distanceRange, dzRangeStageTwo)) { //Stage two
+            amount++;
+            return false;
           }
-          
+
           return true;
         }
       }
@@ -73,12 +72,13 @@ Beast.find().then(beasts => {
     });
 
     beast.battles = newBatlles;
-    beast.type = 'Regular';
     beast.markModified('battles');
-    beast.save().then(() => {next()});
+    beast.save().then(() => {
+      next()
+    });
   }, () => {
     console.log(`Total beasts: ${totalBeasts}\nTotal battles: ${total}\nAmount: ${amount}\nPost purge: ${total-amount}`);
     mongoose.disconnect();
-  console.log('===END===');
-});
+    console.log('===END===');
+  });
 });
