@@ -113,7 +113,7 @@ const processForwards = (inputData, config) => {
         reportData.pipRequired = false;
     }
 
-    // 1525607351
+    // accept only after 24.06.2018
     if(inputData.filter(({date}) => date < 1529787600).length > 0) {
         reportData.criticalError = 'Был замечен форвард время которого меньше за время выкатки обновы Wasteland Wars';
 
