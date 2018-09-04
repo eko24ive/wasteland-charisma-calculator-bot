@@ -119,7 +119,7 @@ const routedBeastView = (Beast, seachParams, route = null, config) => {
 
                     battles.forEach(battle => {
                         let battleReply;
-                        const battleLink = `\n/battle_${battle._id}`;
+                        const battleLink = withLinks ? `\n/battle_${battle._id}` : '';
 
                         if (battle.outcome === 'win') {
                             // TODO: Fix battle parse
