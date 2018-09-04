@@ -2642,6 +2642,11 @@ bot.on('/show_encyclopedia', msg => {
 });
 
 bot.on(/\/battle_(.+)/, msg => {
+    if(process.env.ENV === 'PRODUCTION') {
+        return msg.reply.text(`Ну и хули ты сюда лезешь?)`, {
+            asReply: true
+        }).catch(e => console.log(e));
+    }
 
     const [,battleId] = /\/battle_(.+)/.exec(msg.text);
     // msg.reply.text('neat!');    
