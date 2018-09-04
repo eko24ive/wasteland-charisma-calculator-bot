@@ -484,14 +484,15 @@ reply = `Шикардос, я обновил твой пип!
             beastType = data.beastFaced.type
         }
 
-        if (beastName !== sessions[msg.from.id].beastToValidateName && sessions[msg.from.id].beastToValidateName !== '???' && beastName !== sessions[msg.from.id].beastToValidateName) {
+        if (beastName !== sessions[msg.from.id].beastToValidateName || sessions[msg.from.id].beastToValidateName !== '???' || sessions[msg.from.id].beastToValidateType !== beastType) {
             return msg.reply.text(`
 Этот моб не похож на того с которым ты дрался. Ты чё - наебать меня вздумал?!
 
 Если ты передумал её кидать - жми /skipbeastforward
-*Но тогда я проигнорирую битву с этим мобом*
+<b>Но тогда я проигнорирую битву с этим мобом</b>
             `, {
-                asReply: true
+                asReply: true,
+                parseMode: 'html'
             });
         } else if (isLocation || isDungeonBeastFaced) {
             sessions[msg.from.id].data.push({
@@ -1060,7 +1061,7 @@ const actualProcessUserData = (msg, reportData, updatesData, options) => {
         sessions[msg.from.id].beastToValidateName = reportData.beastToValidate[0].name;
         sessions[msg.from.id].beastToValidateType = reportData.beastToValidate[0].type;
         return msg.reply.text(`
-Слушай, я не могу понять кто тебе надрал задницу, ${reportData.beastToValidate[0].name} - это обычный моб или данжевый?
+Слушай, я не могу понять кто тебе надрал задницу, ${reportData.beastToValidate[0].type === 'DarkZone' ? '🚷' : ''}${reportData.beastToValidate[0].name} - это обычный моб или данжевый?
 
 Пожалуйста скинь форвард встречи с этим мобом:
 \`Во время вылазки на тебя напал...\`
