@@ -378,6 +378,7 @@ const processForwards = (inputData, config) => {
             if (reportData.lastBeastSeen) {
                 if(data.distance === reportData.lastBeastSeen.distance) {
                     beastData.name = reportData.lastBeastSeen.name;
+                    beastData.type = data.type;
 
                     beastData.flees = [{
                         outcome: data.outcome,

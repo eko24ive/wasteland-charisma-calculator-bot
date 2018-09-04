@@ -4,7 +4,7 @@ const {
 
 const parseFleeDefeat = flee => {
     const splitted = flee.split('\n');
-    let outcome, capsLost, materialsLost, healthInjuries;
+    let outcome, capsLost, materialsLost, healthInjuries, type;
 
     const [, distance] = regexps.campDistanceRegExp.exec(flee);
 
@@ -28,6 +28,12 @@ const parseFleeDefeat = flee => {
         outcome = 'lose'
     }
 
+    if (regexps.darkZone.test(flee)) {
+        type = 'DarkZone';
+    } else {
+        type = 'Regular';
+    }
+
     const [, negativePrefix, currentHealth, healthCap] = regexps.healthRegExp.exec(flee);
     
 negativePrefix
@@ -37,7 +43,8 @@ negativePrefix
         capsLost,
         materialsLost,
         healthInjuries: Number(healthInjuries),
-        currentHealth: Number(`${negativePrefix}${currentHealth}`)
+        currentHealth: Number(`${negativePrefix}${currentHealth}`),
+        type
     }
 };
 
