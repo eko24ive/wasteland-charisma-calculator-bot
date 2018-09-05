@@ -62,17 +62,17 @@ const resources = {
     },
     CUBONITE: {
         title: 'Кубонит',
-        icon: '🔗(Кубонит)',
+        icon: '🔗',
         description: ''
     },
     OSMIUM: {
         title: 'Осмий',
-        icon: '🔗(Осмий)',
+        icon: '🔗',
         description: ''
     },
     TITANIUM: {
         title: 'β-Ti3Au',
-        icon: '🔗(β-Ti3Au)',
+        icon: '🔗',
         description: ''
     },
     EPHEDRINE: {
@@ -179,7 +179,7 @@ const resources = {
 
 const getResource = (name, amount) => {
     const resource = resources[name];
-    return `${resource.icon}${resource.title} ${amount}`;
+    return `${resource.icon}${resource.title} x${amount}`;
 }
 
 const FIRST = 'FIRST';

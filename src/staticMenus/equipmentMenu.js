@@ -277,30 +277,20 @@ const inventionsText = `
 const inventionsWeapon = `
 Улучшение *Оружия*
 *ВЕРСТАК:*
-
 ${getWeaponInventionsByPlace(workbench)}
-
 *ИНЖЕНЕР:*
-
 ${getWeaponInventionsByPlace(engineer)}
-
 *ЯДРО:*
-
 ${getWeaponInventionsByPlace(core)}
 `;
 
 const inventionsArmor = `
 Улучшение *Брони*
 *ВЕРСТАК:*
-
 ${getArmorInventionsByPlace(workbench)}
-
 *ИНЖЕНЕР:*
-
 ${getArmorInventionsByPlace(engineer)}
-
 *БЕЗУМНЫЙ СТАРИК:*
-
 ${getArmorInventionsByPlace(madman)}
 `;
 

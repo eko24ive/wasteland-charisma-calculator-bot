@@ -45,20 +45,20 @@ const showMed = item => {
     return `
 ${getItemIcon(item.icon)} *${item.title}*
 ${item.effect}${getItemCharacteristic(item.characteristic)}
-💰: ${item.price.join(',')}
+💰: ${item.price.join(', ')}
 ${item.comment ? `${item.comment}` : ''}
 `;
 }
 
 const showInvention = (item, comment) => {
     return `
-    ${item.icon}${item.title}
-    ${item.rarity} (${item.characteristic}${comment}) - ${item.price.join(',')}
-    `;
+${getItemIcon(item.icon)}${item.title} ${item.rarity}
+(${getItemCharacteristic(item.characteristic)}${comment}) - ${item.price.join(', ')}
+`;
 }
 
 const showItemsByPlace = (place, items, itemsComment) => {
-    const itemsFromPlace = items.filter(item => (item.place === place)&&(!!item.price));
+    const itemsFromPlace = items.filter(item => (item.place === place)&&(!!item.price)&&(!item.rarity));
     return Object.keys(itemsFromPlace).map(item => {
         return showItem(itemsFromPlace[item], itemsComment);
     }).join('');
