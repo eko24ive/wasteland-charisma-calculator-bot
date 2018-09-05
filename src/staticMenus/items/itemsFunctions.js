@@ -35,19 +35,19 @@ const getItemCharacteristic = characteristic => {
 
 const showItem = (item, comment) => {
     return `
-    ${getItemIcon(item.icon)} *${item.title}*
-    ${comment} ${item.characteristic}
-    💰: ${item.price.join(',')}
-    `;
+${getItemIcon(item.icon)} *${item.title}*
+${comment} ${item.characteristic}
+💰: ${item.price.join(', ')}
+`;
 }
 
 const showMed = item => {
     return `
-    ${getItemIcon(item.icon)} *${item.title}*
-    ${item.effect}${getItemCharacteristic(item.characteristic)}
-    💰: ${item.price.join(',')}
-    ${item.comment ? `${item.comment}\n` : ''}
-    `;
+${getItemIcon(item.icon)} *${item.title}*
+${item.effect}${getItemCharacteristic(item.characteristic)}
+💰: ${item.price.join(',')}
+${item.comment ? `${item.comment}` : ''}
+`;
 }
 
 const showInvention = (item, comment) => {

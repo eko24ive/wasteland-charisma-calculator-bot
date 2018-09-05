@@ -179,7 +179,7 @@ const resources = {
 
 const getResource = (name, amount) => {
     const resource = resources[name];
-    return `${resource.icon}${resource.title}: ${amount}`;
+    return `${resource.icon}${resource.title} ${amount}`;
 }
 
 const FIRST = 'FIRST';

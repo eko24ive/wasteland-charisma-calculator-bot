@@ -50,7 +50,6 @@ const vendorText = `
 
 const vendorWeapon = `
 *⚔️ Оружие у 🏚Торгаша:*
-
 ${getWeaponsByPlace(merchant)}
 -----
 
@@ -63,13 +62,11 @@ ${getWeaponsByPlace(merchant)}
 
 const vendorArmor = `
 *🛡️Броня у 🏚Торгаша:*
-
 ${getArmorsByPlace(merchant)}
 `;
 
 const vendorHelmets = `
 *🛡️Шлемы у 🏚Торгаша:*
-
 ${getHelmetsByPlace(merchant)}
 `;
 
@@ -82,7 +79,6 @@ const workbenchText = `
 
 const workbenchWeapon = `
 *⚔️Оружие на верстаке:*
-
 ${getWeaponsByPlace(workbench)}
 
 Все оружие, начиная с *💥BFGzzv-4000* не ломается от времени и может использоваться вечно
@@ -90,13 +86,11 @@ ${getWeaponsByPlace(workbench)}
 
 const workbenchArmor = `
 *🛡Броня на верстаке:*
-
 ${getArmorsByPlace(workbench)}
 `;
 
 const workbenchFirstAid = `
 *⛑Аптечка на верстаке:*
-
 ${getMedsByPlace(workbench)}
 `;
 
@@ -112,19 +106,16 @@ const engineerText = `
 
 const engineerWeapon = `
 *⚔️Оружие у 👓Инженера:*
-
 ${getWeaponsByPlace(engineer)}
 `;
 
 const engineerArmor = `
 *🛡Броня у 👓Инженера:*
-
 ${getArmorsByPlace(engineer)}
 `;
 
 const engineerHelmets = `
 *🛡Шлемы у 👓Инженера:*
-
 ${getHelmetsByPlace(engineer)}
 `;
 
@@ -161,13 +152,11 @@ const engineerModules = `
 
 const engineerFirstAid = `
 *⛑Аптечка* у 👓Инженера. Дает возможность восстановить здоровье в пустоши:
-
 ${getMedsByPlace(engineer)}
 `;
 
 const basementText = `
 Вещи в *🚪Уютном подвальчике*, который расположен на расстоянии 👣43км от лагеря:
-
 ${getWeaponsByPlace(basement)}
 `;
 
@@ -194,7 +183,6 @@ const madmanText = `Вещи у *👴Безумного старика*, кот�
      +🛡1.5 за каждый км, пройденный от лагеря`;
 
 const coreText = `⚔️Оружие в *🕎Ядре*, который расположен на расстоянии 👣30км от лагеря:
-
 ${getWeaponsByPlace(core)}
 `;
 

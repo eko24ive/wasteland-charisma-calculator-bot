@@ -13,10 +13,8 @@ const {
     getResource
 } = require('./resources.js');
 
-//const helmetsComment = '🛡 Защита: +';
-const helmetsComment = helmets => {
-    return '🛡 Защита: +';
-}
+const helmetsComment = '🛡 Защита: +';
+
 const helmets = [
     {
         icon: false,
