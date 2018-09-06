@@ -30,6 +30,7 @@ const {
     STARCH,
     AIRFILTER,
     EPHEDRINE,
+    TRANSISTOR,
     getResource,
     FIRST,
     SECOND,
@@ -129,21 +130,72 @@ const armors = [
         title: "Силовая броня",
         price: [getResource(MATERIALS, 12990), getResource(GENERATORS, 5)],
         characteristic: 25,
-        place: workbench
+        place: workbench,
+        rarities: [FIRST, SECOND]
+    },
+    {
+        icon: "⚙️",
+        title: "Силовая броня",
+        price: [getResource(MINICHARGE, 7), getResource(WIRES, 5)],
+        characteristic: 45,
+        place: workbench,
+        rarity: getRarityIcon(FIRST)
+    },
+    {
+        icon: "⚙️",
+        title: "Силовая броня",
+        price: [getResource(MINICHARGE, 17), getResource(WIRES, 15)],
+        characteristic: 51,
+        place: workbench,
+        rarity: getRarityIcon(SECOND)
     },
     {
         icon: "⚙️",
         title: "Силовая броня🎖",
         price: [getResource(MATERIALS, 22990), getResource(GENERATORS, 15)],
         characteristic: 35,
-        place: workbench
+        place: workbench,
+        rarities: [FIRST, SECOND]
+    },
+    {
+        icon: "⚙️",
+        title: "Силовая броня🎖",
+        price: [getResource(WIRES, 7)],
+        characteristic: 65,
+        place: workbench,
+        rarity: getRarityIcon(FIRST)
+    },
+    {
+        icon: "⚙️",
+        title: "Силовая броня🎖",
+        price: [getResource(WIRES, 19)],
+        characteristic: 71,
+        place: workbench,
+        rarity: getRarityIcon(SECOND)
     },
     {
         icon: "⚙️",
         title: "Силовая броня🎖🎖",
         price: [getResource(MATERIALS, 35990), getResource(GENERATORS, 35)],
         characteristic: 45,
-        place: workbench
+        place: workbench,
+        rarities: [FIRST, SECOND]
+    },
+    {
+        icon: "⚙️",
+        title: "Силовая броня🎖🎖",
+        price: [getResource(TRANSISTOR, 8), getResource(TAPE, 9)],
+        characteristic: 70,
+        place: workbench,
+        rarity: getRarityIcon(FIRST)
+    },
+    {
+        icon: "⚙️",
+        title: "Силовая броня🎖🎖",
+        price: [getResource(TRANSISTOR, 18), getResource(TAPE, 19)],
+        characteristic: 79,
+        place: workbench,
+        rarity: getRarityIcon(SECOND)
     },
     {
         icon: "⚙️",
@@ -196,6 +248,14 @@ const armors = [
         rarity: getRarityIcon(FIRST)
     },
     {
+        icon: "🦇",
+        title: "Бэткостюм",
+        price: [getResource(FOIL, 25), getResource(WIRES, 25), getResource(TAPE, 24)],
+        characteristic: 103,
+        place: engineer,
+        rarity: getRarityIcon(SECOND)
+    },
+    {
         icon: "⚛️",
         title: "Нановолокно",
         price: [getResource(MATERIALS, 98000), getResource(GENERATORS, 150), 
@@ -212,6 +272,15 @@ const armors = [
         characteristic: 113,
         place: engineer,
         rarity: getRarityIcon(FIRST)
+    },
+    {
+        icon: "⚛️",
+        title: "Нановолокно",
+        price: [getResource(FOIL, 25), getResource(WOLFRAM, 23),
+            getResource(TAPE, 24), getResource(WIRES, 38)],
+        characteristic: 126,
+        place: engineer,
+        rarity: getRarityIcon(SECOND)
     },
     {
         icon: "🛠",
@@ -280,7 +349,7 @@ const armors = [
         title: 'Броня Безумца',
         price: [getResource(FOIL, 2), getResource(THROGHEART, 11),
             getResource(POTENTIOMETER, 3), getResource(STEEL, 4)],
-        characteristic: 58,
+        characteristic: 75,
         place: madman,
         rarity: getRarityIcon(FIRST)
     },
@@ -289,7 +358,7 @@ const armors = [
         title: 'Броня Безумца',
         price: [getResource(FOIL, 12), getResource(THROGHEART, 21),
             getResource(POTENTIOMETER, 13), getResource(STEEL, 14)],
-        characteristic: false,
+        characteristic: 84,
         place: madman,
         rarity: getRarityIcon(SECOND)
     },

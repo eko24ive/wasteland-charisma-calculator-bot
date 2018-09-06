@@ -186,6 +186,14 @@ const weapons = [
         rarity: getRarityIcon(FIRST)
     },
     {
+        icon: "💥",
+        title: "BFGzzv-4000",
+        price: [getResource(TRANSISTOR, 15), getResource(TAPE, 16)],
+        characteristic: 36,
+        place: workbench,
+        rarity: getRarityIcon(SECOND)
+    },
+    {
         icon: "🔗",
         title: "Силовой кастет",
         price: [getResource(MATERIALS, 14000), getResource(QUARZ, 20), getResource(GENERATORS, 5)],
@@ -224,6 +232,14 @@ const weapons = [
         characteristic: 29,
         place: workbench,
         rarity: getRarityIcon(FIRST)
+    },
+    {
+        icon: "💥",
+        title: "Колыбель Пустоши",
+        price: [getResource(TRANSISTOR, 19), getResource(IRONTHING, 20)],
+        characteristic: 37,
+        place: workbench,
+        rarity: getRarityIcon(SECOND)
     },
     {
         icon: "💥",
@@ -320,6 +336,14 @@ const weapons = [
         rarity: getRarityIcon(FIRST)
     },
     {
+        icon: "🔮",
+        title: "Энергосфера",
+        price: [getResource(THROGHEART, 34), getResource(DOLL, 13)],
+        characteristic: 83,
+        place: workbench,
+        rarity: getRarityIcon(SECOND)
+    },
+    {
         icon: "🌟",
         title: "Армагеддец",
         price: [getResource(MATERIALS, 129990), getResource(GENERATORS, 150), 
@@ -335,6 +359,14 @@ const weapons = [
         characteristic: 90,
         place: workbench,
         rarity: getRarityIcon(FIRST)
+    },
+    {
+        icon: "🌟",
+        title: "Армагеддец",
+        price: false,
+        characteristic: 98,
+        place: workbench,
+        rarity: getRarityIcon(SECOND)
     },
     {
         icon: "☣️",
@@ -434,7 +466,7 @@ const weapons = [
         icon: "💿",
         title: "DVD-VCH",
         price: [getResource(DUSTER, 50)],
-        characteristic: false,
+        characteristic: 214,
         place: engineer,
         rarity: getRarityIcon(SECOND)
     },

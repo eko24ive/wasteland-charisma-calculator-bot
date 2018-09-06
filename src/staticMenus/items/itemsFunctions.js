@@ -19,12 +19,26 @@ const {
 
 const meds = require('./meds.js');
 
+const {
+    FIRST,
+    SECOND,
+    getRarityIcon
+} = require('./resources.js');
+
 const getItemIcon = icon => {
     if (icon) {
        return icon;
     }
 
    return '';
+}
+
+const getItemPrice = item => {
+    if (item.price) {
+       return item.price.join(', ');
+    }
+
+   return '???';
 }
 
 const getItemCharacteristic = characteristic => {
@@ -39,7 +53,7 @@ const showItem = (item, comment) => {
     return `
 ${getItemIcon(item.icon)} *${item.title}*
 ${comment} ${item.characteristic}
-💰: ${item.price.join(', ')}
+💰: ${getItemPrice(item)}
 `;
 }
 
@@ -47,19 +61,19 @@ const showMed = item => {
     return `
 ${getItemIcon(item.icon)} *${item.title}*
 ${item.effect}${getItemCharacteristic(item.characteristic)}
-💰: ${item.price.join(', ')}${item.comment ? `\n${item.comment}` : ''}
+💰: ${getItemPrice(item)}${item.comment ? `\n${item.comment}` : ''}
 `;
 }
 
 //const showInvention = (item, comment) => {
 //    return `
 //${getItemIcon(item.icon)}${item.title} ${item.rarity}
-//(${getItemCharacteristic(item.characteristic)}${comment}) - ${item.price.join(', ')}
+//(${getItemCharacteristic(item.characteristic)}${comment}) - ${getItemPrice(item)}
 //`;
 //}
 
 const showInventionWithoutTitle = (item, comment) => {
-    return `${item.rarity} (${getItemCharacteristic(item.characteristic)}${comment}) - ${item.price.join(', ')}`;
+    return `${item.rarity} (${getItemCharacteristic(item.characteristic)}${comment}) - ${getItemPrice(item)}`;
 }
 
 const showItemsByPlace = (place, items, itemsComment) => {
@@ -73,9 +87,9 @@ const showItemsInventionsByPlace = (place, items, itemsComment) => {
     const allInv = items.filter(item => (item.place === place)&&(!!item.rarities));
     let result = '';
     allInv.forEach(inv => {
-        const rar1 = items.filter(i => (i.title === inv.title)&&(i.rarity === '🏅'));
-        const rar2 = items.filter(i => (i.title === inv.title)&&(i.rarity === '🔆'));
-        result += `${getItemIcon(inv.icon)} *${inv.title}*
+        const rar1 = items.filter(i => (i.title === inv.title)&&(i.rarity === getRarityIcon(FIRST)));
+        const rar2 = items.filter(i => (i.title === inv.title)&&(i.rarity === getRarityIcon(SECOND)));
+        result += `${getItemIcon(inv.icon)} *${inv.title}* (${getItemCharacteristic(inv.characteristic)}${itemsComment})
 ${rar1[0] ? `${showInventionWithoutTitle(rar1[0], itemsComment)}` : ''}
 ${rar2[0] ? `${showInventionWithoutTitle(rar2[0], itemsComment)}\n` : ''}\n`;
     });
