@@ -40,8 +40,8 @@ const {
     getRarityIcon
 } = require('./resources.js');
 
-const weaponsComment = '💪 Урон: +';
-const inventionWeaponIcon = '⚔️';
+const weaponsLongComment = '💪 Урон: +';
+const weaponsShortComment = '⚔️';
 
 const weapons = [
     {
@@ -126,7 +126,8 @@ const weapons = [
         title: "Электромеч",
         price: [getResource(MATERIALS, 3900)],
         characteristic: 9,
-        place: workbench
+        place: workbench,
+        rarities: [FIRST, SECOND]
     },
     {
         icon: "⚡",
@@ -149,7 +150,8 @@ const weapons = [
         title: "Лазерный тесак",
         price: [getResource(MATERIALS, 5600),getResource(QUARZ, 4)],
         characteristic: 12,
-        place: workbench
+        place: workbench,
+        rarities: [FIRST, SECOND]
     },
     {
         icon: "💥",
@@ -172,7 +174,8 @@ const weapons = [
         title: "BFGzzv-4000",
         price: [getResource(MATERIALS, 12000), getResource(QUARZ, 30)],
         characteristic: 20,
-        place: workbench
+        place: workbench,
+        rarities: [FIRST, SECOND]
     },
     {
         icon: "💥",
@@ -187,7 +190,8 @@ const weapons = [
         title: "Силовой кастет",
         price: [getResource(MATERIALS, 14000), getResource(QUARZ, 20), getResource(GENERATORS, 5)],
         characteristic: 25,
-        place: workbench
+        place: workbench,
+        rarities: [FIRST, SECOND]
     },
     {
         icon: "🔗",
@@ -210,7 +214,8 @@ const weapons = [
         title: "Колыбель Пустоши",
         price: [getResource(MATERIALS, 19990), getResource(QUARZ, 35), getResource(GENERATORS, 5)],
         characteristic: 29,
-        place: workbench
+        place: workbench,
+        rarities: [FIRST, SECOND]
     },
     {
         icon: "💥",
@@ -225,7 +230,8 @@ const weapons = [
         title: "Tyrant-PDR",
         price: [getResource(MATERIALS, 29990), getResource(QUARZ, 60), getResource(GENERATORS, 25)],
         characteristic: 38,
-        place: workbench
+        place: workbench,
+        rarities: [FIRST, SECOND]
 
     },
     {
@@ -250,7 +256,8 @@ const weapons = [
         price: [getResource(MATERIALS, 45900), getResource(QUARZ, 90),
             getResource(GENERATORS, 75), getResource(MICROCHIPS, 5)],
         characteristic: 49,
-        place: workbench
+        place: workbench,
+        rarities: [FIRST, SECOND]
     },
     {
         icon: "☄️",
@@ -276,7 +283,8 @@ const weapons = [
         price: [getResource(MATERIALS, 59990), getResource(QUARZ, 100),
             getResource(GENERATORS, 90), getResource(MICROCHIPS, 45)],
         characteristic: 56,
-        place: workbench
+        place: workbench,
+        rarities: [FIRST, SECOND]
     },
     {
         icon: "☄️",
@@ -300,7 +308,8 @@ const weapons = [
         price: [getResource(MATERIALS, 78990), getResource(GENERATORS, 120), 
             getResource(MICROCHIPS, 60), getResource(IRIDIUM, 20)],
         characteristic: 65,
-        place: workbench
+        place: workbench,
+        rarities: [FIRST, SECOND]
     },
     {
         icon: "🔮",
@@ -316,7 +325,8 @@ const weapons = [
         price: [getResource(MATERIALS, 129990), getResource(GENERATORS, 150), 
             getResource(MICROCHIPS, 70), getResource(IRIDIUM, 40)],
         characteristic: 79,
-        place: workbench
+        place: workbench,
+        rarities: [FIRST, SECOND]
     },
     {
         icon: "🌟",
@@ -332,7 +342,8 @@ const weapons = [
         price: [getResource(MATERIALS, 158990), getResource(GENERATORS, 220), 
             getResource(MICROCHIPS, 99), getResource(IRIDIUM, 88)],
         characteristic: 92,
-        place: engineer
+        place: engineer,
+        rarities: [FIRST, SECOND]
     },
     {
         icon: "☣️",
@@ -356,7 +367,8 @@ const weapons = [
         price: [getResource(MATERIALS, 191000), getResource(GENERATORS, 250), 
             getResource(MICROCHIPS, 135), getResource(IRIDIUM, 112)],
         characteristic: 125,
-        place: engineer
+        place: engineer,
+        rarities: [FIRST, SECOND]
     },
     {
         icon: "☣️",
@@ -372,7 +384,7 @@ const weapons = [
         price: [getResource(MINICHARGE, 23), getResource(PLASMA, 21), getResource(TAPE, 24)],
         characteristic: 163,
         place: engineer,
-        rarity: getRarityIcon(FIRST)
+        rarity: getRarityIcon(SECOND)
     },
     {
         icon: "🌟",
@@ -380,7 +392,8 @@ const weapons = [
         price: [getResource(MATERIALS, 241900), getResource(GENERATORS, 310), 
             getResource(MICROCHIPS, 185), getResource(IRIDIUM, 145)],
         characteristic: 159,
-        place: engineer
+        place: engineer,
+        rarities: [FIRST, SECOND]
     },
     {
         icon: "🌟",
@@ -406,7 +419,8 @@ const weapons = [
         price: [getResource(MATERIALS, 269000), getResource(GENERATORS, 330), 
             getResource(MICROCHIPS, 200), getResource(IRIDIUM, 180)],
         characteristic: 187,
-        place: engineer
+        place: engineer,
+        rarities: [FIRST, SECOND]
     },
     {
         icon: "💿",
@@ -430,7 +444,8 @@ const weapons = [
         price: [getResource(MATERIALS, 281300), getResource(GENERATORS, 350), 
             getResource(MICROCHIPS, 223), getResource(IRIDIUM, 197)],
         characteristic: 206,
-        place: engineer
+        place: engineer,
+        rarities: [FIRST, SECOND]
     },
     {
         icon: "♻️",
@@ -456,7 +471,8 @@ const weapons = [
         price: [getResource(MATERIALS, 349900), getResource(GENERATORS, 410), 
             getResource(MICROCHIPS, 299), getResource(IRIDIUM, 250)],
         characteristic: 266,
-        place: engineer
+        place: engineer,
+        rarities: [FIRST, SECOND]
     },
     {
         icon: "🐱",
@@ -490,7 +506,8 @@ const weapons = [
         price: [getResource(MATERIALS, 379900), getResource(GENERATORS, 410), 
             getResource(MICROCHIPS, 359), getResource(IRIDIUM, 265)],
         characteristic: 291,
-        place: core
+        place: core,
+        rarities: [FIRST, SECOND]
     },
     {
         icon: "❇️",
@@ -594,6 +611,6 @@ const weapons = [
 
 module.exports = {
     weapons,
-    weaponsComment,
-    inventionWeaponIcon
+    weaponsShortComment,
+    weaponsLongComment
 };

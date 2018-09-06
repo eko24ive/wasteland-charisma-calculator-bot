@@ -36,7 +36,8 @@ const {
     getRarityIcon
 } = require('./resources.js');
 
-const armorsComment = '🛡 Защита: +';
+const armorsLongComment = '🛡 Защита: +';
+const armorsShortComment = '🛡';
 
 const armors = [
     {
@@ -44,105 +45,105 @@ const armors = [
         title: "Плотная куртка",
         price: [getResource(CAPS, 30)],
         characteristic: 1,
-        place: merchant,
+        place: merchant
     },
     {
         icon: false,
         title: "Комбинезон убежища",
         price: [getResource(CAPS, 30)],
         characteristic: 3,
-        place: merchant,
+        place: merchant
     },
     {
         icon: false,
         title: "Кожанный нагрудник",
         price: [getResource(CAPS, 30)],
         characteristic: 6,
-        place: merchant,
+        place: merchant
     },
     {
         icon: false,
         title: "Мото-защита",
         price: [getResource(CAPS, 30)],
         characteristic: 9,
-        place: merchant,
+        place: merchant
     },
     {
         icon: false,
         title: "Легкий кевлар",
         price: [getResource(CAPS, 30)],
         characteristic: 10,
-        place: merchant,
+        place: merchant
     },
     {
         icon: false,
         title: "Крепкий кевлар",
         price: [getResource(CAPS, 30)],
         characteristic: 10,
-        place: merchant,
+        place: merchant
     },
     {
         icon: false,
         title: "Броня братства",
         price: [getResource(CAPS, 30)],
         characteristic: 15,
-        place: merchant,
+        place: merchant
     },
     {
         icon: false,
         title: "Боевая броня",
         price: [getResource(CAPS, 680)],
         characteristic: 25,
-        place: merchant,
+        place: merchant
     },
     {
         icon: false,
         title: "Броня Когтей",
         price: [getResource(CAPS, 1580)],
         characteristic: 32,
-        place: merchant,
+        place: merchant
     },
     {
         icon: "👕",
         title: "Портупея",
         price: [getResource(MATERIALS, 390)],
         characteristic: 3,
-        place: workbench,
+        place: workbench
     },
     {
         icon: "👕",
         title: "Кожаный жилет",
         price: [getResource(MATERIALS, 890)],
         characteristic: 6,
-        place: workbench,
+        place: workbench
     },
     {
         icon: "👕",
         title: "Титановые щитки",
         price: [getResource(MATERIALS, 5200)],
         characteristic: 16,
-        place: workbench,
+        place: workbench
     },
     {
         icon: "⚙️",
         title: "Силовая броня",
         price: [getResource(MATERIALS, 12990), getResource(GENERATORS, 5)],
         characteristic: 25,
-        place: workbench,
+        place: workbench
     },
     {
         icon: "⚙️",
         title: "Силовая броня🎖",
         price: [getResource(MATERIALS, 22990), getResource(GENERATORS, 15)],
         characteristic: 35,
-        place: workbench,
+        place: workbench
     },
     {
         icon: "⚙️",
         title: "Силовая броня🎖🎖",
         price: [getResource(MATERIALS, 35990), getResource(GENERATORS, 35)],
         characteristic: 45,
-        place: workbench,
+        place: workbench
     },
     {
         icon: "⚙️",
@@ -150,7 +151,7 @@ const armors = [
         price: [getResource(MATERIALS, 40990), getResource(GENERATORS, 40), 
             getResource(MICROCHIPS, 10)],
         characteristic: 55,
-        place: workbench,
+        place: workbench
     },
     {
         icon: "⚙️",
@@ -159,6 +160,7 @@ const armors = [
             getResource(MICROCHIPS, 21)],
         characteristic: 66,
         place: workbench,
+        rarities: [FIRST, SECOND]
     },
     {
         icon: "⚙️",
@@ -183,6 +185,7 @@ const armors = [
             getResource(MICROCHIPS, 54), getResource(IRIDIUM, 25)],
         characteristic: 76,
         place: engineer,
+        rarities: [FIRST, SECOND]
     },
     {
         icon: "🦇",
@@ -199,6 +202,7 @@ const armors = [
             getResource(MICROCHIPS, 85), getResource(IRIDIUM, 46)],
         characteristic: 89,
         place: engineer,
+        rarities: [FIRST, SECOND]
     },
     {
         icon: "⚛️",
@@ -216,6 +220,7 @@ const armors = [
             getResource(MICROCHIPS, 125), getResource(IRIDIUM, 69)],
         characteristic: 127,
         place: engineer,
+        rarities: [FIRST, SECOND]
     },
     {
         icon: "🛠",
@@ -242,6 +247,7 @@ const armors = [
             getResource(MICROCHIPS, 145), getResource(IRIDIUM, 116)],
         characteristic: 161,
         place: engineer,
+        rarities: [FIRST, SECOND]
     },
     {
         icon: "⚡️",
@@ -262,11 +268,12 @@ const armors = [
         rarity: getRarityIcon(SECOND)
     },
     {
-        icon: '⚙️',
+        icon: false,
         title: 'Броня Безумца',
         price: [getResource(WIRES, 17), getResource(PLASMA, 7), getResource(TAPE, 9)],
         characteristic: 58,
-        place: madman
+        place: madman,
+        rarities: [FIRST, SECOND]
     },
     {
         icon: false,
@@ -287,11 +294,12 @@ const armors = [
         rarity: getRarityIcon(SECOND)
     },
     {
-        icon: '⚙️',
+        icon: '⚛️',
         title: 'Экзокостюм',
         price: [getResource(STARCH, 6), getResource(AIRFILTER, 5), getResource(EPHEDRINE, 15)],
         characteristic: 68,
-        place: madman
+        place: madman,
+        rarities: [FIRST, SECOND]
     },
     {
         icon: '⚛️',
@@ -302,7 +310,7 @@ const armors = [
         rarity: getRarityIcon(FIRST)
     },
     {
-        icon: '⚙️',
+        icon: '⚛️',
         title: 'Экзокостюм',
         price: [getResource(MINICHARGE, 14), getResource(TAPE, 16), getResource(TOPAZ, 15)],
         characteristic: 95,
@@ -327,5 +335,6 @@ const armors = [
 
 module.exports = {
     armors,
-    armorsComment
+    armorsLongComment,
+    armorsShortComment
 };
