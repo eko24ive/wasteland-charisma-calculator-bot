@@ -13,7 +13,9 @@ const forwardPoints = {
     newDistance: 0.5,
     sameDistance: 0.1,
     newGiantData: 2,
-    sameGiantData: 0.1
+    sameGiantData: 0.1,
+    darkZoneBattle: 1.5,
+    regularZoneBattle: 1
 };
 
 module.exports = forwardPoints;

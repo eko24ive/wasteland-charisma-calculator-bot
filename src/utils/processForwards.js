@@ -113,9 +113,9 @@ const processForwards = (inputData, config) => {
         reportData.pipRequired = false;
     }
 
-    // 1525607351
-    if(inputData.filter(({date}) => date < 1525607078).length > 0) {
-        reportData.criticalError = 'Был замечен форвард время которого меньше за время выкатки обновы Wasteland Wars';
+    // accept only after 24.06.2018
+    if(inputData.filter(({date}) => date < 1529787600).length > 0) {
+        reportData.criticalError = 'Был замечен форвард время которого меньше за время последнего обновления Wasteland Wars (24.06.2018)';
 
         return {reportData};
     }
@@ -192,6 +192,7 @@ const processForwards = (inputData, config) => {
             };
 
             beastData.name = data.name;
+            beastData.type = data.type;
             beastData.distanceRange = [data.distance];
             reportData.distance = data.distance;
             reportData.distanceHistory.push(data.distance);
@@ -275,12 +276,12 @@ const processForwards = (inputData, config) => {
                 if (!reportData.lastBeastSeen) {
                     beastData.battles = [];
 
-                    reportData.beastToValidate.push({name: data.name, distance: data.distance});
+                    reportData.beastToValidate.push({name: data.name, distance: data.distance, type: data.type});
                 } else {
                     if(data.name !== reportData.lastBeastSeen.name && reportData.lastBeastSeenType !== 'regular' && data.fightResult === 'lose') {
                         beastData.battles = [];
 
-                        reportData.beastToValidate.push({name: data.name, distance: data.distance});
+                        reportData.beastToValidate.push({name: data.name, distance: data.distance, type: data.type});
                     }
                 }
             }
@@ -377,6 +378,7 @@ const processForwards = (inputData, config) => {
             if (reportData.lastBeastSeen) {
                 if(data.distance === reportData.lastBeastSeen.distance) {
                     beastData.name = reportData.lastBeastSeen.name;
+                    beastData.type = data.type;
 
                     beastData.flees = [{
                         outcome: data.outcome,

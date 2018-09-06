@@ -22,7 +22,7 @@ const parseLocation = location => {
 
     const [, distance] = regexps.campDistanceRegExp.exec(location);
     const [, negativePrefix, currentHealth, healthCap] = regexps.healthRegExp.exec(location);
-    
+
     let [, name] = regexps.locationNameRegExp.exec(location);
 
     if(regexps.locationRaidPostfixRegExp.test(name)) {
@@ -47,9 +47,17 @@ const parseLocation = location => {
     }
     if (regexps.beastFacedRegExp.test(location)) {
         const [, name] = regexps.beastFacedRegExp.exec(location);
+        let type;
+
+        if (regexps.darkZone.test(location)) {
+            type = 'DarkZone';
+        } else {
+            type = 'Regular';
+        }
 
         beastFaced.faced = true;
         beastFaced.name = name;
+        beastFaced.type = type;
     }
 
     const receivedItems = splitted.map(row => {

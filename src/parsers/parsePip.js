@@ -74,12 +74,12 @@ const parseSimple = text => {
     return data;
 };
 
-const parsePip = ({ text }, isClassic) => {
+const parsePip = ({ text, forward_date }, isClassic) => {
     if (isClassic) {
-        return parseClassic(text);
+        return {...parseClassic(text), date: forward_date};
     }
 
-    return parseSimple(text);
+    return {...parseSimple(text), date: forward_date};
 }
 
 module.exports = parsePip;

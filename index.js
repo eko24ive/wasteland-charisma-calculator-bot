@@ -53,6 +53,7 @@ const menuItemHandler = require('./src/utils/menuItemHandler');
 const comparePips = require('./src/database/utils/comparePips');
 
 const routedBeastView = require('./src/views/routedBeastView');
+const routedBattleView = require('./src/views/routedBattleView');
 
 const equipmentMenu = require('./src/staticMenus/equipmentMenu');
 const locationsMenu = require('./src/staticMenus/locationsMenu');
@@ -64,6 +65,7 @@ const buttons = require('./src/ui/buttons');
 const {
     commandsForLag
 } = require('./src/strings/strings');
+const withBackButton = require('./src/utils/withBackButton');
 
 const UserManager = require('./src/database/userManager');
 
@@ -113,7 +115,7 @@ const updateOrCreate = (msg, pip, cb) => {
         username: msg.from.username
     }
 
-    const pipData = {...pip, timeStamp: msg.forward_date};
+    const pipData = {...pip, timeStamp: pip.date};
 
     userManager.findByTelegramId(msg.from.id).then(result => {
         if (result.ok === false && result.reason === 'USER_NOT_FOUND') {
@@ -291,21 +293,13 @@ const bot = new TeleBot({
 const defaultKeyboard = bot.keyboard([
     [
         buttons['journeyForwardStart'].label,
-        buttons['skillUpgrade'].label
+        buttons['skillUpgrade'].label,
+        buttons['showEncyclopedia'].label
     ],
     [
-        buttons['showGiants'].label,
-        buttons['showBeasts'].label,
-        buttons['showEquipment'].label,
-    ],
-    [
-        buttons['showLocations'].label,
-        buttons['showSupplies'].label,
-        buttons['showAchievments'].label
-    ],
-    [
-        buttons['showDungeons'].label,
-        buttons['showInGameCommands'].label
+        buttons['showRegularBeasts'].label,
+        buttons['showDarkZoneBeasts'].label,
+        buttons['showGiants'].label
     ],
     [
         buttons['hallOfFame'].label,
@@ -314,6 +308,20 @@ const defaultKeyboard = bot.keyboard([
 ], {
     resize: true
 });
+
+const encyclopediaKeyboard = [
+    [
+
+        buttons['showEquipment'].label,
+        buttons['showSupplies'].label,
+        buttons['showDrones'].label
+    ],
+    [
+        buttons['showDungeons'].label,
+        buttons['showLocations'].label,
+        buttons['showAchievments'].label
+    ]
+];
 
 const toGameKeyboard = bot.inlineKeyboard([
     [
@@ -455,6 +463,7 @@ reply = `Шикардос, я обновил твой пип!
         let data;
         let dataType;
         let beastName;
+        let beastType;
 
         const isLocation = regExpSetMatcher(msg.text, {
             regexpSet: regexps.location
@@ -472,16 +481,18 @@ reply = `Шикардос, я обновил твой пип!
             data = parseLocation(msg.text);
             dataType = 'location';
             beastName = data.beastFaced.name
+            beastType = data.beastFaced.type
         }
 
-        if (beastName !== sessions[msg.from.id].beastToValidateName && sessions[msg.from.id].beastToValidateName !== '???') {
+        if (beastName !== sessions[msg.from.id].beastToValidateName || sessions[msg.from.id].beastToValidateName !== '???' || sessions[msg.from.id].beastToValidateType !== beastType) {
             return msg.reply.text(`
 Этот моб не похож на того с которым ты дрался. Ты чё - наебать меня вздумал?!
 
 Если ты передумал её кидать - жми /skipbeastforward
-*Но тогда я проигнорирую битву с этим мобом*
+<b>Но тогда я проигнорирую битву с этим мобом</b>
             `, {
-                asReply: true
+                asReply: true,
+                parseMode: 'html'
             });
         } else if (isLocation || isDungeonBeastFaced) {
             sessions[msg.from.id].data.push({
@@ -555,7 +566,7 @@ reply = `Шикардос, я обновил твой пип!
             data = parseLocation(msg.text);
             dataType = 'location';
         } else if (isClassicPip || isSimplePip) {
-            data = parsePip(msg, isClassicPip);
+            data = {...parsePip(msg, isClassicPip)};
             dataType = 'pipboy';
         } else if (isDungeonBeast) {
             data = beastParser.parseDungeonBeast(msg.text);
@@ -801,7 +812,10 @@ reply = `Шикардос, я обновил твой пип!
 
             routedBeastView(Beast, {
                 name: beast.name,
+                type: beast.type,
                 isDungeon: false
+            },null,{
+                env: process.env.ENV
             }).then(({reply, beast}) => {
                 if(reply !== false) {
                     const beastReplyMarkup = getBeastKeyboard(beast._id.toJSON());
@@ -822,6 +836,8 @@ reply = `Шикардос, я обновил твой пип!
             routedBeastView(Beast, {
                 name: oBeast.name,
                 isDungeon: true
+            },{
+                env: process.env.ENV
             }).then(({reply, beast}) => {
                 if(reply !== false) {
                     /* const beastReplyMarkup = getBeastKeyboard(beast._id.toJSON());
@@ -1043,8 +1059,9 @@ const actualProcessUserData = (msg, reportData, updatesData, options) => {
     if (options.useBeastFace && !_.isEmpty(reportData.beastToValidate)) {
         sessions[msg.from.id].state = states.WAIT_FOR_BEAST_FACE_FORWARD;
         sessions[msg.from.id].beastToValidateName = reportData.beastToValidate[0].name;
+        sessions[msg.from.id].beastToValidateType = reportData.beastToValidate[0].type;
         return msg.reply.text(`
-Слушай, я не могу понять кто тебе надрал задницу, ${reportData.beastToValidate[0].name} - это обычный моб или данжевый?
+Слушай, я не могу понять кто тебе надрал задницу, ${reportData.beastToValidate[0].type === 'DarkZone' ? '🚷' : ''}${reportData.beastToValidate[0].name} - это обычный моб или данжевый?
 
 Пожалуйста скинь форвард встречи с этим мобом:
 \`Во время вылазки на тебя напал...\`
@@ -1117,13 +1134,19 @@ _или_
                     } else {
                         Beast.findOne({
                             name: iBeast.name,
-                            isDungeon: iBeast.isDungeon
+                            isDungeon: iBeast.isDungeon,
+                            type: iBeast.type
                         }).then(function (fBeast) {
                             if (fBeast === null) {
                                 const newBeast = new Beast(iBeast);
 
                                 dataProcessed += 1;
-                                userForwardPoints += forwardPoints.newMob;
+
+                                if(iBeast.type === 'DarkZone') {
+                                    userForwardPoints += forwardPoints.newMob * forwardPoints.darkZoneBattle;
+                                } else {
+                                    userForwardPoints += forwardPoints.newMob * forwardPoints.regularZoneBattle;
+                                }
 
                                 newBeast.save().then(() => next());
                             } else {
@@ -1131,7 +1154,8 @@ _или_
                                     isSameConcussionExists = true,
                                     isSameBattleExists = true,
                                     isBattleDupe = false,
-                                    isFleeDupe = false;
+                                    isFleeDupe = false,
+                                    beastPoints = 0;
 
                                 if (iBeast.battles) {
                                     if (iBeast.battles.length > 0) {
@@ -1216,11 +1240,11 @@ _или_
 
                                 if(!isBattleDupe) {
                                     if (!_.contains(fBeast.distanceRange, iBeast.distanceRange[0])) {
-                                        userForwardPoints += forwardPoints.newDistance;
+                                        beastPoints += forwardPoints.newDistance;
 
                                         fBeast.distanceRange.push(iBeast.distanceRange[0]);
                                     } else {
-                                        userForwardPoints += forwardPoints.sameGiantData;
+                                        beastPoints += forwardPoints.sameGiantData;
                                     }
                                 }
 
@@ -1241,12 +1265,12 @@ _или_
                                         const battle = iBeast.battles[0];
 
                                         if (battle.damagesGiven.length === 1) {
-                                            userForwardPoints += forwardPoints.oneShotBattle;
+                                            beastPoints += forwardPoints.oneShotBattle;
                                         } else {
                                             if(battle.outcome === 'win') {
-                                                userForwardPoints += forwardPoints.newBattleWin;
+                                                beastPoints += forwardPoints.newBattleWin;
                                             } else {
-                                                userForwardPoints += forwardPoints.newBattleLose;
+                                                beastPoints += forwardPoints.newBattleLose;
                                             }
                                         }
 
@@ -1256,12 +1280,12 @@ _или_
                                             const battle = iBeast.battles[0];
 
                                             if (battle.damagesGiven.length === 1) {
-                                                userForwardPoints += forwardPoints.oneShotBattle;
+                                                beastPoints += forwardPoints.oneShotBattle;
                                             } else {
                                                 if(battle.outcome === 'win') {
-                                                    userForwardPoints += forwardPoints.sameBattleWin;
+                                                    beastPoints += forwardPoints.sameBattleWin;
                                                 } else {
-                                                    userForwardPoints += forwardPoints.sameBattleLose;
+                                                    beastPoints += forwardPoints.sameBattleLose;
                                                 }
                                             }
                                         }
@@ -1277,9 +1301,9 @@ _или_
                                         const flee = iBeast.flees[0];
 
                                         if(flee.outcome === 'win') {
-                                            userForwardPoints += forwardPoints.newFleeWin;
+                                            beastPoints += forwardPoints.newFleeWin;
                                         } else {
-                                            userForwardPoints += forwardPoints.newFleeLose;
+                                            beastPoints += forwardPoints.newFleeLose;
                                         }
 
                                         fBeast.flees.push(iBeast.flees[0]);
@@ -1288,9 +1312,9 @@ _или_
                                             const flee = iBeast.flees[0];
 
                                             if(flee.outcome === 'win') {
-                                                userForwardPoints += forwardPoints.sameFleeWin;
+                                                beastPoints += forwardPoints.sameFleeWin;
                                             } else {
-                                                userForwardPoints += forwardPoints.sameFleeLose;
+                                                beastPoints += forwardPoints.sameFleeLose;
                                             }
                                         }
 
@@ -1301,6 +1325,12 @@ _или_
 
                                 // TODO: Concussion
                                 // TODO: Received items
+
+                                if(iBeast.type === 'DarkZone') {
+                                    userForwardPoints += beastPoints * forwardPoints.darkZoneBattle;
+                                } else {
+                                    userForwardPoints += beastPoints * forwardPoints.regularZoneBattle;
+                                }
 
                                 fBeast.save().then(() => next()).catch(e => console.log(e));
                             }
@@ -1478,6 +1508,15 @@ const processUserData = (msg, options) => {
         updatesData
     } = processForwards(data);
 
+    if (reportData.criticalError) {
+        return msg.reply.text(`<b>❌ЗАМЕЧЕНА КРИТИЧЕСКАЯ ОШИБКА❌</b>\n\n${reportData.criticalError}\n\n<i>Форварды были отменены.</i>`, {
+            replyMarkup: defaultKeyboard,
+            parseMode: 'html'
+        });
+    }
+
+
+
     if(updatesData.locations.length === 0 && updatesData.beasts.length === 0) {
         return msg.reply.text(`
 К сожалению я ничего не смог узнать из твоих форвардов :с`, {
@@ -1569,15 +1608,6 @@ bot.on('/journeyforwardend', msg => {
             useBeastFace: sessions[msg.from.id].processDataConfig.useBeastFace
         });
     }
-});
-
-bot.on('/journeyforwardcancel', msg => {
-    createSession(msg.from.id);
-
-    return msg.reply.text('Окей, теперь можешь кинуть пип-бой для помощи в прокачке скилов либо же перейти в меню  [`Скинуть лог 🏃`]', {
-        replyMarkup: defaultKeyboard,
-        parseMode: 'markdown'
-    });
 });
 
 bot.on('/skippipforward', msg => {
@@ -1677,9 +1707,9 @@ bot.on('/dng', msg => {
     }).catch(e => console.log(e));
 })
 
-bot.on('/cfl', msg => {
+bot.on('/commands_for_lag', msg => {
     return msg.reply.text(commandsForLag, {
-        paresMode: 'html'
+        parseMode: 'html'
     }).catch(e => console.log(e));
 })
 
@@ -1963,7 +1993,8 @@ _Бот работает в бета режиме._
 
 Если хочешь научить бота новому - нажимаешь скинуть лог, затем кидаешь все свои форварды, которые хочешь записать( бои с монстрами и проход км бот распознает) и в конце свежий пип. Затем нажимаешь стоп и ждешь реакции бота.
 
-Если что, вот гайд - https://teletype.in/@eko24/SkUiLkzCz;
+Канал, где появляется инфа об обновлениях - @wwAssistantBotNews
+Связь с создателем - @eko24
 `, {
     parseMode: 'markdown'
 }));
@@ -2040,18 +2071,26 @@ const giantsKeyboard = bot.inlineKeyboard([
     ]
 ]);
 
-const beastRangesKeyboard = bot.inlineKeyboard(_.chunk(getRanges.map(range => {
+const beastRangesKeyboard = withBackButton(bot.keyboard, _.chunk(getRanges.map(range => {
     const first = _.min(range);
     const last = _.max(range);
 
     if (first !== last) {
-        return bot.inlineButton(`${first}-${last}`, {
-            callback: `show_beast_${first}-${last}`
-        });
+        return `${first}-${last}`;
     }
-    return bot.inlineButton(`${first}`, {
-        callback: `show_beast_${first}-${first}`
-    });
+
+    return `${first}-${last}`;
+}), 5));
+
+const beastRangesDarkZoneKeyboard = withBackButton(bot.keyboard, _.chunk(getRanges.map(range => {
+    const first = _.min(range);
+    const last = _.max(range);
+
+    if (first !== last) {
+        return `${first}—${last}`;
+    }
+
+    return `${first}—${last}`;
 }), 5));
 
 
@@ -2083,9 +2122,9 @@ _Если гиганта нет в списке - значит его ещё н�
     }).catch(e => console.log(e));
 });
 
-bot.on('/show_beasts', msg => {
+bot.on(['/show_beasts(regular)','/show_beasts(darkzone)'], msg => {
     const reply = `
-Это каталог всех мобов в Пустоши <i>(не данжевых)</i>
+Это каталог всех ${msg.text === "💀Мобы" ? 'обычных' : ''} мобов в Пустоши ${msg.text !== "💀Мобы" ? 'из 🚷Тёмной Зоны' : ''} <i>(не данжевых)</i>
 Каталог наполняется посредством форвардов от игроков (бои, побеги и оглушения)
 
 Выбери интересующий диапазон километров, после вам будет доступен список мобов, которые были замечены на этом километре.
@@ -2096,7 +2135,7 @@ bot.on('/show_beasts', msg => {
 Гайд тут: https://teletype.in/@eko24/Sy4pCyiRM
 `;
     msg.reply.text(reply, {
-        replyMarkup: beastRangesKeyboard,
+        replyMarkup: msg.text === "💀Мобы" ? beastRangesKeyboard : beastRangesDarkZoneKeyboard,
         parseMode: 'html',
         webPreview: false
     }).catch(e => console.log(e))
@@ -2108,6 +2147,8 @@ bot.on(/mob_(.+)/, msg => {
     routedBeastView(Beast, {
         _id: id,
         isDungeon: false
+    },null,{
+        env: process.env.ENV
     }).then(({reply,beast}) => {
         if(reply != false) {
             const beastReplyMarkup = getBeastKeyboard(beast._id.toJSON());
@@ -2125,12 +2166,15 @@ bot.on(/mob_(.+)/, msg => {
     });
 });
 
-bot.on('/cancel', msg => {
+bot.on(['/cancel', '/journeyforwardcancel'], msg => {
+    const backMessage = _.random(0,100) >= 90 ? 'Ты вернусля в главное меню\n<i>Вернусля - почётный член этого сообщения, не обижайте её</i>' : 'Ты вернусля в главное меню';
+
     if(sessions[msg.from.id] === undefined) {
         createSession(msg.from.id);
 
-        return msg.reply.text('Ты вернусля в главное меню', {
-            replyMarkup: defaultKeyboard
+        return msg.reply.text(backMessage, {
+            replyMarkup: defaultKeyboard,
+            parseMode: 'html'
         }).catch(e => console.log(e));
     }
     if(sessions[msg.from.id].state === states.WAIT_FOR_DATA_TO_PROCESS) {
@@ -2140,8 +2184,9 @@ bot.on('/cancel', msg => {
     } else {
         createSession(msg.from.id);
 
-        return msg.reply.text('Ты вернусля в главное меню', {
-            replyMarkup: defaultKeyboard
+        return msg.reply.text(backMessage, {
+            replyMarkup: defaultKeyboard,
+            parseMode: 'html'
         }).catch(e => console.log(e));
     }
 
@@ -2195,7 +2240,7 @@ bot.on('/delete_beasts', msg => {
 bot.on('callbackQuery', msg => {
     const chatId = msg.from.id;
     const messageId = msg.message.message_id;
-    const showMobRegExp = /show_beast_(\d+)-(\d+)/;
+    const showMobRegExp = /show_beast_(\d+)-(\d+)\+(.+)/;
     const showEquipmentKeyboardRegExp = /equipment_menu-(.+)/;
     const showLocationsKeyboardRegExp = /locations_menu-(.+)/;
     const showSuppliesKeyboardRegExp = /supplies_menu-(.+)/;
@@ -2252,10 +2297,10 @@ _Если гиганта нет в списке - значит его ещё н�
             parseMode: 'markdown'
         }).catch(e => console.log(e));
     } else if (showMobRegExp.test(msg.data)) {
-        const [, from, to] = showMobRegExp.exec(msg.data);
+        const [, from, to, type] = showMobRegExp.exec(msg.data);
+        const beastType = type === 'regular' ? 'Regular' : 'DarkZone';
 
-
-        Beast.find({isDungeon: false, distanceRange: {$gte: Number(from), $lte: Number(to)}}, 'battles.totalDamageReceived name id').then(beasts => {
+        Beast.find({isDungeon: false, distanceRange: {$gte: Number(from), $lte: Number(to)}, type: beastType}, 'battles.totalDamageReceived name id').then(beasts => {
             bot.answerCallbackQuery(msg.id);
 
             const jsonBeasts = beasts.map(b => {
@@ -2276,13 +2321,13 @@ ${beast.name}
             }).join('\n');
 
             const reply = `
-<b>Мобы на ${from}-${to}км</b>
+<b>Мобы(${type === 'regular' ? '💀' : '🚷'}) на ${from}-${to}км</b>
 <i>Отсортированы от слабым к сильным</i>
 ${beastsList}
 `;
 
             return bot.editMessageText({chatId, messageId}, reply,{
-                replyMarkup: beastRangesKeyboard,
+                replyMarkup: type === 'regular' ? beastRangesKeyboard : beastRangesDarkZoneKeyboard,
                 parseMode: 'html'
             }).catch(e => console.log(e));
         }).catch(e => console.log(e));
@@ -2294,7 +2339,9 @@ ${beastsList}
         routedBeastView(Beast, {
             _id: beastId,
             isDungeon: false
-        }, route).then(({reply, beast}) => {
+        }, route,{
+            env: process.env.ENV
+        }).then(({reply, beast}) => {
             // TODO: Fix keyboard for dungeon beasts
             const beastReplyMarkup = getBeastKeyboard(beast._id.toJSON());
 
@@ -2512,5 +2559,113 @@ ${skillOMaticText}
     });
     }
 });
+
+const validateRange = (_from, _to) => {
+    const from = Number(_from);
+    const to = Number(_to);
+    return getRanges.filter(range => range[0] === from && range[1] === to).length === 1;
+}
+
+bot.on('text', msg => {
+    const regularZoneBeastsRequestRegExp = /(\d+)-(\d+)/;
+    const rangeRegExp = /(\d+)(-|—|--)(\d+)/;
+
+    if(!rangeRegExp.test(msg.text)) {
+        return;
+    }
+
+
+    const [, from,, to] = rangeRegExp.exec(msg.text);
+
+    if(!validateRange(from, to)) {
+        return msg.reply.text('Да, очень умно с твоей стороны. Начислил тебе <i>нихуя</i> 💎<b>Шмепселей</b> за смекалочку, а теперь иди нахуй и используй кнопки внизу.', {
+            parseMode: 'html'
+        });
+    }
+
+    const beastType = regularZoneBeastsRequestRegExp.test(msg.text) ? 'Regular' : 'DarkZone';
+
+    Beast.find({
+        isDungeon: false,
+        distanceRange: {
+            $gte: Number(from),
+            $lte: Number(to)
+        },
+        type: beastType
+    }, 'battles.totalDamageReceived name id').then(beasts => {
+
+        const jsonBeasts = beasts.map(b => {
+            const jsoned = b.toJSON();
+
+            return {
+                id: b.id,
+                ...jsoned
+            }
+        });
+
+        const beastsByDamage = _.sortBy(jsonBeasts, v => v.battles.totalDamageReceived);
+
+        const beastsList = beastsByDamage.map(beast => {
+            return `
+${beast.name}
+/mob_${beast.id}`;
+        }).join('\n');
+
+        const reply = `
+<b>Мобы(${beastType === 'DarkZone' ? '🚷' : '💀'}) на ${from}-${to}км</b>
+<i>Отсортированы от слабым к сильным</i>
+${beastsList}
+`;
+
+        return msg.reply.text(reply, {
+            replyMarkup: beastType === 'DarkZone' ? beastRangesDarkZoneKeyboard : beastRangesKeyboard,
+            parseMode: 'html'
+        }).catch(e => console.log(e));
+    }).catch(e => console.log(e));
+})
+
+bot.on('/show_encyclopedia', msg => {
+    msg.reply.text(`В <b>📔Энциклопедии</b> вы можете просмотреть информацию о мире Wasteland Wars
+
+<b>🎒Экипировка</b> - Оружие, броня и тому подобное.
+<b>🗃Припасы</b> - Еда, баффы и медицина
+<b>🛰Дроны</b> - Характеристики ваших верных спутников
+<b>⚠️Подземелья</b> - Рекомендации к прохождению, инфа о луте и мобах
+<b>🏜️Локации</b> - Рейдовые и обычные локации
+<b>✅Достижения</b> - За что выдают награды
+`, {
+        replyMarkup: withBackButton(bot.keyboard,encyclopediaKeyboard, {
+            resize: true,
+            position: 'bottom'
+        }),
+        parseMode: 'html'
+    });
+});
+
+bot.on(/\/battle_(.+)/, msg => {
+    if(process.env.ENV === 'PRODUCTION') {
+        return msg.reply.text(`Ну и хули ты сюда лезешь?)`, {
+            asReply: true
+        }).catch(e => console.log(e));
+    }
+
+    const [,battleId] = /\/battle_(.+)/.exec(msg.text);
+    // msg.reply.text('neat!');    
+
+    routedBattleView(Beast, {
+        battleId: mongoose.Types.ObjectId(battleId)
+    }).then(({reply, beast}) => {
+        if(reply !== false) {
+
+            return msg.reply.text(reply,{
+                parseMode: 'html'
+            }).catch(e => console.log(e));
+        } else {
+            return msg.reply.text(`Прости, я ничего не знаю про эту битву :c`, {
+                asReply: true
+            }).catch(e => console.log(e));
+        }
+    }).catch(e => console.log(e));
+})
 
 bot.start();

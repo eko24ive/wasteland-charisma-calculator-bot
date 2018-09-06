@@ -105,7 +105,7 @@ module.exports = {
     },
     showInGameCommands: {
         label: "🔄Команды при лагах",
-        command: "/cfl"
+        command: "/commands_for_lag"
     },
     showEquipment: {
         label: "🎒Экипировка",
@@ -135,9 +135,13 @@ module.exports = {
         label: "🦂Гиганты",
         command: "/show_giants"
     },
-    showBeasts: {
+    showRegularBeasts: {
         label: "💀Мобы",
-        command: "/show_beasts"
+        command: "/show_beasts(regular)"
+    },
+    showDarkZoneBeasts: {
+        label: "🚷Мобы",
+        command: "/show_beasts(darkzone)"
     },
     cancelAction: {
         label: "↩️Назад",
@@ -150,5 +154,9 @@ module.exports = {
     skillUpgrade: {
         label: "🎓Скилокачатор",
         command: "/skill_upgrade"
+    },
+    showEncyclopedia: {
+        label: "📔Энциклопедия",
+        command: "/show_encyclopedia"
     }
 };
