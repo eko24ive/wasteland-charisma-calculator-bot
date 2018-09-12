@@ -8,33 +8,37 @@ const {
 } = require('./../places.js');
 
 const {
-    CAPS,
-    MATERIALS,
-    GENERATORS,
-    MICROCHIPS,
-    IRIDIUM,
-    WIRES,
-    MINICHARGE,
-    TOPAZ,
-    DUSTER,
-    WOLFRAM,
-    FOIL,
-    TAPE,
-    THROGHEART,
-    POTENTIOMETER,
-    STEEL,
-    PLASMA,
-    BIOS,
-    MAGNET,
-    PLANTAIN,
-    STARCH,
-    AIRFILTER,
-    EPHEDRINE,
-    TRANSISTOR,
     getResource,
-    FIRST,
-    SECOND,
-    getRarityIcon
+    getRarityIcon,
+    RESOURCES: {
+        CAPS,
+        MATERIALS,
+        GENERATORS,
+        MICROCHIPS,
+        IRIDIUM,
+        WIRES,
+        MINICHARGE,
+        TOPAZ,
+        DUSTER,
+        WOLFRAM,
+        FOIL,
+        TAPE,
+        THROGHEART,
+        POTENTIOMETER,
+        STEEL,
+        PLASMA,
+        BIOS,
+        MAGNET,
+        PLANTAIN,
+        STARCH,
+        AIRFILTER,
+        EPHEDRINE,
+        TRANSISTOR
+    },
+    RARITIES: {
+        FIRST,
+        SECOND
+    }
 } = require('./resources.js');
 
 const armorsLongComment = '🛡 Защита: +';

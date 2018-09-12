@@ -4,12 +4,14 @@ const {
 } = require('./../places.js');
 
 const {
-    CAPS,
-    MATERIALS,
-    QUARZ,
-    GENERATORS,
-    MICROCHIPS,
-    IRIDIUM,
+    RESOURCES: {
+        CAPS,
+        MATERIALS,
+        QUARZ,
+        GENERATORS,
+        MICROCHIPS,
+        IRIDIUM,
+    },
     getResource
 } = require('./resources.js');
 

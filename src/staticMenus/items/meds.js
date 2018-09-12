@@ -4,8 +4,10 @@ const {
 } = require('./../places.js');
 
 const {
-    MATERIALS,
-    EPHEDRINE,
+    RESOURCES: {
+        MATERIALS,
+        EPHEDRINE,
+    },
     getResource
 } = require('./resources.js');
 

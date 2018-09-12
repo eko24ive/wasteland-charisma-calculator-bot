@@ -11,33 +11,37 @@ const {
 } = require('./../places.js');
 
 const {
-    CAPS,
-    MATERIALS,
-    QUARZ,
-    GENERATORS,
-    MICROCHIPS,
-    IRIDIUM,
-    CUBONITE,
-    OSMIUM,
-    TITANIUM,
-    WIRES,
-    MINICHARGE,
-    TRANSISTOR,
-    TOPAZ,
-    DUSTER,
-    WOLFRAM,
-    FOIL,
-    TAPE,
-    IRONTHING,
-    THROGHEART,
-    POTENTIOMETER,
-    STEEL,
-    PLASMA,
-    DOLL,
     getResource,
-    FIRST,
-    SECOND,
-    getRarityIcon
+    getRarityIcon,
+    RESOURCES: {
+        CAPS,
+        MATERIALS,
+        QUARZ,
+        GENERATORS,
+        MICROCHIPS,
+        IRIDIUM,
+        CUBONITE,
+        OSMIUM,
+        TITANIUM,
+        WIRES,
+        MINICHARGE,
+        TRANSISTOR,
+        TOPAZ,
+        DUSTER,
+        WOLFRAM,
+        FOIL,
+        TAPE,
+        IRONTHING,
+        THROGHEART,
+        POTENTIOMETER,
+        STEEL,
+        PLASMA,
+        DOLL,
+    },
+    RARITIES: {
+        FIRST,
+        SECOND
+    }
 } = require('./resources.js');
 
 const weaponsLongComment = '💪 Урон: +';

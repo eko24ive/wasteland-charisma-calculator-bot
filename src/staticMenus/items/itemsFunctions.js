@@ -20,8 +20,10 @@ const {
 const meds = require('./meds.js');
 
 const {
-    FIRST,
-    SECOND,
+    RARITIES: {
+        FIRST,
+        SECOND
+    },
     getRarityIcon
 } = require('./resources.js');
 
@@ -33,9 +35,9 @@ const getItemIcon = icon => {
    return '';
 }
 
-const getItemPrice = item => {
-    if (item.price) {
-       return item.price.join(', ');
+const getItemPrice = price => {
+    if (price) {
+       return price.join(', ');
     }
 
    return '???';
@@ -49,37 +51,70 @@ const getItemCharacteristic = characteristic => {
     return '???';
 }
 
-const showItem = (item, comment) => {
+const showItem = ({
+    icon,
+    title,
+    characteristic,
+    price
+}, comment) => {
+    var icon = getItemIcon(icon);
+    var characteristic = getItemCharacteristic(characteristic);
+    var price = getItemPrice(price);
     return `
-${getItemIcon(item.icon)} *${item.title}*
-${comment} ${item.characteristic}
-💰: ${getItemPrice(item)}
+${icon} *${title}*
+${comment} ${characteristic}
+💰: ${price}
 `;
 }
 
-const showMed = item => {
+const showMed = ({
+    icon,
+    title,
+    effect,
+    characteristic,
+    price,
+    comment
+}) => {
+    var icon = getItemIcon(icon);
+    var characteristic = getItemCharacteristic(characteristic);
+    var price = getItemPrice(price);
     return `
-${getItemIcon(item.icon)} *${item.title}*
-${item.effect}${getItemCharacteristic(item.characteristic)}
-💰: ${getItemPrice(item)}${item.comment ? `\n${item.comment}` : ''}
+${icon} *${title}*
+${effect}${characteristic}
+💰: ${price}${comment ? `\n${comment}` : ''}
 `;
 }
 
-//const showInvention = (item, comment) => {
-//    return `
-//${getItemIcon(item.icon)}${item.title} ${item.rarity}
-//(${getItemCharacteristic(item.characteristic)}${comment}) - ${getItemPrice(item)}
-//`;
-//}
+const showInvention = ({
+    icon,
+    title,
+    rarity,
+    characteristic,
+    price
+}, comment) => {
+    var icon = getItemIcon(icon);
+    var characteristic = getItemCharacteristic(characteristic);
+    var price = getItemPrice(price);
+    return `
+${icon}${title} ${rarity}
+(${characteristic}${comment}) - ${price}
+`;
+}
 
-const showInventionWithoutTitle = (item, comment) => {
-    return `${item.rarity} (${getItemCharacteristic(item.characteristic)}${comment}) - ${getItemPrice(item)}`;
+const showInventionWithoutTitle = ({
+    rarity,
+    characteristic,
+    price
+}, comment) => {
+    var characteristic = getItemCharacteristic(characteristic);
+    var price = getItemPrice(price);
+    return `${rarity} (${characteristic}${comment}) - ${price}`;
 }
 
 const showItemsByPlace = (place, items, itemsComment) => {
-    const itemsFromPlace = items.filter(item => (item.place === place)&&(!!item.price)&&(!item.rarity));
-    return Object.keys(itemsFromPlace).map(item => {
-        return showItem(itemsFromPlace[item], itemsComment);
+    return items.filter(item => item.place === place && !!item.price && !item.rarity)
+                .map(item => {
+                    return showItem(item, itemsComment);
     }).join('');
 };
 
