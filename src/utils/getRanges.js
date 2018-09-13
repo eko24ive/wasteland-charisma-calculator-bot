@@ -364,4 +364,14 @@ const ranges = [
   [85,90],
   [91,95]
 ]
-module.exports = ranges;
+
+const dzRanges = [
+  [23, 39],
+  [53, 64],
+  [75, 100]
+]
+
+module.exports = {
+  ranges,
+  dzRanges
+};
