@@ -46,7 +46,7 @@ const {
 const calculateUpgrade = require('./src/calculateUpgrade');
 const upgradeAmountValidation = require('./src/utils/upgradeAmountValidation');
 const processForwards = require('./src/utils/processForwards');
-const getRanges = require('./src/utils/getRanges');
+const { ranges, dzRanges } = require('./src/utils/getRanges');
 const tinyHash = require('./src/utils/tinyHash');
 const processMenu = require('./src/utils/processMenu');
 const menuItemHandler = require('./src/utils/menuItemHandler');
@@ -2071,7 +2071,7 @@ const giantsKeyboard = bot.inlineKeyboard([
     ]
 ]);
 
-const beastRangesKeyboard = withBackButton(bot.keyboard, _.chunk(getRanges.map(range => {
+const beastRangesKeyboard = withBackButton(bot.keyboard, _.chunk(ranges.map(range => {
     const first = _.min(range);
     const last = _.max(range);
 
@@ -2082,7 +2082,7 @@ const beastRangesKeyboard = withBackButton(bot.keyboard, _.chunk(getRanges.map(r
     return `${first}-${last}`;
 }), 5));
 
-const beastRangesDarkZoneKeyboard = withBackButton(bot.keyboard, _.chunk(getRanges.map(range => {
+const beastRangesDarkZoneKeyboard = withBackButton(bot.keyboard, _.chunk(dzRanges.map(range => {
     const first = _.min(range);
     const last = _.max(range);
 
@@ -2560,24 +2560,27 @@ ${skillOMaticText}
     }
 });
 
-const validateRange = (_from, _to) => {
+const validateRange = (rangeToValidate, _from, _to) => {
     const from = Number(_from);
     const to = Number(_to);
-    return getRanges.filter(range => range[0] === from && range[1] === to).length === 1;
+    return rangeToValidate.filter(range => range[0] === from && range[1] === to).length === 1;
 }
 
 bot.on('text', msg => {
     const regularZoneBeastsRequestRegExp = /(\d+)-(\d+)/;
     const rangeRegExp = /(\d+)(-|—|--)(\d+)/;
 
+
     if(!rangeRegExp.test(msg.text)) {
         return;
     }
 
+    let range = regularZoneBeastsRequestRegExp.test(msg.text) ? ranges : dzRanges;
+
 
     const [, from,, to] = rangeRegExp.exec(msg.text);
 
-    if(!validateRange(from, to)) {
+    if(!validateRange(range, from, to)) {
         return msg.reply.text('Да, очень умно с твоей стороны. Начислил тебе <i>нихуя</i> 💎<b>Шмепселей</b> за смекалочку, а теперь иди нахуй и используй кнопки внизу.', {
             parseMode: 'html'
         });
