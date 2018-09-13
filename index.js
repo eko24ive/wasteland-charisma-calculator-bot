@@ -2158,7 +2158,8 @@ bot.on(/mob_(.+)/, msg => {
     });
 });
 
-bot.on(['/cancel', '/journeyforwardcancel'], msg => {
+bot.on(['/cancel', '/journeyforwardcancel', '/force_cancel'], msg => {
+
     const backMessage = _.random(0,100) >= 90 ? 'Ты вернусля в главное меню\n<i>Вернусля - почётный член этого сообщения, не обижайте её</i>' : 'Ты вернусля в главное меню';
 
     if(sessions[msg.from.id] === undefined) {
@@ -2169,8 +2170,8 @@ bot.on(['/cancel', '/journeyforwardcancel'], msg => {
             parseMode: 'html'
         }).catch(e => console.log(e));
     }
-    if(sessions[msg.from.id].state === states.WAIT_FOR_DATA_TO_PROCESS) {
-        return msg.reply.text('Дождись результатов обработки форвардов', {
+    if(sessions[msg.from.id].state === states.WAIT_FOR_DATA_TO_PROCESS && msg.text !== '/force_cancel') {
+        return msg.reply.text('Дождись результатов обработки форвардов\nЕсли ты хочешь отменить эту операцию - жми /force_cancel', {
             asReply: true
         }).catch(e => console.log(e));
     } else {
