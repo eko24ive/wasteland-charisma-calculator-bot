@@ -118,17 +118,20 @@ const showItemsByPlace = (place, items, itemsComment) => {
     }).join('');
 };
 
+const getItemByRarity = ({items, title, rarityIcon}) => {
+    return items.filter(item => item.title === title && item.rarity === getRarityIcon(rarityIcon)).pop() || false;
+}
+
 const showItemsInventionsByPlace = (place, items, itemsComment) => {
-    const allInventions = items.filter(item => item.place === place && !!item.rarities);
-    let result = '';
-    allInventions.forEach(invention => {
-        const rarity1 = items.filter(i => (i.title === invention.title)&&(i.rarity === getRarityIcon(FIRST)));
-        const rarity2 = items.filter(i => (i.title === invention.title)&&(i.rarity === getRarityIcon(SECOND)));
-        result += `${getItemIcon(invention.icon)} *${invention.title}* (${getItemCharacteristic(invention.characteristic)}${itemsComment})
-${rarity1[0] ? `${showInventionWithoutTitle(rarity1[0], itemsComment)}` : ''}
-${rarity2[0] ? `${showInventionWithoutTitle(rarity2[0], itemsComment)}\n` : ''}\n`;
-    });
-    return result;
+    return items.filter(item => item.place === place && !!item.rarities)
+                .map(invention => {
+        const firstRarity = getItemByRarity({items, title: invention.title, rarityIcon: FIRST});
+        const secondRarity = getItemByRarity({items, title: invention.title, rarityIcon: SECOND});
+        
+        return `${getItemIcon(invention.icon)} *${invention.title}* (${getItemCharacteristic(invention.characteristic)}${itemsComment})
+${firstRarity ? showInventionWithoutTitle(firstRarity, itemsComment) : ''}
+${secondRarity ? `${showInventionWithoutTitle(secondRarity, itemsComment)}\n` : ''}\n`;
+    }).join('');
 }
 
 const getHelmetsByPlace = place => {
