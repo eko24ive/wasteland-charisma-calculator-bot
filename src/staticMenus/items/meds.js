@@ -3,11 +3,19 @@ const {
     workbench
 } = require('./../places.js');
 
+const {
+    RESOURCES: {
+        MATERIALS,
+        EPHEDRINE,
+    },
+    getResource
+} = require('./resources.js');
+
 const meds = [
     {
         icon: '💧',
         title: "Чистая вода",
-        price: { materials: 30, },
+        price: [getResource(MATERIALS, 30)],
         effect: '❤️',
         characteristic: 3,
         place: workbench,
@@ -15,10 +23,7 @@ const meds = [
     {
         icon: '💊',
         title: "Speed-ы",
-        price: { 
-            materials: 200,
-            ephedrine: 1,
-         },
+        price: [getResource(MATERIALS, 30), getResource(EPHEDRINE, 1)],
         effect: '🔋',
         characteristic: 5,
         place: workbench,
@@ -27,9 +32,7 @@ const meds = [
     {
         icon: '💉',
         title: "Стимулятор",
-        price: { 
-            materials: 80,
-         },
+        price: [getResource(MATERIALS, 80)],
         effect: '❤️',
         characteristic: 30,
         place: workbench,
@@ -37,10 +40,7 @@ const meds = [
     {
         icon: '💉',
         title: "++ Суперстим",
-        price: { 
-            materials: '\*',
-            ephedrine: 1,
-         },
+        price: [getResource(MATERIALS, '\*'), getResource(EPHEDRINE, 1)],
         effect: '❤️',
         characteristic: 'полное здоровье + 20%',
         place: workbench,
@@ -49,10 +49,7 @@ const meds = [
     {
         icon: '💌',
         title: "Медпак",
-        price: { 
-            materials: 630,
-            ephedrine: 1,
-         },
+        price: [getResource(MATERIALS, 630), getResource(EPHEDRINE, 1)],
         effect: '❤️',
         characteristic: 60,
         place: engineer,
@@ -62,9 +59,7 @@ const meds = [
     {
         icon: '💉',
         title: "Мед-Х детский",
-        price: { 
-            materials: 410,
-         },
+        price: [getResource(MATERIALS, 410)],
         effect: '❤️',
         characteristic: 30,
         place: engineer,
@@ -73,9 +68,7 @@ const meds = [
     {
         icon: '❣️',
         title: "Баффаут",
-        price: { 
-            materials: 280,
-         },
+        price: [getResource(MATERIALS, 280)],
         effect: '❤️',
         characteristic: 17,
         place: engineer,

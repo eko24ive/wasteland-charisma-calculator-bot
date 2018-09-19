@@ -7,29 +7,40 @@ const {
 
 const {
     weapons,
-    weaponsComment
+    weaponsShortComment,
+    weaponsLongComment
 } = require('./weapon.js');
 
 const {
     armors,
-    armorsComment
+    armorsShortComment,
+    armorsLongComment
 } = require('./armor.js');
 
 const meds = require('./meds.js');
-const prices = require('./../prices.js');
 
-const priceText = price => {
-    return Object.keys(price).map(element => {
-        return `${prices[element].icon}${(element === 'ephedrine') ? `(${price[element]})` : `${price[element]}`} `;
-    }).join(', ');
-};
+const {
+    RARITIES: {
+        FIRST,
+        SECOND
+    },
+    getRarityIcon
+} = require('./resources.js');
 
 const getItemIcon = icon => {
     if (icon) {
-        return icon;
+       return icon;
     }
 
-    return '';
+   return '';
+}
+
+const getItemPrice = price => {
+    if (price) {
+       return price.join(', ');
+    }
+
+   return '???';
 }
 
 const getItemCharacteristic = characteristic => {
@@ -40,81 +51,121 @@ const getItemCharacteristic = characteristic => {
     return '???';
 }
 
-const getItemsByPlace = (place, items, itemsGlobalComment = '') => {
-    const itemsFromPlace = items.filter(item => item.place === place);
+const showItem = ({
+    icon,
+    title,
+    characteristic,
+    price
+}, comment) => {
+    var icon = getItemIcon(icon);
+    var characteristic = getItemCharacteristic(characteristic);
+    var price = getItemPrice(price);
+    return `
+${icon} *${title}*
+${comment} ${characteristic}
+💰: ${price}
+`;
+}
 
-    return _.sortBy(itemsFromPlace, item => item.characteristic).map(({
-        icon,
-        title,
-        price,
-        effect,
-        characteristic,
-        comment
-    }) => {
-        return `${getItemIcon(icon)} *${title}*
-${effect ? effect : ''}${itemsGlobalComment}${getItemCharacteristic(characteristic)}
-💰: ${priceText(price)}
-${comment ? `${comment}\n` : ''}`;
-    }).join('\n');
+const showMed = ({
+    icon,
+    title,
+    effect,
+    characteristic,
+    price,
+    comment
+}) => {
+    var icon = getItemIcon(icon);
+    var characteristic = getItemCharacteristic(characteristic);
+    var price = getItemPrice(price);
+    return `
+${icon} *${title}*
+${effect}${characteristic}
+💰: ${price}${comment ? `\n${comment}` : ''}
+`;
+}
+
+const showInvention = ({
+    icon,
+    title,
+    rarity,
+    characteristic,
+    price
+}, comment) => {
+    var icon = getItemIcon(icon);
+    var characteristic = getItemCharacteristic(characteristic);
+    var price = getItemPrice(price);
+    return `
+${icon}${title} ${rarity}
+(${characteristic}${comment}) - ${price}
+`;
+}
+
+const showInventionWithoutTitle = ({
+    rarity,
+    characteristic,
+    price
+}, comment) => {
+    var characteristic = getItemCharacteristic(characteristic);
+    var price = getItemPrice(price);
+    return `${rarity} (${characteristic}${comment}) - ${price}`;
+}
+
+const showItemsByPlace = (place, items, itemsComment) => {
+    return items.filter(item => item.place === place && !!item.price && !item.rarity)
+                .map(item => {
+                    return showItem(item, itemsComment);
+    }).join('');
 };
 
+const getItemByRarity = ({items, title, rarityIcon}) => {
+    return items.filter(item => item.title === title && item.rarity === getRarityIcon(rarityIcon)).pop() || false;
+}
+
+const showItemsInventionsByPlace = (place, items, itemsComment) => {
+    return items.filter(item => item.place === place && !!item.rarities)
+                .map(invention => {
+        const firstRarity = getItemByRarity({items, title: invention.title, rarityIcon: FIRST});
+        const secondRarity = getItemByRarity({items, title: invention.title, rarityIcon: SECOND});
+        
+        return `${getItemIcon(invention.icon)} *${invention.title}* (${getItemCharacteristic(invention.characteristic)}${itemsComment})
+${firstRarity ? showInventionWithoutTitle(firstRarity, itemsComment) : ''}
+${secondRarity ? `${showInventionWithoutTitle(secondRarity, itemsComment)}\n` : ''}\n`;
+    }).join('');
+}
+
 const getHelmetsByPlace = place => {
-    let placeText = getItemsByPlace(place, helmets, helmetsComment);
-    return placeText;
+    return showItemsByPlace(place, helmets, helmetsComment)
 };
 
 const getWeaponsByPlace = place => {
-    let placeText = getItemsByPlace(place, weapons, weaponsComment);
-    return placeText;
+    return showItemsByPlace(place, weapons, weaponsLongComment)
+};
+
+const getWeaponInventionsByPlace = place => {
+    return showItemsInventionsByPlace(place, weapons, weaponsShortComment)
 };
 
 const getArmorsByPlace = place => {
-    let placeText = getItemsByPlace(place, armors, armorsComment);
-    return placeText;
+    return showItemsByPlace(place, armors, armorsLongComment)
+};
+
+const getArmorInventionsByPlace = place => {
+    return showItemsInventionsByPlace(place, armors, armorsShortComment)
 };
 
 const getMedsByPlace = place => {
-    let placeText = getItemsByPlace(place, meds);
-    return placeText;
-};
-
-const getAllItemsWithPlace = (items, itemsGlobalComment = '') => {
-    const getItemIcon = icon => {
-        if (icon) {
-            return icon;
-        }
-
-        return '';
-    }
-
-    const getItemCharacteristic = characteristic => {
-        if (characteristic) {
-            return characteristic;
-        }
-
-        return '???';
-    }
-
-    return _.sortBy(items, item => item.characteristic).map(({
-        icon,
-        title,
-        price,
-        effect,
-        characteristic,
-        place,
-        comment
-    }) => {
-        return `${getItemIcon(icon)} *${title}*
-        ${priceText(price)}
-        ${effect ? effect : ''}${itemsGlobalComment}${getItemCharacteristic(characteristic)}
-        ${comment ? comment : ''}
-        Место покупки: ${place}`;
-    }).join('\n');
+    const itemsFromPlace = meds.filter(item => (item.place === place));
+    return Object.keys(itemsFromPlace).map(item => {
+        return showMed(itemsFromPlace[item]);
+    }).join('');
 };
 
 module.exports = {
     getHelmetsByPlace,
     getWeaponsByPlace,
     getArmorsByPlace,
-    getMedsByPlace
+    getMedsByPlace,
+    getWeaponInventionsByPlace,
+    getArmorInventionsByPlace
 };
