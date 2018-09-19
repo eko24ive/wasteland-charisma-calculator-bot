@@ -4,8 +4,7 @@ const healthRegExp = /❤️(-|)(\d+)\/(\d+)/;
 const hungerRegExp = /🍗\d+\%/;
 const staminaRegExp = /🔋\d+\/\d+/;
 const campDistanceRegExp = /👣(\d+)км/;
-const receivedCapsRegExp = /Ты заработал: 🕳(\d+)/;
-const receivedMaterialsRegExp = /Получено: 📦(\d+)/;
+const receivedCapsAndMaterialsRegExp = /Найдено: 🕳(\d+) и 📦(\d+)/;
 const receivedItemRegExp = /Получено: (?!📦)(.+)/;
 const receivedBonusItemRegExp = /Бонус: (.+)/;
 const injuryRegExp = /Ты ранен: 💔-(\d+)/;
@@ -65,8 +64,7 @@ const location = {
     contains: [every.contains, locationNameRegExp],
     conditional: [
         every.contains,
-        receivedCapsRegExp,
-        receivedMaterialsRegExp,
+        receivedCapsAndMaterialsRegExp,
         receivedBonusItemRegExp,
         injuryRegExp,
         capsLostRegExp,
@@ -91,8 +89,7 @@ const regularBeast = {
         receivedItemRegExp,
         beastDefeatCapsLostRegExp,
         beastDefeatMaterialsLostRegExp,
-        actionReceivedCapsRegExp,
-        actionReceivedMaterialsRegExp,
+        receivedCapsAndMaterialsRegExp,
         darkZone
     ]
 };
@@ -110,8 +107,7 @@ const dungeonBeast = {
     ],
     excludes: [
         receivedItemRegExp,
-        actionReceivedCapsRegExp,
-        actionReceivedMaterialsRegExp
+        receivedCapsAndMaterialsRegExp
     ]
 }
 
@@ -180,8 +176,7 @@ const regexps = {
     hungerRegExp,
     staminaRegExp,
     campDistanceRegExp,
-    receivedCapsRegExp,
-    receivedMaterialsRegExp,
+    receivedCapsAndMaterialsRegExp,
     receivedItemRegExp,
     receivedBonusItemRegExp,
     injuryRegExp,
