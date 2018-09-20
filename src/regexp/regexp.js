@@ -17,6 +17,7 @@ const actionReceivedCapsRegExp = /Получено крышек: 🕳(\d+)/;
 const actionReceivedMaterialsRegExp = /Получено материалов: 📦(\d+)/;
 
 const beastNameRegExp = /Сражение с (.+)/;
+const beastDungeonFlagRegExp = /📯/;
 const beastAttackRegExp = /.+ 💔-(\d+)/;
 const beastStunRegExp = /(.+) оглушен ударом 💫/;
 const playerBeastAttackRegExp = /👤Ты .+ 💥(\d+)/;
@@ -95,7 +96,7 @@ const regularBeast = {
 };
 
 const dungeonBeast = {
-    contains: [every.contains, beastNameRegExp],
+    contains: [every.contains, beastNameRegExp, beastDungeonFlagRegExp],
     conditional: [
         beastAttackRegExp,
         beastStunRegExp,
