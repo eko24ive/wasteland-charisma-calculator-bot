@@ -273,7 +273,7 @@ const processForwards = (inputData, config) => {
             beastData.battles[0].healthOnStart = data.currentHealth + beastData.battles[0].totalDamageReceived;
             beastData.battles[0].stamp = `${date}${userId}`;
 
-            if (data.fightResult === 'lose') {
+            // if (data.fightResult === 'lose') { EVERY FACE FORWARD IS NOW REQUIRED
                 if (!reportData.lastBeastSeen) {
                     beastData.battles = [];
 
@@ -285,7 +285,7 @@ const processForwards = (inputData, config) => {
                         reportData.beastToValidate.push({name: data.name, distance: data.distance, type: data.type});
                     }
                 }
-            }
+            // }
 
 
             updatesData.beasts.push(beastData);
