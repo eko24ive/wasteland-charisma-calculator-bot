@@ -48,6 +48,7 @@ const upgradeAmountValidation = require('./src/utils/upgradeAmountValidation');
 const processForwards = require('./src/utils/processForwards');
 const { ranges, dzRanges } = require('./src/utils/getRanges');
 const processMenu = require('./src/utils/processMenu');
+const validateForwardDate = require('./src/utils/validateForwardDate');
 
 const routedBeastView = require('./src/views/routedBeastView');
 const routedBattleView = require('./src/views/routedBattleView');
@@ -882,7 +883,7 @@ bot.on('forward', (msg) => {
     }
   }
 
-  if (msg.forward_date < 1537304400) {
+  if (validateForwardDate(msg.forward_date)) {
     return msg.reply.text('❌<b>ЗАМЕЧЕНА КРИТИЧЕСКАЯ ОШИБКА</b>❌\n\nБыл замечен форвард время которого меньше за время последнего обновления Wasteland Wars (19.09.2018)', {
       asReply: true,
       parseMode: 'html',
