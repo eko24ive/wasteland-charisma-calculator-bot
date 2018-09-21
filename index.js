@@ -1077,7 +1077,6 @@ bot.on('forward', (msg) => {
       dataType = 'dungeonBeast';
     }
 
-
     if (isRegularBeast || isLocation || isFlee || isDeathMessage || isDungeonBeastFaced || (isClassicPip || isSimplePip) || isDungeonBeast) {
       sessions[msg.from.id].data.push({
         data,
