@@ -882,6 +882,13 @@ bot.on('forward', (msg) => {
     }
   }
 
+  if (msg.forward_date < 1537304400) {
+    return msg.reply.text('❌<b>ЗАМЕЧЕНА КРИТИЧЕСКАЯ ОШИБКА</b>❌\n\nБыл замечен форвард время которого меньше за время последнего обновления Wasteland Wars (19.09.2018)', {
+      asReply: true,
+      parseMode: 'html',
+    });
+  }
+
   if (sessions[msg.from.id].state === states.WAIT_FOR_PIP_FORWARD) {
     const isClassicPip = regExpSetMatcher(msg.text, {
       regexpSet: PipRegexps.classicPip,
