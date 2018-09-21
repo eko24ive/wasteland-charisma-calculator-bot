@@ -367,16 +367,19 @@ const actualProcessUserData = (msg, reportData, updatesData, options) => {
     sessions[msg.from.id].beastToValidateName = reportData.beastToValidate[0].name;
     sessions[msg.from.id].beastToValidateType = reportData.beastToValidate[0].type;
     return msg.reply.text(`
-  Слушай, я не могу понять кто тебе надрал задницу, ${reportData.beastToValidate[0].type === 'DarkZone' ? '🚷' : ''}${reportData.beastToValidate[0].name} - это обычный моб или данжевый?
-  
-  Пожалуйста скинь форвард встречи с этим мобом:
-  \`Во время вылазки на тебя напал...\`
-  _или_
-  \`...перегородил тебе путь.\`
-  
-  Если у тебя нет на это времени жми /skipbeastforward
-  
-  *ВНИМАНИЕ: ПРИ НАЖАТИИ НА /skipbeastforward - БОТ ПРОИГНОРИРУЕТ ТОЛЬКО РЕЗУЛЬТАТ ТВОЕЙ БИТВЫ С ${reportData.beastToValidate[0].name} НЕ ЗАПИШЕТ ИХ В БАЗУ*
+Слушай, я не могу понять с кем это были у тебярамсы.
+Пожалуйста скинь форвард встречи с ${reportData.beastToValidate[0].type === 'DarkZone' ? '🚷' : ''}${reportData.beastToValidate[0].name}
+
+Пожалуйста скинь форвард встречи с этим мобом:
+\`Во время вылазки на тебя напал...\`
+_или_
+\`...перегородил тебе путь.\`
+_или_
+\`устрашающе начал приближаться\`
+
+Если у тебя нет на это времени жми /skipbeastforward
+
+*ВНИМАНИЕ: ПРИ НАЖАТИИ НА /skipbeastforward - БОТ ПРОИГНОРИРУЕТ ТОЛЬКО РЕЗУЛЬТАТ ТВОЕЙ БИТВЫ С ${reportData.beastToValidate[0].name} НЕ ЗАПИШЕТ ИХ В БАЗУ*
   `, {
       parseMode: 'markdown',
     }).catch(e => console.log(e));
@@ -1075,8 +1078,7 @@ bot.on('forward', (msg) => {
     }
 
 
-    // isDungeonBeast ||
-    if (isRegularBeast || isLocation || isFlee || isDeathMessage || isDungeonBeastFaced || (isClassicPip || isSimplePip)) {
+    if (isRegularBeast || isLocation || isFlee || isDeathMessage || isDungeonBeastFaced || (isClassicPip || isSimplePip) || isDungeonBeast) {
       sessions[msg.from.id].data.push({
         data,
         dataType,

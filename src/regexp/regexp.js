@@ -37,6 +37,7 @@ const deathMessageContentRegExp = /Спустя какое-то время ты 
 const deathMessageRecourcesLostRexExp = /Потеряно: 🕳(\d+) и 📦(\d+)/;
 
 const beastFacedRegExp = /Во время вылазки на тебя напал (.+)\./;
+const randomBeastFacedRegExp = /устрашающе начал приближаться (.+)\./;
 const dungeonBeastFacedRegExp = /(.+) перегородил тебе путь./;
 
 const metalAmountRegExp = /(.+) (\d+)/; // 🔗Кубонит 192
@@ -90,6 +91,7 @@ const regularBeast = {
     receivedCapsAndMaterialsRegExp,
     darkZone,
   ],
+  excludes: [beastDungeonFlagRegExp],
 };
 
 const dungeonBeast = {
@@ -207,6 +209,8 @@ const regexps = {
   giantNameOnField,
   giantHealthOnField,
   darkZone,
+  beastDungeonFlagRegExp,
+  randomBeastFacedRegExp,
 };
 
 module.exports = {
