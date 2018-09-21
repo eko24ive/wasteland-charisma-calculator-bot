@@ -1196,9 +1196,7 @@ bot.on('forward', (msg) => {
             });
           }).catch(e => console.log(e));
         } else {
-          const time = Number(moment.tz(moment().valueOf(), 'Europe/Moscow').format('X'));
-
-          if (databaseGiant.forwardStamp >= time) {
+          if (databaseGiant.forwardStamp >= msg.forward_date) {
             return msg.reply.text(`Прости, у меня есть более свежая иформация про *${giant.name}*`, {
               asReply: true,
               parseMode: 'markdown',
@@ -1206,7 +1204,7 @@ bot.on('forward', (msg) => {
           }
           databaseGiant.health.current = giant.healthCurrent;
           databaseGiant.health.cap = giant.healthCap;
-          databaseGiant.forwardStamp = time;
+          databaseGiant.forwardStamp = msg.forward_date;
 
           const wasDead = databaseGiant.health.current <= 0;
           const isDead = giant.healthCurrent <= 0;
@@ -1338,7 +1336,6 @@ bot.on('forward', (msg) => {
           });
         }).catch(e => console.log(e));
 
-
         return false;
       });
     } else if (isLocation && !isGiantFaced) {
@@ -1348,9 +1345,7 @@ bot.on('forward', (msg) => {
         distance: location.distance,
       }).then((databaseGiant) => {
         if (databaseGiant !== null) {
-          const time = Number(moment.tz(moment().valueOf(), 'Europe/Moscow').format('X'));
-
-          if (databaseGiant.forwardStamp >= time) {
+          if (databaseGiant.forwardStamp >= msg.forward_date) {
             return msg.reply.text('Прости, ничего не могу с этим сделать 🤷‍♂️', {
               asReply: true,
               parseMode: 'markdown',
@@ -1360,9 +1355,9 @@ bot.on('forward', (msg) => {
           const wasDead = databaseGiant.health.current <= 0;
           const isDead = 0;
 
-          if (wasDead !== !isDead) {
+          if (wasDead !== isDead) {
             databaseGiant.health.current = 0;
-            databaseGiant.forwardStamp = time;
+            databaseGiant.forwardStamp = msg.forward_date;
 
             databaseGiant.save().then(() => {
               userManager.addPoints(msg.from.id, forwardPoints.newGiantData).then((result) => {
@@ -1379,12 +1374,14 @@ bot.on('forward', (msg) => {
               });
             }).catch(e => console.log(e));
           }
+        } else {
+          return msg.reply.text('Прости, ничего не могу с этим сделать 🤷‍♂️', {
+            asReply: true,
+            parseMode: 'markdown',
+          });
         }
 
-        return msg.reply.text('Прости, ничего не могу с этим сделать 🤷‍♂️', {
-          asReply: true,
-          parseMode: 'markdown',
-        });
+        return false;
       });
     } else if (isRegularBeastFaced) {
       const beast = parseBeastFaced.parseRegularBeastFaced(msg.text);
