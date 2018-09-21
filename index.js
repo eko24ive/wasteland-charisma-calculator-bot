@@ -359,8 +359,6 @@ const actualProcessUserData = (msg, reportData, updatesData, options) => {
 \`Во время вылазки на тебя напал...\`
 _или_
 \`...перегородил тебе путь.\`
-_или_
-\`устрашающе начал приближаться\`
 
 Если у тебя нет на это времени жми /skipbeastforward
 
@@ -973,7 +971,7 @@ bot.on('forward', (msg) => {
       beastType = data.beastFaced.type;
     }
 
-    if (beastName !== sessions[msg.from.id].beastToValidateName || sessions[msg.from.id].beastToValidateName !== '???' || sessions[msg.from.id].beastToValidateType !== beastType) {
+    if ((beastName !== sessions[msg.from.id].beastToValidateName && sessions[msg.from.id].beastToValidateName !== '???') || sessions[msg.from.id].beastToValidateType !== beastType) {
       return msg.reply.text(`
 Этот моб не похож на того с которым ты дрался. Ты чё - наебать меня вздумал?!
 

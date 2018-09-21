@@ -20,7 +20,7 @@ const parseRegularBeast = (beast) => {
 
   if (regexps.beastVictoryRegExp.test(beast)) {
     fightResult = 'win';
-  } else if (regexps.beastDefeatMaterialsLostRegExp.test(beast)) {
+  } else {
     fightResult = 'lose';
   }
 
