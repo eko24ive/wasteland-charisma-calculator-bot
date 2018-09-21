@@ -2061,10 +2061,14 @@ bot.on(['/show_beasts(regular)', '/show_beasts(darkzone)'], (msg) => {
 bot.on(/mob_(.+)/, (msg) => {
   const [, id] = /mob_(.+)/.exec(msg.text);
 
-  routedBeastView(Beast, {
+  const searchParams = process.env.ENV === 'PRODUCTION' ? {
     _id: id,
     isDungeon: false,
-  }, null, {
+  } : {
+    _id: id,
+  };
+
+  routedBeastView(Beast, searchParams, null, {
     env: process.env.ENV,
   }).then(({ reply, beast }) => {
     if (reply !== false) {
@@ -2519,6 +2523,39 @@ ${beastsList}
       parseMode: 'html',
     }).catch(e => console.log(e));
   }).catch(e => console.log(e));
+});
+
+bot.on('/d', (msg) => {
+  if (process.env.ENV === 'STAGING') {
+    Beast.find({
+      isDungeon: true,
+    }, 'battles.totalDamageReceived name id').then((beasts) => {
+      const jsonBeasts = beasts.map((b) => {
+        const jsoned = b.toJSON();
+
+        return {
+          id: b.id,
+          ...jsoned,
+        };
+      });
+
+      const beastsByDamage = _.sortBy(jsonBeasts, v => v.battles.totalDamageReceived);
+
+      const beastsList = beastsByDamage.map(beast => `
+${beast.name}
+/mob_${beast.id}`).join('\n');
+
+      const reply = `
+<b>Данжевые мобы</b>
+<i>Отсортированы от слабым к сильным</i>
+${beastsList}
+`;
+
+      return msg.reply.text(reply, {
+        parseMode: 'html',
+      }).catch(e => console.log(e));
+    }).catch(e => console.log(e));
+  }
 });
 
 bot.on('/show_encyclopedia', (msg) => {
