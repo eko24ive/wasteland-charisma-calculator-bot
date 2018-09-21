@@ -345,7 +345,7 @@ const getRanges = mobs => {
 
 const ranges = [
   [1, 4],
-  [5, 7],
+  [5, 8],
   [9, 13],
   [14, 17],
   [18, 21],
