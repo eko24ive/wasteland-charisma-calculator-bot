@@ -245,16 +245,16 @@ const defaultKeyboard = bot.keyboard([
   resize: true,
 });
 
-const getEffort = (msg, maxText = false) => {
+const getEffort = (msg, toMax = false) => {
   if (sessions[msg.from.id].state === states.WAIT_FOR_START) {
     return false;
   }
 
   sessions[msg.from.id].state = states.WAIT_FOR_RESPONSE;
 
-  sessions[msg.from.id].amountToUpgrade = maxText || msg.text;
+  sessions[msg.from.id].amountToUpgrade = toMax || msg.text;
 
-  const effort = calculateUpgrade(sessions[msg.from.id]);
+  const effort = calculateUpgrade(sessions[msg.from.id], { toMax });
   const { pip } = sessions[msg.from.id];
 
 
@@ -267,22 +267,6 @@ const getEffort = (msg, maxText = false) => {
     parseMode: 'markdown',
   });
 };
-
-const levelsToMax = (pip, skillToUpgrade, cap) => {
-  const skillMap = {
-    '❤ Живучесть': 'health',
-    '💪 Сила': 'strength',
-    '🔫 Меткость': 'precision',
-    '🗣 Харизма': 'charisma',
-    '🤸‍♀️ Ловкость': 'agility',
-  };
-
-  const currentSkillLevel = pip[skillMap[skillToUpgrade]];
-  const amountToUpgrade = cap - currentSkillLevel;
-
-  return amountToUpgrade;
-};
-
 
 const encyclopediaKeyboard = [
   [
@@ -367,7 +351,7 @@ const actualProcessUserData = (msg, reportData, updatesData, options) => {
     sessions[msg.from.id].beastToValidateName = reportData.beastToValidate[0].name;
     sessions[msg.from.id].beastToValidateType = reportData.beastToValidate[0].type;
     return msg.reply.text(`
-Слушай, я не могу понять с кем это были у тебярамсы.
+Слушай, я не могу понять с кем это были у тебя рамсы.
 Пожалуйста скинь форвард встречи с ${reportData.beastToValidate[0].type === 'DarkZone' ? '🚷' : ''}${reportData.beastToValidate[0].name}
 
 Пожалуйста скинь форвард встречи с этим мобом:
@@ -1487,12 +1471,7 @@ bot.on('/raids_text', msg => msg.reply.text(`
 
 bot.on('/upgradeSkill', (msg) => {
   if (msg.text === 'МАКСИМАЛОЧКА') {
-    const { pip } = sessions[msg.from.id];
-    const skillToUpgrade = sessions[msg.from.id].upgradeSkill;
-
-    const newText = levelsToMax(pip, skillToUpgrade, 1300);
-
-    getEffort(msg, newText);
+    getEffort(msg, true);
   } else {
     getEffort(msg);
   }

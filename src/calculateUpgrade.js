@@ -7,11 +7,19 @@ const mobs = require('./constants/mobs');
 const mobsRanges = require('./constants/mobsRanges');
 
 const skillMap = {
-  '❤ Живучесть': 'health',
   '💪 Сила': 'strength',
   '🔫 Меткость': 'precision',
-  '🗣 Харизма': 'charisma',
   '🤸‍♀️ Ловкость': 'agility',
+  '❤ Живучесть': 'health',
+  '🗣 Харизма': 'charisma',
+};
+
+const skillsCap = {
+  strength: 1300,
+  precision: 1300,
+  agility: 1200,
+  health: 1550,
+  charisma: 1250,
 };
 
 const formatNubmer = (number) => {
@@ -188,14 +196,32 @@ const calculateSpentOnSkill = (
   return spentAmount;
 };
 
+const getCap = ({
+  upgradeSkill, currentSkillLevel, amountToUpgrade, toMax,
+}) => {
+  const upgradeTo = Number(currentSkillLevel) + Number(amountToUpgrade);
+  const skillName = skillMap[upgradeSkill];
+  const skillCap = skillsCap[skillName];
+
+  if (toMax || upgradeTo > skillCap) {
+    return skillCap;
+  }
+
+  return upgradeTo;
+};
+
 const calculateUpgrade = ({
   pip,
   upgradeSkill,
   amountToUpgrade,
   reachableKm,
+}, {
+  toMax,
 }) => {
   const currentSkillLevel = pip[skillMap[upgradeSkill]];
-  const upgradeTo = Number(currentSkillLevel) + Number(amountToUpgrade);
+  const upgradeTo = getCap({
+    upgradeSkill, currentSkillLevel, amountToUpgrade, toMax,
+  });
   const charismaLevel = Number(pip.charisma);
   const reachableDistance = Number(/\d*/.exec(reachableKm).pop());
 
@@ -234,6 +260,8 @@ const calculateUpgrade = ({
 _Всего ты потратил ${formatNubmer(spentOnSkill)} 🕳 крышек на ${upgradeSkill}_
 
 Необходимо потратить ${formatNubmer(calculations.amountToSpend)} 🕳 крышек для прокачки навыка \`${upgradeSkill}\` от ${currentSkillLevel} уровня до ${upgradeTo} уровня
+
+Твой текущий уровень харизмы позволил сэкономить ${formatNubmer(calculations.amountOfSavedFunds)} 🕳 крышек.
 
 Тебе необходимо сделать примерно *${Math.floor((calculations.raidsInfo.worstCaseScenario.amountOfRaids + 2) * 1.5)} 👣 ходок*:
 \`Из-за недавнего обновления Wasteland Wars данные для расчёта ходок работают в эксперементальном режиме\`
