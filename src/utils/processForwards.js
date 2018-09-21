@@ -114,7 +114,7 @@ const processForwards = (inputData) => {
   // accept only after 24.06.2018
   // accept only after 19.09.2018
   if (inputData.filter(({ date }) => validateForwardDate(date)).length > 0) {
-    reportData.criticalError = 'Был замечен форвард время которого меньше за время последнего обновления Wasteland Wars (19.09.2018)';
+    reportData.criticalError = 'Был замечен форвард, время которого меньше, чем время последнего обновления Wasteland Wars (19.09.2018)';
 
     return { reportData };
   }
