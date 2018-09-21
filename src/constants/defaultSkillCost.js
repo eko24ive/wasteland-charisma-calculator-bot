@@ -1,6 +1,5 @@
 /*
-var a = Array.apply(null, Array(1000)).map(function (x, i) { return i+1; });
-
+var a = Array.apply(null, Array(2000)).map(function (x, i) { return i+1; });
 
 x = [];
 
@@ -10,10 +9,12 @@ a.map((v,i) => {
         level: v
    })
 });
+
+JSON.stringify(x)
  */
 
 module.exports = [{
-  caps: 0,
+  caps: -3,
   level: 1,
 }, {
   caps: 10,
@@ -3912,4 +3913,2104 @@ module.exports = [{
 }, {
   caps: 16884,
   level: 1300,
+}, {
+  caps: 16897,
+  level: 1301,
+}, {
+  caps: 16910,
+  level: 1302,
+}, {
+  caps: 16923,
+  level: 1303,
+}, {
+  caps: 16936,
+  level: 1304,
+}, {
+  caps: 16949,
+  level: 1305,
+}, {
+  caps: 16962,
+  level: 1306,
+}, {
+  caps: 16975,
+  level: 1307,
+}, {
+  caps: 16988,
+  level: 1308,
+}, {
+  caps: 17001,
+  level: 1309,
+}, {
+  caps: 17014,
+  level: 1310,
+}, {
+  caps: 17027,
+  level: 1311,
+}, {
+  caps: 17040,
+  level: 1312,
+}, {
+  caps: 17053,
+  level: 1313,
+}, {
+  caps: 17066,
+  level: 1314,
+}, {
+  caps: 17079,
+  level: 1315,
+}, {
+  caps: 17092,
+  level: 1316,
+}, {
+  caps: 17105,
+  level: 1317,
+}, {
+  caps: 17118,
+  level: 1318,
+}, {
+  caps: 17131,
+  level: 1319,
+}, {
+  caps: 17144,
+  level: 1320,
+}, {
+  caps: 17157,
+  level: 1321,
+}, {
+  caps: 17170,
+  level: 1322,
+}, {
+  caps: 17183,
+  level: 1323,
+}, {
+  caps: 17196,
+  level: 1324,
+}, {
+  caps: 17209,
+  level: 1325,
+}, {
+  caps: 17222,
+  level: 1326,
+}, {
+  caps: 17235,
+  level: 1327,
+}, {
+  caps: 17248,
+  level: 1328,
+}, {
+  caps: 17261,
+  level: 1329,
+}, {
+  caps: 17274,
+  level: 1330,
+}, {
+  caps: 17287,
+  level: 1331,
+}, {
+  caps: 17300,
+  level: 1332,
+}, {
+  caps: 17313,
+  level: 1333,
+}, {
+  caps: 17326,
+  level: 1334,
+}, {
+  caps: 17339,
+  level: 1335,
+}, {
+  caps: 17352,
+  level: 1336,
+}, {
+  caps: 17365,
+  level: 1337,
+}, {
+  caps: 17378,
+  level: 1338,
+}, {
+  caps: 17391,
+  level: 1339,
+}, {
+  caps: 17404,
+  level: 1340,
+}, {
+  caps: 17417,
+  level: 1341,
+}, {
+  caps: 17430,
+  level: 1342,
+}, {
+  caps: 17443,
+  level: 1343,
+}, {
+  caps: 17456,
+  level: 1344,
+}, {
+  caps: 17469,
+  level: 1345,
+}, {
+  caps: 17482,
+  level: 1346,
+}, {
+  caps: 17495,
+  level: 1347,
+}, {
+  caps: 17508,
+  level: 1348,
+}, {
+  caps: 17521,
+  level: 1349,
+}, {
+  caps: 17534,
+  level: 1350,
+}, {
+  caps: 17547,
+  level: 1351,
+}, {
+  caps: 17560,
+  level: 1352,
+}, {
+  caps: 17573,
+  level: 1353,
+}, {
+  caps: 17586,
+  level: 1354,
+}, {
+  caps: 17599,
+  level: 1355,
+}, {
+  caps: 17612,
+  level: 1356,
+}, {
+  caps: 17625,
+  level: 1357,
+}, {
+  caps: 17638,
+  level: 1358,
+}, {
+  caps: 17651,
+  level: 1359,
+}, {
+  caps: 17664,
+  level: 1360,
+}, {
+  caps: 17677,
+  level: 1361,
+}, {
+  caps: 17690,
+  level: 1362,
+}, {
+  caps: 17703,
+  level: 1363,
+}, {
+  caps: 17716,
+  level: 1364,
+}, {
+  caps: 17729,
+  level: 1365,
+}, {
+  caps: 17742,
+  level: 1366,
+}, {
+  caps: 17755,
+  level: 1367,
+}, {
+  caps: 17768,
+  level: 1368,
+}, {
+  caps: 17781,
+  level: 1369,
+}, {
+  caps: 17794,
+  level: 1370,
+}, {
+  caps: 17807,
+  level: 1371,
+}, {
+  caps: 17820,
+  level: 1372,
+}, {
+  caps: 17833,
+  level: 1373,
+}, {
+  caps: 17846,
+  level: 1374,
+}, {
+  caps: 17859,
+  level: 1375,
+}, {
+  caps: 17872,
+  level: 1376,
+}, {
+  caps: 17885,
+  level: 1377,
+}, {
+  caps: 17898,
+  level: 1378,
+}, {
+  caps: 17911,
+  level: 1379,
+}, {
+  caps: 17924,
+  level: 1380,
+}, {
+  caps: 17937,
+  level: 1381,
+}, {
+  caps: 17950,
+  level: 1382,
+}, {
+  caps: 17963,
+  level: 1383,
+}, {
+  caps: 17976,
+  level: 1384,
+}, {
+  caps: 17989,
+  level: 1385,
+}, {
+  caps: 18002,
+  level: 1386,
+}, {
+  caps: 18015,
+  level: 1387,
+}, {
+  caps: 18028,
+  level: 1388,
+}, {
+  caps: 18041,
+  level: 1389,
+}, {
+  caps: 18054,
+  level: 1390,
+}, {
+  caps: 18067,
+  level: 1391,
+}, {
+  caps: 18080,
+  level: 1392,
+}, {
+  caps: 18093,
+  level: 1393,
+}, {
+  caps: 18106,
+  level: 1394,
+}, {
+  caps: 18119,
+  level: 1395,
+}, {
+  caps: 18132,
+  level: 1396,
+}, {
+  caps: 18145,
+  level: 1397,
+}, {
+  caps: 18158,
+  level: 1398,
+}, {
+  caps: 18171,
+  level: 1399,
+}, {
+  caps: 18184,
+  level: 1400,
+}, {
+  caps: 18197,
+  level: 1401,
+}, {
+  caps: 18210,
+  level: 1402,
+}, {
+  caps: 18223,
+  level: 1403,
+}, {
+  caps: 18236,
+  level: 1404,
+}, {
+  caps: 18249,
+  level: 1405,
+}, {
+  caps: 18262,
+  level: 1406,
+}, {
+  caps: 18275,
+  level: 1407,
+}, {
+  caps: 18288,
+  level: 1408,
+}, {
+  caps: 18301,
+  level: 1409,
+}, {
+  caps: 18314,
+  level: 1410,
+}, {
+  caps: 18327,
+  level: 1411,
+}, {
+  caps: 18340,
+  level: 1412,
+}, {
+  caps: 18353,
+  level: 1413,
+}, {
+  caps: 18366,
+  level: 1414,
+}, {
+  caps: 18379,
+  level: 1415,
+}, {
+  caps: 18392,
+  level: 1416,
+}, {
+  caps: 18405,
+  level: 1417,
+}, {
+  caps: 18418,
+  level: 1418,
+}, {
+  caps: 18431,
+  level: 1419,
+}, {
+  caps: 18444,
+  level: 1420,
+}, {
+  caps: 18457,
+  level: 1421,
+}, {
+  caps: 18470,
+  level: 1422,
+}, {
+  caps: 18483,
+  level: 1423,
+}, {
+  caps: 18496,
+  level: 1424,
+}, {
+  caps: 18509,
+  level: 1425,
+}, {
+  caps: 18522,
+  level: 1426,
+}, {
+  caps: 18535,
+  level: 1427,
+}, {
+  caps: 18548,
+  level: 1428,
+}, {
+  caps: 18561,
+  level: 1429,
+}, {
+  caps: 18574,
+  level: 1430,
+}, {
+  caps: 18587,
+  level: 1431,
+}, {
+  caps: 18600,
+  level: 1432,
+}, {
+  caps: 18613,
+  level: 1433,
+}, {
+  caps: 18626,
+  level: 1434,
+}, {
+  caps: 18639,
+  level: 1435,
+}, {
+  caps: 18652,
+  level: 1436,
+}, {
+  caps: 18665,
+  level: 1437,
+}, {
+  caps: 18678,
+  level: 1438,
+}, {
+  caps: 18691,
+  level: 1439,
+}, {
+  caps: 18704,
+  level: 1440,
+}, {
+  caps: 18717,
+  level: 1441,
+}, {
+  caps: 18730,
+  level: 1442,
+}, {
+  caps: 18743,
+  level: 1443,
+}, {
+  caps: 18756,
+  level: 1444,
+}, {
+  caps: 18769,
+  level: 1445,
+}, {
+  caps: 18782,
+  level: 1446,
+}, {
+  caps: 18795,
+  level: 1447,
+}, {
+  caps: 18808,
+  level: 1448,
+}, {
+  caps: 18821,
+  level: 1449,
+}, {
+  caps: 18834,
+  level: 1450,
+}, {
+  caps: 18847,
+  level: 1451,
+}, {
+  caps: 18860,
+  level: 1452,
+}, {
+  caps: 18873,
+  level: 1453,
+}, {
+  caps: 18886,
+  level: 1454,
+}, {
+  caps: 18899,
+  level: 1455,
+}, {
+  caps: 18912,
+  level: 1456,
+}, {
+  caps: 18925,
+  level: 1457,
+}, {
+  caps: 18938,
+  level: 1458,
+}, {
+  caps: 18951,
+  level: 1459,
+}, {
+  caps: 18964,
+  level: 1460,
+}, {
+  caps: 18977,
+  level: 1461,
+}, {
+  caps: 18990,
+  level: 1462,
+}, {
+  caps: 19003,
+  level: 1463,
+}, {
+  caps: 19016,
+  level: 1464,
+}, {
+  caps: 19029,
+  level: 1465,
+}, {
+  caps: 19042,
+  level: 1466,
+}, {
+  caps: 19055,
+  level: 1467,
+}, {
+  caps: 19068,
+  level: 1468,
+}, {
+  caps: 19081,
+  level: 1469,
+}, {
+  caps: 19094,
+  level: 1470,
+}, {
+  caps: 19107,
+  level: 1471,
+}, {
+  caps: 19120,
+  level: 1472,
+}, {
+  caps: 19133,
+  level: 1473,
+}, {
+  caps: 19146,
+  level: 1474,
+}, {
+  caps: 19159,
+  level: 1475,
+}, {
+  caps: 19172,
+  level: 1476,
+}, {
+  caps: 19185,
+  level: 1477,
+}, {
+  caps: 19198,
+  level: 1478,
+}, {
+  caps: 19211,
+  level: 1479,
+}, {
+  caps: 19224,
+  level: 1480,
+}, {
+  caps: 19237,
+  level: 1481,
+}, {
+  caps: 19250,
+  level: 1482,
+}, {
+  caps: 19263,
+  level: 1483,
+}, {
+  caps: 19276,
+  level: 1484,
+}, {
+  caps: 19289,
+  level: 1485,
+}, {
+  caps: 19302,
+  level: 1486,
+}, {
+  caps: 19315,
+  level: 1487,
+}, {
+  caps: 19328,
+  level: 1488,
+}, {
+  caps: 19341,
+  level: 1489,
+}, {
+  caps: 19354,
+  level: 1490,
+}, {
+  caps: 19367,
+  level: 1491,
+}, {
+  caps: 19380,
+  level: 1492,
+}, {
+  caps: 19393,
+  level: 1493,
+}, {
+  caps: 19406,
+  level: 1494,
+}, {
+  caps: 19419,
+  level: 1495,
+}, {
+  caps: 19432,
+  level: 1496,
+}, {
+  caps: 19445,
+  level: 1497,
+}, {
+  caps: 19458,
+  level: 1498,
+}, {
+  caps: 19471,
+  level: 1499,
+}, {
+  caps: 19484,
+  level: 1500,
+}, {
+  caps: 19497,
+  level: 1501,
+}, {
+  caps: 19510,
+  level: 1502,
+}, {
+  caps: 19523,
+  level: 1503,
+}, {
+  caps: 19536,
+  level: 1504,
+}, {
+  caps: 19549,
+  level: 1505,
+}, {
+  caps: 19562,
+  level: 1506,
+}, {
+  caps: 19575,
+  level: 1507,
+}, {
+  caps: 19588,
+  level: 1508,
+}, {
+  caps: 19601,
+  level: 1509,
+}, {
+  caps: 19614,
+  level: 1510,
+}, {
+  caps: 19627,
+  level: 1511,
+}, {
+  caps: 19640,
+  level: 1512,
+}, {
+  caps: 19653,
+  level: 1513,
+}, {
+  caps: 19666,
+  level: 1514,
+}, {
+  caps: 19679,
+  level: 1515,
+}, {
+  caps: 19692,
+  level: 1516,
+}, {
+  caps: 19705,
+  level: 1517,
+}, {
+  caps: 19718,
+  level: 1518,
+}, {
+  caps: 19731,
+  level: 1519,
+}, {
+  caps: 19744,
+  level: 1520,
+}, {
+  caps: 19757,
+  level: 1521,
+}, {
+  caps: 19770,
+  level: 1522,
+}, {
+  caps: 19783,
+  level: 1523,
+}, {
+  caps: 19796,
+  level: 1524,
+}, {
+  caps: 19809,
+  level: 1525,
+}, {
+  caps: 19822,
+  level: 1526,
+}, {
+  caps: 19835,
+  level: 1527,
+}, {
+  caps: 19848,
+  level: 1528,
+}, {
+  caps: 19861,
+  level: 1529,
+}, {
+  caps: 19874,
+  level: 1530,
+}, {
+  caps: 19887,
+  level: 1531,
+}, {
+  caps: 19900,
+  level: 1532,
+}, {
+  caps: 19913,
+  level: 1533,
+}, {
+  caps: 19926,
+  level: 1534,
+}, {
+  caps: 19939,
+  level: 1535,
+}, {
+  caps: 19952,
+  level: 1536,
+}, {
+  caps: 19965,
+  level: 1537,
+}, {
+  caps: 19978,
+  level: 1538,
+}, {
+  caps: 19991,
+  level: 1539,
+}, {
+  caps: 20004,
+  level: 1540,
+}, {
+  caps: 20017,
+  level: 1541,
+}, {
+  caps: 20030,
+  level: 1542,
+}, {
+  caps: 20043,
+  level: 1543,
+}, {
+  caps: 20056,
+  level: 1544,
+}, {
+  caps: 20069,
+  level: 1545,
+}, {
+  caps: 20082,
+  level: 1546,
+}, {
+  caps: 20095,
+  level: 1547,
+}, {
+  caps: 20108,
+  level: 1548,
+}, {
+  caps: 20121,
+  level: 1549,
+}, {
+  caps: 20134,
+  level: 1550,
+}, {
+  caps: 20147,
+  level: 1551,
+}, {
+  caps: 20160,
+  level: 1552,
+}, {
+  caps: 20173,
+  level: 1553,
+}, {
+  caps: 20186,
+  level: 1554,
+}, {
+  caps: 20199,
+  level: 1555,
+}, {
+  caps: 20212,
+  level: 1556,
+}, {
+  caps: 20225,
+  level: 1557,
+}, {
+  caps: 20238,
+  level: 1558,
+}, {
+  caps: 20251,
+  level: 1559,
+}, {
+  caps: 20264,
+  level: 1560,
+}, {
+  caps: 20277,
+  level: 1561,
+}, {
+  caps: 20290,
+  level: 1562,
+}, {
+  caps: 20303,
+  level: 1563,
+}, {
+  caps: 20316,
+  level: 1564,
+}, {
+  caps: 20329,
+  level: 1565,
+}, {
+  caps: 20342,
+  level: 1566,
+}, {
+  caps: 20355,
+  level: 1567,
+}, {
+  caps: 20368,
+  level: 1568,
+}, {
+  caps: 20381,
+  level: 1569,
+}, {
+  caps: 20394,
+  level: 1570,
+}, {
+  caps: 20407,
+  level: 1571,
+}, {
+  caps: 20420,
+  level: 1572,
+}, {
+  caps: 20433,
+  level: 1573,
+}, {
+  caps: 20446,
+  level: 1574,
+}, {
+  caps: 20459,
+  level: 1575,
+}, {
+  caps: 20472,
+  level: 1576,
+}, {
+  caps: 20485,
+  level: 1577,
+}, {
+  caps: 20498,
+  level: 1578,
+}, {
+  caps: 20511,
+  level: 1579,
+}, {
+  caps: 20524,
+  level: 1580,
+}, {
+  caps: 20537,
+  level: 1581,
+}, {
+  caps: 20550,
+  level: 1582,
+}, {
+  caps: 20563,
+  level: 1583,
+}, {
+  caps: 20576,
+  level: 1584,
+}, {
+  caps: 20589,
+  level: 1585,
+}, {
+  caps: 20602,
+  level: 1586,
+}, {
+  caps: 20615,
+  level: 1587,
+}, {
+  caps: 20628,
+  level: 1588,
+}, {
+  caps: 20641,
+  level: 1589,
+}, {
+  caps: 20654,
+  level: 1590,
+}, {
+  caps: 20667,
+  level: 1591,
+}, {
+  caps: 20680,
+  level: 1592,
+}, {
+  caps: 20693,
+  level: 1593,
+}, {
+  caps: 20706,
+  level: 1594,
+}, {
+  caps: 20719,
+  level: 1595,
+}, {
+  caps: 20732,
+  level: 1596,
+}, {
+  caps: 20745,
+  level: 1597,
+}, {
+  caps: 20758,
+  level: 1598,
+}, {
+  caps: 20771,
+  level: 1599,
+}, {
+  caps: 20784,
+  level: 1600,
+}, {
+  caps: 20797,
+  level: 1601,
+}, {
+  caps: 20810,
+  level: 1602,
+}, {
+  caps: 20823,
+  level: 1603,
+}, {
+  caps: 20836,
+  level: 1604,
+}, {
+  caps: 20849,
+  level: 1605,
+}, {
+  caps: 20862,
+  level: 1606,
+}, {
+  caps: 20875,
+  level: 1607,
+}, {
+  caps: 20888,
+  level: 1608,
+}, {
+  caps: 20901,
+  level: 1609,
+}, {
+  caps: 20914,
+  level: 1610,
+}, {
+  caps: 20927,
+  level: 1611,
+}, {
+  caps: 20940,
+  level: 1612,
+}, {
+  caps: 20953,
+  level: 1613,
+}, {
+  caps: 20966,
+  level: 1614,
+}, {
+  caps: 20979,
+  level: 1615,
+}, {
+  caps: 20992,
+  level: 1616,
+}, {
+  caps: 21005,
+  level: 1617,
+}, {
+  caps: 21018,
+  level: 1618,
+}, {
+  caps: 21031,
+  level: 1619,
+}, {
+  caps: 21044,
+  level: 1620,
+}, {
+  caps: 21057,
+  level: 1621,
+}, {
+  caps: 21070,
+  level: 1622,
+}, {
+  caps: 21083,
+  level: 1623,
+}, {
+  caps: 21096,
+  level: 1624,
+}, {
+  caps: 21109,
+  level: 1625,
+}, {
+  caps: 21122,
+  level: 1626,
+}, {
+  caps: 21135,
+  level: 1627,
+}, {
+  caps: 21148,
+  level: 1628,
+}, {
+  caps: 21161,
+  level: 1629,
+}, {
+  caps: 21174,
+  level: 1630,
+}, {
+  caps: 21187,
+  level: 1631,
+}, {
+  caps: 21200,
+  level: 1632,
+}, {
+  caps: 21213,
+  level: 1633,
+}, {
+  caps: 21226,
+  level: 1634,
+}, {
+  caps: 21239,
+  level: 1635,
+}, {
+  caps: 21252,
+  level: 1636,
+}, {
+  caps: 21265,
+  level: 1637,
+}, {
+  caps: 21278,
+  level: 1638,
+}, {
+  caps: 21291,
+  level: 1639,
+}, {
+  caps: 21304,
+  level: 1640,
+}, {
+  caps: 21317,
+  level: 1641,
+}, {
+  caps: 21330,
+  level: 1642,
+}, {
+  caps: 21343,
+  level: 1643,
+}, {
+  caps: 21356,
+  level: 1644,
+}, {
+  caps: 21369,
+  level: 1645,
+}, {
+  caps: 21382,
+  level: 1646,
+}, {
+  caps: 21395,
+  level: 1647,
+}, {
+  caps: 21408,
+  level: 1648,
+}, {
+  caps: 21421,
+  level: 1649,
+}, {
+  caps: 21434,
+  level: 1650,
+}, {
+  caps: 21447,
+  level: 1651,
+}, {
+  caps: 21460,
+  level: 1652,
+}, {
+  caps: 21473,
+  level: 1653,
+}, {
+  caps: 21486,
+  level: 1654,
+}, {
+  caps: 21499,
+  level: 1655,
+}, {
+  caps: 21512,
+  level: 1656,
+}, {
+  caps: 21525,
+  level: 1657,
+}, {
+  caps: 21538,
+  level: 1658,
+}, {
+  caps: 21551,
+  level: 1659,
+}, {
+  caps: 21564,
+  level: 1660,
+}, {
+  caps: 21577,
+  level: 1661,
+}, {
+  caps: 21590,
+  level: 1662,
+}, {
+  caps: 21603,
+  level: 1663,
+}, {
+  caps: 21616,
+  level: 1664,
+}, {
+  caps: 21629,
+  level: 1665,
+}, {
+  caps: 21642,
+  level: 1666,
+}, {
+  caps: 21655,
+  level: 1667,
+}, {
+  caps: 21668,
+  level: 1668,
+}, {
+  caps: 21681,
+  level: 1669,
+}, {
+  caps: 21694,
+  level: 1670,
+}, {
+  caps: 21707,
+  level: 1671,
+}, {
+  caps: 21720,
+  level: 1672,
+}, {
+  caps: 21733,
+  level: 1673,
+}, {
+  caps: 21746,
+  level: 1674,
+}, {
+  caps: 21759,
+  level: 1675,
+}, {
+  caps: 21772,
+  level: 1676,
+}, {
+  caps: 21785,
+  level: 1677,
+}, {
+  caps: 21798,
+  level: 1678,
+}, {
+  caps: 21811,
+  level: 1679,
+}, {
+  caps: 21824,
+  level: 1680,
+}, {
+  caps: 21837,
+  level: 1681,
+}, {
+  caps: 21850,
+  level: 1682,
+}, {
+  caps: 21863,
+  level: 1683,
+}, {
+  caps: 21876,
+  level: 1684,
+}, {
+  caps: 21889,
+  level: 1685,
+}, {
+  caps: 21902,
+  level: 1686,
+}, {
+  caps: 21915,
+  level: 1687,
+}, {
+  caps: 21928,
+  level: 1688,
+}, {
+  caps: 21941,
+  level: 1689,
+}, {
+  caps: 21954,
+  level: 1690,
+}, {
+  caps: 21967,
+  level: 1691,
+}, {
+  caps: 21980,
+  level: 1692,
+}, {
+  caps: 21993,
+  level: 1693,
+}, {
+  caps: 22006,
+  level: 1694,
+}, {
+  caps: 22019,
+  level: 1695,
+}, {
+  caps: 22032,
+  level: 1696,
+}, {
+  caps: 22045,
+  level: 1697,
+}, {
+  caps: 22058,
+  level: 1698,
+}, {
+  caps: 22071,
+  level: 1699,
+}, {
+  caps: 22084,
+  level: 1700,
+}, {
+  caps: 22097,
+  level: 1701,
+}, {
+  caps: 22110,
+  level: 1702,
+}, {
+  caps: 22123,
+  level: 1703,
+}, {
+  caps: 22136,
+  level: 1704,
+}, {
+  caps: 22149,
+  level: 1705,
+}, {
+  caps: 22162,
+  level: 1706,
+}, {
+  caps: 22175,
+  level: 1707,
+}, {
+  caps: 22188,
+  level: 1708,
+}, {
+  caps: 22201,
+  level: 1709,
+}, {
+  caps: 22214,
+  level: 1710,
+}, {
+  caps: 22227,
+  level: 1711,
+}, {
+  caps: 22240,
+  level: 1712,
+}, {
+  caps: 22253,
+  level: 1713,
+}, {
+  caps: 22266,
+  level: 1714,
+}, {
+  caps: 22279,
+  level: 1715,
+}, {
+  caps: 22292,
+  level: 1716,
+}, {
+  caps: 22305,
+  level: 1717,
+}, {
+  caps: 22318,
+  level: 1718,
+}, {
+  caps: 22331,
+  level: 1719,
+}, {
+  caps: 22344,
+  level: 1720,
+}, {
+  caps: 22357,
+  level: 1721,
+}, {
+  caps: 22370,
+  level: 1722,
+}, {
+  caps: 22383,
+  level: 1723,
+}, {
+  caps: 22396,
+  level: 1724,
+}, {
+  caps: 22409,
+  level: 1725,
+}, {
+  caps: 22422,
+  level: 1726,
+}, {
+  caps: 22435,
+  level: 1727,
+}, {
+  caps: 22448,
+  level: 1728,
+}, {
+  caps: 22461,
+  level: 1729,
+}, {
+  caps: 22474,
+  level: 1730,
+}, {
+  caps: 22487,
+  level: 1731,
+}, {
+  caps: 22500,
+  level: 1732,
+}, {
+  caps: 22513,
+  level: 1733,
+}, {
+  caps: 22526,
+  level: 1734,
+}, {
+  caps: 22539,
+  level: 1735,
+}, {
+  caps: 22552,
+  level: 1736,
+}, {
+  caps: 22565,
+  level: 1737,
+}, {
+  caps: 22578,
+  level: 1738,
+}, {
+  caps: 22591,
+  level: 1739,
+}, {
+  caps: 22604,
+  level: 1740,
+}, {
+  caps: 22617,
+  level: 1741,
+}, {
+  caps: 22630,
+  level: 1742,
+}, {
+  caps: 22643,
+  level: 1743,
+}, {
+  caps: 22656,
+  level: 1744,
+}, {
+  caps: 22669,
+  level: 1745,
+}, {
+  caps: 22682,
+  level: 1746,
+}, {
+  caps: 22695,
+  level: 1747,
+}, {
+  caps: 22708,
+  level: 1748,
+}, {
+  caps: 22721,
+  level: 1749,
+}, {
+  caps: 22734,
+  level: 1750,
+}, {
+  caps: 22747,
+  level: 1751,
+}, {
+  caps: 22760,
+  level: 1752,
+}, {
+  caps: 22773,
+  level: 1753,
+}, {
+  caps: 22786,
+  level: 1754,
+}, {
+  caps: 22799,
+  level: 1755,
+}, {
+  caps: 22812,
+  level: 1756,
+}, {
+  caps: 22825,
+  level: 1757,
+}, {
+  caps: 22838,
+  level: 1758,
+}, {
+  caps: 22851,
+  level: 1759,
+}, {
+  caps: 22864,
+  level: 1760,
+}, {
+  caps: 22877,
+  level: 1761,
+}, {
+  caps: 22890,
+  level: 1762,
+}, {
+  caps: 22903,
+  level: 1763,
+}, {
+  caps: 22916,
+  level: 1764,
+}, {
+  caps: 22929,
+  level: 1765,
+}, {
+  caps: 22942,
+  level: 1766,
+}, {
+  caps: 22955,
+  level: 1767,
+}, {
+  caps: 22968,
+  level: 1768,
+}, {
+  caps: 22981,
+  level: 1769,
+}, {
+  caps: 22994,
+  level: 1770,
+}, {
+  caps: 23007,
+  level: 1771,
+}, {
+  caps: 23020,
+  level: 1772,
+}, {
+  caps: 23033,
+  level: 1773,
+}, {
+  caps: 23046,
+  level: 1774,
+}, {
+  caps: 23059,
+  level: 1775,
+}, {
+  caps: 23072,
+  level: 1776,
+}, {
+  caps: 23085,
+  level: 1777,
+}, {
+  caps: 23098,
+  level: 1778,
+}, {
+  caps: 23111,
+  level: 1779,
+}, {
+  caps: 23124,
+  level: 1780,
+}, {
+  caps: 23137,
+  level: 1781,
+}, {
+  caps: 23150,
+  level: 1782,
+}, {
+  caps: 23163,
+  level: 1783,
+}, {
+  caps: 23176,
+  level: 1784,
+}, {
+  caps: 23189,
+  level: 1785,
+}, {
+  caps: 23202,
+  level: 1786,
+}, {
+  caps: 23215,
+  level: 1787,
+}, {
+  caps: 23228,
+  level: 1788,
+}, {
+  caps: 23241,
+  level: 1789,
+}, {
+  caps: 23254,
+  level: 1790,
+}, {
+  caps: 23267,
+  level: 1791,
+}, {
+  caps: 23280,
+  level: 1792,
+}, {
+  caps: 23293,
+  level: 1793,
+}, {
+  caps: 23306,
+  level: 1794,
+}, {
+  caps: 23319,
+  level: 1795,
+}, {
+  caps: 23332,
+  level: 1796,
+}, {
+  caps: 23345,
+  level: 1797,
+}, {
+  caps: 23358,
+  level: 1798,
+}, {
+  caps: 23371,
+  level: 1799,
+}, {
+  caps: 23384,
+  level: 1800,
+}, {
+  caps: 23397,
+  level: 1801,
+}, {
+  caps: 23410,
+  level: 1802,
+}, {
+  caps: 23423,
+  level: 1803,
+}, {
+  caps: 23436,
+  level: 1804,
+}, {
+  caps: 23449,
+  level: 1805,
+}, {
+  caps: 23462,
+  level: 1806,
+}, {
+  caps: 23475,
+  level: 1807,
+}, {
+  caps: 23488,
+  level: 1808,
+}, {
+  caps: 23501,
+  level: 1809,
+}, {
+  caps: 23514,
+  level: 1810,
+}, {
+  caps: 23527,
+  level: 1811,
+}, {
+  caps: 23540,
+  level: 1812,
+}, {
+  caps: 23553,
+  level: 1813,
+}, {
+  caps: 23566,
+  level: 1814,
+}, {
+  caps: 23579,
+  level: 1815,
+}, {
+  caps: 23592,
+  level: 1816,
+}, {
+  caps: 23605,
+  level: 1817,
+}, {
+  caps: 23618,
+  level: 1818,
+}, {
+  caps: 23631,
+  level: 1819,
+}, {
+  caps: 23644,
+  level: 1820,
+}, {
+  caps: 23657,
+  level: 1821,
+}, {
+  caps: 23670,
+  level: 1822,
+}, {
+  caps: 23683,
+  level: 1823,
+}, {
+  caps: 23696,
+  level: 1824,
+}, {
+  caps: 23709,
+  level: 1825,
+}, {
+  caps: 23722,
+  level: 1826,
+}, {
+  caps: 23735,
+  level: 1827,
+}, {
+  caps: 23748,
+  level: 1828,
+}, {
+  caps: 23761,
+  level: 1829,
+}, {
+  caps: 23774,
+  level: 1830,
+}, {
+  caps: 23787,
+  level: 1831,
+}, {
+  caps: 23800,
+  level: 1832,
+}, {
+  caps: 23813,
+  level: 1833,
+}, {
+  caps: 23826,
+  level: 1834,
+}, {
+  caps: 23839,
+  level: 1835,
+}, {
+  caps: 23852,
+  level: 1836,
+}, {
+  caps: 23865,
+  level: 1837,
+}, {
+  caps: 23878,
+  level: 1838,
+}, {
+  caps: 23891,
+  level: 1839,
+}, {
+  caps: 23904,
+  level: 1840,
+}, {
+  caps: 23917,
+  level: 1841,
+}, {
+  caps: 23930,
+  level: 1842,
+}, {
+  caps: 23943,
+  level: 1843,
+}, {
+  caps: 23956,
+  level: 1844,
+}, {
+  caps: 23969,
+  level: 1845,
+}, {
+  caps: 23982,
+  level: 1846,
+}, {
+  caps: 23995,
+  level: 1847,
+}, {
+  caps: 24008,
+  level: 1848,
+}, {
+  caps: 24021,
+  level: 1849,
+}, {
+  caps: 24034,
+  level: 1850,
+}, {
+  caps: 24047,
+  level: 1851,
+}, {
+  caps: 24060,
+  level: 1852,
+}, {
+  caps: 24073,
+  level: 1853,
+}, {
+  caps: 24086,
+  level: 1854,
+}, {
+  caps: 24099,
+  level: 1855,
+}, {
+  caps: 24112,
+  level: 1856,
+}, {
+  caps: 24125,
+  level: 1857,
+}, {
+  caps: 24138,
+  level: 1858,
+}, {
+  caps: 24151,
+  level: 1859,
+}, {
+  caps: 24164,
+  level: 1860,
+}, {
+  caps: 24177,
+  level: 1861,
+}, {
+  caps: 24190,
+  level: 1862,
+}, {
+  caps: 24203,
+  level: 1863,
+}, {
+  caps: 24216,
+  level: 1864,
+}, {
+  caps: 24229,
+  level: 1865,
+}, {
+  caps: 24242,
+  level: 1866,
+}, {
+  caps: 24255,
+  level: 1867,
+}, {
+  caps: 24268,
+  level: 1868,
+}, {
+  caps: 24281,
+  level: 1869,
+}, {
+  caps: 24294,
+  level: 1870,
+}, {
+  caps: 24307,
+  level: 1871,
+}, {
+  caps: 24320,
+  level: 1872,
+}, {
+  caps: 24333,
+  level: 1873,
+}, {
+  caps: 24346,
+  level: 1874,
+}, {
+  caps: 24359,
+  level: 1875,
+}, {
+  caps: 24372,
+  level: 1876,
+}, {
+  caps: 24385,
+  level: 1877,
+}, {
+  caps: 24398,
+  level: 1878,
+}, {
+  caps: 24411,
+  level: 1879,
+}, {
+  caps: 24424,
+  level: 1880,
+}, {
+  caps: 24437,
+  level: 1881,
+}, {
+  caps: 24450,
+  level: 1882,
+}, {
+  caps: 24463,
+  level: 1883,
+}, {
+  caps: 24476,
+  level: 1884,
+}, {
+  caps: 24489,
+  level: 1885,
+}, {
+  caps: 24502,
+  level: 1886,
+}, {
+  caps: 24515,
+  level: 1887,
+}, {
+  caps: 24528,
+  level: 1888,
+}, {
+  caps: 24541,
+  level: 1889,
+}, {
+  caps: 24554,
+  level: 1890,
+}, {
+  caps: 24567,
+  level: 1891,
+}, {
+  caps: 24580,
+  level: 1892,
+}, {
+  caps: 24593,
+  level: 1893,
+}, {
+  caps: 24606,
+  level: 1894,
+}, {
+  caps: 24619,
+  level: 1895,
+}, {
+  caps: 24632,
+  level: 1896,
+}, {
+  caps: 24645,
+  level: 1897,
+}, {
+  caps: 24658,
+  level: 1898,
+}, {
+  caps: 24671,
+  level: 1899,
+}, {
+  caps: 24684,
+  level: 1900,
+}, {
+  caps: 24697,
+  level: 1901,
+}, {
+  caps: 24710,
+  level: 1902,
+}, {
+  caps: 24723,
+  level: 1903,
+}, {
+  caps: 24736,
+  level: 1904,
+}, {
+  caps: 24749,
+  level: 1905,
+}, {
+  caps: 24762,
+  level: 1906,
+}, {
+  caps: 24775,
+  level: 1907,
+}, {
+  caps: 24788,
+  level: 1908,
+}, {
+  caps: 24801,
+  level: 1909,
+}, {
+  caps: 24814,
+  level: 1910,
+}, {
+  caps: 24827,
+  level: 1911,
+}, {
+  caps: 24840,
+  level: 1912,
+}, {
+  caps: 24853,
+  level: 1913,
+}, {
+  caps: 24866,
+  level: 1914,
+}, {
+  caps: 24879,
+  level: 1915,
+}, {
+  caps: 24892,
+  level: 1916,
+}, {
+  caps: 24905,
+  level: 1917,
+}, {
+  caps: 24918,
+  level: 1918,
+}, {
+  caps: 24931,
+  level: 1919,
+}, {
+  caps: 24944,
+  level: 1920,
+}, {
+  caps: 24957,
+  level: 1921,
+}, {
+  caps: 24970,
+  level: 1922,
+}, {
+  caps: 24983,
+  level: 1923,
+}, {
+  caps: 24996,
+  level: 1924,
+}, {
+  caps: 25009,
+  level: 1925,
+}, {
+  caps: 25022,
+  level: 1926,
+}, {
+  caps: 25035,
+  level: 1927,
+}, {
+  caps: 25048,
+  level: 1928,
+}, {
+  caps: 25061,
+  level: 1929,
+}, {
+  caps: 25074,
+  level: 1930,
+}, {
+  caps: 25087,
+  level: 1931,
+}, {
+  caps: 25100,
+  level: 1932,
+}, {
+  caps: 25113,
+  level: 1933,
+}, {
+  caps: 25126,
+  level: 1934,
+}, {
+  caps: 25139,
+  level: 1935,
+}, {
+  caps: 25152,
+  level: 1936,
+}, {
+  caps: 25165,
+  level: 1937,
+}, {
+  caps: 25178,
+  level: 1938,
+}, {
+  caps: 25191,
+  level: 1939,
+}, {
+  caps: 25204,
+  level: 1940,
+}, {
+  caps: 25217,
+  level: 1941,
+}, {
+  caps: 25230,
+  level: 1942,
+}, {
+  caps: 25243,
+  level: 1943,
+}, {
+  caps: 25256,
+  level: 1944,
+}, {
+  caps: 25269,
+  level: 1945,
+}, {
+  caps: 25282,
+  level: 1946,
+}, {
+  caps: 25295,
+  level: 1947,
+}, {
+  caps: 25308,
+  level: 1948,
+}, {
+  caps: 25321,
+  level: 1949,
+}, {
+  caps: 25334,
+  level: 1950,
+}, {
+  caps: 25347,
+  level: 1951,
+}, {
+  caps: 25360,
+  level: 1952,
+}, {
+  caps: 25373,
+  level: 1953,
+}, {
+  caps: 25386,
+  level: 1954,
+}, {
+  caps: 25399,
+  level: 1955,
+}, {
+  caps: 25412,
+  level: 1956,
+}, {
+  caps: 25425,
+  level: 1957,
+}, {
+  caps: 25438,
+  level: 1958,
+}, {
+  caps: 25451,
+  level: 1959,
+}, {
+  caps: 25464,
+  level: 1960,
+}, {
+  caps: 25477,
+  level: 1961,
+}, {
+  caps: 25490,
+  level: 1962,
+}, {
+  caps: 25503,
+  level: 1963,
+}, {
+  caps: 25516,
+  level: 1964,
+}, {
+  caps: 25529,
+  level: 1965,
+}, {
+  caps: 25542,
+  level: 1966,
+}, {
+  caps: 25555,
+  level: 1967,
+}, {
+  caps: 25568,
+  level: 1968,
+}, {
+  caps: 25581,
+  level: 1969,
+}, {
+  caps: 25594,
+  level: 1970,
+}, {
+  caps: 25607,
+  level: 1971,
+}, {
+  caps: 25620,
+  level: 1972,
+}, {
+  caps: 25633,
+  level: 1973,
+}, {
+  caps: 25646,
+  level: 1974,
+}, {
+  caps: 25659,
+  level: 1975,
+}, {
+  caps: 25672,
+  level: 1976,
+}, {
+  caps: 25685,
+  level: 1977,
+}, {
+  caps: 25698,
+  level: 1978,
+}, {
+  caps: 25711,
+  level: 1979,
+}, {
+  caps: 25724,
+  level: 1980,
+}, {
+  caps: 25737,
+  level: 1981,
+}, {
+  caps: 25750,
+  level: 1982,
+}, {
+  caps: 25763,
+  level: 1983,
+}, {
+  caps: 25776,
+  level: 1984,
+}, {
+  caps: 25789,
+  level: 1985,
+}, {
+  caps: 25802,
+  level: 1986,
+}, {
+  caps: 25815,
+  level: 1987,
+}, {
+  caps: 25828,
+  level: 1988,
+}, {
+  caps: 25841,
+  level: 1989,
+}, {
+  caps: 25854,
+  level: 1990,
+}, {
+  caps: 25867,
+  level: 1991,
+}, {
+  caps: 25880,
+  level: 1992,
+}, {
+  caps: 25893,
+  level: 1993,
+}, {
+  caps: 25906,
+  level: 1994,
+}, {
+  caps: 25919,
+  level: 1995,
+}, {
+  caps: 25932,
+  level: 1996,
+}, {
+  caps: 25945,
+  level: 1997,
+}, {
+  caps: 25958,
+  level: 1998,
+}, {
+  caps: 25971,
+  level: 1999,
+}, {
+  caps: 25984,
+  level: 2000,
 }];
