@@ -2095,7 +2095,7 @@ bot.on('/show_giants', (msg) => {
   Giant.find({}).then((giants) => {
     const giantsReply = _.sortBy(giants, 'distance').map((giant) => {
       const isDead = giant.health.current <= 0;
-      const time = moment(giant.forwardStamp, 'X').add(3, 'hour').format('DD.MM HH:mm');
+      const time = moment(giant.forwardStamp * 1000).format('DD.MM.YYYY HH:mm')
 
       return `${giant.distance || '??'}км - *${giant.name}*\n${time} - ${isDead ? '💫 повержен' : `❤️${giant.health.current}`}`;
     });
@@ -2260,7 +2260,7 @@ bot.on('callbackQuery', (msg) => {
 
       const giantsReply = _.sortBy(giants, 'distance').map((giant) => {
         const isDead = giant.health.current <= 0;
-        const time = moment(giant.forwardStamp, 'X').add(3, 'hour').format('DD.MM HH:mm');
+        const time = moment(giant.forwardStamp * 1000).format('DD.MM.YYYY HH:mm')
 
         return `${giant.distance || '??'}км - *${giant.name}*\n${time} - ${isDead ? '💫 повержен' : `❤️${giant.health.current}`}`;
       });
