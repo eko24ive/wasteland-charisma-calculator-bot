@@ -1,6 +1,6 @@
 {
   "name": "wasteland-charisma-calculator-bot",
-  "version": "0.0.11",
+  "version": "0.0.12",
   "description": "",
   "main": "index.js",
   "dependencies": {
@@ -18,13 +18,7 @@
     "telebot": "^1.2.6",
     "underscore": "^1.9.0"
   },
-  "devDependencies": {
-    "eslint": "^5.6.0",
-    "eslint-config-airbnb": "^17.1.0",
-    "eslint-plugin-import": "^2.14.0",
-    "eslint-plugin-jsx-a11y": "^6.1.1",
-    "eslint-plugin-react": "^7.11.1"
-  },
+  "devDependencies": {},
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "node ./index.js -D",

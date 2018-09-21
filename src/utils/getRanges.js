@@ -3,7 +3,7 @@
 const _ = require('underscore');
 let async = require('async');
 
-const input = [
+let input = [
   [1],
   [1, 4],
   [5, 7],
@@ -65,7 +65,7 @@ const input = [
   [74, 71],
   [76],
   [78, 76],
-  [81],
+  [81]
 ];
 
 
@@ -80,7 +80,7 @@ function isAppliableToRange(range, distance) {
 
   if (first < distance && distance < last) {
     return true;
-  } if (distance === first) {
+  } else if (distance === first) {
     return true;
   } else if (distance === last) {
     return true;
@@ -96,7 +96,7 @@ function applyToRange(range, distance) {
 
   if (first < distance && distance < last) {
     return range;
-  } if (distance === first) {
+  } else if (distance === first) {
     first = distance;
   } else if (distance === last) {
     last = distance;
@@ -110,15 +110,15 @@ function isMergable(range1, range2) {
     return false;
   }
 
-  let ranges1 = {
+  var ranges1 = {
     first: range1[0],
-    last: range1[1],
-  };
+    last: range1[1]
+  }
 
-  let ranges2 = {
+  var ranges2 = {
     first: range2[0],
-    last: range2[1],
-  };
+    last: range2[1]
+  }
 
   if (ranges2.first <= ranges1.last && ranges1.first < ranges2.last) {
     return true;
@@ -146,9 +146,11 @@ function processData(d) {
       } else {
         withTuples.push(range[0]);
       }
-    } else if (ignoreIndex !== index) {
+    } else {
+      if (ignoreIndex !== index) {
         withTuples.push(range);
       }
+    }
   });
 
   withTuples.forEach((range, index) => {
@@ -156,15 +158,15 @@ function processData(d) {
 
     if (isMergable(rangePrevious, range)) {
 
-    }
+    };
   });
 }
 
-const multiDimensionalUnique = (arr) => {
-  const uniques = [];
-  const itemsFound = {};
+const multiDimensionalUnique = arr => {
+  let uniques = [];
+  let itemsFound = {};
   for (let i = 0, l = arr.length; i < l; i++) {
-    const stringified = JSON.stringify(arr[i]);
+    let stringified = JSON.stringify(arr[i]);
     if (itemsFound[stringified]) {
       continue;
     }
@@ -174,9 +176,10 @@ const multiDimensionalUnique = (arr) => {
   }
 
   return uniques;
-};
+}
 
-const filterDupes = (array) => array.filter((currentRange, index, arrayRO) => {
+const filterDupes = array => {
+  return array.filter((currentRange, index, arrayRO) => {
     if (index !== 0) {
       const previousRange = arrayRO[index - 1];
 
@@ -200,8 +203,9 @@ const filterDupes = (array) => array.filter((currentRange, index, arrayRO) => {
 
     return true;
   });
+}
 
-const getRangeForItems = (range) => {
+const getRangeForItems = range => {
   const first = _.min(range);
   const last = _.max(range);
 
@@ -210,31 +214,31 @@ const getRangeForItems = (range) => {
   }
 
   return [first];
-};
+}
 
-const getRanges = (mobs) => {
-  const sorted = mobs.map((data) => {
+const getRanges = mobs => {
+  const sorted = mobs.map(data => {
     // return data.distanceRange.sort((a, b) => {
     return data.sort((a, b) => {
       if (a < b)
-        {return -1;}
+        return -1;
       if (a > b)
-        {return 1;}
+        return 1;
       return 0;
-    });
+    })
 
     return ordered;
   });
 
   const ordered = sorted.sort((a, b) => {
     if (a[0] < b[0])
-      {return -1;}
+      return -1;
     if (a[0] > b[0])
-      {return 1;}
+      return 1;
     return 0;
-  });
+  })
 
-  const ranged = ordered.map((range) => {
+  const ranged = ordered.map(range => {
     const first = _.max(range);
     const last = _.min(range);
 
@@ -247,32 +251,32 @@ const getRanges = (mobs) => {
 
   const dupeless = multiDimensionalUnique(ranged).sort((a, b) => {
     if (a[0] < b[0])
-      {return -1;}
+      return -1;
     if (a[0] > b[0])
-      {return 1;}
+      return 1;
     return 0;
   }).map(getRangeForItems);
 
   let filtered = filterDupes(dupeless);
 
   async.whilst(
-    () => {
+    function () {
       return !_.isEqual(filtered, filterDupes(filtered))
     },
-    (callback) => {
+    function (callback) {
       filtered = filterDupes(filtered);
       callback(null, filtered);
     },
-    (err, filtered) => {
+    function (err, filtered) {
       return filtered;
-    },
+    }
   );
 
   const noSinglePoints = {};
 
   filtered.forEach((range, index) => {
-    if (range.length !== 2 && (index + 1) < filtered.length) {
-      const nextRange = filtered[index + 1];
+    if(range.length !== 2 && (index + 1) < filtered.length) {
+      let nextRange = filtered[index + 1];
       nextRange.push(range[0]);
 
 
@@ -282,11 +286,11 @@ const getRanges = (mobs) => {
       noSinglePoints[`${first}-${last}`] = [first, last];
 
     } else if (range.length === 2 && (index + 1) < filtered.length) {
-      if (noSinglePoints[`${range[0]}-${range[1]}`] === undefined) {
+      if(noSinglePoints[`${range[0]}-${range[1]}`] === undefined) {
         noSinglePoints[`${range[0]}-${range[1]}`] = range;
       }
     }
-  });
+  })
 
 
   filtered = dupeless.map(z => z.sort()).map(getRangeForItems);
@@ -307,30 +311,32 @@ const getRanges = (mobs) => {
       } else {
         withTuples.push(range[0]);
       }
-    } else if (ignoreIndex !== index) {
+    } else {
+      if (ignoreIndex !== index) {
         withTuples.push(range);
       }
+    }
   });
 
   ignoreIndex = -1;
-  const merged = [];
+  let merged = [];
   withTuples.forEach((range, index) => {
-    if (index !== ignoreIndex) {
+    if(index !== ignoreIndex) {
 
-      const nextRange = withTuples[index + 1];
+    const nextRange = withTuples[index + 1];
 
-      if (isMergable(range, nextRange)) {
-        ignoreIndex = index - 1;
-        merged.push(getRangeForItems(_.union(range, nextRange).sort()));
-      } else {
-        merged.push(range);
-      }
+    if (isMergable(range, nextRange)) {
+      ignoreIndex = index - 1;
+      merged.push(getRangeForItems(_.union(range, nextRange).sort()))
+    } else {
+      merged.push(range);
+    };
   }
 
   });
 
   return withTuples;
-};
+}
 
 // module.exports = getRanges;
 
@@ -354,10 +360,30 @@ const ranges = [
   [57, 60],
   [61, 64],
   [65, 70],
-  [71, 74],
-  [75, 78],
-  [79, 84],
-  [85, 90],
-  [91, 95],
-];
-module.exports = ranges;
+  [71,74],
+  [75,78],
+  [79,84],
+  [85,90],
+  [91,95],
+  [96,100]
+]
+
+const dzRanges = [
+  [23, 27],
+  [28, 29],
+  [30, 33],
+  [34, 39],
+  [53, 56],
+  [57, 60],
+  [61, 64],
+  [75,78],
+  [79,84],
+  [85,90],
+  [91,95],
+  [96,100]
+]
+
+module.exports = {
+  ranges,
+  dzRanges
+};

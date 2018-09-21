@@ -11,8 +11,9 @@ const normalizeItems = (items) => {
 
   items.forEach((item) => {
     let name = item;
-    let amount;
 
+
+    let amount;
     if (regexps.metalAmountRegExp.test(item)) {
       [, name, amount] = regexps.metalAmountRegExp.exec(item);
     }

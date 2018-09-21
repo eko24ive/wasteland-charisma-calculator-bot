@@ -121,7 +121,7 @@ module.exports = {
   },
   showHelp: {
     label: '💬Помощь',
-    command: '/show_help',
+    command: '/help',
   },
   showDrones: {
     label: '🛰Дроны',
@@ -140,7 +140,7 @@ module.exports = {
     command: '/show_beasts(regular)',
   },
   showDarkZoneBeasts: {
-    label: '🚷Мобы',
+    label: '🚷Мобы ТЗ',
     command: '/show_beasts(darkzone)',
   },
   cancelAction: {
