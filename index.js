@@ -2230,6 +2230,14 @@ bot.on('/delete_beasts', (msg) => {
   }
 });
 
+bot.on('/delete_giants', (msg) => {
+  if (process.env.ENV === 'STAGING') {
+    Giant.collection.drop().then(() => msg.reply.text('Я удалил всех гигантов', {
+      asReply: true,
+    }));
+  }
+});
+
 bot.on('callbackQuery', (msg) => {
   const chatId = msg.from.id;
   const messageId = msg.message.message_id;
