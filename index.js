@@ -826,7 +826,7 @@ const processUserData = (msg, options) => {
           });
         } if (reportDataWithUserPip.criticalError && !reportDataWithUserPip.couldBeUpdated) {
           createSession(msg.from.id);
-          return msg.reply.text('Твой пип не соответсвуют твоим статам из форвардам!\nПрости, я вынужден отменить твои форварды.', {
+          return msg.reply.text('Твой пип не соответсвуют твоим статам из форвардов!\nПрости, я вынужден отменить твои форварды.', {
             replyMarkup: defaultKeyboard,
           });
         }
