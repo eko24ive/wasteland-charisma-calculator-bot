@@ -1173,16 +1173,18 @@ bot.on('forward', (msg) => {
             forwardStamp: msg.forward_date,
           });
 
-          newGiant.save().then(() => msg.reply.text('Спасибо за форвард! Я добавил его в базу!', {
-            asReply: true,
-          })).then(() => {
+          newGiant.save().then(() => {
             userManager.addPoints(msg.from.id, forwardPoints.discoveryGiantData).then((result) => {
               if (!result.ok) {
                 if (result.reason === 'USER_NOT_FOUND') {
-                  msg.reply.text('Не могу начислить тебе шмепсели пока ты не скинешь мне свой пип-бой :с');
+                  return msg.reply.text('Не могу начислить тебе шмепсели пока ты не скинешь мне свой пип-бой :с');
                 }
-                // console.log('userManager.addPoints: '+JSON.stringify(result));
               }
+
+              return msg.reply.text(`Спасибо за форвард! Я добавил <b>${giant.name}</b> в базу!\nНачислил тебе ${forwardPoints.discoveryGiantData} 💎<b>Шмепселей</b>`, {
+                asReply: true,
+                parseMode: 'html',
+              });
             });
           }).catch(e => console.log(e));
         } else {
@@ -1203,16 +1205,18 @@ bot.on('forward', (msg) => {
 
           const pointsToAdd = ((!wasDead && isDead) || (wasDead && !isDead)) ? forwardPoints.newGiantData : forwardPoints.sameGiantData;
 
-          databaseGiant.save().then(() => msg.reply.text(`Спасибо за форвард! Я обновил ${giant.name} в базе!`, {
-            asReply: true,
-          })).then(() => {
+          databaseGiant.save().then(() => {
             userManager.addPoints(msg.from.id, pointsToAdd).then((result) => {
               if (!result.ok) {
                 if (result.reason === 'USER_NOT_FOUND') {
-                  msg.reply.text('Не могу начислить тебе шмепсели пока ты не скинешь мне свой пип-бой :с');
+                  return msg.reply.text('Не могу начислить тебе шмепсели пока ты не скинешь мне свой пип-бой :с');
                 }
-                // console.log('userManager.addPoints: '+JSON.stringify(result));
               }
+
+              return msg.reply.text(`Спасибо за форвард! Я обновил <b>${giant.name}</b> в базе!\nНачислил тебе ${pointsToAdd} 💎<b>Шмепселей</b>`, {
+                asReply: true,
+                parseMode: 'html',
+              });
             });
           }).catch(e => console.log(e));
         }
@@ -1236,18 +1240,20 @@ bot.on('forward', (msg) => {
             forwardStamp: msg.forward_date,
           });
 
-          newGiant.save().then(() => msg.reply.text('Спасибо за форвард! Я добавил его в базу!', {
-            asReply: true,
-          }).then(() => {
+          newGiant.save().then(() => {
             userManager.addPoints(msg.from.id, forwardPoints.discoveryGiantData).then((result) => {
               if (!result.ok) {
                 if (result.reason === 'USER_NOT_FOUND') {
-                  msg.reply.text('Не могу начислить тебе шмепсели пока ты не скинешь мне свой пип-бой :с');
+                  return msg.reply.text('Не могу начислить тебе шмепсели пока ты не скинешь мне свой пип-бой :с');
                 }
-                // console.log('userManager.addPoints: '+JSON.stringify(result));
               }
+
+              return msg.reply.text(`Спасибо за форвард! Я добавил <b>${giant.name}</b> в базу!\nНачислил тебе ${forwardPoints.discoveryGiantData} 💎<b>Шмепселей</b>`, {
+                asReply: true,
+                parseMode: 'html',
+              });
             });
-          })).catch(e => console.log(e));
+          }).catch(e => console.log(e));
         } else if (databaseGiant.forwardStamp >= msg.forward_date) {
           return msg.reply.text(`Прости, у меня есть более свежая иформация про *${giant.name}*`, {
             asReply: true,
@@ -1263,17 +1269,20 @@ bot.on('forward', (msg) => {
 
           const pointsToAdd = ((!wasDead && isDead) || (wasDead && !isDead)) ? forwardPoints.newGiantData : forwardPoints.sameGiantData;
 
-          databaseGiant.save().then(() => msg.reply.text(`Спасибо за форвард! Я обновил ${giant.name} в базе!`, {
-            asReply: true,
-          }).then(() => {
+          databaseGiant.save().then(() => {
             userManager.addPoints(msg.from.id, pointsToAdd).then((result) => {
               if (!result.ok) {
                 if (result.reason === 'USER_NOT_FOUND') {
-                  msg.reply.text('Не могу начислить тебе шмепсели пока ты не скинешь мне свой пип-бой :с');
+                  return msg.reply.text('Не могу начислить тебе шмепсели пока ты не скинешь мне свой пип-бой :с');
                 }
               }
+
+              return msg.reply.text(`Спасибо за форвард! Я обновил <b>${giant.name}</b> в базе!\nНачислил тебе ${pointsToAdd} 💎<b>Шмепселей</b>`, {
+                asReply: true,
+                parseMode: 'html',
+              });
             });
-          })).catch(e => console.log(e));
+          }).catch(e => console.log(e));
         }
 
         return false;
@@ -1286,97 +1295,88 @@ bot.on('forward', (msg) => {
       }).then((fGiant) => {
         const databaseGiant = fGiant;
         if (fGiant === null) {
-          const newGiant = new Giant({
-            name: giant.name,
-            health: {
-              current: giant.healthCurrent,
-              cap: giant.healthCap,
-            },
-            forwardStamp: msg.forward_date,
-          });
-
-          newGiant.save().then(() => msg.reply.text('Спасибо за форвард! Я добавил его в базу!', {
+          return msg.reply.text(`Прости, я не знаю на каком километре живёт <b>${giant.name}</b>. Ты можешь сначала скинуть локацию с этим боссом, а потом свою битву.`, {
             asReply: true,
-          })).then(() => {
-            userManager.addPoints(msg.from.id, forwardPoints.discoveryGiantData).then((result) => {
-              if (!result.ok) {
-                if (result.reason === 'USER_NOT_FOUND') {
-                  msg.reply.text('Не могу начислить тебе шмепсели пока ты не скинешь мне свой пип-бой :с');
-                }
-                // console.log('userManager.addPoints: '+JSON.stringify(result));
-              }
-            });
-          }).catch(e => console.log(e));
-        } else if (fGiant.forwardStamp >= msg.forward_date) {
+            parseMode: 'html',
+          });
+        } if (fGiant.forwardStamp >= msg.forward_date) {
           return msg.reply.text(`Прости, у меня есть более свежая иформация про *${giant.name}*`, {
             asReply: true,
             parseMode: 'markdown',
           });
-        } else {
-          databaseGiant.health.current = giant.healthCurrent;
-          databaseGiant.health.cap = giant.healthCap;
-          databaseGiant.forwardStamp = msg.forward_date;
-
-          const wasDead = databaseGiant.health.current <= 0;
-          const isDead = giant.healthCurrent <= 0;
-
-          const pointsToAdd = ((!wasDead && isDead) || (wasDead && !isDead)) ? forwardPoints.newGiantData : forwardPoints.sameGiantData;
-
-          databaseGiant.save().then(() => msg.reply.text(`Спасибо за форвард! Я обновил ${giant.name} в базе!`, {
-            asReply: true,
-          })).then(() => {
-            userManager.addPoints(msg.from.id, pointsToAdd).then((result) => {
-              if (!result.ok) {
-                if (result.reason === 'USER_NOT_FOUND') {
-                  msg.reply.text('Не могу начислить тебе шмепсели пока ты не скинешь мне свой пип-бой :с');
-                }
-                // console.log('userManager.addPoints: '+JSON.stringify(result));
-              }
-            });
-          }).catch(e => console.log(e));
         }
+
+        databaseGiant.health.current = giant.healthCurrent;
+        databaseGiant.health.cap = giant.healthCap;
+        databaseGiant.forwardStamp = msg.forward_date;
+
+        const wasDead = databaseGiant.health.current <= 0;
+        const isDead = giant.healthCurrent <= 0;
+
+        const pointsToAdd = ((!wasDead && isDead) || (wasDead && !isDead)) ? forwardPoints.newGiantData : forwardPoints.sameGiantData;
+
+        databaseGiant.save().then(() => {
+          userManager.addPoints(msg.from.id, pointsToAdd).then((result) => {
+            if (!result.ok) {
+              if (result.reason === 'USER_NOT_FOUND') {
+                return msg.reply.text('Не могу начислить тебе шмепсели пока ты не скинешь мне свой пип-бой :с');
+              }
+            }
+
+            return msg.reply.text(`Спасибо за форвард! Я обновил <b>${giant.name}</b> в базе!\nНачислил тебе ${pointsToAdd} 💎<b>Шмепселей</b>`, {
+              asReply: true,
+              parseMode: 'html',
+            });
+          });
+        }).catch(e => console.log(e));
+
 
         return false;
       });
     } else if (isLocation || !isGiantFaced) {
       const location = parseLocation(msg.text);
-      const giant = parseGiantFaced(msg.text);
 
       Giant.findOne({
         distance: location.distance,
-      }).then((fGiant) => {
-        const databaseGiant = fGiant;
+      }).then((databaseGiant) => {
         if (databaseGiant !== null) {
           const time = Number(moment.tz(moment().valueOf(), 'Europe/Moscow').format('X'));
 
           if (databaseGiant.forwardStamp >= time) {
-            return msg.reply.text('Прости, ничего не могу с этим сделать ¯\_(ツ)_/¯', {
+            return msg.reply.text('Прости, ничего не могу с этим сделать 🤷‍♂️', {
               asReply: true,
               parseMode: 'markdown',
             });
           }
-          databaseGiant.health.current = 0;
-          databaseGiant.forwardStamp = time;
 
           const wasDead = databaseGiant.health.current <= 0;
-          const isDead = giant.healthCurrent <= 0;
+          const isDead = 0;
 
           if (wasDead !== !isDead) {
-            databaseGiant.save().then(() => msg.reply.text(`Спасибо за форвард! Я обновил состояние ${giant.name} в базе!`, {
-              asReply: true,
-            })).then(() => {
+            databaseGiant.health.current = 0;
+            databaseGiant.forwardStamp = time;
+
+            databaseGiant.save().then(() => {
               userManager.addPoints(msg.from.id, forwardPoints.newGiantData).then((result) => {
                 if (!result.ok) {
                   if (result.reason === 'USER_NOT_FOUND') {
                     msg.reply.text('Не могу начислить тебе шмепсели пока ты не скинешь мне свой пип-бой :с');
                   }
                 }
+
+                return msg.reply.text(`Спасибо за форвард! Я обновил состояние <b>${databaseGiant.name}</b> в базе!\nНачислил тебе ${forwardPoints.newGiantData} 💎<b>Шмепселей</b>`, {
+                  asReply: true,
+                  parseMode: 'html',
+                });
               });
             }).catch(e => console.log(e));
           }
         }
 
-        return false;
+        return msg.reply.text('Прости, ничего не могу с этим сделать 🤷‍♂️', {
+          asReply: true,
+          parseMode: 'markdown',
+        });
       });
     } else if (isRegularBeastFaced) {
       const beast = parseBeastFaced.parseRegularBeastFaced(msg.text);
