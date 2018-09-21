@@ -1,10 +1,6 @@
 const _ = require('underscore');
 
 const blacklistKeys = [
-  'faction',
-  'name',
-  'version',
-  'armor',
   'timeStamp',
 ];
 
