@@ -49,5 +49,5 @@ const commandsForLag = `
 /medpack ▫️ 💌Медпак +60❤️ (с оверхилом)`;
 
 module.exports = {
-    commandsForLag
-}
+  commandsForLag,
+};

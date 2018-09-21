@@ -24,66 +24,7 @@ const simpleHungerRegExp = /🍗(\d+)%/;
 const simpleHealthRegExp = /❤️\d*\/(\d+)/;
 
 const classicPip = {
-    contains: [
-        classicNameRegExp,
-        classicFactionRegExp,
-        classicCharismaRegExp,
-        classicAgilityRegExp,
-        classicDamageRegExp,
-        classicArmorRegExp,
-        classicStrengthRegExp,
-        classicPrecisionRegExp,
-        classicEnduranceRegExp,
-        classicHungerRegExp,
-        classicHealthRegExp,
-        classicVerisonRegExp
-    ],
-    excludes: [
-        simpleNameRegExp,
-        simpleFactionRegExp,
-        simpleCharismaRegExp,
-        simpleAgilityRegExp,
-        simpleDamageRegExp,
-        simpleArmorRegExp,
-        simpleStrengthRegExp,
-        simplePrecisionRegExp,
-        simpleEnduranceRegExp,
-        simpleHungerRegExp,
-        simpleHealthRegExp
-    ]
-};
-
-const simplePip = {
-    contains: [
-        simpleNameRegExp,
-        simpleFactionRegExp,
-        simpleCharismaRegExp,
-        simpleAgilityRegExp,
-        simpleDamageRegExp,
-        simpleArmorRegExp,
-        simpleStrengthRegExp,
-        simplePrecisionRegExp,
-        simpleEnduranceRegExp,
-        simpleHungerRegExp,
-        simpleHealthRegExp
-    ],
-    excludes: [
-        classicNameRegExp,
-        classicFactionRegExp,
-        classicCharismaRegExp,
-        classicAgilityRegExp,
-        classicDamageRegExp,
-        classicArmorRegExp,
-        classicStrengthRegExp,
-        classicPrecisionRegExp,
-        classicEnduranceRegExp,
-        classicHungerRegExp,
-        classicHealthRegExp,
-        classicVerisonRegExp
-    ]
-};
-
-const regexps = {
+  contains: [
     classicNameRegExp,
     classicFactionRegExp,
     classicCharismaRegExp,
@@ -96,6 +37,8 @@ const regexps = {
     classicHungerRegExp,
     classicHealthRegExp,
     classicVerisonRegExp,
+  ],
+  excludes: [
     simpleNameRegExp,
     simpleFactionRegExp,
     simpleCharismaRegExp,
@@ -106,11 +49,68 @@ const regexps = {
     simplePrecisionRegExp,
     simpleEnduranceRegExp,
     simpleHungerRegExp,
-    simpleHealthRegExp
+    simpleHealthRegExp,
+  ],
+};
+
+const simplePip = {
+  contains: [
+    simpleNameRegExp,
+    simpleFactionRegExp,
+    simpleCharismaRegExp,
+    simpleAgilityRegExp,
+    simpleDamageRegExp,
+    simpleArmorRegExp,
+    simpleStrengthRegExp,
+    simplePrecisionRegExp,
+    simpleEnduranceRegExp,
+    simpleHungerRegExp,
+    simpleHealthRegExp,
+  ],
+  excludes: [
+    classicNameRegExp,
+    classicFactionRegExp,
+    classicCharismaRegExp,
+    classicAgilityRegExp,
+    classicDamageRegExp,
+    classicArmorRegExp,
+    classicStrengthRegExp,
+    classicPrecisionRegExp,
+    classicEnduranceRegExp,
+    classicHungerRegExp,
+    classicHealthRegExp,
+    classicVerisonRegExp,
+  ],
+};
+
+const regexps = {
+  classicNameRegExp,
+  classicFactionRegExp,
+  classicCharismaRegExp,
+  classicAgilityRegExp,
+  classicDamageRegExp,
+  classicArmorRegExp,
+  classicStrengthRegExp,
+  classicPrecisionRegExp,
+  classicEnduranceRegExp,
+  classicHungerRegExp,
+  classicHealthRegExp,
+  classicVerisonRegExp,
+  simpleNameRegExp,
+  simpleFactionRegExp,
+  simpleCharismaRegExp,
+  simpleAgilityRegExp,
+  simpleDamageRegExp,
+  simpleArmorRegExp,
+  simpleStrengthRegExp,
+  simplePrecisionRegExp,
+  simpleEnduranceRegExp,
+  simpleHungerRegExp,
+  simpleHealthRegExp,
 };
 
 module.exports = {
-    classicPip,
-    simplePip,
-    regexps
-}
+  classicPip,
+  simplePip,
+  regexps,
+};

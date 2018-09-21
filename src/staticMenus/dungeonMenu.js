@@ -327,85 +327,85 @@ const moltenСore = `
 `;
 
 const dungeonMenu = {
-    config: {
-        parseMode: 'html'
-    },
-    name: 'dungeons',
-    title: '⚠️Подземелья',
-    text: suppliesText,
-    content: [{
-            name: 'oldMine',
-            title: '⛰ Старая шахта',
-            text: oldMineText,
-            content: []
-        },
-        {
-            name: 'haloCave',
-            title: '⚠️ Пещера Ореола',
-            text: haloCave,
-            content: []
-        },
-        {
-            name: 'sewerPipe',
-            title: '🚽 Сточная труба',
-            text: sewerPipe,
-            content: []
-        },
-        {
-            name: 'openVault',
-            title: '⚙️Открытое убежище',
-            text: openVault,
-            content: []
-        },
-        {
-            name: 'betCave',
-            title: '🦇Бэт-пещера',
-            text: betCave,
-            content: []
-        },
-        {
-            name: 'utkinPass',
-            title: '🦆Перевал Уткина',
-            text: utkinPass,
-            content: []
-        },
-        {
-            name: 'hroshgarHigh',
-            title: '🌁Высокий Хротгар',
-            text: hroshgarHigh,
-            content: []
-        },
-        {
-            name: 'ruinsOfHexagon',
-            title: '🛑 Руины Гексагона',
-            text: ruinsOfHexagon,
-            content: []
-        },
-        {
-            name: 'scientificComplex',
-            title: '🔬Научный комплекс',
-            text: scientificComplex,
-            content: []
-        },
-        {
-            name: 'templeOfKnowledge',
-            title: '⛩Храм Знаний',
-            text: templeOfKnowledge,
-            content: []
-        },
-        {
-            name: 'blackMesa',
-            title: '🗨Черная Меза',
-            text: blackMesa,
-            content: []
-        },
-        {
-            name: 'moltenСore',
-            title: '🔥Огненные недра',
-            text: moltenСore,
-            content: []
-        }
-    ]
+  config: {
+    parseMode: 'html',
+  },
+  name: 'dungeons',
+  title: '⚠️Подземелья',
+  text: suppliesText,
+  content: [{
+    name: 'oldMine',
+    title: '⛰ Старая шахта',
+    text: oldMineText,
+    content: [],
+  },
+  {
+    name: 'haloCave',
+    title: '⚠️ Пещера Ореола',
+    text: haloCave,
+    content: [],
+  },
+  {
+    name: 'sewerPipe',
+    title: '🚽 Сточная труба',
+    text: sewerPipe,
+    content: [],
+  },
+  {
+    name: 'openVault',
+    title: '⚙️Открытое убежище',
+    text: openVault,
+    content: [],
+  },
+  {
+    name: 'betCave',
+    title: '🦇Бэт-пещера',
+    text: betCave,
+    content: [],
+  },
+  {
+    name: 'utkinPass',
+    title: '🦆Перевал Уткина',
+    text: utkinPass,
+    content: [],
+  },
+  {
+    name: 'hroshgarHigh',
+    title: '🌁Высокий Хротгар',
+    text: hroshgarHigh,
+    content: [],
+  },
+  {
+    name: 'ruinsOfHexagon',
+    title: '🛑 Руины Гексагона',
+    text: ruinsOfHexagon,
+    content: [],
+  },
+  {
+    name: 'scientificComplex',
+    title: '🔬Научный комплекс',
+    text: scientificComplex,
+    content: [],
+  },
+  {
+    name: 'templeOfKnowledge',
+    title: '⛩Храм Знаний',
+    text: templeOfKnowledge,
+    content: [],
+  },
+  {
+    name: 'blackMesa',
+    title: '🗨Черная Меза',
+    text: blackMesa,
+    content: [],
+  },
+  {
+    name: 'moltenСore',
+    title: '🔥Огненные недра',
+    text: moltenСore,
+    content: [],
+  },
+  ],
 };
 
 module.exports = dungeonMenu;

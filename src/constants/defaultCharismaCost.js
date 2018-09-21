@@ -1,4 +1,4 @@
-/* 
+/*
 var a = Array.apply(null, Array(1000)).map(function (x, i) { return i+1; });
 
 x = [];
@@ -7,3908 +7,3908 @@ a.map((v,i) => {
    x.push({
         caps: (10 * i),
         level: v
-   })     
+   })
 });
  */
 
 module.exports = [{
-  "caps": 0,
-  "level": 1
+  caps: 0,
+  level: 1,
 }, {
-  "caps": 10,
-  "level": 2
+  caps: 10,
+  level: 2,
 }, {
-  "caps": 20,
-  "level": 3
+  caps: 20,
+  level: 3,
 }, {
-  "caps": 30,
-  "level": 4
+  caps: 30,
+  level: 4,
 }, {
-  "caps": 40,
-  "level": 5
+  caps: 40,
+  level: 5,
 }, {
-  "caps": 50,
-  "level": 6
+  caps: 50,
+  level: 6,
 }, {
-  "caps": 60,
-  "level": 7
+  caps: 60,
+  level: 7,
 }, {
-  "caps": 70,
-  "level": 8
+  caps: 70,
+  level: 8,
 }, {
-  "caps": 80,
-  "level": 9
+  caps: 80,
+  level: 9,
 }, {
-  "caps": 90,
-  "level": 10
+  caps: 90,
+  level: 10,
 }, {
-  "caps": 100,
-  "level": 11
+  caps: 100,
+  level: 11,
 }, {
-  "caps": 110,
-  "level": 12
+  caps: 110,
+  level: 12,
 }, {
-  "caps": 120,
-  "level": 13
+  caps: 120,
+  level: 13,
 }, {
-  "caps": 130,
-  "level": 14
+  caps: 130,
+  level: 14,
 }, {
-  "caps": 140,
-  "level": 15
+  caps: 140,
+  level: 15,
 }, {
-  "caps": 150,
-  "level": 16
+  caps: 150,
+  level: 16,
 }, {
-  "caps": 160,
-  "level": 17
+  caps: 160,
+  level: 17,
 }, {
-  "caps": 170,
-  "level": 18
+  caps: 170,
+  level: 18,
 }, {
-  "caps": 180,
-  "level": 19
+  caps: 180,
+  level: 19,
 }, {
-  "caps": 190,
-  "level": 20
+  caps: 190,
+  level: 20,
 }, {
-  "caps": 200,
-  "level": 21
+  caps: 200,
+  level: 21,
 }, {
-  "caps": 210,
-  "level": 22
+  caps: 210,
+  level: 22,
 }, {
-  "caps": 220,
-  "level": 23
+  caps: 220,
+  level: 23,
 }, {
-  "caps": 230,
-  "level": 24
+  caps: 230,
+  level: 24,
 }, {
-  "caps": 240,
-  "level": 25
+  caps: 240,
+  level: 25,
 }, {
-  "caps": 250,
-  "level": 26
+  caps: 250,
+  level: 26,
 }, {
-  "caps": 260,
-  "level": 27
+  caps: 260,
+  level: 27,
 }, {
-  "caps": 270,
-  "level": 28
+  caps: 270,
+  level: 28,
 }, {
-  "caps": 280,
-  "level": 29
+  caps: 280,
+  level: 29,
 }, {
-  "caps": 290,
-  "level": 30
+  caps: 290,
+  level: 30,
 }, {
-  "caps": 300,
-  "level": 31
+  caps: 300,
+  level: 31,
 }, {
-  "caps": 310,
-  "level": 32
+  caps: 310,
+  level: 32,
 }, {
-  "caps": 320,
-  "level": 33
+  caps: 320,
+  level: 33,
 }, {
-  "caps": 330,
-  "level": 34
+  caps: 330,
+  level: 34,
 }, {
-  "caps": 340,
-  "level": 35
+  caps: 340,
+  level: 35,
 }, {
-  "caps": 350,
-  "level": 36
+  caps: 350,
+  level: 36,
 }, {
-  "caps": 360,
-  "level": 37
+  caps: 360,
+  level: 37,
 }, {
-  "caps": 370,
-  "level": 38
+  caps: 370,
+  level: 38,
 }, {
-  "caps": 380,
-  "level": 39
+  caps: 380,
+  level: 39,
 }, {
-  "caps": 390,
-  "level": 40
+  caps: 390,
+  level: 40,
 }, {
-  "caps": 400,
-  "level": 41
+  caps: 400,
+  level: 41,
 }, {
-  "caps": 410,
-  "level": 42
+  caps: 410,
+  level: 42,
 }, {
-  "caps": 420,
-  "level": 43
+  caps: 420,
+  level: 43,
 }, {
-  "caps": 430,
-  "level": 44
+  caps: 430,
+  level: 44,
 }, {
-  "caps": 440,
-  "level": 45
+  caps: 440,
+  level: 45,
 }, {
-  "caps": 450,
-  "level": 46
+  caps: 450,
+  level: 46,
 }, {
-  "caps": 460,
-  "level": 47
+  caps: 460,
+  level: 47,
 }, {
-  "caps": 470,
-  "level": 48
+  caps: 470,
+  level: 48,
 }, {
-  "caps": 480,
-  "level": 49
+  caps: 480,
+  level: 49,
 }, {
-  "caps": 490,
-  "level": 50
+  caps: 490,
+  level: 50,
 }, {
-  "caps": 500,
-  "level": 51
+  caps: 500,
+  level: 51,
 }, {
-  "caps": 510,
-  "level": 52
+  caps: 510,
+  level: 52,
 }, {
-  "caps": 520,
-  "level": 53
+  caps: 520,
+  level: 53,
 }, {
-  "caps": 530,
-  "level": 54
+  caps: 530,
+  level: 54,
 }, {
-  "caps": 540,
-  "level": 55
+  caps: 540,
+  level: 55,
 }, {
-  "caps": 550,
-  "level": 56
+  caps: 550,
+  level: 56,
 }, {
-  "caps": 560,
-  "level": 57
+  caps: 560,
+  level: 57,
 }, {
-  "caps": 570,
-  "level": 58
+  caps: 570,
+  level: 58,
 }, {
-  "caps": 580,
-  "level": 59
+  caps: 580,
+  level: 59,
 }, {
-  "caps": 590,
-  "level": 60
+  caps: 590,
+  level: 60,
 }, {
-  "caps": 600,
-  "level": 61
+  caps: 600,
+  level: 61,
 }, {
-  "caps": 610,
-  "level": 62
+  caps: 610,
+  level: 62,
 }, {
-  "caps": 620,
-  "level": 63
+  caps: 620,
+  level: 63,
 }, {
-  "caps": 630,
-  "level": 64
+  caps: 630,
+  level: 64,
 }, {
-  "caps": 640,
-  "level": 65
+  caps: 640,
+  level: 65,
 }, {
-  "caps": 650,
-  "level": 66
+  caps: 650,
+  level: 66,
 }, {
-  "caps": 660,
-  "level": 67
+  caps: 660,
+  level: 67,
 }, {
-  "caps": 670,
-  "level": 68
+  caps: 670,
+  level: 68,
 }, {
-  "caps": 680,
-  "level": 69
+  caps: 680,
+  level: 69,
 }, {
-  "caps": 690,
-  "level": 70
+  caps: 690,
+  level: 70,
 }, {
-  "caps": 700,
-  "level": 71
+  caps: 700,
+  level: 71,
 }, {
-  "caps": 710,
-  "level": 72
+  caps: 710,
+  level: 72,
 }, {
-  "caps": 720,
-  "level": 73
+  caps: 720,
+  level: 73,
 }, {
-  "caps": 730,
-  "level": 74
+  caps: 730,
+  level: 74,
 }, {
-  "caps": 740,
-  "level": 75
+  caps: 740,
+  level: 75,
 }, {
-  "caps": 750,
-  "level": 76
+  caps: 750,
+  level: 76,
 }, {
-  "caps": 760,
-  "level": 77
+  caps: 760,
+  level: 77,
 }, {
-  "caps": 770,
-  "level": 78
+  caps: 770,
+  level: 78,
 }, {
-  "caps": 780,
-  "level": 79
+  caps: 780,
+  level: 79,
 }, {
-  "caps": 790,
-  "level": 80
+  caps: 790,
+  level: 80,
 }, {
-  "caps": 800,
-  "level": 81
+  caps: 800,
+  level: 81,
 }, {
-  "caps": 810,
-  "level": 82
+  caps: 810,
+  level: 82,
 }, {
-  "caps": 820,
-  "level": 83
+  caps: 820,
+  level: 83,
 }, {
-  "caps": 830,
-  "level": 84
+  caps: 830,
+  level: 84,
 }, {
-  "caps": 840,
-  "level": 85
+  caps: 840,
+  level: 85,
 }, {
-  "caps": 850,
-  "level": 86
+  caps: 850,
+  level: 86,
 }, {
-  "caps": 860,
-  "level": 87
+  caps: 860,
+  level: 87,
 }, {
-  "caps": 870,
-  "level": 88
+  caps: 870,
+  level: 88,
 }, {
-  "caps": 880,
-  "level": 89
+  caps: 880,
+  level: 89,
 }, {
-  "caps": 890,
-  "level": 90
+  caps: 890,
+  level: 90,
 }, {
-  "caps": 900,
-  "level": 91
+  caps: 900,
+  level: 91,
 }, {
-  "caps": 910,
-  "level": 92
+  caps: 910,
+  level: 92,
 }, {
-  "caps": 920,
-  "level": 93
+  caps: 920,
+  level: 93,
 }, {
-  "caps": 930,
-  "level": 94
+  caps: 930,
+  level: 94,
 }, {
-  "caps": 940,
-  "level": 95
+  caps: 940,
+  level: 95,
 }, {
-  "caps": 950,
-  "level": 96
+  caps: 950,
+  level: 96,
 }, {
-  "caps": 960,
-  "level": 97
+  caps: 960,
+  level: 97,
 }, {
-  "caps": 970,
-  "level": 98
+  caps: 970,
+  level: 98,
 }, {
-  "caps": 980,
-  "level": 99
+  caps: 980,
+  level: 99,
 }, {
-  "caps": 990,
-  "level": 100
+  caps: 990,
+  level: 100,
 }, {
-  "caps": 1000,
-  "level": 101
+  caps: 1000,
+  level: 101,
 }, {
-  "caps": 1010,
-  "level": 102
+  caps: 1010,
+  level: 102,
 }, {
-  "caps": 1020,
-  "level": 103
+  caps: 1020,
+  level: 103,
 }, {
-  "caps": 1030,
-  "level": 104
+  caps: 1030,
+  level: 104,
 }, {
-  "caps": 1040,
-  "level": 105
+  caps: 1040,
+  level: 105,
 }, {
-  "caps": 1050,
-  "level": 106
+  caps: 1050,
+  level: 106,
 }, {
-  "caps": 1060,
-  "level": 107
+  caps: 1060,
+  level: 107,
 }, {
-  "caps": 1070,
-  "level": 108
+  caps: 1070,
+  level: 108,
 }, {
-  "caps": 1080,
-  "level": 109
+  caps: 1080,
+  level: 109,
 }, {
-  "caps": 1090,
-  "level": 110
+  caps: 1090,
+  level: 110,
 }, {
-  "caps": 1100,
-  "level": 111
+  caps: 1100,
+  level: 111,
 }, {
-  "caps": 1110,
-  "level": 112
+  caps: 1110,
+  level: 112,
 }, {
-  "caps": 1120,
-  "level": 113
+  caps: 1120,
+  level: 113,
 }, {
-  "caps": 1130,
-  "level": 114
+  caps: 1130,
+  level: 114,
 }, {
-  "caps": 1140,
-  "level": 115
+  caps: 1140,
+  level: 115,
 }, {
-  "caps": 1150,
-  "level": 116
+  caps: 1150,
+  level: 116,
 }, {
-  "caps": 1160,
-  "level": 117
+  caps: 1160,
+  level: 117,
 }, {
-  "caps": 1170,
-  "level": 118
+  caps: 1170,
+  level: 118,
 }, {
-  "caps": 1180,
-  "level": 119
+  caps: 1180,
+  level: 119,
 }, {
-  "caps": 1190,
-  "level": 120
+  caps: 1190,
+  level: 120,
 }, {
-  "caps": 1200,
-  "level": 121
+  caps: 1200,
+  level: 121,
 }, {
-  "caps": 1210,
-  "level": 122
+  caps: 1210,
+  level: 122,
 }, {
-  "caps": 1220,
-  "level": 123
+  caps: 1220,
+  level: 123,
 }, {
-  "caps": 1230,
-  "level": 124
+  caps: 1230,
+  level: 124,
 }, {
-  "caps": 1240,
-  "level": 125
+  caps: 1240,
+  level: 125,
 }, {
-  "caps": 1250,
-  "level": 126
+  caps: 1250,
+  level: 126,
 }, {
-  "caps": 1260,
-  "level": 127
+  caps: 1260,
+  level: 127,
 }, {
-  "caps": 1270,
-  "level": 128
+  caps: 1270,
+  level: 128,
 }, {
-  "caps": 1280,
-  "level": 129
+  caps: 1280,
+  level: 129,
 }, {
-  "caps": 1290,
-  "level": 130
+  caps: 1290,
+  level: 130,
 }, {
-  "caps": 1300,
-  "level": 131
+  caps: 1300,
+  level: 131,
 }, {
-  "caps": 1310,
-  "level": 132
+  caps: 1310,
+  level: 132,
 }, {
-  "caps": 1320,
-  "level": 133
+  caps: 1320,
+  level: 133,
 }, {
-  "caps": 1330,
-  "level": 134
+  caps: 1330,
+  level: 134,
 }, {
-  "caps": 1340,
-  "level": 135
+  caps: 1340,
+  level: 135,
 }, {
-  "caps": 1350,
-  "level": 136
+  caps: 1350,
+  level: 136,
 }, {
-  "caps": 1360,
-  "level": 137
+  caps: 1360,
+  level: 137,
 }, {
-  "caps": 1370,
-  "level": 138
+  caps: 1370,
+  level: 138,
 }, {
-  "caps": 1380,
-  "level": 139
+  caps: 1380,
+  level: 139,
 }, {
-  "caps": 1390,
-  "level": 140
+  caps: 1390,
+  level: 140,
 }, {
-  "caps": 1400,
-  "level": 141
+  caps: 1400,
+  level: 141,
 }, {
-  "caps": 1410,
-  "level": 142
+  caps: 1410,
+  level: 142,
 }, {
-  "caps": 1420,
-  "level": 143
+  caps: 1420,
+  level: 143,
 }, {
-  "caps": 1430,
-  "level": 144
+  caps: 1430,
+  level: 144,
 }, {
-  "caps": 1440,
-  "level": 145
+  caps: 1440,
+  level: 145,
 }, {
-  "caps": 1450,
-  "level": 146
+  caps: 1450,
+  level: 146,
 }, {
-  "caps": 1460,
-  "level": 147
+  caps: 1460,
+  level: 147,
 }, {
-  "caps": 1470,
-  "level": 148
+  caps: 1470,
+  level: 148,
 }, {
-  "caps": 1480,
-  "level": 149
+  caps: 1480,
+  level: 149,
 }, {
-  "caps": 1490,
-  "level": 150
+  caps: 1490,
+  level: 150,
 }, {
-  "caps": 1500,
-  "level": 151
+  caps: 1500,
+  level: 151,
 }, {
-  "caps": 1510,
-  "level": 152
+  caps: 1510,
+  level: 152,
 }, {
-  "caps": 1520,
-  "level": 153
+  caps: 1520,
+  level: 153,
 }, {
-  "caps": 1530,
-  "level": 154
+  caps: 1530,
+  level: 154,
 }, {
-  "caps": 1540,
-  "level": 155
+  caps: 1540,
+  level: 155,
 }, {
-  "caps": 1550,
-  "level": 156
+  caps: 1550,
+  level: 156,
 }, {
-  "caps": 1560,
-  "level": 157
+  caps: 1560,
+  level: 157,
 }, {
-  "caps": 1570,
-  "level": 158
+  caps: 1570,
+  level: 158,
 }, {
-  "caps": 1580,
-  "level": 159
+  caps: 1580,
+  level: 159,
 }, {
-  "caps": 1590,
-  "level": 160
+  caps: 1590,
+  level: 160,
 }, {
-  "caps": 1600,
-  "level": 161
+  caps: 1600,
+  level: 161,
 }, {
-  "caps": 1610,
-  "level": 162
+  caps: 1610,
+  level: 162,
 }, {
-  "caps": 1620,
-  "level": 163
+  caps: 1620,
+  level: 163,
 }, {
-  "caps": 1630,
-  "level": 164
+  caps: 1630,
+  level: 164,
 }, {
-  "caps": 1640,
-  "level": 165
+  caps: 1640,
+  level: 165,
 }, {
-  "caps": 1650,
-  "level": 166
+  caps: 1650,
+  level: 166,
 }, {
-  "caps": 1660,
-  "level": 167
+  caps: 1660,
+  level: 167,
 }, {
-  "caps": 1670,
-  "level": 168
+  caps: 1670,
+  level: 168,
 }, {
-  "caps": 1680,
-  "level": 169
+  caps: 1680,
+  level: 169,
 }, {
-  "caps": 1690,
-  "level": 170
+  caps: 1690,
+  level: 170,
 }, {
-  "caps": 1700,
-  "level": 171
+  caps: 1700,
+  level: 171,
 }, {
-  "caps": 1710,
-  "level": 172
+  caps: 1710,
+  level: 172,
 }, {
-  "caps": 1720,
-  "level": 173
+  caps: 1720,
+  level: 173,
 }, {
-  "caps": 1730,
-  "level": 174
+  caps: 1730,
+  level: 174,
 }, {
-  "caps": 1740,
-  "level": 175
+  caps: 1740,
+  level: 175,
 }, {
-  "caps": 1750,
-  "level": 176
+  caps: 1750,
+  level: 176,
 }, {
-  "caps": 1760,
-  "level": 177
+  caps: 1760,
+  level: 177,
 }, {
-  "caps": 1770,
-  "level": 178
+  caps: 1770,
+  level: 178,
 }, {
-  "caps": 1780,
-  "level": 179
+  caps: 1780,
+  level: 179,
 }, {
-  "caps": 1790,
-  "level": 180
+  caps: 1790,
+  level: 180,
 }, {
-  "caps": 1800,
-  "level": 181
+  caps: 1800,
+  level: 181,
 }, {
-  "caps": 1810,
-  "level": 182
+  caps: 1810,
+  level: 182,
 }, {
-  "caps": 1820,
-  "level": 183
+  caps: 1820,
+  level: 183,
 }, {
-  "caps": 1830,
-  "level": 184
+  caps: 1830,
+  level: 184,
 }, {
-  "caps": 1840,
-  "level": 185
+  caps: 1840,
+  level: 185,
 }, {
-  "caps": 1850,
-  "level": 186
+  caps: 1850,
+  level: 186,
 }, {
-  "caps": 1860,
-  "level": 187
+  caps: 1860,
+  level: 187,
 }, {
-  "caps": 1870,
-  "level": 188
+  caps: 1870,
+  level: 188,
 }, {
-  "caps": 1880,
-  "level": 189
+  caps: 1880,
+  level: 189,
 }, {
-  "caps": 1890,
-  "level": 190
+  caps: 1890,
+  level: 190,
 }, {
-  "caps": 1900,
-  "level": 191
+  caps: 1900,
+  level: 191,
 }, {
-  "caps": 1910,
-  "level": 192
+  caps: 1910,
+  level: 192,
 }, {
-  "caps": 1920,
-  "level": 193
+  caps: 1920,
+  level: 193,
 }, {
-  "caps": 1930,
-  "level": 194
+  caps: 1930,
+  level: 194,
 }, {
-  "caps": 1940,
-  "level": 195
+  caps: 1940,
+  level: 195,
 }, {
-  "caps": 1950,
-  "level": 196
+  caps: 1950,
+  level: 196,
 }, {
-  "caps": 1960,
-  "level": 197
+  caps: 1960,
+  level: 197,
 }, {
-  "caps": 1970,
-  "level": 198
+  caps: 1970,
+  level: 198,
 }, {
-  "caps": 1980,
-  "level": 199
+  caps: 1980,
+  level: 199,
 }, {
-  "caps": 1990,
-  "level": 200
+  caps: 1990,
+  level: 200,
 }, {
-  "caps": 2000,
-  "level": 201
+  caps: 2000,
+  level: 201,
 }, {
-  "caps": 2010,
-  "level": 202
+  caps: 2010,
+  level: 202,
 }, {
-  "caps": 2020,
-  "level": 203
+  caps: 2020,
+  level: 203,
 }, {
-  "caps": 2030,
-  "level": 204
+  caps: 2030,
+  level: 204,
 }, {
-  "caps": 2040,
-  "level": 205
+  caps: 2040,
+  level: 205,
 }, {
-  "caps": 2050,
-  "level": 206
+  caps: 2050,
+  level: 206,
 }, {
-  "caps": 2060,
-  "level": 207
+  caps: 2060,
+  level: 207,
 }, {
-  "caps": 2070,
-  "level": 208
+  caps: 2070,
+  level: 208,
 }, {
-  "caps": 2080,
-  "level": 209
+  caps: 2080,
+  level: 209,
 }, {
-  "caps": 2090,
-  "level": 210
+  caps: 2090,
+  level: 210,
 }, {
-  "caps": 2100,
-  "level": 211
+  caps: 2100,
+  level: 211,
 }, {
-  "caps": 2110,
-  "level": 212
+  caps: 2110,
+  level: 212,
 }, {
-  "caps": 2120,
-  "level": 213
+  caps: 2120,
+  level: 213,
 }, {
-  "caps": 2130,
-  "level": 214
+  caps: 2130,
+  level: 214,
 }, {
-  "caps": 2140,
-  "level": 215
+  caps: 2140,
+  level: 215,
 }, {
-  "caps": 2150,
-  "level": 216
+  caps: 2150,
+  level: 216,
 }, {
-  "caps": 2160,
-  "level": 217
+  caps: 2160,
+  level: 217,
 }, {
-  "caps": 2170,
-  "level": 218
+  caps: 2170,
+  level: 218,
 }, {
-  "caps": 2180,
-  "level": 219
+  caps: 2180,
+  level: 219,
 }, {
-  "caps": 2190,
-  "level": 220
+  caps: 2190,
+  level: 220,
 }, {
-  "caps": 2200,
-  "level": 221
+  caps: 2200,
+  level: 221,
 }, {
-  "caps": 2210,
-  "level": 222
+  caps: 2210,
+  level: 222,
 }, {
-  "caps": 2220,
-  "level": 223
+  caps: 2220,
+  level: 223,
 }, {
-  "caps": 2230,
-  "level": 224
+  caps: 2230,
+  level: 224,
 }, {
-  "caps": 2240,
-  "level": 225
+  caps: 2240,
+  level: 225,
 }, {
-  "caps": 2250,
-  "level": 226
+  caps: 2250,
+  level: 226,
 }, {
-  "caps": 2260,
-  "level": 227
+  caps: 2260,
+  level: 227,
 }, {
-  "caps": 2270,
-  "level": 228
+  caps: 2270,
+  level: 228,
 }, {
-  "caps": 2280,
-  "level": 229
+  caps: 2280,
+  level: 229,
 }, {
-  "caps": 2290,
-  "level": 230
+  caps: 2290,
+  level: 230,
 }, {
-  "caps": 2300,
-  "level": 231
+  caps: 2300,
+  level: 231,
 }, {
-  "caps": 2310,
-  "level": 232
+  caps: 2310,
+  level: 232,
 }, {
-  "caps": 2320,
-  "level": 233
+  caps: 2320,
+  level: 233,
 }, {
-  "caps": 2330,
-  "level": 234
+  caps: 2330,
+  level: 234,
 }, {
-  "caps": 2340,
-  "level": 235
+  caps: 2340,
+  level: 235,
 }, {
-  "caps": 2350,
-  "level": 236
+  caps: 2350,
+  level: 236,
 }, {
-  "caps": 2360,
-  "level": 237
+  caps: 2360,
+  level: 237,
 }, {
-  "caps": 2370,
-  "level": 238
+  caps: 2370,
+  level: 238,
 }, {
-  "caps": 2380,
-  "level": 239
+  caps: 2380,
+  level: 239,
 }, {
-  "caps": 2390,
-  "level": 240
+  caps: 2390,
+  level: 240,
 }, {
-  "caps": 2400,
-  "level": 241
+  caps: 2400,
+  level: 241,
 }, {
-  "caps": 2410,
-  "level": 242
+  caps: 2410,
+  level: 242,
 }, {
-  "caps": 2420,
-  "level": 243
+  caps: 2420,
+  level: 243,
 }, {
-  "caps": 2430,
-  "level": 244
+  caps: 2430,
+  level: 244,
 }, {
-  "caps": 2440,
-  "level": 245
+  caps: 2440,
+  level: 245,
 }, {
-  "caps": 2450,
-  "level": 246
+  caps: 2450,
+  level: 246,
 }, {
-  "caps": 2460,
-  "level": 247
+  caps: 2460,
+  level: 247,
 }, {
-  "caps": 2470,
-  "level": 248
+  caps: 2470,
+  level: 248,
 }, {
-  "caps": 2480,
-  "level": 249
+  caps: 2480,
+  level: 249,
 }, {
-  "caps": 2490,
-  "level": 250
+  caps: 2490,
+  level: 250,
 }, {
-  "caps": 2500,
-  "level": 251
+  caps: 2500,
+  level: 251,
 }, {
-  "caps": 2510,
-  "level": 252
+  caps: 2510,
+  level: 252,
 }, {
-  "caps": 2520,
-  "level": 253
+  caps: 2520,
+  level: 253,
 }, {
-  "caps": 2530,
-  "level": 254
+  caps: 2530,
+  level: 254,
 }, {
-  "caps": 2540,
-  "level": 255
+  caps: 2540,
+  level: 255,
 }, {
-  "caps": 2550,
-  "level": 256
+  caps: 2550,
+  level: 256,
 }, {
-  "caps": 2560,
-  "level": 257
+  caps: 2560,
+  level: 257,
 }, {
-  "caps": 2570,
-  "level": 258
+  caps: 2570,
+  level: 258,
 }, {
-  "caps": 2580,
-  "level": 259
+  caps: 2580,
+  level: 259,
 }, {
-  "caps": 2590,
-  "level": 260
+  caps: 2590,
+  level: 260,
 }, {
-  "caps": 2600,
-  "level": 261
+  caps: 2600,
+  level: 261,
 }, {
-  "caps": 2610,
-  "level": 262
+  caps: 2610,
+  level: 262,
 }, {
-  "caps": 2620,
-  "level": 263
+  caps: 2620,
+  level: 263,
 }, {
-  "caps": 2630,
-  "level": 264
+  caps: 2630,
+  level: 264,
 }, {
-  "caps": 2640,
-  "level": 265
+  caps: 2640,
+  level: 265,
 }, {
-  "caps": 2650,
-  "level": 266
+  caps: 2650,
+  level: 266,
 }, {
-  "caps": 2660,
-  "level": 267
+  caps: 2660,
+  level: 267,
 }, {
-  "caps": 2670,
-  "level": 268
+  caps: 2670,
+  level: 268,
 }, {
-  "caps": 2680,
-  "level": 269
+  caps: 2680,
+  level: 269,
 }, {
-  "caps": 2690,
-  "level": 270
+  caps: 2690,
+  level: 270,
 }, {
-  "caps": 2700,
-  "level": 271
+  caps: 2700,
+  level: 271,
 }, {
-  "caps": 2710,
-  "level": 272
+  caps: 2710,
+  level: 272,
 }, {
-  "caps": 2720,
-  "level": 273
+  caps: 2720,
+  level: 273,
 }, {
-  "caps": 2730,
-  "level": 274
+  caps: 2730,
+  level: 274,
 }, {
-  "caps": 2740,
-  "level": 275
+  caps: 2740,
+  level: 275,
 }, {
-  "caps": 2750,
-  "level": 276
+  caps: 2750,
+  level: 276,
 }, {
-  "caps": 2760,
-  "level": 277
+  caps: 2760,
+  level: 277,
 }, {
-  "caps": 2770,
-  "level": 278
+  caps: 2770,
+  level: 278,
 }, {
-  "caps": 2780,
-  "level": 279
+  caps: 2780,
+  level: 279,
 }, {
-  "caps": 2790,
-  "level": 280
+  caps: 2790,
+  level: 280,
 }, {
-  "caps": 2800,
-  "level": 281
+  caps: 2800,
+  level: 281,
 }, {
-  "caps": 2810,
-  "level": 282
+  caps: 2810,
+  level: 282,
 }, {
-  "caps": 2820,
-  "level": 283
+  caps: 2820,
+  level: 283,
 }, {
-  "caps": 2830,
-  "level": 284
+  caps: 2830,
+  level: 284,
 }, {
-  "caps": 2840,
-  "level": 285
+  caps: 2840,
+  level: 285,
 }, {
-  "caps": 2850,
-  "level": 286
+  caps: 2850,
+  level: 286,
 }, {
-  "caps": 2860,
-  "level": 287
+  caps: 2860,
+  level: 287,
 }, {
-  "caps": 2870,
-  "level": 288
+  caps: 2870,
+  level: 288,
 }, {
-  "caps": 2880,
-  "level": 289
+  caps: 2880,
+  level: 289,
 }, {
-  "caps": 2890,
-  "level": 290
+  caps: 2890,
+  level: 290,
 }, {
-  "caps": 2900,
-  "level": 291
+  caps: 2900,
+  level: 291,
 }, {
-  "caps": 2910,
-  "level": 292
+  caps: 2910,
+  level: 292,
 }, {
-  "caps": 2920,
-  "level": 293
+  caps: 2920,
+  level: 293,
 }, {
-  "caps": 2930,
-  "level": 294
+  caps: 2930,
+  level: 294,
 }, {
-  "caps": 2940,
-  "level": 295
+  caps: 2940,
+  level: 295,
 }, {
-  "caps": 2950,
-  "level": 296
+  caps: 2950,
+  level: 296,
 }, {
-  "caps": 2960,
-  "level": 297
+  caps: 2960,
+  level: 297,
 }, {
-  "caps": 2970,
-  "level": 298
+  caps: 2970,
+  level: 298,
 }, {
-  "caps": 2980,
-  "level": 299
+  caps: 2980,
+  level: 299,
 }, {
-  "caps": 2990,
-  "level": 300
+  caps: 2990,
+  level: 300,
 }, {
-  "caps": 3000,
-  "level": 301
+  caps: 3000,
+  level: 301,
 }, {
-  "caps": 3010,
-  "level": 302
+  caps: 3010,
+  level: 302,
 }, {
-  "caps": 3020,
-  "level": 303
+  caps: 3020,
+  level: 303,
 }, {
-  "caps": 3030,
-  "level": 304
+  caps: 3030,
+  level: 304,
 }, {
-  "caps": 3040,
-  "level": 305
+  caps: 3040,
+  level: 305,
 }, {
-  "caps": 3050,
-  "level": 306
+  caps: 3050,
+  level: 306,
 }, {
-  "caps": 3060,
-  "level": 307
+  caps: 3060,
+  level: 307,
 }, {
-  "caps": 3070,
-  "level": 308
+  caps: 3070,
+  level: 308,
 }, {
-  "caps": 3080,
-  "level": 309
+  caps: 3080,
+  level: 309,
 }, {
-  "caps": 3090,
-  "level": 310
+  caps: 3090,
+  level: 310,
 }, {
-  "caps": 3100,
-  "level": 311
+  caps: 3100,
+  level: 311,
 }, {
-  "caps": 3110,
-  "level": 312
+  caps: 3110,
+  level: 312,
 }, {
-  "caps": 3120,
-  "level": 313
+  caps: 3120,
+  level: 313,
 }, {
-  "caps": 3130,
-  "level": 314
+  caps: 3130,
+  level: 314,
 }, {
-  "caps": 3140,
-  "level": 315
+  caps: 3140,
+  level: 315,
 }, {
-  "caps": 3150,
-  "level": 316
+  caps: 3150,
+  level: 316,
 }, {
-  "caps": 3160,
-  "level": 317
+  caps: 3160,
+  level: 317,
 }, {
-  "caps": 3170,
-  "level": 318
+  caps: 3170,
+  level: 318,
 }, {
-  "caps": 3180,
-  "level": 319
+  caps: 3180,
+  level: 319,
 }, {
-  "caps": 3190,
-  "level": 320
+  caps: 3190,
+  level: 320,
 }, {
-  "caps": 3200,
-  "level": 321
+  caps: 3200,
+  level: 321,
 }, {
-  "caps": 3210,
-  "level": 322
+  caps: 3210,
+  level: 322,
 }, {
-  "caps": 3220,
-  "level": 323
+  caps: 3220,
+  level: 323,
 }, {
-  "caps": 3230,
-  "level": 324
+  caps: 3230,
+  level: 324,
 }, {
-  "caps": 3240,
-  "level": 325
+  caps: 3240,
+  level: 325,
 }, {
-  "caps": 3250,
-  "level": 326
+  caps: 3250,
+  level: 326,
 }, {
-  "caps": 3260,
-  "level": 327
+  caps: 3260,
+  level: 327,
 }, {
-  "caps": 3270,
-  "level": 328
+  caps: 3270,
+  level: 328,
 }, {
-  "caps": 3280,
-  "level": 329
+  caps: 3280,
+  level: 329,
 }, {
-  "caps": 3290,
-  "level": 330
+  caps: 3290,
+  level: 330,
 }, {
-  "caps": 3300,
-  "level": 331
+  caps: 3300,
+  level: 331,
 }, {
-  "caps": 3310,
-  "level": 332
+  caps: 3310,
+  level: 332,
 }, {
-  "caps": 3320,
-  "level": 333
+  caps: 3320,
+  level: 333,
 }, {
-  "caps": 3330,
-  "level": 334
+  caps: 3330,
+  level: 334,
 }, {
-  "caps": 3340,
-  "level": 335
+  caps: 3340,
+  level: 335,
 }, {
-  "caps": 3350,
-  "level": 336
+  caps: 3350,
+  level: 336,
 }, {
-  "caps": 3360,
-  "level": 337
+  caps: 3360,
+  level: 337,
 }, {
-  "caps": 3370,
-  "level": 338
+  caps: 3370,
+  level: 338,
 }, {
-  "caps": 3380,
-  "level": 339
+  caps: 3380,
+  level: 339,
 }, {
-  "caps": 3390,
-  "level": 340
+  caps: 3390,
+  level: 340,
 }, {
-  "caps": 3400,
-  "level": 341
+  caps: 3400,
+  level: 341,
 }, {
-  "caps": 3410,
-  "level": 342
+  caps: 3410,
+  level: 342,
 }, {
-  "caps": 3420,
-  "level": 343
+  caps: 3420,
+  level: 343,
 }, {
-  "caps": 3430,
-  "level": 344
+  caps: 3430,
+  level: 344,
 }, {
-  "caps": 3440,
-  "level": 345
+  caps: 3440,
+  level: 345,
 }, {
-  "caps": 3450,
-  "level": 346
+  caps: 3450,
+  level: 346,
 }, {
-  "caps": 3460,
-  "level": 347
+  caps: 3460,
+  level: 347,
 }, {
-  "caps": 3470,
-  "level": 348
+  caps: 3470,
+  level: 348,
 }, {
-  "caps": 3480,
-  "level": 349
+  caps: 3480,
+  level: 349,
 }, {
-  "caps": 3490,
-  "level": 350
+  caps: 3490,
+  level: 350,
 }, {
-  "caps": 3500,
-  "level": 351
+  caps: 3500,
+  level: 351,
 }, {
-  "caps": 3510,
-  "level": 352
+  caps: 3510,
+  level: 352,
 }, {
-  "caps": 3520,
-  "level": 353
+  caps: 3520,
+  level: 353,
 }, {
-  "caps": 3530,
-  "level": 354
+  caps: 3530,
+  level: 354,
 }, {
-  "caps": 3540,
-  "level": 355
+  caps: 3540,
+  level: 355,
 }, {
-  "caps": 3550,
-  "level": 356
+  caps: 3550,
+  level: 356,
 }, {
-  "caps": 3560,
-  "level": 357
+  caps: 3560,
+  level: 357,
 }, {
-  "caps": 3570,
-  "level": 358
+  caps: 3570,
+  level: 358,
 }, {
-  "caps": 3580,
-  "level": 359
+  caps: 3580,
+  level: 359,
 }, {
-  "caps": 3590,
-  "level": 360
+  caps: 3590,
+  level: 360,
 }, {
-  "caps": 3600,
-  "level": 361
+  caps: 3600,
+  level: 361,
 }, {
-  "caps": 3610,
-  "level": 362
+  caps: 3610,
+  level: 362,
 }, {
-  "caps": 3620,
-  "level": 363
+  caps: 3620,
+  level: 363,
 }, {
-  "caps": 3630,
-  "level": 364
+  caps: 3630,
+  level: 364,
 }, {
-  "caps": 3640,
-  "level": 365
+  caps: 3640,
+  level: 365,
 }, {
-  "caps": 3650,
-  "level": 366
+  caps: 3650,
+  level: 366,
 }, {
-  "caps": 3660,
-  "level": 367
+  caps: 3660,
+  level: 367,
 }, {
-  "caps": 3670,
-  "level": 368
+  caps: 3670,
+  level: 368,
 }, {
-  "caps": 3680,
-  "level": 369
+  caps: 3680,
+  level: 369,
 }, {
-  "caps": 3690,
-  "level": 370
+  caps: 3690,
+  level: 370,
 }, {
-  "caps": 3700,
-  "level": 371
+  caps: 3700,
+  level: 371,
 }, {
-  "caps": 3710,
-  "level": 372
+  caps: 3710,
+  level: 372,
 }, {
-  "caps": 3720,
-  "level": 373
+  caps: 3720,
+  level: 373,
 }, {
-  "caps": 3730,
-  "level": 374
+  caps: 3730,
+  level: 374,
 }, {
-  "caps": 3740,
-  "level": 375
+  caps: 3740,
+  level: 375,
 }, {
-  "caps": 3750,
-  "level": 376
+  caps: 3750,
+  level: 376,
 }, {
-  "caps": 3760,
-  "level": 377
+  caps: 3760,
+  level: 377,
 }, {
-  "caps": 3770,
-  "level": 378
+  caps: 3770,
+  level: 378,
 }, {
-  "caps": 3780,
-  "level": 379
+  caps: 3780,
+  level: 379,
 }, {
-  "caps": 3790,
-  "level": 380
+  caps: 3790,
+  level: 380,
 }, {
-  "caps": 3800,
-  "level": 381
+  caps: 3800,
+  level: 381,
 }, {
-  "caps": 3810,
-  "level": 382
+  caps: 3810,
+  level: 382,
 }, {
-  "caps": 3820,
-  "level": 383
+  caps: 3820,
+  level: 383,
 }, {
-  "caps": 3830,
-  "level": 384
+  caps: 3830,
+  level: 384,
 }, {
-  "caps": 3840,
-  "level": 385
+  caps: 3840,
+  level: 385,
 }, {
-  "caps": 3850,
-  "level": 386
+  caps: 3850,
+  level: 386,
 }, {
-  "caps": 3860,
-  "level": 387
+  caps: 3860,
+  level: 387,
 }, {
-  "caps": 3870,
-  "level": 388
+  caps: 3870,
+  level: 388,
 }, {
-  "caps": 3880,
-  "level": 389
+  caps: 3880,
+  level: 389,
 }, {
-  "caps": 3890,
-  "level": 390
+  caps: 3890,
+  level: 390,
 }, {
-  "caps": 3900,
-  "level": 391
+  caps: 3900,
+  level: 391,
 }, {
-  "caps": 3910,
-  "level": 392
+  caps: 3910,
+  level: 392,
 }, {
-  "caps": 3920,
-  "level": 393
+  caps: 3920,
+  level: 393,
 }, {
-  "caps": 3930,
-  "level": 394
+  caps: 3930,
+  level: 394,
 }, {
-  "caps": 3940,
-  "level": 395
+  caps: 3940,
+  level: 395,
 }, {
-  "caps": 3950,
-  "level": 396
+  caps: 3950,
+  level: 396,
 }, {
-  "caps": 3960,
-  "level": 397
+  caps: 3960,
+  level: 397,
 }, {
-  "caps": 3970,
-  "level": 398
+  caps: 3970,
+  level: 398,
 }, {
-  "caps": 3980,
-  "level": 399
+  caps: 3980,
+  level: 399,
 }, {
-  "caps": 3990,
-  "level": 400
+  caps: 3990,
+  level: 400,
 }, {
-  "caps": 4000,
-  "level": 401
+  caps: 4000,
+  level: 401,
 }, {
-  "caps": 4010,
-  "level": 402
+  caps: 4010,
+  level: 402,
 }, {
-  "caps": 4020,
-  "level": 403
+  caps: 4020,
+  level: 403,
 }, {
-  "caps": 4030,
-  "level": 404
+  caps: 4030,
+  level: 404,
 }, {
-  "caps": 4040,
-  "level": 405
+  caps: 4040,
+  level: 405,
 }, {
-  "caps": 4050,
-  "level": 406
+  caps: 4050,
+  level: 406,
 }, {
-  "caps": 4060,
-  "level": 407
+  caps: 4060,
+  level: 407,
 }, {
-  "caps": 4070,
-  "level": 408
+  caps: 4070,
+  level: 408,
 }, {
-  "caps": 4080,
-  "level": 409
+  caps: 4080,
+  level: 409,
 }, {
-  "caps": 4090,
-  "level": 410
+  caps: 4090,
+  level: 410,
 }, {
-  "caps": 4100,
-  "level": 411
+  caps: 4100,
+  level: 411,
 }, {
-  "caps": 4110,
-  "level": 412
+  caps: 4110,
+  level: 412,
 }, {
-  "caps": 4120,
-  "level": 413
+  caps: 4120,
+  level: 413,
 }, {
-  "caps": 4130,
-  "level": 414
+  caps: 4130,
+  level: 414,
 }, {
-  "caps": 4140,
-  "level": 415
+  caps: 4140,
+  level: 415,
 }, {
-  "caps": 4150,
-  "level": 416
+  caps: 4150,
+  level: 416,
 }, {
-  "caps": 4160,
-  "level": 417
+  caps: 4160,
+  level: 417,
 }, {
-  "caps": 4170,
-  "level": 418
+  caps: 4170,
+  level: 418,
 }, {
-  "caps": 4180,
-  "level": 419
+  caps: 4180,
+  level: 419,
 }, {
-  "caps": 4190,
-  "level": 420
+  caps: 4190,
+  level: 420,
 }, {
-  "caps": 4200,
-  "level": 421
+  caps: 4200,
+  level: 421,
 }, {
-  "caps": 4210,
-  "level": 422
+  caps: 4210,
+  level: 422,
 }, {
-  "caps": 4220,
-  "level": 423
+  caps: 4220,
+  level: 423,
 }, {
-  "caps": 4230,
-  "level": 424
+  caps: 4230,
+  level: 424,
 }, {
-  "caps": 4240,
-  "level": 425
+  caps: 4240,
+  level: 425,
 }, {
-  "caps": 4250,
-  "level": 426
+  caps: 4250,
+  level: 426,
 }, {
-  "caps": 4260,
-  "level": 427
+  caps: 4260,
+  level: 427,
 }, {
-  "caps": 4270,
-  "level": 428
+  caps: 4270,
+  level: 428,
 }, {
-  "caps": 4280,
-  "level": 429
+  caps: 4280,
+  level: 429,
 }, {
-  "caps": 4290,
-  "level": 430
+  caps: 4290,
+  level: 430,
 }, {
-  "caps": 4300,
-  "level": 431
+  caps: 4300,
+  level: 431,
 }, {
-  "caps": 4310,
-  "level": 432
+  caps: 4310,
+  level: 432,
 }, {
-  "caps": 4320,
-  "level": 433
+  caps: 4320,
+  level: 433,
 }, {
-  "caps": 4330,
-  "level": 434
+  caps: 4330,
+  level: 434,
 }, {
-  "caps": 4340,
-  "level": 435
+  caps: 4340,
+  level: 435,
 }, {
-  "caps": 4350,
-  "level": 436
+  caps: 4350,
+  level: 436,
 }, {
-  "caps": 4360,
-  "level": 437
+  caps: 4360,
+  level: 437,
 }, {
-  "caps": 4370,
-  "level": 438
+  caps: 4370,
+  level: 438,
 }, {
-  "caps": 4380,
-  "level": 439
+  caps: 4380,
+  level: 439,
 }, {
-  "caps": 4390,
-  "level": 440
+  caps: 4390,
+  level: 440,
 }, {
-  "caps": 4400,
-  "level": 441
+  caps: 4400,
+  level: 441,
 }, {
-  "caps": 4410,
-  "level": 442
+  caps: 4410,
+  level: 442,
 }, {
-  "caps": 4420,
-  "level": 443
+  caps: 4420,
+  level: 443,
 }, {
-  "caps": 4430,
-  "level": 444
+  caps: 4430,
+  level: 444,
 }, {
-  "caps": 4440,
-  "level": 445
+  caps: 4440,
+  level: 445,
 }, {
-  "caps": 4450,
-  "level": 446
+  caps: 4450,
+  level: 446,
 }, {
-  "caps": 4460,
-  "level": 447
+  caps: 4460,
+  level: 447,
 }, {
-  "caps": 4470,
-  "level": 448
+  caps: 4470,
+  level: 448,
 }, {
-  "caps": 4480,
-  "level": 449
+  caps: 4480,
+  level: 449,
 }, {
-  "caps": 4490,
-  "level": 450
+  caps: 4490,
+  level: 450,
 }, {
-  "caps": 4500,
-  "level": 451
+  caps: 4500,
+  level: 451,
 }, {
-  "caps": 4510,
-  "level": 452
+  caps: 4510,
+  level: 452,
 }, {
-  "caps": 4520,
-  "level": 453
+  caps: 4520,
+  level: 453,
 }, {
-  "caps": 4530,
-  "level": 454
+  caps: 4530,
+  level: 454,
 }, {
-  "caps": 4540,
-  "level": 455
+  caps: 4540,
+  level: 455,
 }, {
-  "caps": 4550,
-  "level": 456
+  caps: 4550,
+  level: 456,
 }, {
-  "caps": 4560,
-  "level": 457
+  caps: 4560,
+  level: 457,
 }, {
-  "caps": 4570,
-  "level": 458
+  caps: 4570,
+  level: 458,
 }, {
-  "caps": 4580,
-  "level": 459
+  caps: 4580,
+  level: 459,
 }, {
-  "caps": 4590,
-  "level": 460
+  caps: 4590,
+  level: 460,
 }, {
-  "caps": 4600,
-  "level": 461
+  caps: 4600,
+  level: 461,
 }, {
-  "caps": 4610,
-  "level": 462
+  caps: 4610,
+  level: 462,
 }, {
-  "caps": 4620,
-  "level": 463
+  caps: 4620,
+  level: 463,
 }, {
-  "caps": 4630,
-  "level": 464
+  caps: 4630,
+  level: 464,
 }, {
-  "caps": 4640,
-  "level": 465
+  caps: 4640,
+  level: 465,
 }, {
-  "caps": 4650,
-  "level": 466
+  caps: 4650,
+  level: 466,
 }, {
-  "caps": 4660,
-  "level": 467
+  caps: 4660,
+  level: 467,
 }, {
-  "caps": 4670,
-  "level": 468
+  caps: 4670,
+  level: 468,
 }, {
-  "caps": 4680,
-  "level": 469
+  caps: 4680,
+  level: 469,
 }, {
-  "caps": 4690,
-  "level": 470
+  caps: 4690,
+  level: 470,
 }, {
-  "caps": 4700,
-  "level": 471
+  caps: 4700,
+  level: 471,
 }, {
-  "caps": 4710,
-  "level": 472
+  caps: 4710,
+  level: 472,
 }, {
-  "caps": 4720,
-  "level": 473
+  caps: 4720,
+  level: 473,
 }, {
-  "caps": 4730,
-  "level": 474
+  caps: 4730,
+  level: 474,
 }, {
-  "caps": 4740,
-  "level": 475
+  caps: 4740,
+  level: 475,
 }, {
-  "caps": 4750,
-  "level": 476
+  caps: 4750,
+  level: 476,
 }, {
-  "caps": 4760,
-  "level": 477
+  caps: 4760,
+  level: 477,
 }, {
-  "caps": 4770,
-  "level": 478
+  caps: 4770,
+  level: 478,
 }, {
-  "caps": 4780,
-  "level": 479
+  caps: 4780,
+  level: 479,
 }, {
-  "caps": 4790,
-  "level": 480
+  caps: 4790,
+  level: 480,
 }, {
-  "caps": 4800,
-  "level": 481
+  caps: 4800,
+  level: 481,
 }, {
-  "caps": 4810,
-  "level": 482
+  caps: 4810,
+  level: 482,
 }, {
-  "caps": 4820,
-  "level": 483
+  caps: 4820,
+  level: 483,
 }, {
-  "caps": 4830,
-  "level": 484
+  caps: 4830,
+  level: 484,
 }, {
-  "caps": 4840,
-  "level": 485
+  caps: 4840,
+  level: 485,
 }, {
-  "caps": 4850,
-  "level": 486
+  caps: 4850,
+  level: 486,
 }, {
-  "caps": 4860,
-  "level": 487
+  caps: 4860,
+  level: 487,
 }, {
-  "caps": 4870,
-  "level": 488
+  caps: 4870,
+  level: 488,
 }, {
-  "caps": 4880,
-  "level": 489
+  caps: 4880,
+  level: 489,
 }, {
-  "caps": 4890,
-  "level": 490
+  caps: 4890,
+  level: 490,
 }, {
-  "caps": 4900,
-  "level": 491
+  caps: 4900,
+  level: 491,
 }, {
-  "caps": 4910,
-  "level": 492
+  caps: 4910,
+  level: 492,
 }, {
-  "caps": 4920,
-  "level": 493
+  caps: 4920,
+  level: 493,
 }, {
-  "caps": 4930,
-  "level": 494
+  caps: 4930,
+  level: 494,
 }, {
-  "caps": 4940,
-  "level": 495
+  caps: 4940,
+  level: 495,
 }, {
-  "caps": 4950,
-  "level": 496
+  caps: 4950,
+  level: 496,
 }, {
-  "caps": 4960,
-  "level": 497
+  caps: 4960,
+  level: 497,
 }, {
-  "caps": 4970,
-  "level": 498
+  caps: 4970,
+  level: 498,
 }, {
-  "caps": 4980,
-  "level": 499
+  caps: 4980,
+  level: 499,
 }, {
-  "caps": 4990,
-  "level": 500
+  caps: 4990,
+  level: 500,
 }, {
-  "caps": 5000,
-  "level": 501
+  caps: 5000,
+  level: 501,
 }, {
-  "caps": 5010,
-  "level": 502
+  caps: 5010,
+  level: 502,
 }, {
-  "caps": 5020,
-  "level": 503
+  caps: 5020,
+  level: 503,
 }, {
-  "caps": 5030,
-  "level": 504
+  caps: 5030,
+  level: 504,
 }, {
-  "caps": 5040,
-  "level": 505
+  caps: 5040,
+  level: 505,
 }, {
-  "caps": 5050,
-  "level": 506
+  caps: 5050,
+  level: 506,
 }, {
-  "caps": 5060,
-  "level": 507
+  caps: 5060,
+  level: 507,
 }, {
-  "caps": 5070,
-  "level": 508
+  caps: 5070,
+  level: 508,
 }, {
-  "caps": 5080,
-  "level": 509
+  caps: 5080,
+  level: 509,
 }, {
-  "caps": 5090,
-  "level": 510
+  caps: 5090,
+  level: 510,
 }, {
-  "caps": 5100,
-  "level": 511
+  caps: 5100,
+  level: 511,
 }, {
-  "caps": 5110,
-  "level": 512
+  caps: 5110,
+  level: 512,
 }, {
-  "caps": 5120,
-  "level": 513
+  caps: 5120,
+  level: 513,
 }, {
-  "caps": 5130,
-  "level": 514
+  caps: 5130,
+  level: 514,
 }, {
-  "caps": 5140,
-  "level": 515
+  caps: 5140,
+  level: 515,
 }, {
-  "caps": 5150,
-  "level": 516
+  caps: 5150,
+  level: 516,
 }, {
-  "caps": 5160,
-  "level": 517
+  caps: 5160,
+  level: 517,
 }, {
-  "caps": 5170,
-  "level": 518
+  caps: 5170,
+  level: 518,
 }, {
-  "caps": 5180,
-  "level": 519
+  caps: 5180,
+  level: 519,
 }, {
-  "caps": 5190,
-  "level": 520
+  caps: 5190,
+  level: 520,
 }, {
-  "caps": 5200,
-  "level": 521
+  caps: 5200,
+  level: 521,
 }, {
-  "caps": 5210,
-  "level": 522
+  caps: 5210,
+  level: 522,
 }, {
-  "caps": 5220,
-  "level": 523
+  caps: 5220,
+  level: 523,
 }, {
-  "caps": 5230,
-  "level": 524
+  caps: 5230,
+  level: 524,
 }, {
-  "caps": 5240,
-  "level": 525
+  caps: 5240,
+  level: 525,
 }, {
-  "caps": 5250,
-  "level": 526
+  caps: 5250,
+  level: 526,
 }, {
-  "caps": 5260,
-  "level": 527
+  caps: 5260,
+  level: 527,
 }, {
-  "caps": 5270,
-  "level": 528
+  caps: 5270,
+  level: 528,
 }, {
-  "caps": 5280,
-  "level": 529
+  caps: 5280,
+  level: 529,
 }, {
-  "caps": 5290,
-  "level": 530
+  caps: 5290,
+  level: 530,
 }, {
-  "caps": 5300,
-  "level": 531
+  caps: 5300,
+  level: 531,
 }, {
-  "caps": 5310,
-  "level": 532
+  caps: 5310,
+  level: 532,
 }, {
-  "caps": 5320,
-  "level": 533
+  caps: 5320,
+  level: 533,
 }, {
-  "caps": 5330,
-  "level": 534
+  caps: 5330,
+  level: 534,
 }, {
-  "caps": 5340,
-  "level": 535
+  caps: 5340,
+  level: 535,
 }, {
-  "caps": 5350,
-  "level": 536
+  caps: 5350,
+  level: 536,
 }, {
-  "caps": 5360,
-  "level": 537
+  caps: 5360,
+  level: 537,
 }, {
-  "caps": 5370,
-  "level": 538
+  caps: 5370,
+  level: 538,
 }, {
-  "caps": 5380,
-  "level": 539
+  caps: 5380,
+  level: 539,
 }, {
-  "caps": 5390,
-  "level": 540
+  caps: 5390,
+  level: 540,
 }, {
-  "caps": 5400,
-  "level": 541
+  caps: 5400,
+  level: 541,
 }, {
-  "caps": 5410,
-  "level": 542
+  caps: 5410,
+  level: 542,
 }, {
-  "caps": 5420,
-  "level": 543
+  caps: 5420,
+  level: 543,
 }, {
-  "caps": 5430,
-  "level": 544
+  caps: 5430,
+  level: 544,
 }, {
-  "caps": 5440,
-  "level": 545
+  caps: 5440,
+  level: 545,
 }, {
-  "caps": 5450,
-  "level": 546
+  caps: 5450,
+  level: 546,
 }, {
-  "caps": 5460,
-  "level": 547
+  caps: 5460,
+  level: 547,
 }, {
-  "caps": 5470,
-  "level": 548
+  caps: 5470,
+  level: 548,
 }, {
-  "caps": 5480,
-  "level": 549
+  caps: 5480,
+  level: 549,
 }, {
-  "caps": 5490,
-  "level": 550
+  caps: 5490,
+  level: 550,
 }, {
-  "caps": 5500,
-  "level": 551
+  caps: 5500,
+  level: 551,
 }, {
-  "caps": 5510,
-  "level": 552
+  caps: 5510,
+  level: 552,
 }, {
-  "caps": 5520,
-  "level": 553
+  caps: 5520,
+  level: 553,
 }, {
-  "caps": 5530,
-  "level": 554
+  caps: 5530,
+  level: 554,
 }, {
-  "caps": 5540,
-  "level": 555
+  caps: 5540,
+  level: 555,
 }, {
-  "caps": 5550,
-  "level": 556
+  caps: 5550,
+  level: 556,
 }, {
-  "caps": 5560,
-  "level": 557
+  caps: 5560,
+  level: 557,
 }, {
-  "caps": 5570,
-  "level": 558
+  caps: 5570,
+  level: 558,
 }, {
-  "caps": 5580,
-  "level": 559
+  caps: 5580,
+  level: 559,
 }, {
-  "caps": 5590,
-  "level": 560
+  caps: 5590,
+  level: 560,
 }, {
-  "caps": 5600,
-  "level": 561
+  caps: 5600,
+  level: 561,
 }, {
-  "caps": 5610,
-  "level": 562
+  caps: 5610,
+  level: 562,
 }, {
-  "caps": 5620,
-  "level": 563
+  caps: 5620,
+  level: 563,
 }, {
-  "caps": 5630,
-  "level": 564
+  caps: 5630,
+  level: 564,
 }, {
-  "caps": 5640,
-  "level": 565
+  caps: 5640,
+  level: 565,
 }, {
-  "caps": 5650,
-  "level": 566
+  caps: 5650,
+  level: 566,
 }, {
-  "caps": 5660,
-  "level": 567
+  caps: 5660,
+  level: 567,
 }, {
-  "caps": 5670,
-  "level": 568
+  caps: 5670,
+  level: 568,
 }, {
-  "caps": 5680,
-  "level": 569
+  caps: 5680,
+  level: 569,
 }, {
-  "caps": 5690,
-  "level": 570
+  caps: 5690,
+  level: 570,
 }, {
-  "caps": 5700,
-  "level": 571
+  caps: 5700,
+  level: 571,
 }, {
-  "caps": 5710,
-  "level": 572
+  caps: 5710,
+  level: 572,
 }, {
-  "caps": 5720,
-  "level": 573
+  caps: 5720,
+  level: 573,
 }, {
-  "caps": 5730,
-  "level": 574
+  caps: 5730,
+  level: 574,
 }, {
-  "caps": 5740,
-  "level": 575
+  caps: 5740,
+  level: 575,
 }, {
-  "caps": 5750,
-  "level": 576
+  caps: 5750,
+  level: 576,
 }, {
-  "caps": 5760,
-  "level": 577
+  caps: 5760,
+  level: 577,
 }, {
-  "caps": 5770,
-  "level": 578
+  caps: 5770,
+  level: 578,
 }, {
-  "caps": 5780,
-  "level": 579
+  caps: 5780,
+  level: 579,
 }, {
-  "caps": 5790,
-  "level": 580
+  caps: 5790,
+  level: 580,
 }, {
-  "caps": 5800,
-  "level": 581
+  caps: 5800,
+  level: 581,
 }, {
-  "caps": 5810,
-  "level": 582
+  caps: 5810,
+  level: 582,
 }, {
-  "caps": 5820,
-  "level": 583
+  caps: 5820,
+  level: 583,
 }, {
-  "caps": 5830,
-  "level": 584
+  caps: 5830,
+  level: 584,
 }, {
-  "caps": 5840,
-  "level": 585
+  caps: 5840,
+  level: 585,
 }, {
-  "caps": 5850,
-  "level": 586
+  caps: 5850,
+  level: 586,
 }, {
-  "caps": 5860,
-  "level": 587
+  caps: 5860,
+  level: 587,
 }, {
-  "caps": 5870,
-  "level": 588
+  caps: 5870,
+  level: 588,
 }, {
-  "caps": 5880,
-  "level": 589
+  caps: 5880,
+  level: 589,
 }, {
-  "caps": 5890,
-  "level": 590
+  caps: 5890,
+  level: 590,
 }, {
-  "caps": 5900,
-  "level": 591
+  caps: 5900,
+  level: 591,
 }, {
-  "caps": 5910,
-  "level": 592
+  caps: 5910,
+  level: 592,
 }, {
-  "caps": 5920,
-  "level": 593
+  caps: 5920,
+  level: 593,
 }, {
-  "caps": 5930,
-  "level": 594
+  caps: 5930,
+  level: 594,
 }, {
-  "caps": 5940,
-  "level": 595
+  caps: 5940,
+  level: 595,
 }, {
-  "caps": 5950,
-  "level": 596
+  caps: 5950,
+  level: 596,
 }, {
-  "caps": 5960,
-  "level": 597
+  caps: 5960,
+  level: 597,
 }, {
-  "caps": 5970,
-  "level": 598
+  caps: 5970,
+  level: 598,
 }, {
-  "caps": 5980,
-  "level": 599
+  caps: 5980,
+  level: 599,
 }, {
-  "caps": 5990,
-  "level": 600
+  caps: 5990,
+  level: 600,
 }, {
-  "caps": 6000,
-  "level": 601
+  caps: 6000,
+  level: 601,
 }, {
-  "caps": 6010,
-  "level": 602
+  caps: 6010,
+  level: 602,
 }, {
-  "caps": 6020,
-  "level": 603
+  caps: 6020,
+  level: 603,
 }, {
-  "caps": 6030,
-  "level": 604
+  caps: 6030,
+  level: 604,
 }, {
-  "caps": 6040,
-  "level": 605
+  caps: 6040,
+  level: 605,
 }, {
-  "caps": 6050,
-  "level": 606
+  caps: 6050,
+  level: 606,
 }, {
-  "caps": 6060,
-  "level": 607
+  caps: 6060,
+  level: 607,
 }, {
-  "caps": 6070,
-  "level": 608
+  caps: 6070,
+  level: 608,
 }, {
-  "caps": 6080,
-  "level": 609
+  caps: 6080,
+  level: 609,
 }, {
-  "caps": 6090,
-  "level": 610
+  caps: 6090,
+  level: 610,
 }, {
-  "caps": 6100,
-  "level": 611
+  caps: 6100,
+  level: 611,
 }, {
-  "caps": 6110,
-  "level": 612
+  caps: 6110,
+  level: 612,
 }, {
-  "caps": 6120,
-  "level": 613
+  caps: 6120,
+  level: 613,
 }, {
-  "caps": 6130,
-  "level": 614
+  caps: 6130,
+  level: 614,
 }, {
-  "caps": 6140,
-  "level": 615
+  caps: 6140,
+  level: 615,
 }, {
-  "caps": 6150,
-  "level": 616
+  caps: 6150,
+  level: 616,
 }, {
-  "caps": 6160,
-  "level": 617
+  caps: 6160,
+  level: 617,
 }, {
-  "caps": 6170,
-  "level": 618
+  caps: 6170,
+  level: 618,
 }, {
-  "caps": 6180,
-  "level": 619
+  caps: 6180,
+  level: 619,
 }, {
-  "caps": 6190,
-  "level": 620
+  caps: 6190,
+  level: 620,
 }, {
-  "caps": 6200,
-  "level": 621
+  caps: 6200,
+  level: 621,
 }, {
-  "caps": 6210,
-  "level": 622
+  caps: 6210,
+  level: 622,
 }, {
-  "caps": 6220,
-  "level": 623
+  caps: 6220,
+  level: 623,
 }, {
-  "caps": 6230,
-  "level": 624
+  caps: 6230,
+  level: 624,
 }, {
-  "caps": 6240,
-  "level": 625
+  caps: 6240,
+  level: 625,
 }, {
-  "caps": 6250,
-  "level": 626
+  caps: 6250,
+  level: 626,
 }, {
-  "caps": 6260,
-  "level": 627
+  caps: 6260,
+  level: 627,
 }, {
-  "caps": 6270,
-  "level": 628
+  caps: 6270,
+  level: 628,
 }, {
-  "caps": 6280,
-  "level": 629
+  caps: 6280,
+  level: 629,
 }, {
-  "caps": 6290,
-  "level": 630
+  caps: 6290,
+  level: 630,
 }, {
-  "caps": 6300,
-  "level": 631
+  caps: 6300,
+  level: 631,
 }, {
-  "caps": 6310,
-  "level": 632
+  caps: 6310,
+  level: 632,
 }, {
-  "caps": 6320,
-  "level": 633
+  caps: 6320,
+  level: 633,
 }, {
-  "caps": 6330,
-  "level": 634
+  caps: 6330,
+  level: 634,
 }, {
-  "caps": 6340,
-  "level": 635
+  caps: 6340,
+  level: 635,
 }, {
-  "caps": 6350,
-  "level": 636
+  caps: 6350,
+  level: 636,
 }, {
-  "caps": 6360,
-  "level": 637
+  caps: 6360,
+  level: 637,
 }, {
-  "caps": 6370,
-  "level": 638
+  caps: 6370,
+  level: 638,
 }, {
-  "caps": 6380,
-  "level": 639
+  caps: 6380,
+  level: 639,
 }, {
-  "caps": 6390,
-  "level": 640
+  caps: 6390,
+  level: 640,
 }, {
-  "caps": 6400,
-  "level": 641
+  caps: 6400,
+  level: 641,
 }, {
-  "caps": 6410,
-  "level": 642
+  caps: 6410,
+  level: 642,
 }, {
-  "caps": 6420,
-  "level": 643
+  caps: 6420,
+  level: 643,
 }, {
-  "caps": 6430,
-  "level": 644
+  caps: 6430,
+  level: 644,
 }, {
-  "caps": 6440,
-  "level": 645
+  caps: 6440,
+  level: 645,
 }, {
-  "caps": 6450,
-  "level": 646
+  caps: 6450,
+  level: 646,
 }, {
-  "caps": 6460,
-  "level": 647
+  caps: 6460,
+  level: 647,
 }, {
-  "caps": 6470,
-  "level": 648
+  caps: 6470,
+  level: 648,
 }, {
-  "caps": 6480,
-  "level": 649
+  caps: 6480,
+  level: 649,
 }, {
-  "caps": 6490,
-  "level": 650
+  caps: 6490,
+  level: 650,
 }, {
-  "caps": 6500,
-  "level": 651
+  caps: 6500,
+  level: 651,
 }, {
-  "caps": 6510,
-  "level": 652
+  caps: 6510,
+  level: 652,
 }, {
-  "caps": 6520,
-  "level": 653
+  caps: 6520,
+  level: 653,
 }, {
-  "caps": 6530,
-  "level": 654
+  caps: 6530,
+  level: 654,
 }, {
-  "caps": 6540,
-  "level": 655
+  caps: 6540,
+  level: 655,
 }, {
-  "caps": 6550,
-  "level": 656
+  caps: 6550,
+  level: 656,
 }, {
-  "caps": 6560,
-  "level": 657
+  caps: 6560,
+  level: 657,
 }, {
-  "caps": 6570,
-  "level": 658
+  caps: 6570,
+  level: 658,
 }, {
-  "caps": 6580,
-  "level": 659
+  caps: 6580,
+  level: 659,
 }, {
-  "caps": 6590,
-  "level": 660
+  caps: 6590,
+  level: 660,
 }, {
-  "caps": 6600,
-  "level": 661
+  caps: 6600,
+  level: 661,
 }, {
-  "caps": 6610,
-  "level": 662
+  caps: 6610,
+  level: 662,
 }, {
-  "caps": 6620,
-  "level": 663
+  caps: 6620,
+  level: 663,
 }, {
-  "caps": 6630,
-  "level": 664
+  caps: 6630,
+  level: 664,
 }, {
-  "caps": 6640,
-  "level": 665
+  caps: 6640,
+  level: 665,
 }, {
-  "caps": 6650,
-  "level": 666
+  caps: 6650,
+  level: 666,
 }, {
-  "caps": 6660,
-  "level": 667
+  caps: 6660,
+  level: 667,
 }, {
-  "caps": 6670,
-  "level": 668
+  caps: 6670,
+  level: 668,
 }, {
-  "caps": 6680,
-  "level": 669
+  caps: 6680,
+  level: 669,
 }, {
-  "caps": 6690,
-  "level": 670
+  caps: 6690,
+  level: 670,
 }, {
-  "caps": 6700,
-  "level": 671
+  caps: 6700,
+  level: 671,
 }, {
-  "caps": 6710,
-  "level": 672
+  caps: 6710,
+  level: 672,
 }, {
-  "caps": 6720,
-  "level": 673
+  caps: 6720,
+  level: 673,
 }, {
-  "caps": 6730,
-  "level": 674
+  caps: 6730,
+  level: 674,
 }, {
-  "caps": 6740,
-  "level": 675
+  caps: 6740,
+  level: 675,
 }, {
-  "caps": 6750,
-  "level": 676
+  caps: 6750,
+  level: 676,
 }, {
-  "caps": 6760,
-  "level": 677
+  caps: 6760,
+  level: 677,
 }, {
-  "caps": 6770,
-  "level": 678
+  caps: 6770,
+  level: 678,
 }, {
-  "caps": 6780,
-  "level": 679
+  caps: 6780,
+  level: 679,
 }, {
-  "caps": 6790,
-  "level": 680
+  caps: 6790,
+  level: 680,
 }, {
-  "caps": 6800,
-  "level": 681
+  caps: 6800,
+  level: 681,
 }, {
-  "caps": 6810,
-  "level": 682
+  caps: 6810,
+  level: 682,
 }, {
-  "caps": 6820,
-  "level": 683
+  caps: 6820,
+  level: 683,
 }, {
-  "caps": 6830,
-  "level": 684
+  caps: 6830,
+  level: 684,
 }, {
-  "caps": 6840,
-  "level": 685
+  caps: 6840,
+  level: 685,
 }, {
-  "caps": 6850,
-  "level": 686
+  caps: 6850,
+  level: 686,
 }, {
-  "caps": 6860,
-  "level": 687
+  caps: 6860,
+  level: 687,
 }, {
-  "caps": 6870,
-  "level": 688
+  caps: 6870,
+  level: 688,
 }, {
-  "caps": 6880,
-  "level": 689
+  caps: 6880,
+  level: 689,
 }, {
-  "caps": 6890,
-  "level": 690
+  caps: 6890,
+  level: 690,
 }, {
-  "caps": 6900,
-  "level": 691
+  caps: 6900,
+  level: 691,
 }, {
-  "caps": 6910,
-  "level": 692
+  caps: 6910,
+  level: 692,
 }, {
-  "caps": 6920,
-  "level": 693
+  caps: 6920,
+  level: 693,
 }, {
-  "caps": 6930,
-  "level": 694
+  caps: 6930,
+  level: 694,
 }, {
-  "caps": 6940,
-  "level": 695
+  caps: 6940,
+  level: 695,
 }, {
-  "caps": 6950,
-  "level": 696
+  caps: 6950,
+  level: 696,
 }, {
-  "caps": 6960,
-  "level": 697
+  caps: 6960,
+  level: 697,
 }, {
-  "caps": 6970,
-  "level": 698
+  caps: 6970,
+  level: 698,
 }, {
-  "caps": 6980,
-  "level": 699
+  caps: 6980,
+  level: 699,
 }, {
-  "caps": 6990,
-  "level": 700
+  caps: 6990,
+  level: 700,
 }, {
-  "caps": 7000,
-  "level": 701
+  caps: 7000,
+  level: 701,
 }, {
-  "caps": 7010,
-  "level": 702
+  caps: 7010,
+  level: 702,
 }, {
-  "caps": 7020,
-  "level": 703
+  caps: 7020,
+  level: 703,
 }, {
-  "caps": 7030,
-  "level": 704
+  caps: 7030,
+  level: 704,
 }, {
-  "caps": 7040,
-  "level": 705
+  caps: 7040,
+  level: 705,
 }, {
-  "caps": 7050,
-  "level": 706
+  caps: 7050,
+  level: 706,
 }, {
-  "caps": 7060,
-  "level": 707
+  caps: 7060,
+  level: 707,
 }, {
-  "caps": 7070,
-  "level": 708
+  caps: 7070,
+  level: 708,
 }, {
-  "caps": 7080,
-  "level": 709
+  caps: 7080,
+  level: 709,
 }, {
-  "caps": 7090,
-  "level": 710
+  caps: 7090,
+  level: 710,
 }, {
-  "caps": 7100,
-  "level": 711
+  caps: 7100,
+  level: 711,
 }, {
-  "caps": 7110,
-  "level": 712
+  caps: 7110,
+  level: 712,
 }, {
-  "caps": 7120,
-  "level": 713
+  caps: 7120,
+  level: 713,
 }, {
-  "caps": 7130,
-  "level": 714
+  caps: 7130,
+  level: 714,
 }, {
-  "caps": 7140,
-  "level": 715
+  caps: 7140,
+  level: 715,
 }, {
-  "caps": 7150,
-  "level": 716
+  caps: 7150,
+  level: 716,
 }, {
-  "caps": 7160,
-  "level": 717
+  caps: 7160,
+  level: 717,
 }, {
-  "caps": 7170,
-  "level": 718
+  caps: 7170,
+  level: 718,
 }, {
-  "caps": 7180,
-  "level": 719
+  caps: 7180,
+  level: 719,
 }, {
-  "caps": 7190,
-  "level": 720
+  caps: 7190,
+  level: 720,
 }, {
-  "caps": 7200,
-  "level": 721
+  caps: 7200,
+  level: 721,
 }, {
-  "caps": 7210,
-  "level": 722
+  caps: 7210,
+  level: 722,
 }, {
-  "caps": 7220,
-  "level": 723
+  caps: 7220,
+  level: 723,
 }, {
-  "caps": 7230,
-  "level": 724
+  caps: 7230,
+  level: 724,
 }, {
-  "caps": 7240,
-  "level": 725
+  caps: 7240,
+  level: 725,
 }, {
-  "caps": 7250,
-  "level": 726
+  caps: 7250,
+  level: 726,
 }, {
-  "caps": 7260,
-  "level": 727
+  caps: 7260,
+  level: 727,
 }, {
-  "caps": 7270,
-  "level": 728
+  caps: 7270,
+  level: 728,
 }, {
-  "caps": 7280,
-  "level": 729
+  caps: 7280,
+  level: 729,
 }, {
-  "caps": 7290,
-  "level": 730
+  caps: 7290,
+  level: 730,
 }, {
-  "caps": 7300,
-  "level": 731
+  caps: 7300,
+  level: 731,
 }, {
-  "caps": 7310,
-  "level": 732
+  caps: 7310,
+  level: 732,
 }, {
-  "caps": 7320,
-  "level": 733
+  caps: 7320,
+  level: 733,
 }, {
-  "caps": 7330,
-  "level": 734
+  caps: 7330,
+  level: 734,
 }, {
-  "caps": 7340,
-  "level": 735
+  caps: 7340,
+  level: 735,
 }, {
-  "caps": 7350,
-  "level": 736
+  caps: 7350,
+  level: 736,
 }, {
-  "caps": 7360,
-  "level": 737
+  caps: 7360,
+  level: 737,
 }, {
-  "caps": 7370,
-  "level": 738
+  caps: 7370,
+  level: 738,
 }, {
-  "caps": 7380,
-  "level": 739
+  caps: 7380,
+  level: 739,
 }, {
-  "caps": 7390,
-  "level": 740
+  caps: 7390,
+  level: 740,
 }, {
-  "caps": 7400,
-  "level": 741
+  caps: 7400,
+  level: 741,
 }, {
-  "caps": 7410,
-  "level": 742
+  caps: 7410,
+  level: 742,
 }, {
-  "caps": 7420,
-  "level": 743
+  caps: 7420,
+  level: 743,
 }, {
-  "caps": 7430,
-  "level": 744
+  caps: 7430,
+  level: 744,
 }, {
-  "caps": 7440,
-  "level": 745
+  caps: 7440,
+  level: 745,
 }, {
-  "caps": 7450,
-  "level": 746
+  caps: 7450,
+  level: 746,
 }, {
-  "caps": 7460,
-  "level": 747
+  caps: 7460,
+  level: 747,
 }, {
-  "caps": 7470,
-  "level": 748
+  caps: 7470,
+  level: 748,
 }, {
-  "caps": 7480,
-  "level": 749
+  caps: 7480,
+  level: 749,
 }, {
-  "caps": 7490,
-  "level": 750
+  caps: 7490,
+  level: 750,
 }, {
-  "caps": 7500,
-  "level": 751
+  caps: 7500,
+  level: 751,
 }, {
-  "caps": 7510,
-  "level": 752
+  caps: 7510,
+  level: 752,
 }, {
-  "caps": 7520,
-  "level": 753
+  caps: 7520,
+  level: 753,
 }, {
-  "caps": 7530,
-  "level": 754
+  caps: 7530,
+  level: 754,
 }, {
-  "caps": 7540,
-  "level": 755
+  caps: 7540,
+  level: 755,
 }, {
-  "caps": 7550,
-  "level": 756
+  caps: 7550,
+  level: 756,
 }, {
-  "caps": 7560,
-  "level": 757
+  caps: 7560,
+  level: 757,
 }, {
-  "caps": 7570,
-  "level": 758
+  caps: 7570,
+  level: 758,
 }, {
-  "caps": 7580,
-  "level": 759
+  caps: 7580,
+  level: 759,
 }, {
-  "caps": 7590,
-  "level": 760
+  caps: 7590,
+  level: 760,
 }, {
-  "caps": 7600,
-  "level": 761
+  caps: 7600,
+  level: 761,
 }, {
-  "caps": 7610,
-  "level": 762
+  caps: 7610,
+  level: 762,
 }, {
-  "caps": 7620,
-  "level": 763
+  caps: 7620,
+  level: 763,
 }, {
-  "caps": 7630,
-  "level": 764
+  caps: 7630,
+  level: 764,
 }, {
-  "caps": 7640,
-  "level": 765
+  caps: 7640,
+  level: 765,
 }, {
-  "caps": 7650,
-  "level": 766
+  caps: 7650,
+  level: 766,
 }, {
-  "caps": 7660,
-  "level": 767
+  caps: 7660,
+  level: 767,
 }, {
-  "caps": 7670,
-  "level": 768
+  caps: 7670,
+  level: 768,
 }, {
-  "caps": 7680,
-  "level": 769
+  caps: 7680,
+  level: 769,
 }, {
-  "caps": 7690,
-  "level": 770
+  caps: 7690,
+  level: 770,
 }, {
-  "caps": 7700,
-  "level": 771
+  caps: 7700,
+  level: 771,
 }, {
-  "caps": 7710,
-  "level": 772
+  caps: 7710,
+  level: 772,
 }, {
-  "caps": 7720,
-  "level": 773
+  caps: 7720,
+  level: 773,
 }, {
-  "caps": 7730,
-  "level": 774
+  caps: 7730,
+  level: 774,
 }, {
-  "caps": 7740,
-  "level": 775
+  caps: 7740,
+  level: 775,
 }, {
-  "caps": 7750,
-  "level": 776
+  caps: 7750,
+  level: 776,
 }, {
-  "caps": 7760,
-  "level": 777
+  caps: 7760,
+  level: 777,
 }, {
-  "caps": 7770,
-  "level": 778
+  caps: 7770,
+  level: 778,
 }, {
-  "caps": 7780,
-  "level": 779
+  caps: 7780,
+  level: 779,
 }, {
-  "caps": 7790,
-  "level": 780
+  caps: 7790,
+  level: 780,
 }, {
-  "caps": 7800,
-  "level": 781
+  caps: 7800,
+  level: 781,
 }, {
-  "caps": 7810,
-  "level": 782
+  caps: 7810,
+  level: 782,
 }, {
-  "caps": 7820,
-  "level": 783
+  caps: 7820,
+  level: 783,
 }, {
-  "caps": 7830,
-  "level": 784
+  caps: 7830,
+  level: 784,
 }, {
-  "caps": 7840,
-  "level": 785
+  caps: 7840,
+  level: 785,
 }, {
-  "caps": 7850,
-  "level": 786
+  caps: 7850,
+  level: 786,
 }, {
-  "caps": 7860,
-  "level": 787
+  caps: 7860,
+  level: 787,
 }, {
-  "caps": 7870,
-  "level": 788
+  caps: 7870,
+  level: 788,
 }, {
-  "caps": 7880,
-  "level": 789
+  caps: 7880,
+  level: 789,
 }, {
-  "caps": 7890,
-  "level": 790
+  caps: 7890,
+  level: 790,
 }, {
-  "caps": 7900,
-  "level": 791
+  caps: 7900,
+  level: 791,
 }, {
-  "caps": 7910,
-  "level": 792
+  caps: 7910,
+  level: 792,
 }, {
-  "caps": 7920,
-  "level": 793
+  caps: 7920,
+  level: 793,
 }, {
-  "caps": 7930,
-  "level": 794
+  caps: 7930,
+  level: 794,
 }, {
-  "caps": 7940,
-  "level": 795
+  caps: 7940,
+  level: 795,
 }, {
-  "caps": 7950,
-  "level": 796
+  caps: 7950,
+  level: 796,
 }, {
-  "caps": 7960,
-  "level": 797
+  caps: 7960,
+  level: 797,
 }, {
-  "caps": 7970,
-  "level": 798
+  caps: 7970,
+  level: 798,
 }, {
-  "caps": 7980,
-  "level": 799
+  caps: 7980,
+  level: 799,
 }, {
-  "caps": 7990,
-  "level": 800
+  caps: 7990,
+  level: 800,
 }, {
-  "caps": 8000,
-  "level": 801
+  caps: 8000,
+  level: 801,
 }, {
-  "caps": 8010,
-  "level": 802
+  caps: 8010,
+  level: 802,
 }, {
-  "caps": 8020,
-  "level": 803
+  caps: 8020,
+  level: 803,
 }, {
-  "caps": 8030,
-  "level": 804
+  caps: 8030,
+  level: 804,
 }, {
-  "caps": 8040,
-  "level": 805
+  caps: 8040,
+  level: 805,
 }, {
-  "caps": 8050,
-  "level": 806
+  caps: 8050,
+  level: 806,
 }, {
-  "caps": 8060,
-  "level": 807
+  caps: 8060,
+  level: 807,
 }, {
-  "caps": 8070,
-  "level": 808
+  caps: 8070,
+  level: 808,
 }, {
-  "caps": 8080,
-  "level": 809
+  caps: 8080,
+  level: 809,
 }, {
-  "caps": 8090,
-  "level": 810
+  caps: 8090,
+  level: 810,
 }, {
-  "caps": 8100,
-  "level": 811
+  caps: 8100,
+  level: 811,
 }, {
-  "caps": 8110,
-  "level": 812
+  caps: 8110,
+  level: 812,
 }, {
-  "caps": 8120,
-  "level": 813
+  caps: 8120,
+  level: 813,
 }, {
-  "caps": 8130,
-  "level": 814
+  caps: 8130,
+  level: 814,
 }, {
-  "caps": 8140,
-  "level": 815
+  caps: 8140,
+  level: 815,
 }, {
-  "caps": 8150,
-  "level": 816
+  caps: 8150,
+  level: 816,
 }, {
-  "caps": 8160,
-  "level": 817
+  caps: 8160,
+  level: 817,
 }, {
-  "caps": 8170,
-  "level": 818
+  caps: 8170,
+  level: 818,
 }, {
-  "caps": 8180,
-  "level": 819
+  caps: 8180,
+  level: 819,
 }, {
-  "caps": 8190,
-  "level": 820
+  caps: 8190,
+  level: 820,
 }, {
-  "caps": 8200,
-  "level": 821
+  caps: 8200,
+  level: 821,
 }, {
-  "caps": 8210,
-  "level": 822
+  caps: 8210,
+  level: 822,
 }, {
-  "caps": 8220,
-  "level": 823
+  caps: 8220,
+  level: 823,
 }, {
-  "caps": 8230,
-  "level": 824
+  caps: 8230,
+  level: 824,
 }, {
-  "caps": 8240,
-  "level": 825
+  caps: 8240,
+  level: 825,
 }, {
-  "caps": 8250,
-  "level": 826
+  caps: 8250,
+  level: 826,
 }, {
-  "caps": 8260,
-  "level": 827
+  caps: 8260,
+  level: 827,
 }, {
-  "caps": 8270,
-  "level": 828
+  caps: 8270,
+  level: 828,
 }, {
-  "caps": 8280,
-  "level": 829
+  caps: 8280,
+  level: 829,
 }, {
-  "caps": 8290,
-  "level": 830
+  caps: 8290,
+  level: 830,
 }, {
-  "caps": 8300,
-  "level": 831
+  caps: 8300,
+  level: 831,
 }, {
-  "caps": 8310,
-  "level": 832
+  caps: 8310,
+  level: 832,
 }, {
-  "caps": 8320,
-  "level": 833
+  caps: 8320,
+  level: 833,
 }, {
-  "caps": 8330,
-  "level": 834
+  caps: 8330,
+  level: 834,
 }, {
-  "caps": 8340,
-  "level": 835
+  caps: 8340,
+  level: 835,
 }, {
-  "caps": 8350,
-  "level": 836
+  caps: 8350,
+  level: 836,
 }, {
-  "caps": 8360,
-  "level": 837
+  caps: 8360,
+  level: 837,
 }, {
-  "caps": 8370,
-  "level": 838
+  caps: 8370,
+  level: 838,
 }, {
-  "caps": 8380,
-  "level": 839
+  caps: 8380,
+  level: 839,
 }, {
-  "caps": 8390,
-  "level": 840
+  caps: 8390,
+  level: 840,
 }, {
-  "caps": 8400,
-  "level": 841
+  caps: 8400,
+  level: 841,
 }, {
-  "caps": 8410,
-  "level": 842
+  caps: 8410,
+  level: 842,
 }, {
-  "caps": 8420,
-  "level": 843
+  caps: 8420,
+  level: 843,
 }, {
-  "caps": 8430,
-  "level": 844
+  caps: 8430,
+  level: 844,
 }, {
-  "caps": 8440,
-  "level": 845
+  caps: 8440,
+  level: 845,
 }, {
-  "caps": 8450,
-  "level": 846
+  caps: 8450,
+  level: 846,
 }, {
-  "caps": 8460,
-  "level": 847
+  caps: 8460,
+  level: 847,
 }, {
-  "caps": 8470,
-  "level": 848
+  caps: 8470,
+  level: 848,
 }, {
-  "caps": 8480,
-  "level": 849
+  caps: 8480,
+  level: 849,
 }, {
-  "caps": 8490,
-  "level": 850
+  caps: 8490,
+  level: 850,
 }, {
-  "caps": 8500,
-  "level": 851
+  caps: 8500,
+  level: 851,
 }, {
-  "caps": 8510,
-  "level": 852
+  caps: 8510,
+  level: 852,
 }, {
-  "caps": 8520,
-  "level": 853
+  caps: 8520,
+  level: 853,
 }, {
-  "caps": 8530,
-  "level": 854
+  caps: 8530,
+  level: 854,
 }, {
-  "caps": 8540,
-  "level": 855
+  caps: 8540,
+  level: 855,
 }, {
-  "caps": 8550,
-  "level": 856
+  caps: 8550,
+  level: 856,
 }, {
-  "caps": 8560,
-  "level": 857
+  caps: 8560,
+  level: 857,
 }, {
-  "caps": 8570,
-  "level": 858
+  caps: 8570,
+  level: 858,
 }, {
-  "caps": 8580,
-  "level": 859
+  caps: 8580,
+  level: 859,
 }, {
-  "caps": 8590,
-  "level": 860
+  caps: 8590,
+  level: 860,
 }, {
-  "caps": 8600,
-  "level": 861
+  caps: 8600,
+  level: 861,
 }, {
-  "caps": 8610,
-  "level": 862
+  caps: 8610,
+  level: 862,
 }, {
-  "caps": 8620,
-  "level": 863
+  caps: 8620,
+  level: 863,
 }, {
-  "caps": 8630,
-  "level": 864
+  caps: 8630,
+  level: 864,
 }, {
-  "caps": 8640,
-  "level": 865
+  caps: 8640,
+  level: 865,
 }, {
-  "caps": 8650,
-  "level": 866
+  caps: 8650,
+  level: 866,
 }, {
-  "caps": 8660,
-  "level": 867
+  caps: 8660,
+  level: 867,
 }, {
-  "caps": 8670,
-  "level": 868
+  caps: 8670,
+  level: 868,
 }, {
-  "caps": 8680,
-  "level": 869
+  caps: 8680,
+  level: 869,
 }, {
-  "caps": 8690,
-  "level": 870
+  caps: 8690,
+  level: 870,
 }, {
-  "caps": 8700,
-  "level": 871
+  caps: 8700,
+  level: 871,
 }, {
-  "caps": 8710,
-  "level": 872
+  caps: 8710,
+  level: 872,
 }, {
-  "caps": 8720,
-  "level": 873
+  caps: 8720,
+  level: 873,
 }, {
-  "caps": 8730,
-  "level": 874
+  caps: 8730,
+  level: 874,
 }, {
-  "caps": 8740,
-  "level": 875
+  caps: 8740,
+  level: 875,
 }, {
-  "caps": 8750,
-  "level": 876
+  caps: 8750,
+  level: 876,
 }, {
-  "caps": 8760,
-  "level": 877
+  caps: 8760,
+  level: 877,
 }, {
-  "caps": 8770,
-  "level": 878
+  caps: 8770,
+  level: 878,
 }, {
-  "caps": 8780,
-  "level": 879
+  caps: 8780,
+  level: 879,
 }, {
-  "caps": 8790,
-  "level": 880
+  caps: 8790,
+  level: 880,
 }, {
-  "caps": 8800,
-  "level": 881
+  caps: 8800,
+  level: 881,
 }, {
-  "caps": 8810,
-  "level": 882
+  caps: 8810,
+  level: 882,
 }, {
-  "caps": 8820,
-  "level": 883
+  caps: 8820,
+  level: 883,
 }, {
-  "caps": 8830,
-  "level": 884
+  caps: 8830,
+  level: 884,
 }, {
-  "caps": 8840,
-  "level": 885
+  caps: 8840,
+  level: 885,
 }, {
-  "caps": 8850,
-  "level": 886
+  caps: 8850,
+  level: 886,
 }, {
-  "caps": 8860,
-  "level": 887
+  caps: 8860,
+  level: 887,
 }, {
-  "caps": 8870,
-  "level": 888
+  caps: 8870,
+  level: 888,
 }, {
-  "caps": 8880,
-  "level": 889
+  caps: 8880,
+  level: 889,
 }, {
-  "caps": 8890,
-  "level": 890
+  caps: 8890,
+  level: 890,
 }, {
-  "caps": 8900,
-  "level": 891
+  caps: 8900,
+  level: 891,
 }, {
-  "caps": 8910,
-  "level": 892
+  caps: 8910,
+  level: 892,
 }, {
-  "caps": 8920,
-  "level": 893
+  caps: 8920,
+  level: 893,
 }, {
-  "caps": 8930,
-  "level": 894
+  caps: 8930,
+  level: 894,
 }, {
-  "caps": 8940,
-  "level": 895
+  caps: 8940,
+  level: 895,
 }, {
-  "caps": 8950,
-  "level": 896
+  caps: 8950,
+  level: 896,
 }, {
-  "caps": 8960,
-  "level": 897
+  caps: 8960,
+  level: 897,
 }, {
-  "caps": 8970,
-  "level": 898
+  caps: 8970,
+  level: 898,
 }, {
-  "caps": 8980,
-  "level": 899
+  caps: 8980,
+  level: 899,
 }, {
-  "caps": 8990,
-  "level": 900
+  caps: 8990,
+  level: 900,
 }, {
-  "caps": 9000,
-  "level": 901
+  caps: 9000,
+  level: 901,
 }, {
-  "caps": 9010,
-  "level": 902
+  caps: 9010,
+  level: 902,
 }, {
-  "caps": 9020,
-  "level": 903
+  caps: 9020,
+  level: 903,
 }, {
-  "caps": 9030,
-  "level": 904
+  caps: 9030,
+  level: 904,
 }, {
-  "caps": 9040,
-  "level": 905
+  caps: 9040,
+  level: 905,
 }, {
-  "caps": 9050,
-  "level": 906
+  caps: 9050,
+  level: 906,
 }, {
-  "caps": 9060,
-  "level": 907
+  caps: 9060,
+  level: 907,
 }, {
-  "caps": 9070,
-  "level": 908
+  caps: 9070,
+  level: 908,
 }, {
-  "caps": 9080,
-  "level": 909
+  caps: 9080,
+  level: 909,
 }, {
-  "caps": 9090,
-  "level": 910
+  caps: 9090,
+  level: 910,
 }, {
-  "caps": 9100,
-  "level": 911
+  caps: 9100,
+  level: 911,
 }, {
-  "caps": 9110,
-  "level": 912
+  caps: 9110,
+  level: 912,
 }, {
-  "caps": 9120,
-  "level": 913
+  caps: 9120,
+  level: 913,
 }, {
-  "caps": 9130,
-  "level": 914
+  caps: 9130,
+  level: 914,
 }, {
-  "caps": 9140,
-  "level": 915
+  caps: 9140,
+  level: 915,
 }, {
-  "caps": 9150,
-  "level": 916
+  caps: 9150,
+  level: 916,
 }, {
-  "caps": 9160,
-  "level": 917
+  caps: 9160,
+  level: 917,
 }, {
-  "caps": 9170,
-  "level": 918
+  caps: 9170,
+  level: 918,
 }, {
-  "caps": 9180,
-  "level": 919
+  caps: 9180,
+  level: 919,
 }, {
-  "caps": 9190,
-  "level": 920
+  caps: 9190,
+  level: 920,
 }, {
-  "caps": 9200,
-  "level": 921
+  caps: 9200,
+  level: 921,
 }, {
-  "caps": 9210,
-  "level": 922
+  caps: 9210,
+  level: 922,
 }, {
-  "caps": 9220,
-  "level": 923
+  caps: 9220,
+  level: 923,
 }, {
-  "caps": 9230,
-  "level": 924
+  caps: 9230,
+  level: 924,
 }, {
-  "caps": 9240,
-  "level": 925
+  caps: 9240,
+  level: 925,
 }, {
-  "caps": 9250,
-  "level": 926
+  caps: 9250,
+  level: 926,
 }, {
-  "caps": 9260,
-  "level": 927
+  caps: 9260,
+  level: 927,
 }, {
-  "caps": 9270,
-  "level": 928
+  caps: 9270,
+  level: 928,
 }, {
-  "caps": 9280,
-  "level": 929
+  caps: 9280,
+  level: 929,
 }, {
-  "caps": 9290,
-  "level": 930
+  caps: 9290,
+  level: 930,
 }, {
-  "caps": 9300,
-  "level": 931
+  caps: 9300,
+  level: 931,
 }, {
-  "caps": 9310,
-  "level": 932
+  caps: 9310,
+  level: 932,
 }, {
-  "caps": 9320,
-  "level": 933
+  caps: 9320,
+  level: 933,
 }, {
-  "caps": 9330,
-  "level": 934
+  caps: 9330,
+  level: 934,
 }, {
-  "caps": 9340,
-  "level": 935
+  caps: 9340,
+  level: 935,
 }, {
-  "caps": 9350,
-  "level": 936
+  caps: 9350,
+  level: 936,
 }, {
-  "caps": 9360,
-  "level": 937
+  caps: 9360,
+  level: 937,
 }, {
-  "caps": 9370,
-  "level": 938
+  caps: 9370,
+  level: 938,
 }, {
-  "caps": 9380,
-  "level": 939
+  caps: 9380,
+  level: 939,
 }, {
-  "caps": 9390,
-  "level": 940
+  caps: 9390,
+  level: 940,
 }, {
-  "caps": 9400,
-  "level": 941
+  caps: 9400,
+  level: 941,
 }, {
-  "caps": 9410,
-  "level": 942
+  caps: 9410,
+  level: 942,
 }, {
-  "caps": 9420,
-  "level": 943
+  caps: 9420,
+  level: 943,
 }, {
-  "caps": 9430,
-  "level": 944
+  caps: 9430,
+  level: 944,
 }, {
-  "caps": 9440,
-  "level": 945
+  caps: 9440,
+  level: 945,
 }, {
-  "caps": 9450,
-  "level": 946
+  caps: 9450,
+  level: 946,
 }, {
-  "caps": 9460,
-  "level": 947
+  caps: 9460,
+  level: 947,
 }, {
-  "caps": 9470,
-  "level": 948
+  caps: 9470,
+  level: 948,
 }, {
-  "caps": 9480,
-  "level": 949
+  caps: 9480,
+  level: 949,
 }, {
-  "caps": 9490,
-  "level": 950
+  caps: 9490,
+  level: 950,
 }, {
-  "caps": 9500,
-  "level": 951
+  caps: 9500,
+  level: 951,
 }, {
-  "caps": 9510,
-  "level": 952
+  caps: 9510,
+  level: 952,
 }, {
-  "caps": 9520,
-  "level": 953
+  caps: 9520,
+  level: 953,
 }, {
-  "caps": 9530,
-  "level": 954
+  caps: 9530,
+  level: 954,
 }, {
-  "caps": 9540,
-  "level": 955
+  caps: 9540,
+  level: 955,
 }, {
-  "caps": 9550,
-  "level": 956
+  caps: 9550,
+  level: 956,
 }, {
-  "caps": 9560,
-  "level": 957
+  caps: 9560,
+  level: 957,
 }, {
-  "caps": 9570,
-  "level": 958
+  caps: 9570,
+  level: 958,
 }, {
-  "caps": 9580,
-  "level": 959
+  caps: 9580,
+  level: 959,
 }, {
-  "caps": 9590,
-  "level": 960
+  caps: 9590,
+  level: 960,
 }, {
-  "caps": 9600,
-  "level": 961
+  caps: 9600,
+  level: 961,
 }, {
-  "caps": 9610,
-  "level": 962
+  caps: 9610,
+  level: 962,
 }, {
-  "caps": 9620,
-  "level": 963
+  caps: 9620,
+  level: 963,
 }, {
-  "caps": 9630,
-  "level": 964
+  caps: 9630,
+  level: 964,
 }, {
-  "caps": 9640,
-  "level": 965
+  caps: 9640,
+  level: 965,
 }, {
-  "caps": 9650,
-  "level": 966
+  caps: 9650,
+  level: 966,
 }, {
-  "caps": 9660,
-  "level": 967
+  caps: 9660,
+  level: 967,
 }, {
-  "caps": 9670,
-  "level": 968
+  caps: 9670,
+  level: 968,
 }, {
-  "caps": 9680,
-  "level": 969
+  caps: 9680,
+  level: 969,
 }, {
-  "caps": 9690,
-  "level": 970
+  caps: 9690,
+  level: 970,
 }, {
-  "caps": 9700,
-  "level": 971
+  caps: 9700,
+  level: 971,
 }, {
-  "caps": 9710,
-  "level": 972
+  caps: 9710,
+  level: 972,
 }, {
-  "caps": 9720,
-  "level": 973
+  caps: 9720,
+  level: 973,
 }, {
-  "caps": 9730,
-  "level": 974
+  caps: 9730,
+  level: 974,
 }, {
-  "caps": 9740,
-  "level": 975
+  caps: 9740,
+  level: 975,
 }, {
-  "caps": 9750,
-  "level": 976
+  caps: 9750,
+  level: 976,
 }, {
-  "caps": 9760,
-  "level": 977
+  caps: 9760,
+  level: 977,
 }, {
-  "caps": 9770,
-  "level": 978
+  caps: 9770,
+  level: 978,
 }, {
-  "caps": 9780,
-  "level": 979
+  caps: 9780,
+  level: 979,
 }, {
-  "caps": 9790,
-  "level": 980
+  caps: 9790,
+  level: 980,
 }, {
-  "caps": 9800,
-  "level": 981
+  caps: 9800,
+  level: 981,
 }, {
-  "caps": 9810,
-  "level": 982
+  caps: 9810,
+  level: 982,
 }, {
-  "caps": 9820,
-  "level": 983
+  caps: 9820,
+  level: 983,
 }, {
-  "caps": 9830,
-  "level": 984
+  caps: 9830,
+  level: 984,
 }, {
-  "caps": 9840,
-  "level": 985
+  caps: 9840,
+  level: 985,
 }, {
-  "caps": 9850,
-  "level": 986
+  caps: 9850,
+  level: 986,
 }, {
-  "caps": 9860,
-  "level": 987
+  caps: 9860,
+  level: 987,
 }, {
-  "caps": 9870,
-  "level": 988
+  caps: 9870,
+  level: 988,
 }, {
-  "caps": 9880,
-  "level": 989
+  caps: 9880,
+  level: 989,
 }, {
-  "caps": 9890,
-  "level": 990
+  caps: 9890,
+  level: 990,
 }, {
-  "caps": 9900,
-  "level": 991
+  caps: 9900,
+  level: 991,
 }, {
-  "caps": 9910,
-  "level": 992
+  caps: 9910,
+  level: 992,
 }, {
-  "caps": 9920,
-  "level": 993
+  caps: 9920,
+  level: 993,
 }, {
-  "caps": 9930,
-  "level": 994
+  caps: 9930,
+  level: 994,
 }, {
-  "caps": 9940,
-  "level": 995
+  caps: 9940,
+  level: 995,
 }, {
-  "caps": 9950,
-  "level": 996
+  caps: 9950,
+  level: 996,
 }, {
-  "caps": 9960,
-  "level": 997
+  caps: 9960,
+  level: 997,
 }, {
-  "caps": 9970,
-  "level": 998
+  caps: 9970,
+  level: 998,
 }, {
-  "caps": 9980,
-  "level": 999
+  caps: 9980,
+  level: 999,
 }, {
-  "caps": 9990,
-  "level": 1000
+  caps: 9990,
+  level: 1000,
 }, {
-  "caps": 10000,
-  "level": 1001
+  caps: 10000,
+  level: 1001,
 }, {
-  "caps": 10010,
-  "level": 1002
+  caps: 10010,
+  level: 1002,
 }, {
-  "caps": 10020,
-  "level": 1003
+  caps: 10020,
+  level: 1003,
 }, {
-  "caps": 10030,
-  "level": 1004
+  caps: 10030,
+  level: 1004,
 }, {
-  "caps": 10040,
-  "level": 1005
+  caps: 10040,
+  level: 1005,
 }, {
-  "caps": 10050,
-  "level": 1006
+  caps: 10050,
+  level: 1006,
 }, {
-  "caps": 10060,
-  "level": 1007
+  caps: 10060,
+  level: 1007,
 }, {
-  "caps": 10070,
-  "level": 1008
+  caps: 10070,
+  level: 1008,
 }, {
-  "caps": 10080,
-  "level": 1009
+  caps: 10080,
+  level: 1009,
 }, {
-  "caps": 10090,
-  "level": 1010
+  caps: 10090,
+  level: 1010,
 }, {
-  "caps": 10100,
-  "level": 1011
+  caps: 10100,
+  level: 1011,
 }, {
-  "caps": 10110,
-  "level": 1012
+  caps: 10110,
+  level: 1012,
 }, {
-  "caps": 10120,
-  "level": 1013
+  caps: 10120,
+  level: 1013,
 }, {
-  "caps": 10130,
-  "level": 1014
+  caps: 10130,
+  level: 1014,
 }, {
-  "caps": 10140,
-  "level": 1015
+  caps: 10140,
+  level: 1015,
 }, {
-  "caps": 10150,
-  "level": 1016
+  caps: 10150,
+  level: 1016,
 }, {
-  "caps": 10160,
-  "level": 1017
+  caps: 10160,
+  level: 1017,
 }, {
-  "caps": 10170,
-  "level": 1018
+  caps: 10170,
+  level: 1018,
 }, {
-  "caps": 10180,
-  "level": 1019
+  caps: 10180,
+  level: 1019,
 }, {
-  "caps": 10190,
-  "level": 1020
+  caps: 10190,
+  level: 1020,
 }, {
-  "caps": 10200,
-  "level": 1021
+  caps: 10200,
+  level: 1021,
 }, {
-  "caps": 10210,
-  "level": 1022
+  caps: 10210,
+  level: 1022,
 }, {
-  "caps": 10220,
-  "level": 1023
+  caps: 10220,
+  level: 1023,
 }, {
-  "caps": 10230,
-  "level": 1024
+  caps: 10230,
+  level: 1024,
 }, {
-  "caps": 10240,
-  "level": 1025
+  caps: 10240,
+  level: 1025,
 }, {
-  "caps": 10250,
-  "level": 1026
+  caps: 10250,
+  level: 1026,
 }, {
-  "caps": 10260,
-  "level": 1027
+  caps: 10260,
+  level: 1027,
 }, {
-  "caps": 10270,
-  "level": 1028
+  caps: 10270,
+  level: 1028,
 }, {
-  "caps": 10280,
-  "level": 1029
+  caps: 10280,
+  level: 1029,
 }, {
-  "caps": 10290,
-  "level": 1030
+  caps: 10290,
+  level: 1030,
 }, {
-  "caps": 10300,
-  "level": 1031
+  caps: 10300,
+  level: 1031,
 }, {
-  "caps": 10310,
-  "level": 1032
+  caps: 10310,
+  level: 1032,
 }, {
-  "caps": 10320,
-  "level": 1033
+  caps: 10320,
+  level: 1033,
 }, {
-  "caps": 10330,
-  "level": 1034
+  caps: 10330,
+  level: 1034,
 }, {
-  "caps": 10340,
-  "level": 1035
+  caps: 10340,
+  level: 1035,
 }, {
-  "caps": 10350,
-  "level": 1036
+  caps: 10350,
+  level: 1036,
 }, {
-  "caps": 10360,
-  "level": 1037
+  caps: 10360,
+  level: 1037,
 }, {
-  "caps": 10370,
-  "level": 1038
+  caps: 10370,
+  level: 1038,
 }, {
-  "caps": 10380,
-  "level": 1039
+  caps: 10380,
+  level: 1039,
 }, {
-  "caps": 10390,
-  "level": 1040
+  caps: 10390,
+  level: 1040,
 }, {
-  "caps": 10400,
-  "level": 1041
+  caps: 10400,
+  level: 1041,
 }, {
-  "caps": 10410,
-  "level": 1042
+  caps: 10410,
+  level: 1042,
 }, {
-  "caps": 10420,
-  "level": 1043
+  caps: 10420,
+  level: 1043,
 }, {
-  "caps": 10430,
-  "level": 1044
+  caps: 10430,
+  level: 1044,
 }, {
-  "caps": 10440,
-  "level": 1045
+  caps: 10440,
+  level: 1045,
 }, {
-  "caps": 10450,
-  "level": 1046
+  caps: 10450,
+  level: 1046,
 }, {
-  "caps": 10460,
-  "level": 1047
+  caps: 10460,
+  level: 1047,
 }, {
-  "caps": 10470,
-  "level": 1048
+  caps: 10470,
+  level: 1048,
 }, {
-  "caps": 10480,
-  "level": 1049
+  caps: 10480,
+  level: 1049,
 }, {
-  "caps": 10490,
-  "level": 1050
+  caps: 10490,
+  level: 1050,
 }, {
-  "caps": 10500,
-  "level": 1051
+  caps: 10500,
+  level: 1051,
 }, {
-  "caps": 10510,
-  "level": 1052
+  caps: 10510,
+  level: 1052,
 }, {
-  "caps": 10520,
-  "level": 1053
+  caps: 10520,
+  level: 1053,
 }, {
-  "caps": 10530,
-  "level": 1054
+  caps: 10530,
+  level: 1054,
 }, {
-  "caps": 10540,
-  "level": 1055
+  caps: 10540,
+  level: 1055,
 }, {
-  "caps": 10550,
-  "level": 1056
+  caps: 10550,
+  level: 1056,
 }, {
-  "caps": 10560,
-  "level": 1057
+  caps: 10560,
+  level: 1057,
 }, {
-  "caps": 10570,
-  "level": 1058
+  caps: 10570,
+  level: 1058,
 }, {
-  "caps": 10580,
-  "level": 1059
+  caps: 10580,
+  level: 1059,
 }, {
-  "caps": 10590,
-  "level": 1060
+  caps: 10590,
+  level: 1060,
 }, {
-  "caps": 10600,
-  "level": 1061
+  caps: 10600,
+  level: 1061,
 }, {
-  "caps": 10610,
-  "level": 1062
+  caps: 10610,
+  level: 1062,
 }, {
-  "caps": 10620,
-  "level": 1063
+  caps: 10620,
+  level: 1063,
 }, {
-  "caps": 10630,
-  "level": 1064
+  caps: 10630,
+  level: 1064,
 }, {
-  "caps": 10640,
-  "level": 1065
+  caps: 10640,
+  level: 1065,
 }, {
-  "caps": 10650,
-  "level": 1066
+  caps: 10650,
+  level: 1066,
 }, {
-  "caps": 10660,
-  "level": 1067
+  caps: 10660,
+  level: 1067,
 }, {
-  "caps": 10670,
-  "level": 1068
+  caps: 10670,
+  level: 1068,
 }, {
-  "caps": 10680,
-  "level": 1069
+  caps: 10680,
+  level: 1069,
 }, {
-  "caps": 10690,
-  "level": 1070
+  caps: 10690,
+  level: 1070,
 }, {
-  "caps": 10700,
-  "level": 1071
+  caps: 10700,
+  level: 1071,
 }, {
-  "caps": 10710,
-  "level": 1072
+  caps: 10710,
+  level: 1072,
 }, {
-  "caps": 10720,
-  "level": 1073
+  caps: 10720,
+  level: 1073,
 }, {
-  "caps": 10730,
-  "level": 1074
+  caps: 10730,
+  level: 1074,
 }, {
-  "caps": 10740,
-  "level": 1075
+  caps: 10740,
+  level: 1075,
 }, {
-  "caps": 10750,
-  "level": 1076
+  caps: 10750,
+  level: 1076,
 }, {
-  "caps": 10760,
-  "level": 1077
+  caps: 10760,
+  level: 1077,
 }, {
-  "caps": 10770,
-  "level": 1078
+  caps: 10770,
+  level: 1078,
 }, {
-  "caps": 10780,
-  "level": 1079
+  caps: 10780,
+  level: 1079,
 }, {
-  "caps": 10790,
-  "level": 1080
+  caps: 10790,
+  level: 1080,
 }, {
-  "caps": 10800,
-  "level": 1081
+  caps: 10800,
+  level: 1081,
 }, {
-  "caps": 10810,
-  "level": 1082
+  caps: 10810,
+  level: 1082,
 }, {
-  "caps": 10820,
-  "level": 1083
+  caps: 10820,
+  level: 1083,
 }, {
-  "caps": 10830,
-  "level": 1084
+  caps: 10830,
+  level: 1084,
 }, {
-  "caps": 10840,
-  "level": 1085
+  caps: 10840,
+  level: 1085,
 }, {
-  "caps": 10850,
-  "level": 1086
+  caps: 10850,
+  level: 1086,
 }, {
-  "caps": 10860,
-  "level": 1087
+  caps: 10860,
+  level: 1087,
 }, {
-  "caps": 10870,
-  "level": 1088
+  caps: 10870,
+  level: 1088,
 }, {
-  "caps": 10880,
-  "level": 1089
+  caps: 10880,
+  level: 1089,
 }, {
-  "caps": 10890,
-  "level": 1090
+  caps: 10890,
+  level: 1090,
 }, {
-  "caps": 10900,
-  "level": 1091
+  caps: 10900,
+  level: 1091,
 }, {
-  "caps": 10910,
-  "level": 1092
+  caps: 10910,
+  level: 1092,
 }, {
-  "caps": 10920,
-  "level": 1093
+  caps: 10920,
+  level: 1093,
 }, {
-  "caps": 10930,
-  "level": 1094
+  caps: 10930,
+  level: 1094,
 }, {
-  "caps": 10940,
-  "level": 1095
+  caps: 10940,
+  level: 1095,
 }, {
-  "caps": 10950,
-  "level": 1096
+  caps: 10950,
+  level: 1096,
 }, {
-  "caps": 10960,
-  "level": 1097
+  caps: 10960,
+  level: 1097,
 }, {
-  "caps": 10970,
-  "level": 1098
+  caps: 10970,
+  level: 1098,
 }, {
-  "caps": 10980,
-  "level": 1099
+  caps: 10980,
+  level: 1099,
 }, {
-  "caps": 10990,
-  "level": 1100
+  caps: 10990,
+  level: 1100,
 }, {
-  "caps": 11000,
-  "level": 1101
+  caps: 11000,
+  level: 1101,
 }, {
-  "caps": 11010,
-  "level": 1102
+  caps: 11010,
+  level: 1102,
 }, {
-  "caps": 11020,
-  "level": 1103
+  caps: 11020,
+  level: 1103,
 }, {
-  "caps": 11030,
-  "level": 1104
+  caps: 11030,
+  level: 1104,
 }, {
-  "caps": 11040,
-  "level": 1105
+  caps: 11040,
+  level: 1105,
 }, {
-  "caps": 11050,
-  "level": 1106
+  caps: 11050,
+  level: 1106,
 }, {
-  "caps": 11060,
-  "level": 1107
+  caps: 11060,
+  level: 1107,
 }, {
-  "caps": 11070,
-  "level": 1108
+  caps: 11070,
+  level: 1108,
 }, {
-  "caps": 11080,
-  "level": 1109
+  caps: 11080,
+  level: 1109,
 }, {
-  "caps": 11090,
-  "level": 1110
+  caps: 11090,
+  level: 1110,
 }, {
-  "caps": 11100,
-  "level": 1111
+  caps: 11100,
+  level: 1111,
 }, {
-  "caps": 11110,
-  "level": 1112
+  caps: 11110,
+  level: 1112,
 }, {
-  "caps": 11120,
-  "level": 1113
+  caps: 11120,
+  level: 1113,
 }, {
-  "caps": 11130,
-  "level": 1114
+  caps: 11130,
+  level: 1114,
 }, {
-  "caps": 11140,
-  "level": 1115
+  caps: 11140,
+  level: 1115,
 }, {
-  "caps": 11150,
-  "level": 1116
+  caps: 11150,
+  level: 1116,
 }, {
-  "caps": 11160,
-  "level": 1117
+  caps: 11160,
+  level: 1117,
 }, {
-  "caps": 11170,
-  "level": 1118
+  caps: 11170,
+  level: 1118,
 }, {
-  "caps": 11180,
-  "level": 1119
+  caps: 11180,
+  level: 1119,
 }, {
-  "caps": 11190,
-  "level": 1120
+  caps: 11190,
+  level: 1120,
 }, {
-  "caps": 11200,
-  "level": 1121
+  caps: 11200,
+  level: 1121,
 }, {
-  "caps": 11210,
-  "level": 1122
+  caps: 11210,
+  level: 1122,
 }, {
-  "caps": 11220,
-  "level": 1123
+  caps: 11220,
+  level: 1123,
 }, {
-  "caps": 11230,
-  "level": 1124
+  caps: 11230,
+  level: 1124,
 }, {
-  "caps": 11240,
-  "level": 1125
+  caps: 11240,
+  level: 1125,
 }, {
-  "caps": 11250,
-  "level": 1126
+  caps: 11250,
+  level: 1126,
 }, {
-  "caps": 11260,
-  "level": 1127
+  caps: 11260,
+  level: 1127,
 }, {
-  "caps": 11270,
-  "level": 1128
+  caps: 11270,
+  level: 1128,
 }, {
-  "caps": 11280,
-  "level": 1129
+  caps: 11280,
+  level: 1129,
 }, {
-  "caps": 11290,
-  "level": 1130
+  caps: 11290,
+  level: 1130,
 }, {
-  "caps": 11300,
-  "level": 1131
+  caps: 11300,
+  level: 1131,
 }, {
-  "caps": 11310,
-  "level": 1132
+  caps: 11310,
+  level: 1132,
 }, {
-  "caps": 11320,
-  "level": 1133
+  caps: 11320,
+  level: 1133,
 }, {
-  "caps": 11330,
-  "level": 1134
+  caps: 11330,
+  level: 1134,
 }, {
-  "caps": 11340,
-  "level": 1135
+  caps: 11340,
+  level: 1135,
 }, {
-  "caps": 11350,
-  "level": 1136
+  caps: 11350,
+  level: 1136,
 }, {
-  "caps": 11360,
-  "level": 1137
+  caps: 11360,
+  level: 1137,
 }, {
-  "caps": 11370,
-  "level": 1138
+  caps: 11370,
+  level: 1138,
 }, {
-  "caps": 11380,
-  "level": 1139
+  caps: 11380,
+  level: 1139,
 }, {
-  "caps": 11390,
-  "level": 1140
+  caps: 11390,
+  level: 1140,
 }, {
-  "caps": 11400,
-  "level": 1141
+  caps: 11400,
+  level: 1141,
 }, {
-  "caps": 11410,
-  "level": 1142
+  caps: 11410,
+  level: 1142,
 }, {
-  "caps": 11420,
-  "level": 1143
+  caps: 11420,
+  level: 1143,
 }, {
-  "caps": 11430,
-  "level": 1144
+  caps: 11430,
+  level: 1144,
 }, {
-  "caps": 11440,
-  "level": 1145
+  caps: 11440,
+  level: 1145,
 }, {
-  "caps": 11450,
-  "level": 1146
+  caps: 11450,
+  level: 1146,
 }, {
-  "caps": 11460,
-  "level": 1147
+  caps: 11460,
+  level: 1147,
 }, {
-  "caps": 11470,
-  "level": 1148
+  caps: 11470,
+  level: 1148,
 }, {
-  "caps": 11480,
-  "level": 1149
+  caps: 11480,
+  level: 1149,
 }, {
-  "caps": 11490,
-  "level": 1150
+  caps: 11490,
+  level: 1150,
 }, {
-  "caps": 11500,
-  "level": 1151
+  caps: 11500,
+  level: 1151,
 }, {
-  "caps": 11510,
-  "level": 1152
+  caps: 11510,
+  level: 1152,
 }, {
-  "caps": 11520,
-  "level": 1153
+  caps: 11520,
+  level: 1153,
 }, {
-  "caps": 11530,
-  "level": 1154
+  caps: 11530,
+  level: 1154,
 }, {
-  "caps": 11540,
-  "level": 1155
+  caps: 11540,
+  level: 1155,
 }, {
-  "caps": 11550,
-  "level": 1156
+  caps: 11550,
+  level: 1156,
 }, {
-  "caps": 11560,
-  "level": 1157
+  caps: 11560,
+  level: 1157,
 }, {
-  "caps": 11570,
-  "level": 1158
+  caps: 11570,
+  level: 1158,
 }, {
-  "caps": 11580,
-  "level": 1159
+  caps: 11580,
+  level: 1159,
 }, {
-  "caps": 11590,
-  "level": 1160
+  caps: 11590,
+  level: 1160,
 }, {
-  "caps": 11600,
-  "level": 1161
+  caps: 11600,
+  level: 1161,
 }, {
-  "caps": 11610,
-  "level": 1162
+  caps: 11610,
+  level: 1162,
 }, {
-  "caps": 11620,
-  "level": 1163
+  caps: 11620,
+  level: 1163,
 }, {
-  "caps": 11630,
-  "level": 1164
+  caps: 11630,
+  level: 1164,
 }, {
-  "caps": 11640,
-  "level": 1165
+  caps: 11640,
+  level: 1165,
 }, {
-  "caps": 11650,
-  "level": 1166
+  caps: 11650,
+  level: 1166,
 }, {
-  "caps": 11660,
-  "level": 1167
+  caps: 11660,
+  level: 1167,
 }, {
-  "caps": 11670,
-  "level": 1168
+  caps: 11670,
+  level: 1168,
 }, {
-  "caps": 11680,
-  "level": 1169
+  caps: 11680,
+  level: 1169,
 }, {
-  "caps": 11690,
-  "level": 1170
+  caps: 11690,
+  level: 1170,
 }, {
-  "caps": 11700,
-  "level": 1171
+  caps: 11700,
+  level: 1171,
 }, {
-  "caps": 11710,
-  "level": 1172
+  caps: 11710,
+  level: 1172,
 }, {
-  "caps": 11720,
-  "level": 1173
+  caps: 11720,
+  level: 1173,
 }, {
-  "caps": 11730,
-  "level": 1174
+  caps: 11730,
+  level: 1174,
 }, {
-  "caps": 11740,
-  "level": 1175
+  caps: 11740,
+  level: 1175,
 }, {
-  "caps": 11750,
-  "level": 1176
+  caps: 11750,
+  level: 1176,
 }, {
-  "caps": 11760,
-  "level": 1177
+  caps: 11760,
+  level: 1177,
 }, {
-  "caps": 11770,
-  "level": 1178
+  caps: 11770,
+  level: 1178,
 }, {
-  "caps": 11780,
-  "level": 1179
+  caps: 11780,
+  level: 1179,
 }, {
-  "caps": 11790,
-  "level": 1180
+  caps: 11790,
+  level: 1180,
 }, {
-  "caps": 11800,
-  "level": 1181
+  caps: 11800,
+  level: 1181,
 }, {
-  "caps": 11810,
-  "level": 1182
+  caps: 11810,
+  level: 1182,
 }, {
-  "caps": 11820,
-  "level": 1183
+  caps: 11820,
+  level: 1183,
 }, {
-  "caps": 11830,
-  "level": 1184
+  caps: 11830,
+  level: 1184,
 }, {
-  "caps": 11840,
-  "level": 1185
+  caps: 11840,
+  level: 1185,
 }, {
-  "caps": 11850,
-  "level": 1186
+  caps: 11850,
+  level: 1186,
 }, {
-  "caps": 11860,
-  "level": 1187
+  caps: 11860,
+  level: 1187,
 }, {
-  "caps": 11870,
-  "level": 1188
+  caps: 11870,
+  level: 1188,
 }, {
-  "caps": 11880,
-  "level": 1189
+  caps: 11880,
+  level: 1189,
 }, {
-  "caps": 11890,
-  "level": 1190
+  caps: 11890,
+  level: 1190,
 }, {
-  "caps": 11900,
-  "level": 1191
+  caps: 11900,
+  level: 1191,
 }, {
-  "caps": 11910,
-  "level": 1192
+  caps: 11910,
+  level: 1192,
 }, {
-  "caps": 11920,
-  "level": 1193
+  caps: 11920,
+  level: 1193,
 }, {
-  "caps": 11930,
-  "level": 1194
+  caps: 11930,
+  level: 1194,
 }, {
-  "caps": 11940,
-  "level": 1195
+  caps: 11940,
+  level: 1195,
 }, {
-  "caps": 11950,
-  "level": 1196
+  caps: 11950,
+  level: 1196,
 }, {
-  "caps": 11960,
-  "level": 1197
+  caps: 11960,
+  level: 1197,
 }, {
-  "caps": 11970,
-  "level": 1198
+  caps: 11970,
+  level: 1198,
 }, {
-  "caps": 11980,
-  "level": 1199
+  caps: 11980,
+  level: 1199,
 }, {
-  "caps": 11990,
-  "level": 1200
+  caps: 11990,
+  level: 1200,
 }, {
-  "caps": 12000,
-  "level": 1201
+  caps: 12000,
+  level: 1201,
 }, {
-  "caps": 12010,
-  "level": 1202
+  caps: 12010,
+  level: 1202,
 }, {
-  "caps": 12020,
-  "level": 1203
+  caps: 12020,
+  level: 1203,
 }, {
-  "caps": 12030,
-  "level": 1204
+  caps: 12030,
+  level: 1204,
 }, {
-  "caps": 12040,
-  "level": 1205
+  caps: 12040,
+  level: 1205,
 }, {
-  "caps": 12050,
-  "level": 1206
+  caps: 12050,
+  level: 1206,
 }, {
-  "caps": 12060,
-  "level": 1207
+  caps: 12060,
+  level: 1207,
 }, {
-  "caps": 12070,
-  "level": 1208
+  caps: 12070,
+  level: 1208,
 }, {
-  "caps": 12080,
-  "level": 1209
+  caps: 12080,
+  level: 1209,
 }, {
-  "caps": 12090,
-  "level": 1210
+  caps: 12090,
+  level: 1210,
 }, {
-  "caps": 12100,
-  "level": 1211
+  caps: 12100,
+  level: 1211,
 }, {
-  "caps": 12110,
-  "level": 1212
+  caps: 12110,
+  level: 1212,
 }, {
-  "caps": 12120,
-  "level": 1213
+  caps: 12120,
+  level: 1213,
 }, {
-  "caps": 12130,
-  "level": 1214
+  caps: 12130,
+  level: 1214,
 }, {
-  "caps": 12140,
-  "level": 1215
+  caps: 12140,
+  level: 1215,
 }, {
-  "caps": 12150,
-  "level": 1216
+  caps: 12150,
+  level: 1216,
 }, {
-  "caps": 12160,
-  "level": 1217
+  caps: 12160,
+  level: 1217,
 }, {
-  "caps": 12170,
-  "level": 1218
+  caps: 12170,
+  level: 1218,
 }, {
-  "caps": 12180,
-  "level": 1219
+  caps: 12180,
+  level: 1219,
 }, {
-  "caps": 12190,
-  "level": 1220
+  caps: 12190,
+  level: 1220,
 }, {
-  "caps": 12200,
-  "level": 1221
+  caps: 12200,
+  level: 1221,
 }, {
-  "caps": 12210,
-  "level": 1222
+  caps: 12210,
+  level: 1222,
 }, {
-  "caps": 12220,
-  "level": 1223
+  caps: 12220,
+  level: 1223,
 }, {
-  "caps": 12230,
-  "level": 1224
+  caps: 12230,
+  level: 1224,
 }, {
-  "caps": 12240,
-  "level": 1225
+  caps: 12240,
+  level: 1225,
 }, {
-  "caps": 12250,
-  "level": 1226
+  caps: 12250,
+  level: 1226,
 }, {
-  "caps": 12260,
-  "level": 1227
+  caps: 12260,
+  level: 1227,
 }, {
-  "caps": 12270,
-  "level": 1228
+  caps: 12270,
+  level: 1228,
 }, {
-  "caps": 12280,
-  "level": 1229
+  caps: 12280,
+  level: 1229,
 }, {
-  "caps": 12290,
-  "level": 1230
+  caps: 12290,
+  level: 1230,
 }, {
-  "caps": 12300,
-  "level": 1231
+  caps: 12300,
+  level: 1231,
 }, {
-  "caps": 12310,
-  "level": 1232
+  caps: 12310,
+  level: 1232,
 }, {
-  "caps": 12320,
-  "level": 1233
+  caps: 12320,
+  level: 1233,
 }, {
-  "caps": 12330,
-  "level": 1234
+  caps: 12330,
+  level: 1234,
 }, {
-  "caps": 12340,
-  "level": 1235
+  caps: 12340,
+  level: 1235,
 }, {
-  "caps": 12350,
-  "level": 1236
+  caps: 12350,
+  level: 1236,
 }, {
-  "caps": 12360,
-  "level": 1237
+  caps: 12360,
+  level: 1237,
 }, {
-  "caps": 12370,
-  "level": 1238
+  caps: 12370,
+  level: 1238,
 }, {
-  "caps": 12380,
-  "level": 1239
+  caps: 12380,
+  level: 1239,
 }, {
-  "caps": 12390,
-  "level": 1240
+  caps: 12390,
+  level: 1240,
 }, {
-  "caps": 12400,
-  "level": 1241
+  caps: 12400,
+  level: 1241,
 }, {
-  "caps": 12410,
-  "level": 1242
+  caps: 12410,
+  level: 1242,
 }, {
-  "caps": 12420,
-  "level": 1243
+  caps: 12420,
+  level: 1243,
 }, {
-  "caps": 12430,
-  "level": 1244
+  caps: 12430,
+  level: 1244,
 }, {
-  "caps": 12440,
-  "level": 1245
+  caps: 12440,
+  level: 1245,
 }, {
-  "caps": 12450,
-  "level": 1246
+  caps: 12450,
+  level: 1246,
 }, {
-  "caps": 12460,
-  "level": 1247
+  caps: 12460,
+  level: 1247,
 }, {
-  "caps": 12470,
-  "level": 1248
+  caps: 12470,
+  level: 1248,
 }, {
-  "caps": 12480,
-  "level": 1249
+  caps: 12480,
+  level: 1249,
 }, {
-  "caps": 12490,
-  "level": 1250
+  caps: 12490,
+  level: 1250,
 }, {
-  "caps": 12500,
-  "level": 1251
+  caps: 12500,
+  level: 1251,
 }, {
-  "caps": 12510,
-  "level": 1252
+  caps: 12510,
+  level: 1252,
 }, {
-  "caps": 12520,
-  "level": 1253
+  caps: 12520,
+  level: 1253,
 }, {
-  "caps": 12530,
-  "level": 1254
+  caps: 12530,
+  level: 1254,
 }, {
-  "caps": 12540,
-  "level": 1255
+  caps: 12540,
+  level: 1255,
 }, {
-  "caps": 12550,
-  "level": 1256
+  caps: 12550,
+  level: 1256,
 }, {
-  "caps": 12560,
-  "level": 1257
+  caps: 12560,
+  level: 1257,
 }, {
-  "caps": 12570,
-  "level": 1258
+  caps: 12570,
+  level: 1258,
 }, {
-  "caps": 12580,
-  "level": 1259
+  caps: 12580,
+  level: 1259,
 }, {
-  "caps": 12590,
-  "level": 1260
+  caps: 12590,
+  level: 1260,
 }, {
-  "caps": 12600,
-  "level": 1261
+  caps: 12600,
+  level: 1261,
 }, {
-  "caps": 12610,
-  "level": 1262
+  caps: 12610,
+  level: 1262,
 }, {
-  "caps": 12620,
-  "level": 1263
+  caps: 12620,
+  level: 1263,
 }, {
-  "caps": 12630,
-  "level": 1264
+  caps: 12630,
+  level: 1264,
 }, {
-  "caps": 12640,
-  "level": 1265
+  caps: 12640,
+  level: 1265,
 }, {
-  "caps": 12650,
-  "level": 1266
+  caps: 12650,
+  level: 1266,
 }, {
-  "caps": 12660,
-  "level": 1267
+  caps: 12660,
+  level: 1267,
 }, {
-  "caps": 12670,
-  "level": 1268
+  caps: 12670,
+  level: 1268,
 }, {
-  "caps": 12680,
-  "level": 1269
+  caps: 12680,
+  level: 1269,
 }, {
-  "caps": 12690,
-  "level": 1270
+  caps: 12690,
+  level: 1270,
 }, {
-  "caps": 12700,
-  "level": 1271
+  caps: 12700,
+  level: 1271,
 }, {
-  "caps": 12710,
-  "level": 1272
+  caps: 12710,
+  level: 1272,
 }, {
-  "caps": 12720,
-  "level": 1273
+  caps: 12720,
+  level: 1273,
 }, {
-  "caps": 12730,
-  "level": 1274
+  caps: 12730,
+  level: 1274,
 }, {
-  "caps": 12740,
-  "level": 1275
+  caps: 12740,
+  level: 1275,
 }, {
-  "caps": 12750,
-  "level": 1276
+  caps: 12750,
+  level: 1276,
 }, {
-  "caps": 12760,
-  "level": 1277
+  caps: 12760,
+  level: 1277,
 }, {
-  "caps": 12770,
-  "level": 1278
+  caps: 12770,
+  level: 1278,
 }, {
-  "caps": 12780,
-  "level": 1279
+  caps: 12780,
+  level: 1279,
 }, {
-  "caps": 12790,
-  "level": 1280
+  caps: 12790,
+  level: 1280,
 }, {
-  "caps": 12800,
-  "level": 1281
+  caps: 12800,
+  level: 1281,
 }, {
-  "caps": 12810,
-  "level": 1282
+  caps: 12810,
+  level: 1282,
 }, {
-  "caps": 12820,
-  "level": 1283
+  caps: 12820,
+  level: 1283,
 }, {
-  "caps": 12830,
-  "level": 1284
+  caps: 12830,
+  level: 1284,
 }, {
-  "caps": 12840,
-  "level": 1285
+  caps: 12840,
+  level: 1285,
 }, {
-  "caps": 12850,
-  "level": 1286
+  caps: 12850,
+  level: 1286,
 }, {
-  "caps": 12860,
-  "level": 1287
+  caps: 12860,
+  level: 1287,
 }, {
-  "caps": 12870,
-  "level": 1288
+  caps: 12870,
+  level: 1288,
 }, {
-  "caps": 12880,
-  "level": 1289
+  caps: 12880,
+  level: 1289,
 }, {
-  "caps": 12890,
-  "level": 1290
+  caps: 12890,
+  level: 1290,
 }, {
-  "caps": 12900,
-  "level": 1291
+  caps: 12900,
+  level: 1291,
 }, {
-  "caps": 12910,
-  "level": 1292
+  caps: 12910,
+  level: 1292,
 }, {
-  "caps": 12920,
-  "level": 1293
+  caps: 12920,
+  level: 1293,
 }, {
-  "caps": 12930,
-  "level": 1294
+  caps: 12930,
+  level: 1294,
 }, {
-  "caps": 12940,
-  "level": 1295
+  caps: 12940,
+  level: 1295,
 }, {
-  "caps": 12950,
-  "level": 1296
+  caps: 12950,
+  level: 1296,
 }, {
-  "caps": 12960,
-  "level": 1297
+  caps: 12960,
+  level: 1297,
 }, {
-  "caps": 12970,
-  "level": 1298
+  caps: 12970,
+  level: 1298,
 }, {
-  "caps": 12980,
-  "level": 1299
+  caps: 12980,
+  level: 1299,
 }, {
-  "caps": 12990,
-  "level": 1300
+  caps: 12990,
+  level: 1300,
 }];

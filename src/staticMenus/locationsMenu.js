@@ -97,31 +97,31 @@ const locationsDungeon = `
 `;
 
 const locationsMenu = {
-    config: {
-        parseMode: 'html'
-    },
-    name: 'locations',
-    title: 'Локации',
-    text: locationsText,
-    content: [{
-            name: 'locationsAll',
-            title: '🏜 Все',
-            text: locationsAll,
-            content: []
-        },
-        {
-            name: 'locationsRaid',
-            title: '🤘 Рейдовые',
-            text: locationsRaid,
-            content: []
-        },
-        {
-            name: 'locationsDungeon',
-            title: '⚠️Подземелья',
-            text: locationsDungeon,
-            content: []
-        }
-    ]
+  config: {
+    parseMode: 'html',
+  },
+  name: 'locations',
+  title: 'Локации',
+  text: locationsText,
+  content: [{
+    name: 'locationsAll',
+    title: '🏜 Все',
+    text: locationsAll,
+    content: [],
+  },
+  {
+    name: 'locationsRaid',
+    title: '🤘 Рейдовые',
+    text: locationsRaid,
+    content: [],
+  },
+  {
+    name: 'locationsDungeon',
+    title: '⚠️Подземелья',
+    text: locationsDungeon,
+    content: [],
+  },
+  ],
 };
 
 module.exports = locationsMenu;

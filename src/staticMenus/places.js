@@ -1,6 +1,6 @@
 const merchant = {
   name: 'merchant',
-  title: '🏚Торгаш'
+  title: '🏚Торгаш',
 };
 const workbench = {
   name: 'workbench',
@@ -24,5 +24,5 @@ module.exports = {
   workbench,
   engineer,
   core,
-  basement
-}
+  basement,
+};

@@ -1,16 +1,14 @@
 const {
-    regexps
+  regexps,
 } = require('../regexp/regexp');
 
-const parseDeathMessage = deathMessage => {
-    const splitted = deathMessage.split('\n');
+const parseDeathMessage = (deathMessage) => {
+  const [, capsLost, materialsLost] = regexps.deathMessageRecourcesLostRexExp.exec(deathMessage);
 
-    const [, capsLost, materialsLost] = regexps.deathMessageRecourcesLostRexExp.exec(deathMessage);
-
-    return {
-        capsLost,
-        materialsLost
-    }
+  return {
+    capsLost,
+    materialsLost,
+  };
 };
 
 module.exports = parseDeathMessage;
