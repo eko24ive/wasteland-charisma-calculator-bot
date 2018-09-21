@@ -883,7 +883,7 @@ bot.on('forward', (msg) => {
     }
   }
 
-  if (validateForwardDate(msg.forward_date)) {
+  if (!validateForwardDate(msg.forward_date)) {
     return msg.reply.text('❌<b>ЗАМЕЧЕНА КРИТИЧЕСКАЯ ОШИБКА</b>❌\n\nБыл замечен форвард, время которого меньше, чем время последнего обновления Wasteland Wars (19.09.2018)', {
       asReply: true,
       parseMode: 'html',
@@ -1341,7 +1341,7 @@ bot.on('forward', (msg) => {
 
         return false;
       });
-    } else if (isLocation || !isGiantFaced) {
+    } else if (isLocation && !isGiantFaced) {
       const location = parseLocation(msg.text);
 
       Giant.findOne({
