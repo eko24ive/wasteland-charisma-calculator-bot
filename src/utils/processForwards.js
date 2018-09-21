@@ -114,8 +114,9 @@ const processForwards = (inputData, config) => {
     }
 
     // accept only after 24.06.2018
-    if(inputData.filter(({date}) => date < 1529787600).length > 0) {
-        reportData.criticalError = 'Был замечен форвард время которого меньше за время последнего обновления Wasteland Wars (24.06.2018)';
+    // accept only after 19.09.2018
+    if(inputData.filter(({date}) => date < 1537304400).length > 0) {
+        reportData.criticalError = 'Был замечен форвард время которого меньше за время последнего обновления Wasteland Wars (19.09.2018)';
 
         return {reportData};
     }
@@ -272,7 +273,7 @@ const processForwards = (inputData, config) => {
             beastData.battles[0].healthOnStart = data.currentHealth + beastData.battles[0].totalDamageReceived;
             beastData.battles[0].stamp = `${date}${userId}`;
 
-            if (data.fightResult === 'lose') {
+            // if (data.fightResult === 'lose') { EVERY FACE FORWARD IS NOW REQUIRED
                 if (!reportData.lastBeastSeen) {
                     beastData.battles = [];
 
@@ -284,7 +285,7 @@ const processForwards = (inputData, config) => {
                         reportData.beastToValidate.push({name: data.name, distance: data.distance, type: data.type});
                     }
                 }
-            }
+            // }
 
 
             updatesData.beasts.push(beastData);

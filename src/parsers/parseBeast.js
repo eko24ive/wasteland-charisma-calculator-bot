@@ -15,12 +15,8 @@ const parseRegularBeast = beast => {
     const [, distance] = regexps.campDistanceRegExp.exec(beast);
     const [, name] = regexps.beastNameRegExp.exec(beast);
 
-    if (regexps.actionReceivedCapsRegExp.test(beast)) {
-        [, capsReceived] = regexps.actionReceivedCapsRegExp.exec(beast);
-    }
-
-    if (regexps.actionReceivedMaterialsRegExp.test(beast)) {
-        [, materialsReceived] = regexps.actionReceivedMaterialsRegExp.exec(beast);
+    if (regexps.receivedCapsAndMaterialsRegExp.test(beast)) {
+        [, capsReceived, materialsReceived] = regexps.receivedCapsAndMaterialsRegExp.exec(beast);
     }
 
     if (regexps.beastVictoryRegExp.test(beast)) {

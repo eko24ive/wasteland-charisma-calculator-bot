@@ -30,11 +30,8 @@ const parseLocation = location => {
         isRaid = true;
     }
 
-    if (regexps.receivedCapsRegExp.test(location)) {
-        [, capsReceived] = regexps.receivedCapsRegExp.exec(location);
-    }
-    if (regexps.receivedMaterialsRegExp.test(location)) {
-        [, materialsReceived] = regexps.receivedMaterialsRegExp.exec(location);
+    if (regexps.receivedCapsAndMaterialsRegExp.test(location)) {
+        [, capsReceived, materialsReceived] = regexps.receivedCapsAndMaterialsRegExp.exec(location);
     }
     if (regexps.capsLostRegExp.test(location)) {
         [, capsLost] = regexps.capsLostRegExp.exec(location);
