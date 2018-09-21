@@ -265,17 +265,17 @@ const processForwards = (inputData) => {
       beastData.battles[0].healthOnStart = data.currentHealth + beastData.battles[0].totalDamageReceived;
       beastData.battles[0].stamp = `${date}${userId}`;
 
-      // if (data.fightResult === 'lose') { EVERY FACE FORWARD IS NOW REQUIRED
-      if (!reportData.lastBeastSeen) {
-        beastData.battles = [];
+      if (data.fightResult === 'lose') {
+        if (!reportData.lastBeastSeen) {
+          beastData.battles = [];
 
-        reportData.beastToValidate.push({ name: data.name, distance: data.distance, type: data.type });
-      } else if (data.name !== reportData.lastBeastSeen.name && reportData.lastBeastSeenType !== 'regular' && data.fightResult === 'lose') {
-        beastData.battles = [];
+          reportData.beastToValidate.push({ name: data.name, distance: data.distance, type: data.type });
+        } else if (data.name !== reportData.lastBeastSeen.name && reportData.lastBeastSeenType !== 'regular' && data.fightResult === 'lose') {
+          beastData.battles = [];
 
-        reportData.beastToValidate.push({ name: data.name, distance: data.distance, type: data.type });
+          reportData.beastToValidate.push({ name: data.name, distance: data.distance, type: data.type });
+        }
       }
-      // }
 
 
       updatesData.beasts.push(beastData);
