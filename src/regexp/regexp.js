@@ -115,9 +115,11 @@ const flee = {
   contains: [
     every.contains,
   ],
-  conditional: [
+  either: [
     beastDefeatFleeRegExp,
     beastSuccessFleeRegExp,
+  ],
+  conditional: [
     beastDefeatCapsLostRegExp,
     beastDefeatMaterialsLostRegExp,
   ],

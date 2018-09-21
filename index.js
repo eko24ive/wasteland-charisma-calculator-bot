@@ -350,9 +350,10 @@ const actualProcessUserData = (msg, reportData, updatesData, options) => {
     sessions[msg.from.id].state = states.WAIT_FOR_BEAST_FACE_FORWARD;
     sessions[msg.from.id].beastToValidateName = reportData.beastToValidate[0].name;
     sessions[msg.from.id].beastToValidateType = reportData.beastToValidate[0].type;
+    sessions[msg.from.id].distance = reportData.beastToValidate[0].distance;
     return msg.reply.text(`
 Слушай, я не могу понять с кем это были у тебя рамсы.
-Пожалуйста скинь форвард встречи с ${reportData.beastToValidate[0].type === 'DarkZone' ? '🚷' : ''}${reportData.beastToValidate[0].name}
+Пожалуйста скинь форвард встречи с ${reportData.beastToValidate[0].type === 'DarkZone' ? '🚷' : ''}${reportData.beastToValidate[0].name} на ${reportData.beastToValidate[0].distance}км
 
 Пожалуйста скинь форвард встречи с этим мобом:
 \`Во время вылазки на тебя напал...\`
@@ -726,12 +727,12 @@ _или_
   Спасибо за форвард. Я перевёл ${userForwardPoints.toFixed(1)} 💎*Шмепселей* на твой счёт.\n_${dupesText}_`;
         } else {
           reply = `Фух, я со всём справился - спасибо тебе огромное за информацию!
-  Ты заработал ${userForwardPoints.toFixed(1)} 💎*Шмепселей* за свои форварды!
-  _${dupesText}_
-  Всего я насчитал ${dataProcessed} данных!
-  
-  Если ты чего-то забыл докинуть - смело жми на \`[Скинуть лог 🏃]\` и _докидывай_
-  ${errors}`;
+Ты заработал ${userForwardPoints.toFixed(1)} 💎*Шмепселей* за свои форварды!
+_${dupesText}_
+Всего я насчитал ${dataProcessed} данных!
+
+Если ты чего-то забыл докинуть - смело жми на \`[Скинуть лог 🏃]\` и _докидывай_
+${errors}`;
         }
 
         msg.reply.text(reply, {

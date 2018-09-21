@@ -20,6 +20,7 @@ const regExpSetMatcher = (string, {
 }) => {
   let {
     contains,
+    either,
     conditional,
     excludes,
   } = regexpSet;
@@ -27,10 +28,12 @@ const regExpSetMatcher = (string, {
   let containsCheck = true;
   let conditionalCheck = true;
   let excludesCheck = true;
+  let eitherCheck = true;
 
   contains = _.flatten(contains);
   conditional = _.flatten(conditional);
   excludes = _.flatten(excludes);
+  either = _.flatten(either);
 
   if (contains !== undefined && contains.length > 0) {
     containsCheck = testRegExpsOnString(contains, string, true, true);
@@ -43,8 +46,11 @@ const regExpSetMatcher = (string, {
   if (excludes !== undefined && excludes.length > 0) {
     excludesCheck = testRegExpsOnString(excludes, string, true, false);
   }
+  if (either !== undefined && either.length > 0) {
+    eitherCheck = testRegExpsOnString(either, string, false, true);
+  }
 
-  return (containsCheck && conditionalCheck && excludesCheck);
+  return (containsCheck && conditionalCheck && excludesCheck && eitherCheck);
 };
 
 const matcher = (string, regExp) => regExp.test(string);
