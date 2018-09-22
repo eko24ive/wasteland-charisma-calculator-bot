@@ -130,15 +130,39 @@ const getToken = () => {
 
   throw new Error('Please, specify bot token mode "--dev" for development and "--prod" production');
 };
-
+/* 
 const bot = new TeleBot({
   token: getToken(),
   usePlugins: ['namedButtons'],
   polling: {
-    interval: 100, // How often check updates (in ms).
-    limit: 500, // Limits the number of updates to be retrieved.
+    interval: 50, // How often check updates (in ms).
+    limit: 2000, // Limits the number of updates to be retrieved.
     retryTimeout: 1000, // Reconne   cting timeout (in ms).
   },
+  webhook: { // Optional. Use webhook instead of polling.
+    key: 'key.pem', // Optional. Private key for server.
+    cert: 'cert.pem', // Optional. Public key.
+    url: 'https://....', // HTTPS url to send updates to.
+    host: '0.0.0.0', // Webhook server host.
+    port: 443, // Server port.
+    maxConnections: 40 // Optional. Maximum allowed number of simultaneous HTTPS connections to the webhook for update delivery
+  },
+  pluginConfig: {
+    namedButtons: {
+      buttons,
+    },
+  },
+});
+ */
+const token = getToken();
+const host = '0.0.0.1';
+const port = process.env.PORT;
+const url = 'https://ww-assistant-staging.herokuapp.com/'
+
+const bot = new TeleBot({
+  token: token,
+  usePlugins: ['namedButtons'],
+  webhook: {url, host, port},
   pluginConfig: {
     namedButtons: {
       buttons,
@@ -2686,4 +2710,4 @@ bot.on(/\/battle_(.+)/, (msg) => {
   return false;
 });
 
-bot.start();
+bot.connect();
