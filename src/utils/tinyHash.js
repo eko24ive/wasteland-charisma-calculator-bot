@@ -1,17 +1,19 @@
-const tinyHash = string => {
-    let hash = 0;
+/* eslint-disable */
 
-    if (string.length == 0) {
-        return hash;
-    }
-    
-    for (var i = 0; i < string.length; i++) {
-        let char = string.charCodeAt(i);
-        hash = ((hash<<5)-hash)+char;
-        hash = hash & hash; // Convert to 32bit integer
-    }
+const tinyHash = (string) => {
+  let hash = 0;
 
-    return Math.abs(Number(hash));
-}
+  if (string.length === 0) {
+    return hash;
+  }
+
+  for (let i = 0; i < string.length; i ++) {
+    const char = string.charCodeAt(i);
+    hash = ((hash << 5) - hash) + char;
+    hash &= hash; // Convert to 32bit integer
+  }
+
+  return Math.abs(Number(hash));
+};
 
 module.exports = tinyHash;

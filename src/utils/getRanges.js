@@ -1,5 +1,7 @@
+/* eslint-disable */
+
 const _ = require('underscore');
-var async = require('async');
+let async = require('async');
 
 let input = [
   [1],
@@ -343,7 +345,7 @@ const getRanges = mobs => {
 
 const ranges = [
   [1, 4],
-  [5, 7],
+  [5, 8],
   [9, 13],
   [14, 17],
   [18, 21],
@@ -362,6 +364,26 @@ const ranges = [
   [75,78],
   [79,84],
   [85,90],
-  [91,95]
+  [91,95],
+  [96,100]
 ]
-module.exports = ranges;
+
+const dzRanges = [
+  [23, 27],
+  [28, 29],
+  [30, 33],
+  [34, 39],
+  [53, 56],
+  [57, 60],
+  [61, 64],
+  [75,78],
+  [79,84],
+  [85,90],
+  [91,95],
+  [96,100]
+]
+
+module.exports = {
+  ranges,
+  dzRanges
+};

@@ -1,5 +1,3 @@
-
-
 const achievementsText = `
 ✅*Достижения* дают за определенные действия в игре:
 
@@ -144,56 +142,56 @@ const foodText = `
 `;
 
 const achievementsMenu = {
-    config: {
-        parseMode: 'markdown'
+  config: {
+    parseMode: 'markdown',
+  },
+  name: 'achievements',
+  title: '✅Достижения',
+  text: achievementsText,
+  content: [
+    {
+      name: 'education',
+      title: '🎓Обучение',
+      text: educationText,
+      content: [],
     },
-    name: 'achievements',
-    title: '✅Достижения',
-    text: achievementsText,
-    content: [
-        {
-            name: 'education',
-            title: '🎓Обучение',
-            text: educationText,
-            content: []
-        },
-        {
-            name: 'camp',
-            title: '⛺️Лагерь',
-            text: campText,
-            content: []
-        },
-        {
-            name: 'chems',
-            title: '❤️Вещества',
-            text: chemsText,
-            content: []
-        },
-        {
-            name: 'fight',
-            title: '⚔️Бой',
-            text: fightText,
-            content: []
-        },
-        {
-            name: 'wasteland',
-            title: '👣Пустошь',
-            text: wastelandText,
-            content: []
-        },
-        {
-            name: 'bar',
-            title: '🍺Бар',
-            text: barText,
-            content: []
-        },
-        {
-            name: 'food',
-            title: '🍗Еда',
-            text: foodText,
-            content: []
-        }
-    ]
+    {
+      name: 'camp',
+      title: '⛺️Лагерь',
+      text: campText,
+      content: [],
+    },
+    {
+      name: 'chems',
+      title: '❤️Вещества',
+      text: chemsText,
+      content: [],
+    },
+    {
+      name: 'fight',
+      title: '⚔️Бой',
+      text: fightText,
+      content: [],
+    },
+    {
+      name: 'wasteland',
+      title: '👣Пустошь',
+      text: wastelandText,
+      content: [],
+    },
+    {
+      name: 'bar',
+      title: '🍺Бар',
+      text: barText,
+      content: [],
+    },
+    {
+      name: 'food',
+      title: '🍗Еда',
+      text: foodText,
+      content: [],
+    },
+  ],
 };
 
 module.exports = achievementsMenu;

@@ -83,25 +83,25 @@ const buffText = `
 `;
 
 const suppliesMenu = {
-    config: {
-        parseMode: 'html'
-    },
-    name: 'supplies',
-    title: '🗃Припасы',
-    text: suppliesText,
-    content: [{
-            name: 'suppliesFood',
-            title: '🍱Еда',
-            text: foodText,
-            content: []
-        },
-        {
-            name: 'suppliesBuffs',
-            title: '🍹Баффы',
-            text: buffText,
-            content: []
-        }
-    ]
+  config: {
+    parseMode: 'html',
+  },
+  name: 'supplies',
+  title: '🗃Припасы',
+  text: suppliesText,
+  content: [{
+    name: 'suppliesFood',
+    title: '🍱Еда',
+    text: foodText,
+    content: [],
+  },
+  {
+    name: 'suppliesBuffs',
+    title: '🍹Баффы',
+    text: buffText,
+    content: [],
+  },
+  ],
 };
 
 module.exports = suppliesMenu;
