@@ -157,7 +157,7 @@ const bot = new TeleBot({
 const token = getToken();
 const host = '0.0.0.0';
 const port = process.env.PORT;
-const url = 'https://ww-assistant-staging.herokuapp.com/'
+const url = 'https://ww-assistant-staging.herokuapp.com'
 
 const bot = new TeleBot({
   token: token,
