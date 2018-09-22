@@ -1,18 +1,16 @@
 
 const {
-    regexps
+  regexps,
 } = require('../regexp/regexp');
 
-const parseGiant = data => {
-    const splitted = data.split('\n');
+const parseGiant = (data) => {
+  const [, name, healthCurrent, healthCap] = regexps.giantHealthRegExp.exec(data);
 
-    const [, name, healthCurrent, healthCap] = regexps.giantHealthRegExp.exec(data);
-
-    return {
-        name,
-        healthCurrent: Number(healthCurrent),
-        healthCap: Number(healthCap)
-    }
+  return {
+    name,
+    healthCurrent: Number(healthCurrent),
+    healthCap: Number(healthCap),
+  };
 };
 
 module.exports = parseGiant;

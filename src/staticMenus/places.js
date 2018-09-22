@@ -1,61 +1,61 @@
 const merchant = {
   name: 'merchant',
   title: 'Торгаш',
-  icon: '🏚'
+  icon: '🏚',
 };
 const workbench = {
   name: 'workbench',
   title: 'Верстак',
-  icon: '🛠'
+  icon: '🛠',
 };
 const engineer = {
   name: 'engineer',
   title: 'Инженер',
-  icon: '👓'
+  icon: '👓',
 };
 const core = {
   name: 'core',
   title: 'Ядро',
-  icon: '🕎'
+  icon: '🕎',
 };
 const basement = {
   name: 'basement',
   title: 'Уютный подвальчик',
-  icon: '🚪'
+  icon: '🚪',
 };
 const madman = {
   name: 'madman',
-  title: 'Безумный старик'
-}
+  title: 'Безумный старик',
+};
 const mine = {
   name: 'mine',
-  title: 'Старая шахта'
-}
+  title: 'Старая шахта',
+};
 const openShelter = {
   name: 'openShelter',
   title: 'Открытое убежище',
-  icon: '⚙️'
-}
+  icon: '⚙️',
+};
 const highHrotgar = {
   name: 'highHrotgar',
   title: 'Высокий Хротгар',
-  icon: '🌁'
-}
+  icon: '🌁',
+};
 const moltenCore = {
   name: 'moltenCore',
   title: 'Огненные Недра',
-  icon: '🔥'
-}
+  icon: '🔥',
+};
 const hexagon = {
   name: 'hexagon',
   title: 'Руины Гексагона',
-  icon: '🛑'
-}
+  icon: '🛑',
+};
 const siencelab = {
   name: 'siencelab',
   title: 'Научная лаборатория',
-  icon: '🔬'
-}
+  icon: '🔬',
+};
 
 module.exports = {
   merchant,
@@ -69,5 +69,5 @@ module.exports = {
   highHrotgar,
   moltenCore,
   hexagon,
-  siencelab
-}
+  siencelab,
+};

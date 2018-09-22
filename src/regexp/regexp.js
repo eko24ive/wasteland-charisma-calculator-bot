@@ -37,15 +37,13 @@ const deathMessageContentRegExp = /Спустя какое-то время ты 
 const deathMessageRecourcesLostRexExp = /Потеряно: 🕳(\d+) и 📦(\d+)/;
 
 const beastFacedRegExp = /Во время вылазки на тебя напал (.+)\./;
+const randomBeastFacedRegExp = /устрашающе начал приближаться (.+)\./;
 const dungeonBeastFacedRegExp = /(.+) перегородил тебе путь./;
 
 const metalAmountRegExp = /(.+) (\d+)/; // 🔗Кубонит 192
-const multipleItemsReceived = /(.+) [x|х](\d+)/; //Провода x1
-const emojiRecourceAmount = /(.+) [\u{1f300}-\u{1f5ff}\u{1f900}-\u{1f9ff}\u{1f600}-\u{1f64f}\u{1f680}-\u{1f6ff}\u{2600}-\u{26ff}\u{2700}-\u{27bf}\u{1f1e6}-\u{1f1ff}\u{1f191}-\u{1f251}\u{1f004}\u{1f0cf}\u{1f170}-\u{1f171}\u{1f17e}-\u{1f17f}\u{1f18e}\u{3030}\u{2b50}\u{2b55}\u{2934}-\u{2935}\u{2b05}-\u{2b07}\u{2b1b}-\u{2b1c}\u{3297}\u{3299}\u{303d}\u{00a9}\u{00ae}\u{2122}\u{23f3}\u{24c2}\u{23e9}-\u{23ef}\u{25b6}\u{23f8}-\u{23fa}](\d+)/u; //Кварц 🔹1
-const bonusEmojiResourceAmount = /([\u{1f300}-\u{1f5ff}\u{1f900}-\u{1f9ff}\u{1f600}-\u{1f64f}\u{1f680}-\u{1f6ff}\u{2600}-\u{26ff}\u{2700}-\u{27bf}\u{1f1e6}-\u{1f1ff}\u{1f191}-\u{1f251}\u{1f004}\u{1f0cf}\u{1f170}-\u{1f171}\u{1f17e}-\u{1f17f}\u{1f18e}\u{3030}\u{2b50}\u{2b55}\u{2934}-\u{2935}\u{2b05}-\u{2b07}\u{2b1b}-\u{2b1c}\u{3297}\u{3299}\u{303d}\u{00a9}\u{00ae}\u{2122}\u{23f3}\u{24c2}\u{23e9}-\u{23ef}\u{25b6}\u{23f8}-\u{23fa}])\+(\d+)/u; //Бонус: 🔩+4
-
-const achievmentMessageRegExp = /🏆Достижение получено!/;
-const achievmentContentRegExp = /✅(.+)\n(.+)/;
+const multipleItemsReceived = /(.+) [x|х](\d+)/; // Провода x1
+const emojiRecourceAmount = /(.+) [\u{1f300}-\u{1f5ff}\u{1f900}-\u{1f9ff}\u{1f600}-\u{1f64f}\u{1f680}-\u{1f6ff}\u{2600}-\u{26ff}\u{2700}-\u{27bf}\u{1f1e6}-\u{1f1ff}\u{1f191}-\u{1f251}\u{1f004}\u{1f0cf}\u{1f170}-\u{1f171}\u{1f17e}-\u{1f17f}\u{1f18e}\u{3030}\u{2b50}\u{2b55}\u{2934}-\u{2935}\u{2b05}-\u{2b07}\u{2b1b}-\u{2b1c}\u{3297}\u{3299}\u{303d}\u{00a9}\u{00ae}\u{2122}\u{23f3}\u{24c2}\u{23e9}-\u{23ef}\u{25b6}\u{23f8}-\u{23fa}](\d+)/u; // Кварц 🔹1
+const bonusEmojiResourceAmount = /([\u{1f300}-\u{1f5ff}\u{1f900}-\u{1f9ff}\u{1f600}-\u{1f64f}\u{1f680}-\u{1f6ff}\u{2600}-\u{26ff}\u{2700}-\u{27bf}\u{1f1e6}-\u{1f1ff}\u{1f191}-\u{1f251}\u{1f004}\u{1f0cf}\u{1f170}-\u{1f171}\u{1f17e}-\u{1f17f}\u{1f18e}\u{3030}\u{2b50}\u{2b55}\u{2934}-\u{2935}\u{2b05}-\u{2b07}\u{2b1b}-\u{2b1c}\u{3297}\u{3299}\u{303d}\u{00a9}\u{00ae}\u{2122}\u{23f3}\u{24c2}\u{23e9}-\u{23ef}\u{25b6}\u{23f8}-\u{23fa}])\+(\d+)/u; // Бонус: 🔩+4
 
 const currentHealthRegExp = /❤️(.\d*)\/\d+/;
 
@@ -58,171 +56,176 @@ const giantNameOnField = /(.+)\n❤️/;
 const giantHealthOnField = /❤️(\d+|-\d+)\/(\d+)/;
 
 const every = {
-    contains: [healthRegExp, hungerRegExp, staminaRegExp, campDistanceRegExp]
+  contains: [healthRegExp, hungerRegExp, staminaRegExp, campDistanceRegExp],
 };
 
 const location = {
-    contains: [every.contains, locationNameRegExp],
-    conditional: [
-        every.contains,
-        receivedCapsAndMaterialsRegExp,
-        receivedBonusItemRegExp,
-        injuryRegExp,
-        capsLostRegExp,
-        materialsLostRegExp,
-        receivedItemRegExp,
-        actionReceivedCapsRegExp,
-        actionReceivedMaterialsRegExp,
-        beastFacedRegExp,
-        darkZone
-    ],
-    excludes: [beastNameRegExp]
-};
-
-const regularBeast = {
-    contains: [every.contains, beastNameRegExp],
-    conditional: [
-        beastAttackRegExp,
-        beastStunRegExp,
-        playerBeastAttackRegExp,
-        beastDefeatRegExp,
-        beastVictoryRegExp,
-        receivedItemRegExp,
-        beastDefeatCapsLostRegExp,
-        beastDefeatMaterialsLostRegExp,
-        receivedCapsAndMaterialsRegExp,
-        darkZone
-    ]
-};
-
-const dungeonBeast = {
-    contains: [every.contains, beastNameRegExp, beastDungeonFlagRegExp],
-    conditional: [
-        beastAttackRegExp,
-        beastStunRegExp,
-        playerBeastAttackRegExp,
-        beastDefeatRegExp,
-        beastVictoryRegExp,
-        beastDefeatCapsLostRegExp,
-        beastDefeatMaterialsLostRegExp
-    ],
-    excludes: [
-        receivedItemRegExp,
-        receivedCapsAndMaterialsRegExp
-    ]
-}
-
-const flee = {
-    contains: [
-        every.contains,
-    ],
-    conditional: [
-        beastDefeatFleeRegExp,
-        beastSuccessFleeRegExp,
-        beastDefeatCapsLostRegExp,
-        beastDefeatMaterialsLostRegExp
-    ],
-    excludes: [
-        beastNameRegExp
-    ]
-}
-
-const deathMessage = {
-    contains: [
-        deathMessageHeaderRegExp,
-        deathMessageContentRegExp,
-        deathMessageRecourcesLostRexExp
-    ]
-};
-
-const regularBeastFaced = {
-    contains: [
-        beastFacedRegExp
-    ]
-};
-
-const dungeonBeastFaced = {
-    contains: [
-        dungeonBeastFacedRegExp
-    ]
-};
-
-const giantFaced = {
-    contains: [
-        every.contains,
-        giantFacedRegExp,
-        giantHealthRegExp
-    ]
-};
-
-const giantFought = {
-    contains: [
-        giantHealthRegExp,
-        giantFoughtRegExp
-    ]
-}
-
-const giantFacedOnField = {
-    contains: [
-        giantOnField,
-        giantNameOnField,
-        giantHealthOnField
-    ]
-}
-
-const regexps = {
-    locationNameRegExp,
-    locationRaidPostfixRegExp,
-    healthRegExp,
-    hungerRegExp,
-    staminaRegExp,
-    campDistanceRegExp,
+  contains: [every.contains, locationNameRegExp],
+  conditional: [
+    every.contains,
     receivedCapsAndMaterialsRegExp,
-    receivedItemRegExp,
     receivedBonusItemRegExp,
     injuryRegExp,
     capsLostRegExp,
     materialsLostRegExp,
+    receivedItemRegExp,
     actionReceivedCapsRegExp,
     actionReceivedMaterialsRegExp,
-    beastNameRegExp,
+    beastFacedRegExp,
+    darkZone,
+  ],
+  excludes: [beastNameRegExp],
+};
+
+const regularBeast = {
+  contains: [every.contains, beastNameRegExp],
+  conditional: [
     beastAttackRegExp,
     beastStunRegExp,
     playerBeastAttackRegExp,
-    dungeonBeastFacedRegExp,
+    beastDefeatRegExp,
+    beastVictoryRegExp,
+    receivedItemRegExp,
+    beastDefeatCapsLostRegExp,
+    beastDefeatMaterialsLostRegExp,
+    receivedCapsAndMaterialsRegExp,
+    darkZone,
+  ],
+  excludes: [beastDungeonFlagRegExp],
+};
+
+const dungeonBeast = {
+  contains: [every.contains, beastNameRegExp, beastDungeonFlagRegExp],
+  conditional: [
+    beastAttackRegExp,
+    beastStunRegExp,
+    playerBeastAttackRegExp,
     beastDefeatRegExp,
     beastVictoryRegExp,
     beastDefeatCapsLostRegExp,
     beastDefeatMaterialsLostRegExp,
-    deathMessageRegExp,
-    junkmanRegExp,
-    junkManItems,
-    deathMessageRecourcesLostRexExp,
-    beastFacedRegExp,
-    metalAmountRegExp,
-    emojiRecourceAmount,
-    bonusEmojiResourceAmount,
-    multipleItemsReceived,
-    currentHealthRegExp,
-    beastSuccessFleeRegExp,
+  ],
+  excludes: [
+    receivedItemRegExp,
+    receivedCapsAndMaterialsRegExp,
+  ],
+};
+
+const flee = {
+  contains: [
+    every.contains,
+  ],
+  either: [
     beastDefeatFleeRegExp,
+    beastSuccessFleeRegExp,
+  ],
+  conditional: [
+    beastDefeatCapsLostRegExp,
+    beastDefeatMaterialsLostRegExp,
+  ],
+  excludes: [
+    beastNameRegExp,
+  ],
+};
+
+const deathMessage = {
+  contains: [
+    deathMessageHeaderRegExp,
+    deathMessageContentRegExp,
+    deathMessageRecourcesLostRexExp,
+  ],
+};
+
+const regularBeastFaced = {
+  contains: [
+    beastFacedRegExp,
+  ],
+};
+
+const dungeonBeastFaced = {
+  contains: [
+    dungeonBeastFacedRegExp,
+  ],
+};
+
+const giantFaced = {
+  contains: [
+    every.contains,
+    giantFacedRegExp,
     giantHealthRegExp,
+  ],
+};
+
+const giantFought = {
+  contains: [
+    giantHealthRegExp,
+    giantFoughtRegExp,
+  ],
+};
+
+const giantFacedOnField = {
+  contains: [
+    giantOnField,
     giantNameOnField,
     giantHealthOnField,
-    darkZone
-}
+  ],
+};
+
+const regexps = {
+  locationNameRegExp,
+  locationRaidPostfixRegExp,
+  healthRegExp,
+  hungerRegExp,
+  staminaRegExp,
+  campDistanceRegExp,
+  receivedCapsAndMaterialsRegExp,
+  receivedItemRegExp,
+  receivedBonusItemRegExp,
+  injuryRegExp,
+  capsLostRegExp,
+  materialsLostRegExp,
+  actionReceivedCapsRegExp,
+  actionReceivedMaterialsRegExp,
+  beastNameRegExp,
+  beastAttackRegExp,
+  beastStunRegExp,
+  playerBeastAttackRegExp,
+  dungeonBeastFacedRegExp,
+  beastDefeatRegExp,
+  beastVictoryRegExp,
+  beastDefeatCapsLostRegExp,
+  beastDefeatMaterialsLostRegExp,
+  deathMessageRegExp,
+  junkmanRegExp,
+  junkManItems,
+  deathMessageRecourcesLostRexExp,
+  beastFacedRegExp,
+  metalAmountRegExp,
+  emojiRecourceAmount,
+  bonusEmojiResourceAmount,
+  multipleItemsReceived,
+  currentHealthRegExp,
+  beastSuccessFleeRegExp,
+  beastDefeatFleeRegExp,
+  giantHealthRegExp,
+  giantNameOnField,
+  giantHealthOnField,
+  darkZone,
+  beastDungeonFlagRegExp,
+  randomBeastFacedRegExp,
+};
 
 module.exports = {
-    every,
-    location,
-    regularBeast,
-    dungeonBeast,
-    flee,
-    deathMessage,
-    regularBeastFaced,
-    dungeonBeastFaced,
-    giantFaced,
-    giantFought,
-    giantFacedOnField,
-    regexps
+  every,
+  location,
+  regularBeast,
+  dungeonBeast,
+  flee,
+  deathMessage,
+  regularBeastFaced,
+  dungeonBeastFaced,
+  giantFaced,
+  giantFought,
+  giantFacedOnField,
+  regexps,
 };

@@ -4,16 +4,16 @@ const {
   getMedsByPlace,
   getWeaponsByPlace,
   getWeaponInventionsByPlace,
-  getArmorInventionsByPlace
+  getArmorInventionsByPlace,
 } = require('./items/itemsFunctions.js');
 
 const {
-    merchant,
-    engineer,
-    workbench,
-    core,
-    basement,
-    madman
+  merchant,
+  engineer,
+  workbench,
+  core,
+  basement,
+  madman,
 } = require('./places.js');
 
 const uniqueAccessoriesText = require('./items/accessories.js');
@@ -294,7 +294,7 @@ ${getArmorInventionsByPlace(engineer)}
 ${getArmorInventionsByPlace(madman)}
 `;
 
-const dronesText = `
+/* const dronesText = `
 🛰Барахло ⚙️Универсальный
 ⚔️10 🛡50/50 ⚡️6%
 
@@ -324,7 +324,7 @@ const dronesText = `
 ⚔️ - урон дрона
 🛡- прочность, уменьшается при попадание монстров по дрону.
 ⚡️- шанс вступить в бой.
-`;
+`; */
 
 const domOfThunderText = `
 *⚡️Купол Грома*
@@ -338,172 +338,172 @@ const domOfThunderText = `
 
 const equipmentMenu = {
   config: {
-    parseMode: 'markdown'
+    parseMode: 'markdown',
   },
   name: 'equipment',
   title: 'Экиперовка',
   text: equipmentText,
   content: [{
-      name: 'vendor',
-      title: '🏚Торгаш',
-      text: vendorText,
-      content: [{
-          name: 'vendor_weapon',
-          title: '🔫Оружие',
-          text: vendorWeapon
-        },
-        {
-          name: 'vendor_armor',
-          title: '🛡️Броня',
-          text: vendorArmor
-        },
-        {
-          name: 'vendor_helmets',
-          title: '🛡️️Шлемы',
-          text: vendorHelmets
-        },
-        {
-          title: 'Назад',
-          name: 'equipment'
-        }
-      ]
+    name: 'vendor',
+    title: '🏚Торгаш',
+    text: vendorText,
+    content: [{
+      name: 'vendor_weapon',
+      title: '🔫Оружие',
+      text: vendorWeapon,
     },
     {
-      name: 'workbench',
-      title: '🛠Верстак',
-      text: workbenchText,
-      content: [{
-          name: 'workbench_weapon',
-          title: '🔫Оружие',
-          text: workbenchWeapon
-        },
-        {
-          name: 'workbench_armor',
-          title: '🛡️Броня',
-          text: workbenchArmor
-        },
-        {
-          name: 'workbench_firstAid',
-          title: '⛑️Аптечка',
-          text: workbenchFirstAid
-        },
-        {
-          title: 'Назад',
-          name: 'equipment'
-        }
-      ]
+      name: 'vendor_armor',
+      title: '🛡️Броня',
+      text: vendorArmor,
     },
     {
-      name: 'engineer',
-      title: '👓Инженер',
-      text: engineerText,
-      content: [{
-          name: 'engineer_weapon',
-          title: '🔫Оружие',
-          text: engineerWeapon
-        },
-        {
-          name: 'engineer_armor',
-          title: '🛡️Броня',
-          text: engineerArmor
-        },
-        {
-          name: 'engineer_helmets',
-          title: '️🛡️Шлемы',
-          text: engineerHelmets
-        },
-        {
-          name: 'engineer_modules',
-          title: '📥️Модули',
-          text: engineerModules
-        },
-        {
-          name: 'engineer_firstAid',
-          title: '⛑️Аптечка',
-          text: engineerFirstAid
-        },
-        {
-          title: 'Назад',
-          name: 'equipment'
-        }
-      ]
+      name: 'vendor_helmets',
+      title: '🛡️️Шлемы',
+      text: vendorHelmets,
     },
     {
-      name: 'basement',
-      title: '🚪Уютный подвальчик',
-      text: basementText,
-      content: [{
-        title: 'Назад',
-        name: 'equipment'
-      }]
+      title: 'Назад',
+      name: 'equipment',
+    },
+    ],
+  },
+  {
+    name: 'workbench',
+    title: '🛠Верстак',
+    text: workbenchText,
+    content: [{
+      name: 'workbench_weapon',
+      title: '🔫Оружие',
+      text: workbenchWeapon,
     },
     {
-      name: 'madman',
-      title: '👴Безумный старик',
-      text: madmanText,
-      content: [{
-        title: 'Назад',
-        name: 'equipment'
-      }]
+      name: 'workbench_armor',
+      title: '🛡️Броня',
+      text: workbenchArmor,
     },
     {
-      name: 'core',
-      title: '🕎Ядро',
-      text: coreText,
-      content: [{
-        title: 'Назад',
-        name: 'equipment'
-      }]
+      name: 'workbench_firstAid',
+      title: '⛑️Аптечка',
+      text: workbenchFirstAid,
     },
     {
-      name: 'dungeons',
-      title: '⚠️Подземелья',
-      text: dungeonText,
-      content: [{
-        title: 'Назад',
-        name: 'equipment'
-      }]
+      title: 'Назад',
+      name: 'equipment',
+    },
+    ],
+  },
+  {
+    name: 'engineer',
+    title: '👓Инженер',
+    text: engineerText,
+    content: [{
+      name: 'engineer_weapon',
+      title: '🔫Оружие',
+      text: engineerWeapon,
     },
     {
-      name: 'accessory',
-      title: '🏺Аксессуары',
-      text: accessoryText,
-      content: [{
-        title: 'Назад',
-        name: 'equipment'
-      }]
+      name: 'engineer_armor',
+      title: '🛡️Броня',
+      text: engineerArmor,
     },
     {
-      name: 'inventions',
-      title: '🔆Изобретения',
-      text: inventionsText,
-      content: [{
-          name: 'inventions_weapon',
-          title: '🔫Оружие',
-          text: inventionsWeapon
-        },
-        {
-          name: 'inventions_armor',
-          title: '🛡️Броня',
-          text: inventionsArmor,
-          content: []
-        },
-        {
-          title: 'Назад',
-          name: 'equipment'
-        }
-      ]
+      name: 'engineer_helmets',
+      title: '️🛡️Шлемы',
+      text: engineerHelmets,
     },
     {
-      name: 'domeOfThunder',
-      title: '⚡️Купол Грома',
-      text: domOfThunderText,
-      content: [{
-        title: 'Назад',
-        name: 'equipment'
-      }]
-    }
-  ]
+      name: 'engineer_modules',
+      title: '📥️Модули',
+      text: engineerModules,
+    },
+    {
+      name: 'engineer_firstAid',
+      title: '⛑️Аптечка',
+      text: engineerFirstAid,
+    },
+    {
+      title: 'Назад',
+      name: 'equipment',
+    },
+    ],
+  },
+  {
+    name: 'basement',
+    title: '🚪Уютный подвальчик',
+    text: basementText,
+    content: [{
+      title: 'Назад',
+      name: 'equipment',
+    }],
+  },
+  {
+    name: 'madman',
+    title: '👴Безумный старик',
+    text: madmanText,
+    content: [{
+      title: 'Назад',
+      name: 'equipment',
+    }],
+  },
+  {
+    name: 'core',
+    title: '🕎Ядро',
+    text: coreText,
+    content: [{
+      title: 'Назад',
+      name: 'equipment',
+    }],
+  },
+  {
+    name: 'dungeons',
+    title: '⚠️Подземелья',
+    text: dungeonText,
+    content: [{
+      title: 'Назад',
+      name: 'equipment',
+    }],
+  },
+  {
+    name: 'accessory',
+    title: '🏺Аксессуары',
+    text: accessoryText,
+    content: [{
+      title: 'Назад',
+      name: 'equipment',
+    }],
+  },
+  {
+    name: 'inventions',
+    title: '🔆Изобретения',
+    text: inventionsText,
+    content: [{
+      name: 'inventions_weapon',
+      title: '🔫Оружие',
+      text: inventionsWeapon,
+    },
+    {
+      name: 'inventions_armor',
+      title: '🛡️Броня',
+      text: inventionsArmor,
+      content: [],
+    },
+    {
+      title: 'Назад',
+      name: 'equipment',
+    },
+    ],
+  },
+  {
+    name: 'domeOfThunder',
+    title: '⚡️Купол Грома',
+    text: domOfThunderText,
+    content: [{
+      title: 'Назад',
+      name: 'equipment',
+    }],
+  },
+  ],
 };
 
 module.exports = equipmentMenu;

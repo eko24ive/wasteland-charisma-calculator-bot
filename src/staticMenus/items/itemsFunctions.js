@@ -1,171 +1,149 @@
-const _ = require('underscore');
-
 const {
-    helmets,
-    helmetsComment
+  helmets,
+  helmetsComment,
 } = require('./helmet.js');
 
 const {
-    weapons,
-    weaponsShortComment,
-    weaponsLongComment
+  weapons,
+  weaponsShortComment,
+  weaponsLongComment,
 } = require('./weapon.js');
 
 const {
-    armors,
-    armorsShortComment,
-    armorsLongComment
+  armors,
+  armorsShortComment,
+  armorsLongComment,
 } = require('./armor.js');
 
 const meds = require('./meds.js');
 
 const {
-    RARITIES: {
-        FIRST,
-        SECOND
-    },
-    getRarityIcon
+  RARITIES: {
+    FIRST,
+    SECOND,
+  },
+  getRarityIcon,
 } = require('./resources.js');
 
-const getItemIcon = icon => {
-    if (icon) {
-       return icon;
-    }
+const getItemIcon = (icon) => {
+  if (icon) {
+    return icon;
+  }
 
-   return '';
-}
+  return '';
+};
 
-const getItemPrice = price => {
-    if (price) {
-       return price.join(', ');
-    }
+const getItemPrice = (price) => {
+  if (price) {
+    return price.join(', ');
+  }
 
-   return '???';
-}
+  return '???';
+};
 
-const getItemCharacteristic = characteristic => {
-    if (characteristic) {
-        return characteristic;
-    }
+const getItemCharacteristic = (characteristic) => {
+  if (characteristic) {
+    return characteristic;
+  }
 
-    return '???';
-}
+  return '???';
+};
 
 const showItem = ({
-    icon,
-    title,
-    characteristic,
-    price
+  icon,
+  title,
+  characteristic,
+  price,
 }, comment) => {
-    var icon = getItemIcon(icon);
-    var characteristic = getItemCharacteristic(characteristic);
-    var price = getItemPrice(price);
-    return `
-${icon} *${title}*
-${comment} ${characteristic}
-💰: ${price}
+  const itemIcon = getItemIcon(icon);
+  const itemCharacteristic = getItemCharacteristic(characteristic);
+  const itemPrice = getItemPrice(price);
+  return `
+${itemIcon} *${title}*
+${comment} ${itemCharacteristic}
+💰: ${itemPrice}
 `;
-}
+};
 
 const showMed = ({
-    icon,
-    title,
-    effect,
-    characteristic,
-    price,
-    comment
+  icon,
+  title,
+  effect,
+  characteristic,
+  price,
+  comment,
 }) => {
-    var icon = getItemIcon(icon);
-    var characteristic = getItemCharacteristic(characteristic);
-    var price = getItemPrice(price);
-    return `
-${icon} *${title}*
-${effect}${characteristic}
-💰: ${price}${comment ? `\n${comment}` : ''}
+  const medIcon = getItemIcon(icon);
+  const medCharacteristic = getItemCharacteristic(characteristic);
+  const medPrice = getItemPrice(price);
+  return `
+${medIcon} *${title}*
+${effect}${medCharacteristic}
+💰: ${medPrice}${comment ? `\n${comment}` : ''}
 `;
-}
+};
 
-const showInvention = ({
-    icon,
-    title,
-    rarity,
-    characteristic,
-    price
+/* const showInvention = ({
+  icon,
+  title,
+  rarity,
+  characteristic,
+  price,
 }, comment) => {
-    var icon = getItemIcon(icon);
-    var characteristic = getItemCharacteristic(characteristic);
-    var price = getItemPrice(price);
-    return `
+  var icon = getItemIcon(icon);
+  var characteristic = getItemCharacteristic(characteristic);
+  var price = getItemPrice(price);
+  return `
 ${icon}${title} ${rarity}
 (${characteristic}${comment}) - ${price}
 `;
-}
+}; */
 
 const showInventionWithoutTitle = ({
-    rarity,
-    characteristic,
-    price
+  rarity,
+  characteristic,
+  price,
 }, comment) => {
-    var characteristic = getItemCharacteristic(characteristic);
-    var price = getItemPrice(price);
-    return `${rarity} (${characteristic}${comment}) - ${price}`;
-}
-
-const showItemsByPlace = (place, items, itemsComment) => {
-    return items.filter(item => item.place === place && !!item.price && !item.rarity)
-                .map(item => {
-                    return showItem(item, itemsComment);
-    }).join('');
+  const inventionCharacteristic = getItemCharacteristic(characteristic);
+  const inventionPrice = getItemPrice(price);
+  return `${rarity} (${inventionCharacteristic}${comment}) - ${inventionPrice}`;
 };
 
-const getItemByRarity = ({items, title, rarityIcon}) => {
-    return items.filter(item => item.title === title && item.rarity === getRarityIcon(rarityIcon)).pop() || false;
-}
+const showItemsByPlace = (place, items, itemsComment) => items.filter(item => item.place === place && !!item.price && !item.rarity)
+  .map(item => showItem(item, itemsComment)).join('');
 
-const showItemsInventionsByPlace = (place, items, itemsComment) => {
-    return items.filter(item => item.place === place && !!item.rarities)
-                .map(invention => {
-        const firstRarity = getItemByRarity({items, title: invention.title, rarityIcon: FIRST});
-        const secondRarity = getItemByRarity({items, title: invention.title, rarityIcon: SECOND});
-        
-        return `${getItemIcon(invention.icon)} *${invention.title}* (${getItemCharacteristic(invention.characteristic)}${itemsComment})
+const getItemByRarity = ({ items, title, rarityIcon }) => items.filter(item => item.title === title && item.rarity === getRarityIcon(rarityIcon)).pop() || false;
+
+const showItemsInventionsByPlace = (place, items, itemsComment) => items.filter(item => item.place === place && !!item.rarities)
+  .map((invention) => {
+    const firstRarity = getItemByRarity({ items, title: invention.title, rarityIcon: FIRST });
+    const secondRarity = getItemByRarity({ items, title: invention.title, rarityIcon: SECOND });
+
+    return `${getItemIcon(invention.icon)} *${invention.title}* (${getItemCharacteristic(invention.characteristic)}${itemsComment})
 ${firstRarity ? showInventionWithoutTitle(firstRarity, itemsComment) : ''}
 ${secondRarity ? `${showInventionWithoutTitle(secondRarity, itemsComment)}\n` : ''}\n`;
-    }).join('');
-}
+  }).join('');
 
-const getHelmetsByPlace = place => {
-    return showItemsByPlace(place, helmets, helmetsComment)
-};
+const getHelmetsByPlace = place => showItemsByPlace(place, helmets, helmetsComment);
 
-const getWeaponsByPlace = place => {
-    return showItemsByPlace(place, weapons, weaponsLongComment)
-};
+const getWeaponsByPlace = place => showItemsByPlace(place, weapons, weaponsLongComment);
 
-const getWeaponInventionsByPlace = place => {
-    return showItemsInventionsByPlace(place, weapons, weaponsShortComment)
-};
+const getWeaponInventionsByPlace = place => showItemsInventionsByPlace(place, weapons, weaponsShortComment);
 
-const getArmorsByPlace = place => {
-    return showItemsByPlace(place, armors, armorsLongComment)
-};
+const getArmorsByPlace = place => showItemsByPlace(place, armors, armorsLongComment);
 
-const getArmorInventionsByPlace = place => {
-    return showItemsInventionsByPlace(place, armors, armorsShortComment)
-};
+const getArmorInventionsByPlace = place => showItemsInventionsByPlace(place, armors, armorsShortComment);
 
-const getMedsByPlace = place => {
-    const itemsFromPlace = meds.filter(item => (item.place === place));
-    return Object.keys(itemsFromPlace).map(item => {
-        return showMed(itemsFromPlace[item]);
-    }).join('');
+const getMedsByPlace = (place) => {
+  const itemsFromPlace = meds.filter(item => (item.place === place));
+  return Object.keys(itemsFromPlace).map(item => showMed(itemsFromPlace[item])).join('');
 };
 
 module.exports = {
-    getHelmetsByPlace,
-    getWeaponsByPlace,
-    getArmorsByPlace,
-    getMedsByPlace,
-    getWeaponInventionsByPlace,
-    getArmorInventionsByPlace
+  getHelmetsByPlace,
+  getWeaponsByPlace,
+  getArmorsByPlace,
+  getMedsByPlace,
+  getWeaponInventionsByPlace,
+  getArmorInventionsByPlace,
 };
