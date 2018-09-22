@@ -130,45 +130,51 @@ const getToken = () => {
 
   throw new Error('Please, specify bot token mode "--dev" for development and "--prod" production');
 };
-/* 
-const bot = new TeleBot({
-  token: getToken(),
-  usePlugins: ['namedButtons'],
-  polling: {
-    interval: 50, // How often check updates (in ms).
-    limit: 2000, // Limits the number of updates to be retrieved.
-    retryTimeout: 1000, // Reconne   cting timeout (in ms).
-  },
-  webhook: { // Optional. Use webhook instead of polling.
-    key: 'key.pem', // Optional. Private key for server.
-    cert: 'cert.pem', // Optional. Public key.
-    url: 'https://....', // HTTPS url to send updates to.
-    host: '0.0.0.0', // Webhook server host.
-    port: 443, // Server port.
-    maxConnections: 40 // Optional. Maximum allowed number of simultaneous HTTPS connections to the webhook for update delivery
-  },
-  pluginConfig: {
-    namedButtons: {
-      buttons,
-    },
-  },
-});
- */
-const token = getToken();
-const host = '0.0.0.0';
-const port = process.env.PORT;
-const url = 'https://ww-assistant-staging.herokuapp.com'
 
-const bot = new TeleBot({
-  token: token,
-  usePlugins: ['namedButtons'],
-  webhook: {url, host, port},
-  pluginConfig: {
-    namedButtons: {
-      buttons,
+const getUrl = () => {
+  process.env.ENV === 'PRODUCTION' ? process.env.URL_PRODUCTION : process.env.URL_STAGING;
+
+  if (process.env.ENV === 'PRODUCTION') {
+    return process.env.URL_PRODUCTION;
+  } else if (process.env.ENV === 'STAGING') {
+    return process.env.URL_STAGING;
+  }
+
+  throw new Error('Please, specify bot token mode "--dev" for development and "--prod" production');
+}
+
+let bot;
+
+if(process.env.ENV === 'LOCAL') {
+  bot = new TeleBot({
+    token: getToken(),
+    usePlugins: ['namedButtons'],
+    polling: {
+      interval: 1, // How often check updates (in ms).
     },
-  },
-});
+    pluginConfig: {
+      namedButtons: {
+        buttons,
+      },
+    },
+  });
+} else {
+  const token = getToken();
+  const host = '0.0.0.0';
+  const port = process.env.PORT;
+  const url = getUrl();
+  
+  bot = new TeleBot({
+    token: token,
+    usePlugins: ['namedButtons'],
+    webhook: {url, host, port},
+    pluginConfig: {
+      namedButtons: {
+        buttons,
+      },
+    },
+  });
+}
 
 const updateOrCreate = (msg, pip, cb) => {
   const telegramData = {
