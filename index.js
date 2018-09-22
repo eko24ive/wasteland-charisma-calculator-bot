@@ -1338,51 +1338,6 @@ bot.on('forward', (msg) => {
 
         return false;
       });
-    } else if (isLocation && !isGiantFaced) {
-      const location = parseLocation(msg.text);
-
-      Giant.findOne({
-        distance: location.distance,
-      }).then((databaseGiant) => {
-        if (databaseGiant !== null) {
-          if (databaseGiant.forwardStamp >= msg.forward_date) {
-            return msg.reply.text('Прости, ничего не могу с этим сделать 🤷‍♂️', {
-              asReply: true,
-              parseMode: 'markdown',
-            });
-          }
-
-          const wasDead = databaseGiant.health.current <= 0;
-          const isDead = 0;
-
-          if (wasDead !== isDead) {
-            databaseGiant.health.current = 0;
-            databaseGiant.forwardStamp = msg.forward_date;
-
-            databaseGiant.save().then(() => {
-              userManager.addPoints(msg.from.id, forwardPoints.newGiantData).then((result) => {
-                if (!result.ok) {
-                  if (result.reason === 'USER_NOT_FOUND') {
-                    msg.reply.text('Не могу начислить тебе шмепсели пока ты не скинешь мне свой пип-бой :с');
-                  }
-                }
-
-                return msg.reply.text(`Спасибо за форвард! Я обновил состояние <b>${databaseGiant.name}</b> в базе!\nНачислил тебе ${forwardPoints.newGiantData} 💎<b>Шмепселей</b>`, {
-                  asReply: true,
-                  parseMode: 'html',
-                });
-              });
-            }).catch(e => console.log(e));
-          }
-        } else {
-          return msg.reply.text('Прости, ничего не могу с этим сделать 🤷‍♂️', {
-            asReply: true,
-            parseMode: 'markdown',
-          });
-        }
-
-        return false;
-      });
     } else if (isRegularBeastFaced) {
       const beast = parseBeastFaced.parseRegularBeastFaced(msg.text);
 
@@ -1392,9 +1347,9 @@ bot.on('forward', (msg) => {
         isDungeon: false,
       }, null, {
         env: process.env.ENV,
-      }).then(({ reply, rotedBeast }) => {
+      }).then(({ reply, beast }) => {
         if (reply !== false) {
-          const beastReplyMarkup = getBeastKeyboard(rotedBeast._id.toJSON());
+          const beastReplyMarkup = getBeastKeyboard(beast._id.toJSON());
 
           return msg.reply.text(reply, {
             replyMarkup: beastReplyMarkup,
@@ -1474,6 +1429,51 @@ bot.on('forward', (msg) => {
         usePip: sessions[msg.from.id].processDataConfig.usePip,
         useBeastFace: sessions[msg.from.id].processDataConfig.useBeastFace,
         silent: true,
+      });
+    } else if (isLocation && !isGiantFaced) {
+      const location = parseLocation(msg.text);
+
+      Giant.findOne({
+        distance: location.distance,
+      }).then((databaseGiant) => {
+        if (databaseGiant !== null) {
+          if (databaseGiant.forwardStamp >= msg.forward_date) {
+            return msg.reply.text('Прости, ничего не могу с этим сделать 🤷‍♂️', {
+              asReply: true,
+              parseMode: 'markdown',
+            });
+          }
+
+          const wasDead = databaseGiant.health.current <= 0;
+          const isDead = 0;
+
+          if (wasDead !== isDead) {
+            databaseGiant.health.current = 0;
+            databaseGiant.forwardStamp = msg.forward_date;
+
+            databaseGiant.save().then(() => {
+              userManager.addPoints(msg.from.id, forwardPoints.newGiantData).then((result) => {
+                if (!result.ok) {
+                  if (result.reason === 'USER_NOT_FOUND') {
+                    msg.reply.text('Не могу начислить тебе шмепсели пока ты не скинешь мне свой пип-бой :с');
+                  }
+                }
+
+                return msg.reply.text(`Спасибо за форвард! Я обновил состояние <b>${databaseGiant.name}</b> в базе!\nНачислил тебе ${forwardPoints.newGiantData} 💎<b>Шмепселей</b>`, {
+                  asReply: true,
+                  parseMode: 'html',
+                });
+              });
+            }).catch(e => console.log(e));
+          }
+        } else {
+          return msg.reply.text('Прости, ничего не могу с этим сделать 🤷‍♂️', {
+            asReply: true,
+            parseMode: 'markdown',
+          });
+        }
+
+        return false;
       });
     }
   }
