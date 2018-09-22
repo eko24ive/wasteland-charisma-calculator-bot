@@ -1347,9 +1347,9 @@ bot.on('forward', (msg) => {
         isDungeon: false,
       }, null, {
         env: process.env.ENV,
-      }).then(({ reply, rotedBeast }) => {
+      }).then(({ reply, beast }) => {
         if (reply !== false) {
-          const beastReplyMarkup = getBeastKeyboard(rotedBeast._id.toJSON());
+          const beastReplyMarkup = getBeastKeyboard(beast._id.toJSON());
 
           return msg.reply.text(reply, {
             replyMarkup: beastReplyMarkup,
