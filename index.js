@@ -1121,6 +1121,10 @@ bot.on('forward', (msg) => {
       regexpSet: regexps.location,
     });
 
+    const isDungeonBeast = regExpSetMatcher(msg.text, {
+      regexpSet: regexps.dungeonBeast
+    });
+
     /* const isLocation = regExpSetMatcher(msg.text, {
             regexpSet: regexps.location
         });
@@ -1389,7 +1393,7 @@ bot.on('forward', (msg) => {
 
         return false;
       }).catch(e => console.log(e));
-    } else if (isRegularBeast || isFlee) {
+    } else if (isRegularBeast || isFlee || isDungeonBeast) {
       // || isLocation || isDungeonBeast || isFlee
       let data;
       let dataType;
@@ -1402,6 +1406,9 @@ bot.on('forward', (msg) => {
       } else if (isRegularBeast) {
         data = beastParser.parseRegularBeast(msg.text);
         dataType = 'regularBeast';
+      } else if (isDungeonBeast) {
+        data = beastParser.parseRegularBeast(msg.text);
+        dataType = 'dungeonBeast';
       }
 
       /* if (isDungeonBeast) {
