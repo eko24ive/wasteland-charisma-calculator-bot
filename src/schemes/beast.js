@@ -11,6 +11,7 @@ const beastScheme = new Schema({
   materialsReceived: [Number],
   receivedItems: Object,
   type: String,
+  subType: String,
   battles: [{
     totalDamageGiven: Number,
     totalDamageReceived: Number,

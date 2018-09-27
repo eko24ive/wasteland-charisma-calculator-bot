@@ -59,6 +59,7 @@ const processForwards = (inputData) => {
     distance: 0,
     lastBeastSeen: null,
     lastBeastSeenType: null,
+    lastBeastSeenSubType: null,
     lastPip: null,
     pips: [],
     pipMismatchOccurred: false,
@@ -174,6 +175,7 @@ const processForwards = (inputData) => {
         };
 
         reportData.lastBeastSeenType = 'regular';
+        reportData.lastBeastSeenSubType = 'regular';
       }
 
       reportData.distance = data.distance;
@@ -186,9 +188,11 @@ const processForwards = (inputData) => {
 
     if (dataType === 'regularBeast' && reportData.prcoessAllowed) {
       const isDungeon = reportData.lastBeastSeenType !== 'regular';
+      const subType = reportData.lastBeastSeenSubType;
 
       const beastData = {
         isDungeon,
+        subType,
       };
 
       beastData.name = data.name;
@@ -275,7 +279,10 @@ const processForwards = (inputData) => {
           beastData.battles = [];
 
           reportData.beastToValidate.push({ name: data.name, distance: data.distance, type: data.type });
-        } else if (data.name !== reportData.lastBeastSeen.name && reportData.lastBeastSeenType !== 'regular' && data.fightResult === 'lose') {
+        } else if (
+          (reportData.lastBeastSeenSubType === 'regular' && data.name !== reportData.lastBeastSeen.name && reportData.lastBeastSeenType !== beastData.type)
+          || (reportData.lastBeastSeenSubType === 'walking' && data.name.indexOf(reportData.lastBeastSeen.name) === -1 && reportData.lastBeastSeenType !== beastData.type)
+        ) {
           beastData.battles = [];
 
           reportData.beastToValidate.push({ name: data.name, distance: data.distance, type: data.type });
@@ -429,6 +436,12 @@ const processForwards = (inputData) => {
     if (dataType === 'dungeonBeastFaced' && reportData.prcoessAllowed) {
       reportData.lastBeastSeen = { name: data.name };
       reportData.lastBeastSeenType = 'dungeon';
+      reportData.lastBeastSeenSubType = 'regular';
+    }
+
+    if (dataType === 'walkingBeastFaced' && reportData.prcoessAllowed) {
+      reportData.lastBeastSeen = { name: data.name };
+      reportData.lastBeastSeenSubType = 'walking';
     }
   });
 

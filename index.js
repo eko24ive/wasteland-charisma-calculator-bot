@@ -360,6 +360,8 @@ const actualProcessUserData = (msg, reportData, updatesData, options) => {
 \`Во время вылазки на тебя напал...\`
 _или_
 \`...перегородил тебе путь.\`
+_или_
+\`устрашающе начал приближаться...\`
 
 Если у тебя нет на это времени жми /skipbeastforward
 
@@ -414,6 +416,7 @@ _или_
             name: iBeast.name,
             isDungeon: iBeast.isDungeon,
             type: iBeast.type,
+            subType: iBeast.subType,
           }).then((fBeast) => {
             const databaseBeast = fBeast;
             if (databaseBeast === null) {
@@ -708,8 +711,8 @@ _или_
 
     if (reportData.errors.length > 0) {
       errors = `
-      *Также я заметил такие вещи*:
-      ${reportData.errors.join('\n')}
+*Также я заметил такие вещи*:
+${reportData.errors.join('\n')}
               `;
     }
 
@@ -726,12 +729,13 @@ _или_
   Спасибо за форвард. Я перевёл ${userForwardPoints.toFixed(1)} 💎*Шмепселей* на твой счёт.\n_${dupesText}_`;
         } else {
           reply = `Фух, я со всём справился - спасибо тебе огромное за информацию!
-Ты заработал ${userForwardPoints.toFixed(1)} 💎*Шмепселей* за свои форварды!
-_${dupesText}_
 Всего я насчитал ${dataProcessed} данных!
 
-Если ты чего-то забыл докинуть - смело жми на \`[Скинуть лог 🏃]\` и _докидывай_
-${errors}`;
+Ты заработал ${userForwardPoints.toFixed(1)} 💎*Шмепселей* за свои форварды!
+_${dupesText}_
+
+${errors}
+Если ты чего-то забыл докинуть - смело жми на \`[Скинуть лог 🏃]\` и _докидывай_`;
         }
 
         msg.reply.text(reply, {
@@ -967,6 +971,10 @@ bot.on('forward', (msg) => {
     const isDungeonBeastFaced = regExpSetMatcher(msg.text, {
       regexpSet: regexps.dungeonBeastFaced,
     });
+    
+    const isWalkingBeastFaced = regExpSetMatcher(msg.text, {
+      regexpSet: regexps.walkingBeastFaced,
+    });
 
     if (isDungeonBeastFaced) {
       data = parseBeastFaced.parseDungeonBeastFaced(msg.text);
@@ -977,9 +985,23 @@ bot.on('forward', (msg) => {
       dataType = 'location';
       beastName = data.beastFaced.name;
       beastType = data.beastFaced.type;
+    } else if (isWalkingBeastFaced) {
+      data = parseBeastFaced.parseWalkingBeastFaced(msg.text);
+      dataType = 'walkingBeastFaced';
+      beastName = data.name;
     }
 
-    if ((beastName !== sessions[msg.from.id].beastToValidateName && sessions[msg.from.id].beastToValidateName !== '???') || sessions[msg.from.id].beastToValidateType !== beastType) {
+    const isForwardValid = ({dataType, beastName, beastType}) => {
+      const {beastToValidateName, beastToValidateType} = sessions[msg.from.id];
+
+      if (dataType === 'walkingBeastFaced') {
+        return beastToValidateName.indexOf(beastName) !== 0;
+      }
+
+      return (beastName !== beastToValidateName && beastToValidateName !== '???') || beastToValidateType !== beastType
+    }
+
+    if (isForwardValid({dataType, beastName, beastType})) {
       return msg.reply.text(`
 Этот моб не похож на того с которым ты дрался. Ты чё - наебать меня вздумал?!
 
@@ -989,7 +1011,7 @@ bot.on('forward', (msg) => {
         asReply: true,
         parseMode: 'html',
       });
-    } if (isLocation || isDungeonBeastFaced) {
+    } if (isLocation || isDungeonBeastFaced || isWalkingBeastFaced) {
       sessions[msg.from.id].data.push({
         data,
         dataType,
@@ -1037,6 +1059,10 @@ bot.on('forward', (msg) => {
       regexpSet: regexps.dungeonBeastFaced,
     });
 
+    const isWalkingBeastFaced = regExpSetMatcher(msg.text, {
+      regexpSet: regexps.walkingBeastFaced,
+    });
+
     const isClassicPip = regExpSetMatcher(msg.text, {
       regexpSet: PipRegexps.classicPip,
     });
@@ -1045,9 +1071,16 @@ bot.on('forward', (msg) => {
       regexpSet: PipRegexps.simplePip,
     });
 
+    
+
+
     if (isDungeonBeastFaced) {
       data = parseBeastFaced.parseDungeonBeastFaced(msg.text);
       dataType = 'dungeonBeastFaced';
+    } else if (isWalkingBeastFaced) {
+      data = parseBeastFaced.parseWalkingBeastFaced(msg.text);
+      dataType = 'walkingBeastFaced';
+      beastName = data.name;
     } else if (isFlee) {
       data = parseFlee(msg.text);
       dataType = 'flee';
@@ -1068,7 +1101,7 @@ bot.on('forward', (msg) => {
       dataType = 'dungeonBeast';
     }
 
-    if (isRegularBeast || isLocation || isFlee || isDeathMessage || isDungeonBeastFaced || (isClassicPip || isSimplePip) || isDungeonBeast) {
+    if (isRegularBeast || isLocation || isFlee || isDeathMessage || isDungeonBeastFaced || (isClassicPip || isSimplePip) || isDungeonBeast || isWalkingBeastFaced) {
       sessions[msg.from.id].data.push({
         data,
         dataType,
