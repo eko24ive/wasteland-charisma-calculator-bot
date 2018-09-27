@@ -1126,6 +1126,10 @@ bot.on('forward', (msg) => {
       regexpSet: regexps.regularBeastFaced,
     });
 
+    const isWalkingBeastFaced = regExpSetMatcher(msg.text, {
+      regexpSet: regexps.walkingBeastFaced,
+    });
+
     const isGiantFaced = regExpSetMatcher(msg.text, {
       regexpSet: regexps.giantFaced,
     });
@@ -1382,6 +1386,7 @@ bot.on('forward', (msg) => {
         name: beast.name,
         type: beast.type,
         isDungeon: false,
+        subType: 'regular',
       }, null, {
         env: process.env.ENV,
       }).then(({ reply, beast }) => {
@@ -1396,6 +1401,25 @@ bot.on('forward', (msg) => {
         return msg.reply.text('Прости, я никогда не слышал про этого моба :c', {
           asReply: true,
         }).catch(e => console.log(e));
+      }).catch(e => console.log(e));
+    } else if (isWalkingBeastFaced) {
+      const beast = parseBeastFaced.parseWalkingBeastFaced(msg.text);
+
+      Beast.findOne({
+        name: new RegExp(beast.name, "i"),
+        subType: 'walking',
+      }).then(fBeast => {
+        if (fBeast !== null) {
+            return msg.reply.text(`Хей, у меня есть данные про гуляющего *${beast.name}*, но я пока что не умею их выводить, прости :с`, {
+              asReply: true,
+              parseMode: 'markdown',
+            }).catch(e => console.log(e));
+          } 
+
+        return msg.reply.text(`Чёрт, я никогда не слышал про гуляющего *${beast.name}*, прости :с`, {
+          asReply: true,
+          parseMode: 'markdown',
+        })
       }).catch(e => console.log(e));
     } else if (isDungeonBeastFaced) {
       const oBeast = parseBeastFaced.parseDungeonBeastFaced(msg.text);
