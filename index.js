@@ -784,6 +784,28 @@ const processUserData = (msg, options) => {
     });
   }
 
+  if (options.useBeastFace && !_.isEmpty(reportData.beastToValidate)) {
+    sessions[msg.from.id].state = states.WAIT_FOR_BEAST_FACE_FORWARD;
+    sessions[msg.from.id].beastToValidateName = reportData.beastToValidate[0].name;
+    sessions[msg.from.id].beastToValidateType = reportData.beastToValidate[0].type;
+    sessions[msg.from.id].distance = reportData.beastToValidate[0].distance;
+    return msg.reply.text(`
+Слушай, я не могу понять с кем это были у тебя рамсы.
+Пожалуйста скинь форвард встречи с ${reportData.beastToValidate[0].type === 'DarkZone' ? '🚷' : ''}${reportData.beastToValidate[0].name} на ${reportData.beastToValidate[0].distance}км
+
+Пожалуйста скинь форвард встречи с этим мобом:
+\`Во время вылазки на тебя напал...\`
+_или_
+\`...перегородил тебе путь.\`
+
+Если у тебя нет на это времени жми /skipbeastforward
+
+*ВНИМАНИЕ: ПРИ НАЖАТИИ НА /skipbeastforward - БОТ ПРОИГНОРИРУЕТ ТОЛЬКО РЕЗУЛЬТАТ ТВОЕЙ БИТВЫ С ${reportData.beastToValidate[0].name} НЕ ЗАПИШЕТ ИХ В БАЗУ*
+  `, {
+      parseMode: 'markdown',
+    }).catch(e => console.log(e));
+  }
+
 
   if (updatesData.locations.length === 0 && updatesData.beasts.length === 0) {
     return msg.reply.text(`
