@@ -278,14 +278,14 @@ const processForwards = (inputData) => {
         if (!reportData.lastBeastSeen) {
           beastData.battles = [];
 
-          reportData.beastToValidate.push({ name: data.name, distance: data.distance, type: data.type });
+          reportData.beastToValidate.push({ name: data.name, distance: data.distance, type: data.type, reason: 'battle', date});
         } else if (
           (reportData.lastBeastSeenSubType === 'regular' && data.name !== reportData.lastBeastSeen.name && reportData.lastBeastSeenType !== beastData.type)
           || (reportData.lastBeastSeenSubType === 'walking' && data.name.indexOf(reportData.lastBeastSeen.name) === -1 && reportData.lastBeastSeenType !== beastData.type)
         ) {
           beastData.battles = [];
 
-          reportData.beastToValidate.push({ name: data.name, distance: data.distance, type: data.type });
+          reportData.beastToValidate.push({ name: data.name, distance: data.distance, type: data.type, reason: 'battle', date});
         }
       }
 
@@ -407,10 +407,10 @@ const processForwards = (inputData) => {
 
           updatesData.beasts.push(beastData);
         } else {
-          reportData.beastToValidate.push({ name: '???', distance: data.distance });
+          reportData.beastToValidate.push({ name: '???', distance: data.distance, reason: 'flee', date });
         }
       } else {
-        reportData.beastToValidate.push({ name: '???', distance: data.distance });
+        reportData.beastToValidate.push({ name: '???', distance: data.distance, reason: 'flee', date });
       }
     }
 
