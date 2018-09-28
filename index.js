@@ -91,7 +91,7 @@ const WAIT_FOR_RESPONSE = 'WAIT_FOR_RESPONSE';
 const WAIT_FOR_FORWARD_END = 'WAIT_FOR_FORWARD_END';
 const WAIT_FOR_START = 'WAIT_FOR_START';
 const WAIT_FOR_PIP_FORWARD = 'WAIT_FOR_PIP_FORWARD';
-const WAIT_FOR_BEAST_FACE_FORWARD = 'WAIT_FOR_BEAST_FACE_FORWARD';
+const WAIT_FOR_BEAST_VALIDATION = 'WAIT_FOR_BEAST_VALIDATION';
 const WAIT_FOR_DATA_TO_PROCESS = 'WAIT_FOR_DATA_TO_PROCESS';
 
 const states = {
@@ -102,7 +102,7 @@ const states = {
   WAIT_FOR_START,
   WAIT_FOR_FORWARD_END,
   WAIT_FOR_PIP_FORWARD,
-  WAIT_FOR_BEAST_FACE_FORWARD,
+  WAIT_FOR_BEAST_VALIDATION,
   WAIT_FOR_DATA_TO_PROCESS,
 };
 
@@ -116,6 +116,7 @@ const createSession = (id) => {
       useBeastFace: true,
       silent: false,
     },
+    beastToValidate: []
   };
 };
 
@@ -348,10 +349,8 @@ const actualProcessUserData = (msg, reportData, updatesData, options) => {
   }
 
   if (options.useBeastFace && !_.isEmpty(reportData.beastToValidate)) {
-    sessions[msg.from.id].state = states.WAIT_FOR_BEAST_FACE_FORWARD;
-    sessions[msg.from.id].beastToValidateName = reportData.beastToValidate[0].name;
-    sessions[msg.from.id].beastToValidateType = reportData.beastToValidate[0].type;
-    sessions[msg.from.id].distance = reportData.beastToValidate[0].distance;
+    sessions[msg.from.id].state = states.WAIT_FOR_BEAST_VALIDATION;
+    sessions[msg.from.id].beastToValidate = reportData.beastToValidate;
     return msg.reply.text(`
 Слушай, я не могу понять с кем это были у тебя рамсы.
 Пожалуйста скинь форвард встречи с ${reportData.beastToValidate[0].type === 'DarkZone' ? '🚷' : ''}${reportData.beastToValidate[0].name} на ${reportData.beastToValidate[0].distance}км
@@ -956,7 +955,7 @@ bot.on('forward', (msg) => {
         asReply: true,
       });
     }
-  } if (sessions[msg.from.id].state === states.WAIT_FOR_BEAST_FACE_FORWARD) {
+  } if (sessions[msg.from.id].state === states.WAIT_FOR_BEAST_VALIDATION) {
     // TODO: Validate forward date - should be greater that date of the first forward and less than date of last forward
 
     let data;
@@ -1111,7 +1110,7 @@ bot.on('forward', (msg) => {
     }
   } else if (
     sessions[msg.from.id].state !== states.WAIT_FOR_PIP_FORWARD
-        && sessions[msg.from.id].state !== states.WAIT_FOR_BEAST_FACE_FORWARD
+        && sessions[msg.from.id].state !== states.WAIT_FOR_BEAST_VALIDATION
         && sessions[msg.from.id].state !== states.WAIT_FOR_FORWARD_END
   ) {
     const isClassicPip = regExpSetMatcher(msg.text, {
