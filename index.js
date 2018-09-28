@@ -91,7 +91,7 @@ const WAIT_FOR_RESPONSE = 'WAIT_FOR_RESPONSE';
 const WAIT_FOR_FORWARD_END = 'WAIT_FOR_FORWARD_END';
 const WAIT_FOR_START = 'WAIT_FOR_START';
 const WAIT_FOR_PIP_FORWARD = 'WAIT_FOR_PIP_FORWARD';
-const WAIT_FOR_BEAST_VALIDATION = 'WAIT_FOR_BEAST_VALIDATION';
+const WAIT_FOR_BEAST_FACE_FORWARD = 'WAIT_FOR_BEAST_FACE_FORWARD';
 const WAIT_FOR_DATA_TO_PROCESS = 'WAIT_FOR_DATA_TO_PROCESS';
 
 const states = {
@@ -102,7 +102,7 @@ const states = {
   WAIT_FOR_START,
   WAIT_FOR_FORWARD_END,
   WAIT_FOR_PIP_FORWARD,
-  WAIT_FOR_BEAST_VALIDATION,
+  WAIT_FOR_BEAST_FACE_FORWARD,
   WAIT_FOR_DATA_TO_PROCESS,
 };
 
@@ -116,7 +116,6 @@ const createSession = (id) => {
       useBeastFace: true,
       silent: false,
     },
-    beastToValidate: []
   };
 };
 
@@ -349,8 +348,10 @@ const actualProcessUserData = (msg, reportData, updatesData, options) => {
   }
 
   if (options.useBeastFace && !_.isEmpty(reportData.beastToValidate)) {
-    sessions[msg.from.id].state = states.WAIT_FOR_BEAST_VALIDATION;
-    sessions[msg.from.id].beastToValidate = reportData.beastToValidate;
+    sessions[msg.from.id].state = states.WAIT_FOR_BEAST_FACE_FORWARD;
+    sessions[msg.from.id].beastToValidateName = reportData.beastToValidate[0].name;
+    sessions[msg.from.id].beastToValidateType = reportData.beastToValidate[0].type;
+    sessions[msg.from.id].distance = reportData.beastToValidate[0].distance;
     return msg.reply.text(`
 Слушай, я не могу понять с кем это были у тебя рамсы.
 Пожалуйста скинь форвард встречи с ${reportData.beastToValidate[0].type === 'DarkZone' ? '🚷' : ''}${reportData.beastToValidate[0].name} на ${reportData.beastToValidate[0].distance}км
@@ -359,8 +360,6 @@ const actualProcessUserData = (msg, reportData, updatesData, options) => {
 \`Во время вылазки на тебя напал...\`
 _или_
 \`...перегородил тебе путь.\`
-_или_
-\`устрашающе начал приближаться...\`
 
 Если у тебя нет на это времени жми /skipbeastforward
 
@@ -415,7 +414,6 @@ _или_
             name: iBeast.name,
             isDungeon: iBeast.isDungeon,
             type: iBeast.type,
-            subType: iBeast.subType,
           }).then((fBeast) => {
             const databaseBeast = fBeast;
             if (databaseBeast === null) {
@@ -710,8 +708,8 @@ _или_
 
     if (reportData.errors.length > 0) {
       errors = `
-*Также я заметил такие вещи*:
-${reportData.errors.join('\n')}
+      *Также я заметил такие вещи*:
+      ${reportData.errors.join('\n')}
               `;
     }
 
@@ -728,13 +726,12 @@ ${reportData.errors.join('\n')}
   Спасибо за форвард. Я перевёл ${userForwardPoints.toFixed(1)} 💎*Шмепселей* на твой счёт.\n_${dupesText}_`;
         } else {
           reply = `Фух, я со всём справился - спасибо тебе огромное за информацию!
-Всего я насчитал ${dataProcessed} данных!
-
 Ты заработал ${userForwardPoints.toFixed(1)} 💎*Шмепселей* за свои форварды!
 _${dupesText}_
+Всего я насчитал ${dataProcessed} данных!
 
-${errors}
-Если ты чего-то забыл докинуть - смело жми на \`[Скинуть лог 🏃]\` и _докидывай_`;
+Если ты чего-то забыл докинуть - смело жми на \`[Скинуть лог 🏃]\` и _докидывай_
+${errors}`;
         }
 
         msg.reply.text(reply, {
@@ -785,6 +782,28 @@ const processUserData = (msg, options) => {
       replyMarkup: defaultKeyboard,
       parseMode: 'html',
     });
+  }
+
+  if (options.useBeastFace && !_.isEmpty(reportData.beastToValidate)) {
+    sessions[msg.from.id].state = states.WAIT_FOR_BEAST_FACE_FORWARD;
+    sessions[msg.from.id].beastToValidateName = reportData.beastToValidate[0].name;
+    sessions[msg.from.id].beastToValidateType = reportData.beastToValidate[0].type;
+    sessions[msg.from.id].distance = reportData.beastToValidate[0].distance;
+    return msg.reply.text(`
+Слушай, я не могу понять с кем это были у тебя рамсы.
+Пожалуйста скинь форвард встречи с ${reportData.beastToValidate[0].type === 'DarkZone' ? '🚷' : ''}${reportData.beastToValidate[0].name} на ${reportData.beastToValidate[0].distance}км
+
+Пожалуйста скинь форвард встречи с этим мобом:
+\`Во время вылазки на тебя напал...\`
+_или_
+\`...перегородил тебе путь.\`
+
+Если у тебя нет на это времени жми /skipbeastforward
+
+*ВНИМАНИЕ: ПРИ НАЖАТИИ НА /skipbeastforward - БОТ ПРОИГНОРИРУЕТ ТОЛЬКО РЕЗУЛЬТАТ ТВОЕЙ БИТВЫ С ${reportData.beastToValidate[0].name} НЕ ЗАПИШЕТ ИХ В БАЗУ*
+  `, {
+      parseMode: 'markdown',
+    }).catch(e => console.log(e));
   }
 
 
@@ -955,7 +974,7 @@ bot.on('forward', (msg) => {
         asReply: true,
       });
     }
-  } if (sessions[msg.from.id].state === states.WAIT_FOR_BEAST_VALIDATION) {
+  } if (sessions[msg.from.id].state === states.WAIT_FOR_BEAST_FACE_FORWARD) {
     // TODO: Validate forward date - should be greater that date of the first forward and less than date of last forward
 
     let data;
@@ -970,10 +989,6 @@ bot.on('forward', (msg) => {
     const isDungeonBeastFaced = regExpSetMatcher(msg.text, {
       regexpSet: regexps.dungeonBeastFaced,
     });
-    
-    const isWalkingBeastFaced = regExpSetMatcher(msg.text, {
-      regexpSet: regexps.walkingBeastFaced,
-    });
 
     if (isDungeonBeastFaced) {
       data = parseBeastFaced.parseDungeonBeastFaced(msg.text);
@@ -984,23 +999,9 @@ bot.on('forward', (msg) => {
       dataType = 'location';
       beastName = data.beastFaced.name;
       beastType = data.beastFaced.type;
-    } else if (isWalkingBeastFaced) {
-      data = parseBeastFaced.parseWalkingBeastFaced(msg.text);
-      dataType = 'walkingBeastFaced';
-      beastName = data.name;
     }
 
-    const isForwardValid = ({dataType, beastName, beastType}) => {
-      const {beastToValidateName, beastToValidateType} = sessions[msg.from.id];
-
-      if (dataType === 'walkingBeastFaced') {
-        return beastToValidateName.indexOf(beastName) !== 0;
-      }
-
-      return (beastName !== beastToValidateName && beastToValidateName !== '???') || beastToValidateType !== beastType
-    }
-
-    if (isForwardValid({dataType, beastName, beastType})) {
+    if ((beastName !== sessions[msg.from.id].beastToValidateName && sessions[msg.from.id].beastToValidateName !== '???') || sessions[msg.from.id].beastToValidateType !== beastType) {
       return msg.reply.text(`
 Этот моб не похож на того с которым ты дрался. Ты чё - наебать меня вздумал?!
 
@@ -1010,7 +1011,7 @@ bot.on('forward', (msg) => {
         asReply: true,
         parseMode: 'html',
       });
-    } if (isLocation || isDungeonBeastFaced || isWalkingBeastFaced) {
+    } if (isLocation || isDungeonBeastFaced) {
       sessions[msg.from.id].data.push({
         data,
         dataType,
@@ -1058,10 +1059,6 @@ bot.on('forward', (msg) => {
       regexpSet: regexps.dungeonBeastFaced,
     });
 
-    const isWalkingBeastFaced = regExpSetMatcher(msg.text, {
-      regexpSet: regexps.walkingBeastFaced,
-    });
-
     const isClassicPip = regExpSetMatcher(msg.text, {
       regexpSet: PipRegexps.classicPip,
     });
@@ -1070,16 +1067,9 @@ bot.on('forward', (msg) => {
       regexpSet: PipRegexps.simplePip,
     });
 
-    
-
-
     if (isDungeonBeastFaced) {
       data = parseBeastFaced.parseDungeonBeastFaced(msg.text);
       dataType = 'dungeonBeastFaced';
-    } else if (isWalkingBeastFaced) {
-      data = parseBeastFaced.parseWalkingBeastFaced(msg.text);
-      dataType = 'walkingBeastFaced';
-      beastName = data.name;
     } else if (isFlee) {
       data = parseFlee(msg.text);
       dataType = 'flee';
@@ -1100,7 +1090,7 @@ bot.on('forward', (msg) => {
       dataType = 'dungeonBeast';
     }
 
-    if (isRegularBeast || isLocation || isFlee || isDeathMessage || isDungeonBeastFaced || (isClassicPip || isSimplePip) || isDungeonBeast || isWalkingBeastFaced) {
+    if (isRegularBeast || isLocation || isFlee || isDeathMessage || isDungeonBeastFaced || (isClassicPip || isSimplePip) || isDungeonBeast) {
       sessions[msg.from.id].data.push({
         data,
         dataType,
@@ -1110,7 +1100,7 @@ bot.on('forward', (msg) => {
     }
   } else if (
     sessions[msg.from.id].state !== states.WAIT_FOR_PIP_FORWARD
-        && sessions[msg.from.id].state !== states.WAIT_FOR_BEAST_VALIDATION
+        && sessions[msg.from.id].state !== states.WAIT_FOR_BEAST_FACE_FORWARD
         && sessions[msg.from.id].state !== states.WAIT_FOR_FORWARD_END
   ) {
     const isClassicPip = regExpSetMatcher(msg.text, {
@@ -1123,10 +1113,6 @@ bot.on('forward', (msg) => {
 
     const isRegularBeastFaced = regExpSetMatcher(msg.text, {
       regexpSet: regexps.regularBeastFaced,
-    });
-
-    const isWalkingBeastFaced = regExpSetMatcher(msg.text, {
-      regexpSet: regexps.walkingBeastFaced,
     });
 
     const isGiantFaced = regExpSetMatcher(msg.text, {
@@ -1385,7 +1371,6 @@ bot.on('forward', (msg) => {
         name: beast.name,
         type: beast.type,
         isDungeon: false,
-        subType: 'regular',
       }, null, {
         env: process.env.ENV,
       }).then(({ reply, beast }) => {
@@ -1400,25 +1385,6 @@ bot.on('forward', (msg) => {
         return msg.reply.text('Прости, я никогда не слышал про этого моба :c', {
           asReply: true,
         }).catch(e => console.log(e));
-      }).catch(e => console.log(e));
-    } else if (isWalkingBeastFaced) {
-      const beast = parseBeastFaced.parseWalkingBeastFaced(msg.text);
-
-      Beast.findOne({
-        name: new RegExp(beast.name, "i"),
-        subType: 'walking',
-      }).then(fBeast => {
-        if (fBeast !== null) {
-            return msg.reply.text(`Хей, у меня есть данные про гуляющего *${beast.name}*, но я пока что не умею их выводить, прости :с`, {
-              asReply: true,
-              parseMode: 'markdown',
-            }).catch(e => console.log(e));
-          } 
-
-        return msg.reply.text(`Чёрт, я никогда не слышал про гуляющего *${beast.name}*, прости :с`, {
-          asReply: true,
-          parseMode: 'markdown',
-        })
       }).catch(e => console.log(e));
     } else if (isDungeonBeastFaced) {
       const oBeast = parseBeastFaced.parseDungeonBeastFaced(msg.text);

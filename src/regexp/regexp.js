@@ -5,6 +5,7 @@ const hungerRegExp = /🍗\d+\%/;
 const staminaRegExp = /🔋\d+\/\d+/;
 const campDistanceRegExp = /👣(\d+)км/;
 const receivedCapsAndMaterialsRegExp = /Найдено: 🕳(\d+) и 📦(\d+)/;
+const lostCapsAndMaterialsRegExp = /Потеряно: 🕳(\d+) и 📦(\d+)/;
 const receivedItemRegExp = /Получено: (?!📦)(.+)/;
 const receivedBonusItemRegExp = /Бонус: (.+)/;
 const injuryRegExp = /Ты ранен: 💔-(\d+)/;
@@ -121,6 +122,7 @@ const flee = {
     beastSuccessFleeRegExp,
   ],
   conditional: [
+    lostCapsAndMaterialsRegExp,
     beastDefeatCapsLostRegExp,
     beastDefeatMaterialsLostRegExp,
   ],
@@ -220,6 +222,7 @@ const regexps = {
   darkZone,
   beastDungeonFlagRegExp,
   walkingBeastFacedRegExp,
+  lostCapsAndMaterialsRegExp,
 };
 
 module.exports = {
