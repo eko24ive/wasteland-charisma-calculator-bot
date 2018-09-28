@@ -1000,8 +1000,13 @@ bot.on('forward', (msg) => {
     const { beastsToValidate, initialForwardDate, lastForwardDate } = sessions[msg.from.id];
 
     if (msg.forward_date > lastForwardDate) {
-      if (String(msg.forward_date*1000) < moment(initialForwardDate*1000).subtract(3, 'hours').format('X'))
-      return msg.reply('Дата этого форврада не вписываеться во временной промежуток твоих фовардов - наебать меня вздумал?', {
+      if (String(msg.forward_date*1000) < moment(initialForwardDate*1000).subtract(3, 'hours').format('X')) {
+        return msg.reply('Дата этого форврада не вписываеться во временной промежуток твоих фовардов - наебать меня вздумал?', {
+          asReply: true
+        })
+      }
+
+      return msg.reply('Дата этого форврада позже последнего форварда из твоего круга - наебать меня вздумал?', {
         asReply: true
       })
     }
