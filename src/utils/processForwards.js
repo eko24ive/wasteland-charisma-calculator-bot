@@ -206,7 +206,7 @@ const processForwards = (inputData) => {
       }
 
       const isDungeon = reportData.lastBeastSeenType !== 'regular';
-      const subType = reportData.lastBeastSeenSubType;
+      const subType = reportData.lastBeastSeenSubType || 'regular';
 
       const beastData = {
         isDungeon,
