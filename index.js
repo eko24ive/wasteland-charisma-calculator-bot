@@ -116,7 +116,9 @@ const createSession = (id) => {
       useBeastFace: true,
       silent: false,
     },
-    beastToValidate: []
+    beastsToValidate: [],
+    initialForwardDate: null,
+    lastForwardDate: null
   };
 };
 
@@ -341,42 +343,42 @@ bot.on(['/start', '/help'], (msg) => {
   );
 });
 
-const getBeastToValidateMessage = (beastsToValidate) => {
+const getBeastToValidateMessage = (beastsToValidate, firstTime = true, failing = false) => {
+  const indexedBeasts = beastsToValidate.map((beast, index) => ({...beast, index}));
 
-  const battlesToValidate = beastsToValidate.filter(({reason}) => reason === 'battle')
+  const battlesToValidate = indexedBeasts.filter(({reason}) => reason === 'battle')
                             .map(({
                               type,
                               name,
                               distance,
                               date,
-                            }) => `- ${name} в ${type === 'DarkZone' ? 'Тёмной Зоне' : 'Безопасной Зоне'} на ${distance}км\nБитва произошла в ${moment(date).calendar()}`);
+                              index,
+                            }) => `- <b>${name}</b> в ${type === 'DarkZone' ? '🚷ТЗ' : '💀Безопасной Зоне'} на ${distance}км\n<i>Битва произошла в ${moment(date*1000).format('DD.MM.YYYY HH:mm')}</i>\nПроигнорировать: /ignore_${index}_${date}`);
 
-  const fleesToValidate = beastsToValidate.filter(({reason}) => reason === 'battle')
+  const fleesToValidate = indexedBeasts.filter(({reason}) => reason === 'flee')
                             .map(({
                               type,
-                              name,
                               distance,
                               date,
-                            }) => `- Неизвестный моб в ${type === 'DarkZone' ? 'Тёмной Зоне' : 'Безопасной Зоне'} на ${distance}км\Побег произошел в ${moment(date).calendar()}`);
+                              index,
+                            }) => `- Неизвестный моб в ${type === 'DarkZone' ? '🚷ТЗ' : '💀Безопасной Зоне'} на ${distance}км\n<i>Побег произошел в ${moment(date*1000).format('DD.MM.YYYY HH:mm')}</i>\nПроигнорировать: /ignore_${index}_${date}`);
 
-  return `Слушай, у меня тут есть пару вопросиков по поводу правдивости твоей инфы - давай мы их обкашляем.
+  return `${failing ? 'Ты скинул мне какую-то хуйню, вот список того что мне нужно:' : (firstTime ? 'Слушай, у меня тут есть пару вопросиков по поводу правдивости твоей инфы - давай-ка их обкашляем.' : 'Отлично, продолжай в том же духе')}
 
-${battlesToValidate.length > 0 ? '[БИТВЫ]' : ''}
+${battlesToValidate.length > 0 ? '<b>[БИТВЫ]</b>' : ''}
 ${battlesToValidate.join('\n')}
 
-${battlesToValidate.length > 0 ? '[БИТВЫ]' : ''}
-${battlesToValidate.join('\n')}
+${fleesToValidate.length > 0 ? '<b>[ПОБЕГИ]</b>' : ''}
+${fleesToValidate.join('\n')}
 
-Пожалуйста скинь форвард встречи с этими красавцами, они выглядят как-то так:
-\`Во время вылазки на тебя напал...\`
-_или_
-\`...перегородил тебе путь.\`
-_или_
-\`устрашающе начал приближаться...\`
-
-Если у тебя нет на это времени жми /skipbeastforward
-
-*ВНИМАНИЕ: ПРИ НАЖАТИИ НА /skipbeastforward - БОТ ПРОИГНОРИРУЕТ ТОЛЬКО РЕЗУЛЬТАТ ТВОЕЙ БИТВЫ С ${reportData.beastToValidate[0].name} НЕ ЗАПИШЕТ ИХ В БАЗУ*`;
+${firstTime ? `Пожалуйста, скинь форварды встречи с этими красавцами, они выглядят как-то так:
+<code>Во время вылазки на тебя напал...</code>
+<i>или</i>
+<code>...перегородил тебе путь.</code>
+<i>или</i>
+<code>устрашающе начал приближаться...</code>\n` : ''}
+Если у тебя нет на это времени жми /skipbeastforwards
+<i>ВНИМАНИЕ: ПРИ НАЖАТИИ НА /skipbeastforwards - БОТ ПРОИГНОРИРУЕТ ДАННЫЕ, КОТОРЫЕ ЗАВИСЯТ ОТ УКАЗАНЫХ ВЫШЕ ФОРВАРДОВ, И НЕ ЗАПИШЕТ ИХ В БАЗУ</i>`;
 }
 
 const actualProcessUserData = (msg, reportData, updatesData, options) => {
@@ -386,12 +388,15 @@ const actualProcessUserData = (msg, reportData, updatesData, options) => {
     });
   }
 
-  if (options.useBeastFace && !_.isEmpty(reportData.beastToValidate)) {
+  if (options.useBeastFace && !_.isEmpty(reportData.beastsToValidate)) {
     sessions[msg.from.id].state = states.WAIT_FOR_DATA_VALIDATION;
-    sessions[msg.from.id].beastToValidate = reportData.beastToValidate;
+    sessions[msg.from.id].initialForwardDate = reportData.initialForwardDate;
+    sessions[msg.from.id].lastForwardDate = reportData.lastForwardDate;
+    sessions[msg.from.id].beastsToValidate = reportData.beastsToValidate;
 
-    return msg.reply.text(getBeastToValidateMessage(sessions[msg.from.id].beastToValidate), {
+    return msg.reply.text(getBeastToValidateMessage(sessions[msg.from.id].beastsToValidate), {
       parseMode: 'html',
+      replyMarkup: 'hide',
     }).catch(e => console.log(e));
   }
 
@@ -426,7 +431,7 @@ const actualProcessUserData = (msg, reportData, updatesData, options) => {
     return false;
   }
 
-  const isBeastUnderValidation = name => reportData.beastToValidate.filter(beast => beast.name === name).length > 0;
+  const isBeastUnderValidation = name => reportData.beastsToValidate.filter(beast => beast.name === name).length > 0;
 
   const processBeasts = () => new Promise((resolve) => {
     if (updatesData.beasts.length > 0 && options.usePip === true) {
@@ -810,12 +815,15 @@ const processUserData = (msg, options) => {
     });
   }
 
-  if (options.useBeastFace && !_.isEmpty(reportData.beastToValidate)) {
+  if (options.useBeastFace && !_.isEmpty(reportData.beastsToValidate)) {
     sessions[msg.from.id].state = states.WAIT_FOR_DATA_VALIDATION;
-    sessions[msg.from.id].beastToValidate = reportData.beastToValidate;
+    sessions[msg.from.id].initialForwardDate = reportData.initialForwardDate;
+    sessions[msg.from.id].lastForwardDate = reportData.lastForwardDate;
+    sessions[msg.from.id].beastsToValidate = reportData.beastsToValidate;
 
-    return msg.reply.text(getBeastToValidateMessage(sessions[msg.from.id].beastToValidate), {
+    return msg.reply.text(getBeastToValidateMessage(sessions[msg.from.id].beastsToValidate), {
       parseMode: 'html',
+      replyMarkup: 'hide',
     }).catch(e => console.log(e));
   }
 
@@ -989,7 +997,15 @@ bot.on('forward', (msg) => {
     }
   } if (sessions[msg.from.id].state === states.WAIT_FOR_DATA_VALIDATION) {
     // TODO: Validate forward date - should be greater that date of the first forward and less than date of last forward
+    const { beastsToValidate, initialForwardDate, lastForwardDate } = sessions[msg.from.id];
 
+    if (msg.forward_date > lastForwardDate) {
+      if (String(msg.forward_date*1000) < moment(initialForwardDate*1000).subtract(3, 'hours').format('X'))
+      return msg.reply('Дата этого форврада не вписываеться во временной промежуток твоих фовардов - наебать меня вздумал?', {
+        asReply: true
+      })
+    }
+    
     let data;
     let dataType;
     let beastName;
@@ -1023,13 +1039,12 @@ bot.on('forward', (msg) => {
     }
 
     const isForwardValid = ({dataType, beastName, beastType}) => {
-      const {beastToValidateName, beastToValidateType} = sessions[msg.from.id];
 
       if (dataType === 'walkingBeastFaced') {
-        return beastToValidateName.indexOf(beastName) !== 0;
+        return beastsToValidate.every(beast => (beast.name.indexOf(beastName) !== 0))
       }
 
-      return (beastName !== beastToValidateName && beastToValidateName !== '???') || beastToValidateType !== beastType
+      return beastsToValidate.every(beast => (beast.name !== beastName && beast.name !== '???') || beast.type !== beastType)
     }
 
     if (isForwardValid({dataType, beastName, beastType})) {
@@ -1737,8 +1752,15 @@ bot.on('/skippipforward', (msg) => {
   });
 });
 
-bot.on('/skipbeastforward', (msg) => {
-  msg.reply.text('Окей, сейчас попробую обработать что смогу');
+bot.on(['/skipbeastforward','/skipbeastforwards'], (msg) => {
+  if(_.isEmpty(sessions)) {
+    return msg.reply.text('Слушай, а мне собственно нечего игнорировать. Может меня опять какой-то пидор перезагрузил, не знаешь?', {
+      asReply: true,
+      replyMarkup: defaultKeyboard,
+    });
+  }
+
+  msg.reply.text('Окей, обработаю что смогу');
 
   sessions[msg.from.id].processDataConfig.useBeastFace = false;
 
@@ -2777,5 +2799,60 @@ bot.on(/\/battle_(.+)/, (msg) => {
 
   return false;
 });
+
+bot.on(/\/ignore_(.+)_(.+)/, msg => {
+  if(_.isEmpty(sessions)) {
+    return msg.reply.text('Слушай, а мне собственно нечего игнорировать. Может меня опять какой-то пидор перезагрузил, не знаешь?', {
+      asReply: true,
+      replyMarkup: defaultKeyboard,
+    });
+  }
+
+  const [, ignoreIndex, date] = /\/ignore_(.+)_(.+)/.exec(msg.text);
+  const {beastsToValidate} = sessions[msg.from.id];
+  const index = Number(ignoreIndex);
+
+  if (Number.isInteger(index) || !date) {
+    if (beastsToValidate !== undefined && beastsToValidate.length > 0) {
+      if(beastsToValidate[index] !== undefined) {
+        const {data} = sessions[msg.from.id];
+
+        sessions[msg.from.id].data = data.map(data => {
+          if (data.date === Number(date)) {
+            return {
+              ...data,
+              ignore: true
+            }
+          }
+
+          return data;
+        });
+
+        sessions[msg.from.id].state = states.WAIT_FOR_DATA_TO_PROCESS;
+
+        processUserData(msg, {
+          usePip: sessions[msg.from.id].processDataConfig.usePip,
+          useBeastFace: sessions[msg.from.id].processDataConfig.useBeastFace,
+        });
+
+        return;
+      }
+
+      return msg.reply.text('Эм, я такой команды тебе не давал, а туда ли ты воюешь?', {
+        asReply: true
+      });
+    }
+
+    return msg.reply.text('Слушай, а мне собственно нечего игнорировать. Может меня опять какой-то пидор перезагрузил, не знаешь?', {
+      asReply: true,
+      replyMarkup: defaultKeyboard,
+    });
+  }
+
+  return msg.reply.text('Ты какую-то хуйню сделал. Моя твоя не понимать.', {
+    asReply: true
+  });
+
+})
 
 bot.start();

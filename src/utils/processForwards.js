@@ -70,8 +70,10 @@ const processForwards = (inputData) => {
     criticalError: false,
     healthCapHistory: [],
     distanceHistory: [],
-    beastToValidate: [],
+    beastsToValidate: [],
     prcoessAllowed: true,
+    initialForwardDate: null,
+    lastForwardDate: null,
   };
 
   const updatesData = {
@@ -137,7 +139,16 @@ const processForwards = (inputData) => {
     dataType,
     date,
     userId,
-  }) => {
+    ignore
+  }, index) => {
+    if (index === 0) {
+      reportData.initialForwardDate = date;
+    }
+
+    if (index === (inputData.length - 1)) {
+      reportData.lastForwardDate = date;
+    }
+
     if (reportData.prcoessAllowed) {
       const lastDistance = _.last(reportData.distanceHistory);
 
@@ -182,11 +193,18 @@ const processForwards = (inputData) => {
       reportData.distanceHistory.push(data.distance);
 
       delete locationData.beastFaced;
+      delete locationData.lastBeastSeenType;
+      delete locationData.lastBeastSeenSubType;
+
       updatesData.locations.push(locationData);
       reportData.healthCapHistory.push(data.healthCap);
     }
 
     if (dataType === 'regularBeast' && reportData.prcoessAllowed) {
+      if (ignore) {
+        return;
+      }
+
       const isDungeon = reportData.lastBeastSeenType !== 'regular';
       const subType = reportData.lastBeastSeenSubType;
 
@@ -197,6 +215,7 @@ const processForwards = (inputData) => {
 
       beastData.name = data.name;
       beastData.type = data.type;
+      beastData.proofedByForward = true;
       beastData.distanceRange = [data.distance];
       reportData.distance = data.distance;
       reportData.distanceHistory.push(data.distance);
@@ -278,23 +297,38 @@ const processForwards = (inputData) => {
         if (!reportData.lastBeastSeen) {
           beastData.battles = [];
 
-          reportData.beastToValidate.push({ name: data.name, distance: data.distance, type: data.type, reason: 'battle', date});
+          reportData.beastsToValidate.push({ name: data.name, distance: data.distance, type: data.type, reason: 'battle', date});
         } else if (
           (reportData.lastBeastSeenSubType === 'regular' && data.name !== reportData.lastBeastSeen.name && reportData.lastBeastSeenType !== beastData.type)
           || (reportData.lastBeastSeenSubType === 'walking' && data.name.indexOf(reportData.lastBeastSeen.name) === -1 && reportData.lastBeastSeenType !== beastData.type)
         ) {
           beastData.battles = [];
 
-          reportData.beastToValidate.push({ name: data.name, distance: data.distance, type: data.type, reason: 'battle', date});
+          reportData.beastsToValidate.push({ name: data.name, distance: data.distance, type: data.type, reason: 'battle', date});
+        }
+      } else {
+        if (!reportData.lastBeastSeen) {
+          beastData.proofedByForward = false;
+        } else if (
+          (reportData.lastBeastSeenSubType === 'regular' && data.name !== reportData.lastBeastSeen.name && reportData.lastBeastSeenType !== beastData.type)
+          || (reportData.lastBeastSeenSubType === 'walking' && data.name.indexOf(reportData.lastBeastSeen.name) === -1 && reportData.lastBeastSeenType !== beastData.type)
+        ) {
+          beastData.proofedByForward = false;
         }
       }
+      
 
 
       updatesData.beasts.push(beastData);
       reportData.healthCapHistory.push(data.meta.healthCap);
+      console.log(beastData.proofedByForward);
     }
 
     if (dataType === 'dungeonBeast' && reportData.prcoessAllowed) {
+      if (ignore) {
+        return;
+      }
+
       const isDungeon = reportData.lastBeastSeenType !== 'regular';
 
       const beastData = {
@@ -371,6 +405,10 @@ const processForwards = (inputData) => {
     }
 
     if (dataType === 'flee' && reportData.prcoessAllowed) {
+      if (ignore) {
+        return;
+      }
+
       const beastData = {
         isDungeon: false,
         distanceRange: [data.distance],
@@ -407,10 +445,10 @@ const processForwards = (inputData) => {
 
           updatesData.beasts.push(beastData);
         } else {
-          reportData.beastToValidate.push({ name: '???', distance: data.distance, reason: 'flee', date });
+          reportData.beastsToValidate.push({ name: '???', distance: data.distance, type: data.type, reason: 'flee', date });
         }
       } else {
-        reportData.beastToValidate.push({ name: '???', distance: data.distance, reason: 'flee', date });
+        reportData.beastsToValidate.push({ name: '???', distance: data.distance, type: data.type, reason: 'flee', date });
       }
     }
 
