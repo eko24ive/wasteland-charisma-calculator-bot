@@ -206,7 +206,7 @@ const processForwards = (inputData) => {
       }
 
       const isDungeon = reportData.lastBeastSeenType !== 'regular';
-      const subType = reportData.lastBeastSeenSubType || 'regular';
+      const subType = reportData.lastBeastSeenSubType;
 
       const beastData = {
         isDungeon,
@@ -215,6 +215,7 @@ const processForwards = (inputData) => {
 
       beastData.name = data.name;
       beastData.type = data.type;
+      beastData.date = date;
       beastData.proofedByForward = true;
       beastData.distanceRange = [data.distance];
       reportData.distance = data.distance;
