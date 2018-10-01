@@ -320,7 +320,7 @@ bot.on(['/start', '/help'], (msg) => {
 
 <code>[Скинуть лог 🏃]</code> - Запуск режима "ЛОГ". В этом режиме ты можешь переслать сюда сообщения от игрового бота.
 
-<code>[🎓Скилокачатор]</code> - Запуск «<b>Скилокачатора</b>» - анализатора в прокачке твоих скилов 
+<code>[🎓Скилокачатор]</code> - Запуск «<b>Скилокачатора</b>» - анализатора в прокачке твоих скилов
 
 <code>[💀Мобы]</code> - Информация об <b>обычных</b> мобах
 
@@ -471,7 +471,7 @@ const actualProcessUserData = (msg, reportData, updatesData, options) => {
                 const newBeast = new Beast(iBeast);
 
                 dataProcessed += 1;
-  
+
                 if (iBeast.type === 'DarkZone') {
                   userForwardPoints += forwardPoints.newMob * forwardPoints.darkZoneBattle;
                 } else {
@@ -480,7 +480,7 @@ const actualProcessUserData = (msg, reportData, updatesData, options) => {
 
                 newBeast.save().then(() => next());
               }
-              
+
               beastsToValidate.push({ name: iBeast.name, distance: iBeast.distanceRange[0], type: iBeast.type, reason: 'battle', date: iBeast.date});
               next();
             } else {
@@ -808,7 +808,7 @@ ${errors}
             sessions[msg.from.id].lastForwardDate = reportData.lastForwardDate;
             sessions[msg.from.id].beastsToValidate = beastsToValidate;
             sessions[msg.from.id].beastRequest = true;
-        
+
             return msg.reply.text(getBeastToValidateMessage(sessions[msg.from.id].beastsToValidate, sessions[msg.from.id].beastRequest), {
               parseMode: 'html',
               replyMarkup: 'hide',
@@ -824,14 +824,13 @@ ${errors}
           sessions[msg.from.id].lastForwardDate = reportData.lastForwardDate;
           sessions[msg.from.id].beastsToValidate = beastsToValidate;
           sessions[msg.from.id].beastRequest = true;
-      
+
           return msg.reply.text(getBeastToValidateMessage(sessions[msg.from.id].beastsToValidate, sessions[msg.from.id].beastRequest), {
             parseMode: 'html',
             replyMarkup: 'hide',
           }).catch(e => console.log(e));
         }
 
-        createSession(msg.from.id);
         return msg.reply.text(`
   К сожалению я ничего не смог узнать из твоих форвардов :с`, {
           replyMarkup: defaultKeyboard,
@@ -908,9 +907,9 @@ const processUserData = (msg, options) => {
   Твой пип-бой, который я когда-то сохранил - устарел.
   Пожалуйста скинь мне свой новый пип-бой.
   Либо же это форвард с статами, отличными от твоих.
-  
+
   Если у тебя нет на это времени жми /skippipforward
-  
+
   *ВНИМАНИЕ: ПРИ НАЖАТИИ НА /skippipforward - БОТ ПРОИГНОРИРУЕТ ТВОИ БИТВЫ И ПОБЕГИ ОТ МОБОВ И НЕ ЗАПИШЕТ ИХ В БАЗУ*
   `, {
             parseMode: 'markdown',
@@ -931,7 +930,7 @@ const processUserData = (msg, options) => {
         return msg.reply.text(`
   Похоже ты мне ещё не скидывал пип бой
   Если у тебя нет на это времени жми /skippipforward
-  
+
   *ВНИМАНИЕ: ПРИ НАЖАТИИ НА /skippipforward - БОТ ПРОИГНОРИРУЕТ ТВОИ БИТВЫ И ПОБЕГИ ОТ МОБОВ И НЕ ЗАПИШЕТ ИХ В БАЗУ*
   `, {
           parseMode: 'markdown',
@@ -1052,7 +1051,7 @@ bot.on('forward', (msg) => {
         asReply: true
       })
     }
-    
+
     let data;
     let dataType;
     let beastName;
@@ -1084,7 +1083,7 @@ bot.on('forward', (msg) => {
       dataType = 'walkingBeastFaced';
       beastName = data.name;
     }
-    
+
     const isForwardValid = ({dataType, beastName, beastType}) => {
       let beastValidationTimeScope = beastsToValidate.map((beast, index) => ({...beast, index}));
       let timeOffset;
@@ -1154,7 +1153,7 @@ bot.on('forward', (msg) => {
         asReply: true,
         parseMode: 'html'
       });
-      
+
     } else {
       return msg.reply.text(`
 Это не похоже на встречу моба. Если ты передумал её кидать - жми /skipbeastforward
@@ -1544,7 +1543,7 @@ bot.on('forward', (msg) => {
               asReply: true,
               parseMode: 'markdown',
             }).catch(e => console.log(e));
-          } 
+          }
 
         return msg.reply.text(`Чёрт, я никогда не слышал про гуляющего *${beast.name}*, прости :с`, {
           asReply: true,
@@ -1795,7 +1794,7 @@ bot.on('/journeyforwardstart', (msg) => {
  - Побег от моба
  - Информацию о локации(километре)
 
-Обработаную информацию я занесу в базу, которая обязательно поможет другим игрокам а тебе в награду отсыплю пару 💎*Шмепселей* 
+Обработаную информацию я занесу в базу, которая обязательно поможет другим игрокам а тебе в награду отсыплю пару 💎*Шмепселей*
     `, {
     replyMarkup,
     parseMode: 'markdown',
