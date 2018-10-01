@@ -44,9 +44,68 @@ const normalizeItems = (items) => {
   return normalizedItems;
 };
 
-// TODO: Validate kilometers
-// TODO: Handle death
-// TODO: Typescript
+const mergeBeasts = (beastsToMerge) => {
+  const unproofedBeasts = beastsToMerge.filter(beast => !beast.proofedByForward);
+  const proofedBeast = beastsToMerge.filter(beast => beast.proofedByForward);
+
+  const mergedBeasts = {};
+
+  proofedBeast.forEach(beast => {
+    if (mergedBeasts[beast.name]) {
+      const existingBeast = mergedBeasts[beast.name];
+
+      if (existingBeast.isDungeon === beast.isDungeon && existingBeast.subType === beast.subType && existingBeast.type === beast.type && existingBeast.isDungeon === beast.isDungeon && existingBeast.isDungeon === beast.isDungeon) {
+        mergedBeasts[beast.name] = beast;
+
+        if (!_.contains(existingBeast.distanceRange, beast.distanceRange[0])) {
+          existingBeast.distanceRange.push(beast.distanceRange[0]);
+        }
+
+        if (beast.capsReceived !== undefined) {
+          if (!_.contains(existingBeast.capsReceived, beast.capsReceived)) {
+            if (_.isArray(existingBeast.capsReceived)) {
+              existingBeast.capsReceived.push(beast.capsReceived);
+            }
+
+            existingBeast.capsReceived = [existingBeast.capsReceived, beast.capsReceived];
+          }
+        }
+
+        if (beast.materialsReceived !== undefined) {
+          if (!_.contains(existingBeast.materialsReceived, beast.materialsReceived)) {
+            if (_.isArray(existingBeast.materialsReceived)) {
+              existingBeast.materialsReceived.push(beast.materialsReceived);
+            }
+
+            existingBeast.materialsReceived = [existingBeast.materialsReceived, beast.capsReceived];
+          }
+        }
+
+        if (beast.battles !== undefined) {
+          existingBeast.battles.push(beast.battles[0]);
+        }
+
+        if (beast.concussions !== undefined) {
+          existingBeast.concussions.push(beast.concussions[0]);
+        }
+
+        if (beast.flees !== undefined) {
+          existingBeast.flees.push(beast.flees[0]);
+        }
+
+        mergedBeasts[beast.name] = existingBeast;
+      }
+    } else {
+      mergedBeasts[beast.name] = beast;
+    }
+  })
+
+  const beasts = _.flatten([...unproofedBeasts, _.flatten(Object.keys(mergedBeasts).map(name => {
+    return mergedBeasts[name]
+  }))]);
+
+  return beasts;
+}
 
 const processForwards = (inputData) => {
   const reportData = {
@@ -103,7 +162,9 @@ const processForwards = (inputData) => {
   if (dataPips.length > 1) {
     if (!checkPips(dataPips)) {
       reportData.criticalError = 'Пипы не соответствуют!';
-      return { reportData };
+      return {
+        reportData
+      };
     }
 
     reportData.lastPip = dataPips.pop().data;
@@ -252,7 +313,9 @@ const processForwards = (inputData) => {
         }];
 
         if (reportData.lastPip) {
-          beastData.concussions[0].stats = { agility: reportData.lastPip.agility };
+          beastData.concussions[0].stats = {
+            agility: reportData.lastPip.agility
+          };
         } else {
           reportData.recalculationRequired = true;
         }
@@ -298,26 +361,38 @@ const processForwards = (inputData) => {
         if (!reportData.lastBeastSeen) {
           beastData.battles = [];
 
-          reportData.beastsToValidate.push({ name: data.name, distance: data.distance, type: data.type, reason: 'battle', date});
+          reportData.beastsToValidate.push({
+            name: data.name,
+            distance: data.distance,
+            type: data.type,
+            reason: 'battle',
+            date
+          });
         } else if (
-          (reportData.lastBeastSeenSubType === 'regular' && data.name !== reportData.lastBeastSeen.name && reportData.lastBeastSeenType !== beastData.type)
-          || (reportData.lastBeastSeenSubType === 'walking' && data.name.indexOf(reportData.lastBeastSeen.name) === -1 && reportData.lastBeastSeenType !== beastData.type)
+          (reportData.lastBeastSeenSubType === 'regular' && data.name !== reportData.lastBeastSeen.name && reportData.lastBeastSeenType !== beastData.type) ||
+          (reportData.lastBeastSeenSubType === 'walking' && data.name.indexOf(reportData.lastBeastSeen.name) === -1 && reportData.lastBeastSeenType !== beastData.type)
         ) {
           beastData.battles = [];
 
-          reportData.beastsToValidate.push({ name: data.name, distance: data.distance, type: data.type, reason: 'battle', date});
+          reportData.beastsToValidate.push({
+            name: data.name,
+            distance: data.distance,
+            type: data.type,
+            reason: 'battle',
+            date
+          });
         }
       } else {
         if (!reportData.lastBeastSeen) {
           beastData.proofedByForward = false;
         } else if (
-          (reportData.lastBeastSeenSubType === 'regular' && data.name !== reportData.lastBeastSeen.name && reportData.lastBeastSeenType !== beastData.type)
-          || (reportData.lastBeastSeenSubType === 'walking' && data.name.indexOf(reportData.lastBeastSeen.name) === -1 && reportData.lastBeastSeenType !== beastData.type)
+          (reportData.lastBeastSeenSubType === 'regular' && data.name !== reportData.lastBeastSeen.name && reportData.lastBeastSeenType !== beastData.type) ||
+          (reportData.lastBeastSeenSubType === 'walking' && data.name.indexOf(reportData.lastBeastSeen.name) === -1 && reportData.lastBeastSeenType !== beastData.type)
         ) {
           beastData.proofedByForward = false;
         }
       }
-      
+
 
 
       updatesData.beasts.push(beastData);
@@ -340,6 +415,7 @@ const processForwards = (inputData) => {
       beastData.distanceRange = [data.distance];
       reportData.distance = data.distance;
       reportData.distanceHistory.push(data.distance);
+
 
       if (data.fightResult === 'win') {
         beastData.battles = [{
@@ -413,6 +489,7 @@ const processForwards = (inputData) => {
       const beastData = {
         isDungeon: false,
         distanceRange: [data.distance],
+        proofedByForward: true
       };
 
       reportData.distanceHistory.push(data.distance);
@@ -446,10 +523,22 @@ const processForwards = (inputData) => {
 
           updatesData.beasts.push(beastData);
         } else {
-          reportData.beastsToValidate.push({ name: '???', distance: data.distance, type: data.type, reason: 'flee', date });
+          reportData.beastsToValidate.push({
+            name: '???',
+            distance: data.distance,
+            type: data.type,
+            reason: 'flee',
+            date
+          });
         }
       } else {
-        reportData.beastsToValidate.push({ name: '???', distance: data.distance, type: data.type, reason: 'flee', date });
+        reportData.beastsToValidate.push({
+          name: '???',
+          distance: data.distance,
+          type: data.type,
+          reason: 'flee',
+          date
+        });
       }
     }
 
@@ -473,13 +562,17 @@ const processForwards = (inputData) => {
     }
 
     if (dataType === 'dungeonBeastFaced' && reportData.prcoessAllowed) {
-      reportData.lastBeastSeen = { name: data.name };
+      reportData.lastBeastSeen = {
+        name: data.name
+      };
       reportData.lastBeastSeenType = 'dungeon';
       reportData.lastBeastSeenSubType = 'regular';
     }
 
     if (dataType === 'walkingBeastFaced' && reportData.prcoessAllowed) {
-      reportData.lastBeastSeen = { name: data.name };
+      reportData.lastBeastSeen = {
+        name: data.name
+      };
       reportData.lastBeastSeenSubType = 'walking';
     }
   });
@@ -494,10 +587,17 @@ const processForwards = (inputData) => {
     }
   }
 
+
+
   return {
     reportData,
-    updatesData,
+    updatesData: {
+      locations: updatesData.locations,
+      beasts: mergeBeasts(updatesData.beasts),
+    },
   };
+
+
 };
 
 module.exports = processForwards;
