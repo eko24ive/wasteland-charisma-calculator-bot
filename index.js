@@ -581,6 +581,7 @@ const actualProcessUserData = (msg, reportData, updatesData, options) => {
               }
 
               if (iBeast.capsReceived !== undefined) {
+                // TODO: Crosscheck value
                 if (!_.contains(databaseBeast.capsReceived, iBeast.capsReceived)) {
                   databaseBeast.capsReceived.push(iBeast.capsReceived);
                 }
@@ -645,9 +646,6 @@ const actualProcessUserData = (msg, reportData, updatesData, options) => {
               }
 
               dataProcessed += 1;
-
-              // TODO: Concussion
-              // TODO: Received items
 
               if (iBeast.type === 'DarkZone') {
                 userForwardPoints += beastPoints * forwardPoints.darkZoneBattle;
