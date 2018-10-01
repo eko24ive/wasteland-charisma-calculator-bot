@@ -149,7 +149,7 @@ const bot = new TeleBot({
   },
 });
 
-const updateOrCreate = (msg, pip, cb) => {
+const updateOrCreate = (msg, pip, cb = (() => {})) => {
   const telegramData = {
     first_name: msg.from.first_name,
     id: msg.from.id,
@@ -399,9 +399,7 @@ ${firstTime ? `Пожалуйста, скинь <b>ОТДЕЛЬНО</b> форв
 
 const actualProcessUserData = (msg, reportData, updatesData, options) => {
   if (reportData.lastPip !== null) {
-    updateOrCreate(msg, reportData.lastPip, (result) => {
-      console.log(result);
-    });
+    updateOrCreate(msg, reportData.lastPip);
   }
 
   if (options.useBeastFace && !_.isEmpty(reportData.beastsToValidate)) {
@@ -479,10 +477,10 @@ const actualProcessUserData = (msg, reportData, updatesData, options) => {
                 }
 
                 newBeast.save().then(() => next());
+              } else {
+                beastsToValidate.push({ name: iBeast.name, distance: iBeast.distanceRange[0], type: iBeast.type, reason: 'battle', date: iBeast.date});
+                next();
               }
-
-              beastsToValidate.push({ name: iBeast.name, distance: iBeast.distanceRange[0], type: iBeast.type, reason: 'battle', date: iBeast.date});
-              next();
             } else {
               let isSameFleeExists = true;
               let isSameConcussionExists = true;
