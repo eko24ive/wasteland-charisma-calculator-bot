@@ -354,7 +354,7 @@ const getBeastToValidateMessage = (beastsToValidate, beastRequest = false, first
 
     if(firstTime) {
       if(beastRequest) {
-        beastRequestFirstTime
+        return beastRequestFirstTime
       }
       return beastRequestValidate
     } else if (failing) {
@@ -491,15 +491,21 @@ const actualProcessUserData = (msg, reportData, updatesData, options) => {
 
               if (iBeast.battles) {
                 if (iBeast.battles.length > 0) {
+                  // FIXME: Implement correct battle dupe detection
                   isSameBattleExists = databaseBeast.battles.map((battle) => {
                     if (iBeast.battles === undefined) {
                       return true;
                     }
 
                     const existingBattle = _.clone(battle.toJSON());
-                    const sameStatsBattle = existingBattle.totalDamageReceived === iBeast.battles[0].totalDamageReceived
-                                              && existingBattle.totalDamageGiven === iBeast.battles[0].totalDamageGiven;
-                    const sameStamp = iBeast.battles[0].stamp === existingBattle.stamp;
+                    const sameStatsBattle = iBeast.battles.some(newBattle => {
+                      return existingBattle.totalDamageReceived === newBattle.totalDamageReceived
+                      && existingBattle.totalDamageGiven === newBattle.totalDamageGiven;
+                    });
+
+                    const sameStamp = iBeast.battles.some(newBattle => {
+                      return newBattle.stamp === existingBattle.stamp;
+                    })
 
                     if (sameStamp) {
                       isBattleDupe = true;
@@ -512,14 +518,15 @@ const actualProcessUserData = (msg, reportData, updatesData, options) => {
               }
 
 
-              // TODO: Error logging for no stats object
               if (iBeast.concussions) {
                 if (iBeast.concussions.length > 0) {
                   isSameConcussionExists = databaseBeast.concussions.map((concussion) => {
                     const existingConcussion = _.clone(concussion.toJSON());
 
-                    return existingConcussion.stats.agility === iBeast.concussions[0].stats.agility
-                                                  && existingConcussion.amount === iBeast.concussions[0].amount;
+                    return iBeast.concussions.some(newConcussion => {
+                      return existingConcussion.stats.agility === newConcussion.stats.agility
+                      && existingConcussion.amount === newConcussion.amount;
+                    });
                   }).some(result => result === true);
                 }
               }
@@ -529,15 +536,15 @@ const actualProcessUserData = (msg, reportData, updatesData, options) => {
                   isSameFleeExists = databaseBeast.flees.map((flee) => {
                     const existingFlee = _.clone(flee.toJSON());
 
-                    if (iBeast.flees[0].outcome === 'win') {
-                      return existingFlee.stats.agility === iBeast.flees[0].stats.agility
-                                                      && existingFlee.outcome === iBeast.flees[0].outcome;
-                    }
+                    const sameStatsFlee = iBeast.flees[0].some(newFlee => {
+                      return existingFlee.stats.agility === newFlee.stats.agility
+                              && existingFlee.outcome === newFlee.outcome
+                              && existingFlee.damageReceived === newFlee.damageReceived;
+                    });
 
-                    const sameStatsFlee = existingFlee.stats.agility === iBeast.flees[0].stats.agility
-                                              && existingFlee.outcome === iBeast.flees[0].outcome
-                                              && existingFlee.damageReceived === iBeast.flees[0].damageReceived;
-                    const sameStamp = iBeast.flees[0].stamp === flee.stamp;
+                    const sameStamp = iBeast.flees.some(newFlee => {
+                      return newFlee.stamp === flee.stamp;
+                    })
 
                     if (sameStamp) {
                       isFleeDupe = true;
@@ -550,7 +557,9 @@ const actualProcessUserData = (msg, reportData, updatesData, options) => {
               }
 
               if (!_.isEmpty(iBeast.receivedItems)) {
-                if (_.isEmpty(databaseBeast.receivedItems)) {
+                // FIXME: Implement cross-validation and cross-updation of receivedItems
+
+                /* if (_.isEmpty(databaseBeast.receivedItems)) {
                   databaseBeast.receivedItems = {};
                 }
 
@@ -567,81 +576,98 @@ const actualProcessUserData = (msg, reportData, updatesData, options) => {
                     databaseBeast.markModified('receivedItems');
                     databaseBeast.receivedItems[item] = [amount];
                   }
-                });
+                }); */
               }
 
               if (!isBattleDupe) {
-                if (!_.contains(databaseBeast.distanceRange, iBeast.distanceRange[0])) {
-                  beastPoints += forwardPoints.newDistance;
+                if (
+                  !iBeast.distanceRange.some(newDistance => _.contains(databaseBeast.distanceRange,newDistance))
+                  ) {
+                  
+                  beastPoints += forwardPoints.newDistance * iBeast.distanceRange.length;
+                  
+                  databaseBeast.distanceRange = _.uniq(
+                    _.flatten([databaseBeast.distanceRange, iBeast.distanceRange])
+                  );
 
-                  databaseBeast.distanceRange.push(iBeast.distanceRange[0]);
                 } else {
                   beastPoints += forwardPoints.sameDistance;
                 }
               }
 
               if (iBeast.capsReceived !== undefined) {
-                // TODO: Crosscheck value
-                if (!_.contains(databaseBeast.capsReceived, iBeast.capsReceived)) {
-                  databaseBeast.capsReceived.push(iBeast.capsReceived);
+                if (
+                  !iBeast.capsReceived.some(newCapsReceived => _.contains(databaseBeast.capsReceived,newCapsReceived))
+                  ) {
+
+                  databaseBeast.capsReceived = _.uniq(
+                    _.flatten([databaseBeast.capsReceived, iBeast.capsReceived])
+                  );
                 }
               }
 
               if (iBeast.materialsReceived !== undefined) {
                 if (!_.contains(databaseBeast.materialsReceived, iBeast.materialsReceived)) {
-                  databaseBeast.materialsReceived.push(iBeast.materialsReceived);
+                  if (
+                    !iBeast.materialsReceived.some(newMaterialsReceived => _.contains(databaseBeast.materialsReceived,newMaterialsReceived))
+                    ) {
+
+                    databaseBeast.materialsReceived = _.uniq(
+                      _.flatten([databaseBeast.materialsReceived, iBeast.materialsReceived])
+                    );
+                  }
                 }
               }
 
               if (!isBattleDupe) {
                 if (!isSameBattleExists) {
-                  const battle = iBeast.battles[0];
-
-                  if (battle.damagesGiven.length === 1) {
-                    beastPoints += forwardPoints.oneShotBattle;
-                  } else if (battle.outcome === 'win') {
-                    beastPoints += forwardPoints.newBattleWin;
-                  } else {
-                    beastPoints += forwardPoints.newBattleLose;
-                  }
-
-                  databaseBeast.battles.push(iBeast.battles[0]);
+                  iBeast.battles.forEach(newBattle => {
+                    if (newBattle.damagesGiven.length === 1) {
+                      beastPoints += forwardPoints.oneShotBattle;
+                    } else if (newBattle.outcome === 'win') {
+                      beastPoints += forwardPoints.newBattleWin;
+                    } else {
+                      beastPoints += forwardPoints.newBattleLose;
+                    }
+  
+                    databaseBeast.battles.push(newBattle);
+                  })
                 } else if (iBeast.battles !== undefined) {
-                  const battle = iBeast.battles[0];
-
-                  if (battle.damagesGiven.length === 1) {
-                    beastPoints += forwardPoints.oneShotBattle;
-                  } else if (battle.outcome === 'win') {
-                    beastPoints += forwardPoints.sameBattleWin;
-                  } else {
-                    beastPoints += forwardPoints.sameBattleLose;
-                  }
+                  iBeast.battles.forEach(newBattle => {
+                    if (newBattle.damagesGiven.length === 1) {
+                      beastPoints += forwardPoints.oneShotBattle;
+                    } else if (newBattle.outcome === 'win') {
+                      beastPoints += forwardPoints.sameBattleWin;
+                    } else {
+                      beastPoints += forwardPoints.sameBattleLose;
+                    }
+                  });
                 }
               }
 
               if (!isSameConcussionExists && !isBattleDupe) {
-                databaseBeast.concussions.push(iBeast.concussions[0]);
+                databaseBeast.concussions.push(_.flatten(iBeast.concussions));
               }
 
               if (!isFleeDupe) {
                 if (!isSameFleeExists) {
-                  const flee = iBeast.flees[0];
-
-                  if (flee.outcome === 'win') {
-                    beastPoints += forwardPoints.newFleeWin;
-                  } else {
-                    beastPoints += forwardPoints.newFleeLose;
-                  }
-
-                  databaseBeast.flees.push(iBeast.flees[0]);
+                  iBeast.flees.forEach(newFlee => {
+                    if (newFlee.outcome === 'win') {
+                      beastPoints += forwardPoints.newFleeWin;
+                    } else {
+                      beastPoints += forwardPoints.newFleeLose;
+                    }
+  
+                    databaseBeast.flees.push(newFlee);
+                  })
                 } else if (iBeast.flees !== undefined) {
-                  const flee = iBeast.flees[0];
-
-                  if (flee.outcome === 'win') {
-                    beastPoints += forwardPoints.sameFleeWin;
-                  } else {
-                    beastPoints += forwardPoints.sameFleeLose;
-                  }
+                  iBeast.flees.forEach(newFlee => {
+                    if (newFlee.outcome === 'win') {
+                      beastPoints += forwardPoints.sameFleeWin;
+                    } else {
+                      beastPoints += forwardPoints.sameFleeLose;
+                    }
+                  })
                 }
               }
 

@@ -411,8 +411,10 @@ const processForwards = (inputData) => {
 
       const beastData = {
         isDungeon,
+        proofedByForward: true,
       };
 
+      beastData.date = date;
       beastData.name = data.name;
       beastData.distanceRange = [data.distance];
       reportData.distance = data.distance;
@@ -495,8 +497,7 @@ const processForwards = (inputData) => {
             date
           });
         } else if (
-          (reportData.lastBeastSeenSubType === 'regular' && data.name !== reportData.lastBeastSeen.name && reportData.lastBeastSeenType !== beastData.type) ||
-          (reportData.lastBeastSeenSubType === 'walking' && data.name.indexOf(reportData.lastBeastSeen.name) === -1 && reportData.lastBeastSeenType !== beastData.type)
+          data.name !== reportData.lastBeastSeen.name && reportData.lastBeastSeenType !== beastData.type
         ) {
           beastData.battles = [];
 
@@ -512,8 +513,7 @@ const processForwards = (inputData) => {
         if (!reportData.lastBeastSeen) {
           beastData.proofedByForward = false;
         } else if (
-          (reportData.lastBeastSeenSubType === 'regular' && data.name !== reportData.lastBeastSeen.name && reportData.lastBeastSeenType !== beastData.type) ||
-          (reportData.lastBeastSeenSubType === 'walking' && data.name.indexOf(reportData.lastBeastSeen.name) === -1 && reportData.lastBeastSeenType !== beastData.type)
+          data.name !== reportData.lastBeastSeen.name && reportData.lastBeastSeenType !== beastData.type
         ) {
           beastData.proofedByForward = false;
         }
