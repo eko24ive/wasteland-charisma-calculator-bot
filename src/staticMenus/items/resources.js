@@ -28,6 +28,12 @@ const PLANTAIN = 'PLANTAIN';
 const STARCH = 'STARCH';
 const AIRFILTER = 'AIRFILTER';
 
+const FIRST = 'FIRST';
+const SECOND = 'SECOND';
+
+const AGILITY = 'AGILITY';
+const STRENGTH = 'STRENGTH';
+
 const resources = {
   CAPS: {
     title: 'Крышки',
@@ -177,14 +183,6 @@ const resources = {
   },
 };
 
-const getResource = (name, amount) => {
-  const resource = resources[name];
-  return `${resource.icon}${resource.title} x${amount}`;
-};
-
-const FIRST = 'FIRST';
-const SECOND = 'SECOND';
-
 const rarities = {
   FIRST: {
     icon: '🏅',
@@ -194,14 +192,36 @@ const rarities = {
   },
 };
 
+const characteristics = {
+  AGILITY: {
+    title: 'Ловкость',
+    icon: '🤸🏽‍♂️',
+  },
+  STRENGTH: {
+    icon: '💪',
+    title: 'Сила',
+  },
+};
+
+const getResource = (name, amount) => {
+  const resource = resources[name];
+  return `${resource.icon}${resource.title} x${amount}`;
+};
+
 const getRarityIcon = (name) => {
   const rarity = rarities[name];
   return `${rarity.icon}`;
 };
 
+const getCharacteristic = (name, amount) => {
+  const characteristic = characteristics[name];
+  return `Можно надеть с ${characteristic.icon}(${characteristic.title}) не ниже ${amount}`;
+};
+
 module.exports = {
   getResource,
   getRarityIcon,
+  getCharacteristic,
   RESOURCES: {
     CAPS,
     MATERIALS,
@@ -236,5 +256,9 @@ module.exports = {
   RARITIES: {
     FIRST,
     SECOND,
+  },
+  CHARACTERISTICS: {
+    AGILITY,
+    STRENGTH,
   },
 };

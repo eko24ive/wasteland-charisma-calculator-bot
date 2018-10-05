@@ -13,6 +13,7 @@ const {
 const {
   getResource,
   getRarityIcon,
+  getCharacteristic,
   RESOURCES: {
     CAPS,
     MATERIALS,
@@ -41,6 +42,9 @@ const {
   RARITIES: {
     FIRST,
     SECOND,
+  },
+  CHARACTERISTICS: {
+    STRENGTH,
   },
 } = require('./resources.js');
 
@@ -278,6 +282,7 @@ const weapons = [
     characteristic: 49,
     place: workbench,
     rarities: [FIRST, SECOND],
+    demand: getCharacteristic(STRENGTH, 28),
   },
   {
     icon: '☄️',
