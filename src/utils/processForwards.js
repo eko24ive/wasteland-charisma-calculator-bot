@@ -399,7 +399,6 @@ const processForwards = (inputData) => {
 
       updatesData.beasts.push(beastData);
       reportData.healthCapHistory.push(data.meta.healthCap);
-      console.log(beastData.proofedByForward);
     }
 
     if (dataType === 'dungeonBeast' && reportData.prcoessAllowed) {
