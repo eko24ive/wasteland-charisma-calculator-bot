@@ -449,6 +449,16 @@ const actualProcessUserData = (msg, reportData, updatesData, options) => {
 
   const isBeastUnderValidation = name => reportData.beastsToValidate.filter(beast => beast.name === name).length > 0;
 
+  const flattifyBeast = beast => {
+    const {materialsReceived, capsReceived, ...rest} = beast;
+
+    return {
+      materialsReceived: _.flatten(materialsReceived),
+      capsReceived: _.flatten(capsReceived),
+      ...rest
+    }
+  }
+
   const processBeasts = () => new Promise((resolve) => {
     if (updatesData.beasts.length > 0 && options.usePip === true) {
       async.forEach(updatesData.beasts, (iBeast, next) => {
@@ -466,7 +476,7 @@ const actualProcessUserData = (msg, reportData, updatesData, options) => {
             const databaseBeast = fBeast;
             if (databaseBeast === null) {
               if(iBeast.proofedByForward) {
-                const newBeast = new Beast(iBeast);
+                const newBeast = new Beast(flattifyBeast(iBeast));
 
                 dataProcessed += 1;
 
@@ -847,6 +857,8 @@ ${reportData.errors.join('\n')}`;
           });
         // }, 1500);
       }
+
+      sessions[msg.from.id].state = states.WAIT_FOR_DATA_VALIDATION;
     }
   }).catch(e => console.log(e));
 
