@@ -371,7 +371,7 @@ const getBeastToValidateMessage = (beastsToValidate, beastRequest = false, first
                               distance,
                               date,
                               index,
-                            }) => `- <b>${name}</b> в ${type === 'DarkZone' ? '🚷ТЗ' : '💀Безопасной Зоне'} на ${distance}км\n<i>Битва произошла в ${moment(date*1000).format('DD.MM.YYYY HH:mm')}</i>\nПроигнорировать: /ignore_${index}_${date}`);
+                            }) => `- <b>${name}</b> в ${type === 'DarkZone' ? '🚷ТЗ' : '💀Безопасной Зоне'} на ${distance}км\n<i>Битва произошла в ${moment(date*1000).add(3, 'hour').format('DD.MM.YYYY HH:mm')}(МСК)</i>\nПроигнорировать: /ignore_${index}_${date}`);
 
   const fleesToValidate = indexedBeasts.filter(({reason}) => reason === 'flee')
                             .map(({
@@ -379,7 +379,7 @@ const getBeastToValidateMessage = (beastsToValidate, beastRequest = false, first
                               distance,
                               date,
                               index,
-                            }) => `- Неизвестный моб в ${type === 'DarkZone' ? '🚷ТЗ' : '💀Безопасной Зоне'} на ${distance}км\n<i>Побег произошел в ${moment(date*1000).format('DD.MM.YYYY HH:mm')}</i>\nПроигнорировать: /ignore_${index}_${date}`);
+                            }) => `- Неизвестный моб в ${type === 'DarkZone' ? '🚷ТЗ' : '💀Безопасной Зоне'} на ${distance}км\n<i>Побег произошел в ${moment(date*1000).add(3, 'hour').format('DD.MM.YYYY HH:mm')}(МСК)</i>\nПроигнорировать: /ignore_${index}_${date}`);
 
   return `${getHeader(beastRequest, firstTime, failing)}
 
