@@ -215,7 +215,7 @@ const getRarityIcon = (name) => {
 
 const getCharacteristic = (name, amount) => {
   const characteristic = characteristics[name];
-  return `Можно надеть с ${characteristic.icon}(${characteristic.title}) не ниже ${amount}`;
+  return `Требования: ${characteristic.icon}${amount}+`;
 };
 
 module.exports = {

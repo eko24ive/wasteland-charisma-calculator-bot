@@ -70,7 +70,7 @@ const showItem = ({
   const itemDemand = getItemDemand(demand);
   return `
 ${itemIcon} *${title}*
-${comment} ${itemCharacteristic}
+${comment}${itemCharacteristic}
 💰: ${itemPrice}${itemDemand ? `\n${itemDemand}` : ''}
 `;
 };
