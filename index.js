@@ -699,9 +699,7 @@ const actualProcessUserData = (msg, reportData, updatesData, options) => {
     } else {
       resolve();
     }
-  }, (() => {
-    // console.log('iterating done');
-  }));
+  });
 
   const processLocations = () => new Promise((resolve) => {
     if (updatesData.locations.length > 0) {
@@ -823,14 +821,16 @@ ${reportData.errors.join('\n')}`;
             reply = `
     Спасибо за форвард. Я перевёл ${userForwardPoints.toFixed(1)} 💎*Шмепселей* на твой счёт.\n_${dupesText}_`;
           } else {
+
+// Всего я насчитал ${dataProcessed} данных!
+
             reply = `Фух, я со всём справился - спасибо тебе огромное за информацию!
-  Всего я насчитал ${dataProcessed} данных!
-  
-  Ты заработал ${userForwardPoints.toFixed(1)} 💎*Шмепселей* за свои форварды!
-  _${dupesText}_
-  
-  ${errors}
-  Если ты чего-то забыл докинуть - смело жми на \`[Скинуть лог 🏃]\` и _докидывай_`;
+
+Ты заработал ${userForwardPoints.toFixed(1)} 💎*Шмепселей* за свои форварды!
+_${dupesText}_
+
+${errors}
+Если ты чего-то забыл докинуть - смело жми на \`[Скинуть лог 🏃]\` и _докидывай_`;
           }
   
           msg.reply.text(reply, {
@@ -1069,7 +1069,7 @@ bot.on('forward', (msg) => {
     const { beastsToValidate, lastForwardDate } = sessions[msg.from.id];
 
     if (msg.forward_date > lastForwardDate) {
-      return msg.reply('Дата этого форврада позже последнего форварда из твоего круга - наебать меня вздумал?', {
+      return msg.reply.text('Дата этого форврада позже последнего форварда из твоего круга - наебать меня вздумал?', {
         asReply: true
       })
     }
@@ -1115,7 +1115,7 @@ bot.on('forward', (msg) => {
       } else if (isLocation) {
         timeOffset = msg.forward_date - (3 * 60 * 60);
       } else if (isWalkingBeastFaced) {
-        timeOffset = msg.forward_date - (50 * 60);
+        timeOffset = msg.forward_date - (60 * 60);
       }
 
       const beastIndexToRemove = date => beastValidationTimeScope.sort((a, b) => Math.abs(date - a.date) - Math.abs(date - b.date))[0].index;
@@ -1123,16 +1123,16 @@ bot.on('forward', (msg) => {
       beastValidationTimeScope = beastValidationTimeScope.filter(({date}) => date > (timeOffset) && date > msg.forward_date);
 
       if (dataType === 'walkingBeastFaced') {
-        if(!beastValidationTimeScope.every(beast => (beast.name.indexOf(beastName) !== 0))) {
-          return false;
+        if(beastValidationTimeScope.some(beast => (beast.name.indexOf(beastName) !== -1))) {
+          const beastIndex = beastIndexToRemove(msg.forward_date);
+          sessions[msg.from.id].beastsToValidate = sessions[msg.from.id].beastsToValidate.filter((beast, index) => {
+            return index !== beastIndex;
+          });
+
+          return true;
         }
 
-        const beastIndex = beastIndexToRemove(msg.forward_date);
-        sessions[msg.from.id].beastsToValidate = sessions[msg.from.id].beastsToValidate.filter((beast, index) => {
-          return index !== beastIndex;
-        });
-
-        return true;
+        return false;
       }
 
       if(beastValidationTimeScope.every(beast => (beast.name !== beastName && beast.name !== '???') || beast.type !== beastType)) {
