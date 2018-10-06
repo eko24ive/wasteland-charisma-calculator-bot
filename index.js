@@ -1118,7 +1118,7 @@ bot.on('forward', (msg) => {
         timeOffset = msg.forward_date - (50 * 60);
       }
 
-      const beastIndexToRemove = () => beastValidationTimeScope.sort((a, b) => Math.abs(date - a.date) - Math.abs(date - b.date))[0].index;
+      const beastIndexToRemove = date => beastValidationTimeScope.sort((a, b) => Math.abs(date - a.date) - Math.abs(date - b.date))[0].index;
 
       beastValidationTimeScope = beastValidationTimeScope.filter(({date}) => date > (timeOffset) && date > msg.forward_date);
 
