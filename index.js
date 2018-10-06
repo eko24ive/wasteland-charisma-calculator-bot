@@ -792,73 +792,61 @@ ${reportData.errors.join('\n')}`;
       dupesText = 'Похоже ты скидывал некоторые форварды по второму разу. Я не начислял тебе за них очки';
     }
 
-    if (dataProcessed > 0) {
-      // TODO: Move out shit to strings
-      // TODO: Implement meaningfull report data regarding found usefull data
-      setTimeout(() => {
-        if (options.silent) {
-          reply = `
-  Спасибо за форвард. Я перевёл ${userForwardPoints.toFixed(1)} 💎*Шмепселей* на твой счёт.\n_${dupesText}_`;
-        } else {
-          reply = `Фух, я со всём справился - спасибо тебе огромное за информацию!
-Всего я насчитал ${dataProcessed} данных!
+    if (!_.isEmpty(beastsToValidate)) {
+      sessions[msg.from.id].state = states.WAIT_FOR_DATA_VALIDATION;
+      sessions[msg.from.id].initialForwardDate = reportData.initialForwardDate;
+      sessions[msg.from.id].lastForwardDate = reportData.lastForwardDate;
+      sessions[msg.from.id].beastsToValidate = beastsToValidate;
+      sessions[msg.from.id].beastRequest = true;
 
-Ты заработал ${userForwardPoints.toFixed(1)} 💎*Шмепселей* за свои форварды!
-_${dupesText}_
-
-${errors}
-Если ты чего-то забыл докинуть - смело жми на \`[Скинуть лог 🏃]\` и _докидывай_`;
-        }
-
-        msg.reply.text(reply, {
-          replyMarkup: defaultKeyboard,
-          parseMode: 'markdown',
-          asReply: options.silent,
-        }).then(() => {
-          userManager.addPoints(msg.from.id, userForwardPoints).then((result) => {
-            if (!result.ok) {
-              if (result.reason === 'USER_NOT_FOUND') {
-                msg.reply.text('Не могу начислить тебе шмепсели пока ты не скинешь мне свой пип-бой :с');
-              }
-              console.log(`userManager.addPoints: ${JSON.stringify(result)}`);
-            }
-          });
-        }).then(() => {
-          if (!_.isEmpty(beastsToValidate)) {
-            sessions[msg.from.id].state = states.WAIT_FOR_DATA_VALIDATION;
-            sessions[msg.from.id].initialForwardDate = reportData.initialForwardDate;
-            sessions[msg.from.id].lastForwardDate = reportData.lastForwardDate;
-            sessions[msg.from.id].beastsToValidate = beastsToValidate;
-            sessions[msg.from.id].beastRequest = true;
-
-            return msg.reply.text(getBeastToValidateMessage(sessions[msg.from.id].beastsToValidate, sessions[msg.from.id].beastRequest), {
-              parseMode: 'html',
-              replyMarkup: 'hide',
-            }).catch(e => console.log(e));
-          }
-        }).catch(e => console.log(e));
-      }, 1500);
+      return msg.reply.text(getBeastToValidateMessage(sessions[msg.from.id].beastsToValidate, sessions[msg.from.id].beastRequest), {
+        parseMode: 'html',
+        replyMarkup: 'hide',
+      }).catch(e => console.log(e));
     } else {
-      setTimeout(() => {
-        if (!_.isEmpty(beastsToValidate)) {
-          sessions[msg.from.id].state = states.WAIT_FOR_DATA_VALIDATION;
-          sessions[msg.from.id].initialForwardDate = reportData.initialForwardDate;
-          sessions[msg.from.id].lastForwardDate = reportData.lastForwardDate;
-          sessions[msg.from.id].beastsToValidate = beastsToValidate;
-          sessions[msg.from.id].beastRequest = true;
+      if (dataProcessed > 0) {
+        // TODO: Move out shit to strings
+        // TODO: Implement meaningfull report data regarding found usefull data
 
-          return msg.reply.text(getBeastToValidateMessage(sessions[msg.from.id].beastsToValidate, sessions[msg.from.id].beastRequest), {
-            parseMode: 'html',
-            replyMarkup: 'hide',
+        // setTimeout(() => {
+          if (options.silent) {
+            reply = `
+    Спасибо за форвард. Я перевёл ${userForwardPoints.toFixed(1)} 💎*Шмепселей* на твой счёт.\n_${dupesText}_`;
+          } else {
+            reply = `Фух, я со всём справился - спасибо тебе огромное за информацию!
+  Всего я насчитал ${dataProcessed} данных!
+  
+  Ты заработал ${userForwardPoints.toFixed(1)} 💎*Шмепселей* за свои форварды!
+  _${dupesText}_
+  
+  ${errors}
+  Если ты чего-то забыл докинуть - смело жми на \`[Скинуть лог 🏃]\` и _докидывай_`;
+          }
+  
+          msg.reply.text(reply, {
+            replyMarkup: defaultKeyboard,
+            parseMode: 'markdown',
+            asReply: options.silent,
+          }).then(() => {
+            userManager.addPoints(msg.from.id, userForwardPoints).then((result) => {
+              if (!result.ok) {
+                if (result.reason === 'USER_NOT_FOUND') {
+                  msg.reply.text('Не могу начислить тебе шмепсели пока ты не скинешь мне свой пип-бой :с');
+                }
+                console.log(`userManager.addPoints: ${JSON.stringify(result)}`);
+              }
+            });
           }).catch(e => console.log(e));
-        }
-
-        return msg.reply.text(`
-  К сожалению я ничего не смог узнать из твоих форвардов :с`, {
-          replyMarkup: defaultKeyboard,
-          parseMode: 'markdown',
-        });
-      }, 1500);
+        // }, 1500);
+      } else {
+        // setTimeout(() => {
+          return msg.reply.text(`
+    К сожалению я ничего не смог узнать из твоих форвардов :с`, {
+            replyMarkup: defaultKeyboard,
+            parseMode: 'markdown',
+          });
+        // }, 1500);
+      }
     }
   }).catch(e => console.log(e));
 
@@ -2527,7 +2515,7 @@ _Если гиганта нет в списке - значит его ещё н�
     const [, from, to, type] = showMobRegExp.exec(msg.data);
     const beastType = type === 'regular' ? 'Regular' : 'DarkZone';
 
-    Beast.find({ isDungeon: false, distanceRange: { $gte: Number(from), $lte: Number(to) }, type: beastType }, 'battles.totalDamageReceived name id').then((beasts) => {
+    Beast.find({ isDungeon: false, subType:'regular', distanceRange: { $gte: Number(from), $lte: Number(to) }, type: beastType }, 'battles.totalDamageReceived name id').then((beasts) => {
       bot.answerCallbackQuery(msg.id);
 
       const jsonBeasts = beasts.map((b) => {
@@ -2798,6 +2786,7 @@ bot.on('text', (msg) => {
 
   Beast.find({
     isDungeon: false,
+    subType:'regular',
     distanceRange: {
       $gte: Number(from),
       $lte: Number(to),
@@ -2967,6 +2956,12 @@ bot.on('/delete_all_beasts', msg => {
     mongoose.connection.db.dropCollection('beasts', function(err, result) {
       return msg.reply.text('Все мобы удалёны')
     });
+  }
+});
+
+bot.on('/state', msg => {
+  if (process.env.ENV === 'STAGING' || process.env.ENV === 'LOCAL') {
+    return msg.reply.text(sessions ? (sessions[msg.from.id] ? sessions[msg.from.id].state : 'null') : 'null');
   }
 })
 

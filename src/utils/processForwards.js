@@ -292,12 +292,12 @@ const processForwards = (inputData) => {
         beastData.receivedItems = normalizeItems(data.receivedItems);
 
         if (Number(data.capsReceived) !== 0) {
-          beastData.capsReceived = Number(data.capsReceived);
+          beastData.capsReceived = [Number(data.capsReceived)];
           beastData.isDungeon = false;
         }
 
         if (Number(data.materialsReceived) !== 0) {
-          beastData.materialsReceived = Number(data.materialsReceived);
+          beastData.materialsReceived = [Number(data.materialsReceived)];
           beastData.isDungeon = false;
         }
       } else if (data.fightResult === 'lose') {
