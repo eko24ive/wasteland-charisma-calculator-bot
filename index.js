@@ -605,7 +605,7 @@ const actualProcessUserData = (msg, reportData, updatesData, options) => {
                 }
               }
 
-              if (iBeast.capsReceived !== undefined) {
+              if (iBeast.capsReceived.length > 0) {
                 if (
                   !iBeast.capsReceived.some(newCapsReceived => _.contains(databaseBeast.capsReceived,newCapsReceived))
                   ) {
@@ -616,7 +616,7 @@ const actualProcessUserData = (msg, reportData, updatesData, options) => {
                 }
               }
 
-              if (iBeast.materialsReceived !== undefined) {
+              if (iBeast.materialsReceived.length > 0) {
                 if (!_.contains(databaseBeast.materialsReceived, iBeast.materialsReceived)) {
                   if (
                     !iBeast.materialsReceived.some(newMaterialsReceived => _.contains(databaseBeast.materialsReceived,newMaterialsReceived))
