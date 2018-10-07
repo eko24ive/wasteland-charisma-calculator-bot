@@ -118,7 +118,7 @@ const createSession = (id) => {
     },
     beastsToValidate: [],
     initialForwardDate: null,
-    lastForwardDate: null
+    lastForwardDate: null,
   };
 };
 
@@ -344,7 +344,9 @@ bot.on(['/start', '/help'], (msg) => {
 });
 
 const getBeastToValidateMessage = (beastsToValidate, beastRequest = false, firstTime = true, failing = false) => {
-  const indexedBeasts = _.sortBy(beastsToValidate, 'date');
+  const indexedBeasts = beastsToValidate.length > 10 ? _.first(_.sortBy(beastsToValidate, 'date'), 10) : _.sortBy(beastsToValidate, 'date');
+
+  const isThereMoreBeasts = beastsToValidate.length > 10;
 
   const getHeader = () => {
     const failingMessage = 'Ты скинул мне какую-то хуйню, вот список того что мне нужно:';
@@ -386,6 +388,7 @@ ${battlesToValidate.length > 0 ? '<b>[БИТВЫ]</b>' : ''}
 ${battlesToValidate.join('\n')+'\n'}
 ${fleesToValidate.length > 0 ? '<b>[ПОБЕГИ]</b>' : ''}
 ${fleesToValidate.join('\n')+'\n'}
+${isThereMoreBeasts ? '<b>Там ещё есть мобы на проверку, но ты сначала с этими разберись</b>\n' : ''}
 ${firstTime ? `Пожалуйста, скинь <b>ОТДЕЛЬНО</b> (по одному за раз) форвард встречи с этими красавцами, они выглядят как-то так:
 <code>Во время вылазки на тебя напал...</code>
 <i>или</i>
@@ -2993,14 +2996,24 @@ bot.on(/\/ignore_(.+)/, msg => {
           return data;
         });
 
-        sessions[msg.from.id].state = states.WAIT_FOR_DATA_TO_PROCESS;
+        if (beastsToValidate.length === 1) {
+          sessions[msg.from.id].state = states.WAIT_FOR_DATA_TO_PROCESS;
 
-        processUserData(msg, {
-          usePip: sessions[msg.from.id].processDataConfig.usePip,
-          useBeastFace: sessions[msg.from.id].processDataConfig.useBeastFace,
-        });
+          processUserData(msg, {
+            usePip: sessions[msg.from.id].processDataConfig.usePip,
+            useBeastFace: sessions[msg.from.id].processDataConfig.useBeastFace,
+          });
+          
+          return;
+        } else {
+          return msg.reply.text(getBeastToValidateMessage(sessions[msg.from.id].beastsToValidate, sessions[msg.from.id].beastRequest), {
+            parseMode: 'html',
+            replyMarkup: 'hide',
+          });
+        }
 
-        return;
+        
+
       }
 
       return msg.reply.text('Эм, я такой команды тебе не давал, а туда ли ты воюешь?', {
