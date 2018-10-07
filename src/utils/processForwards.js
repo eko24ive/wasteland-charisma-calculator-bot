@@ -415,6 +415,7 @@ const processForwards = (inputData) => {
 
       beastData.date = date;
       beastData.name = data.name;
+      beastData.type = data.type;
       beastData.distanceRange = [data.distance];
       reportData.distance = data.distance;
       reportData.distanceHistory.push(data.distance);

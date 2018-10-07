@@ -370,16 +370,15 @@ const getBeastToValidateMessage = (beastsToValidate, beastRequest = false, first
                               name,
                               distance,
                               date,
-                              index,
-                            }) => `- <b>${name}</b> в ${type === 'DarkZone' ? '🚷ТЗ' : '💀Безопасной Зоне'} на ${distance}км\n<i>Битва произошла в ${moment(date*1000).add(3, 'hour').format('DD.MM.YYYY HH:mm')}(МСК)</i>\nПроигнорировать: /ignore_${date}`);
+                              isDungeon,
+                            }) => `- <b>${name}</b> в ${type === 'DarkZone' ? '🚷ТЗ' : '💀Безопасной Зоне'}${isDungeon ? ' в подземелье' : ''} на ${distance}км\n<i>Битва произошла в ${moment(date*1000).add(3, 'hour').format('DD.MM.YYYY HH:mm')} (МСК)</i>\nПроигнорировать: /ignore_${date}`);
 
   const fleesToValidate = indexedBeasts.filter(({reason}) => reason === 'flee')
                             .map(({
                               type,
                               distance,
                               date,
-                              index,
-                            }) => `- Неизвестный моб в ${type === 'DarkZone' ? '🚷ТЗ' : '💀Безопасной Зоне'} на ${distance}км\n<i>Побег произошел в ${moment(date*1000).add(3, 'hour').format('DD.MM.YYYY HH:mm')}(МСК)</i>\nПроигнорировать: /ignore_${date}`);
+                            }) => `- Неизвестный моб в ${type === 'DarkZone' ? '🚷ТЗ' : '💀Безопасной Зоне'} на ${distance}км\n<i>Побег произошел в ${moment(date*1000).add(3, 'hour').format('DD.MM.YYYY HH:mm')} (МСК)</i>\nПроигнорировать: /ignore_${date}`);
 
   return `${getHeader(beastRequest, firstTime, failing)}
 
@@ -488,7 +487,7 @@ const actualProcessUserData = (msg, reportData, updatesData, options) => {
 
                 newBeast.save().then(() => next());
               } else {
-                beastsToValidate.push({ name: iBeast.name, distance: iBeast.distanceRange[0], type: iBeast.type, reason: 'battle', date: iBeast.date});
+                beastsToValidate.push({ name: iBeast.name, distance: iBeast.distanceRange[0], type: iBeast.type, isDungeon: iBeast.isDungeon, reason: 'battle', date: iBeast.date});
                 next();
               }
             } else {
