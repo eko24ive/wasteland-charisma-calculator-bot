@@ -344,7 +344,7 @@ bot.on(['/start', '/help'], (msg) => {
 });
 
 const getBeastToValidateMessage = (beastsToValidate, beastRequest = false, firstTime = true, failing = false) => {
-  const indexedBeasts = beastsToValidate.map((beast, index) => ({...beast, index}));
+  const indexedBeasts = _.sortBy(beastsToValidate, 'date');
 
   const getHeader = () => {
     const failingMessage = 'Ты скинул мне какую-то хуйню, вот список того что мне нужно:';
@@ -371,7 +371,7 @@ const getBeastToValidateMessage = (beastsToValidate, beastRequest = false, first
                               distance,
                               date,
                               index,
-                            }) => `- <b>${name}</b> в ${type === 'DarkZone' ? '🚷ТЗ' : '💀Безопасной Зоне'} на ${distance}км\n<i>Битва произошла в ${moment(date*1000).add(3, 'hour').format('DD.MM.YYYY HH:mm')}(МСК)</i>\nПроигнорировать: /ignore_${index}_${date}`);
+                            }) => `- <b>${name}</b> в ${type === 'DarkZone' ? '🚷ТЗ' : '💀Безопасной Зоне'} на ${distance}км\n<i>Битва произошла в ${moment(date*1000).add(3, 'hour').format('DD.MM.YYYY HH:mm')}(МСК)</i>\nПроигнорировать: /ignore_${date}`);
 
   const fleesToValidate = indexedBeasts.filter(({reason}) => reason === 'flee')
                             .map(({
@@ -379,7 +379,7 @@ const getBeastToValidateMessage = (beastsToValidate, beastRequest = false, first
                               distance,
                               date,
                               index,
-                            }) => `- Неизвестный моб в ${type === 'DarkZone' ? '🚷ТЗ' : '💀Безопасной Зоне'} на ${distance}км\n<i>Побег произошел в ${moment(date*1000).add(3, 'hour').format('DD.MM.YYYY HH:mm')}(МСК)</i>\nПроигнорировать: /ignore_${index}_${date}`);
+                            }) => `- Неизвестный моб в ${type === 'DarkZone' ? '🚷ТЗ' : '💀Безопасной Зоне'} на ${distance}км\n<i>Побег произошел в ${moment(date*1000).add(3, 'hour').format('DD.MM.YYYY HH:mm')}(МСК)</i>\nПроигнорировать: /ignore_${date}`);
 
   return `${getHeader(beastRequest, firstTime, failing)}
 
@@ -2909,7 +2909,7 @@ bot.on(/\/battle_(.+)/, (msg) => {
   return false;
 });
 
-bot.on(/\/ignore_(.+)_(.+)/, msg => {
+bot.on(/\/ignore_(.+)/, msg => {
   if(_.isEmpty(sessions)) {
     return msg.reply.text('Слушай, а мне собственно нечего игнорировать. Может меня опять какой-то пидор перезагрузил, не знаешь?', {
       asReply: true,
@@ -2917,9 +2917,11 @@ bot.on(/\/ignore_(.+)_(.+)/, msg => {
     });
   }
 
-  const [, ignoreIndex, date] = /\/ignore_(.+)_(.+)/.exec(msg.text);
+  const [, date] = /\/ignore_(.+)/.exec(msg.text);
   const {beastsToValidate} = sessions[msg.from.id];
-  const index = Number(ignoreIndex);
+  const index = _.findIndex(beastsToValidate, beast => {
+    return beast.date === Number(date);
+  })
 
   if (Number.isInteger(index) || !date) {
     if (beastsToValidate !== undefined && beastsToValidate.length > 0) {
