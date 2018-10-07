@@ -458,6 +458,41 @@ const actualProcessUserData = (msg, reportData, updatesData, options) => {
     }
   }
 
+  const detectBeastForValidation = () => new Promise((resolve, reject) => {
+    if (updatesData.beasts.length > 0) {
+      async.forEach(updatesData.beasts, (iBeast, next) => {
+        if (!options.useBeastFace) {
+          if (isBeastUnderValidation(iBeast.name)) {
+            next();
+          }
+        } else {
+          Beast.findOne({
+            name: iBeast.name,
+            isDungeon: iBeast.isDungeon,
+            type: iBeast.type,
+            subType: iBeast.subType,
+          }).then((fBeast) => {
+            const databaseBeast = fBeast;
+            if (databaseBeast === null) {
+              if(iBeast.proofedByForward) {
+                next();
+              } else {
+                beastsToValidate.push({ name: iBeast.name, distance: iBeast.distanceRange[0], type: iBeast.type, isDungeon: iBeast.isDungeon, reason: 'battle', date: iBeast.date});
+                next();
+              }
+            }
+          });
+        }
+      }, () => {
+        if(beastsToValidate.length > 0) {
+          reject();
+        } else {
+          resolve();
+        }
+      });
+    }
+  });
+
   const processBeasts = () => new Promise((resolve) => {
     if (updatesData.beasts.length > 0 && options.usePip === true) {
       async.forEach(updatesData.beasts, (iBeast, next) => {
@@ -781,57 +816,46 @@ const actualProcessUserData = (msg, reportData, updatesData, options) => {
     }
   });
 
+  detectBeastForValidation().then(
+    function processingData() {
+      Promise.all([
+        processBeasts(),
+        processLocations(),
+      ]).then(() => {
+        let errors = '';
+        let dupesText = '';
+        let reply;
 
-  Promise.all([
-    processBeasts(),
-    processLocations(),
-  ]).then(() => {
-    let errors = '';
-    let dupesText = '';
-    let reply;
+        if (reportData.errors.length > 0) {
+          errors = `*Также я заметил такие вещи*:
+    ${reportData.errors.join('\n')}`;
+        }
 
-    if (reportData.errors.length > 0) {
-      errors = `*Также я заметил такие вещи*:
-${reportData.errors.join('\n')}`;
-    }
+        if (dupes.battles > 0 || dupes.flees > 0) {
+          dupesText = 'Похоже ты скидывал некоторые форварды по второму разу. Я не начислял тебе за них очки';
+        }
 
-    if (dupes.battles > 0 || dupes.flees > 0) {
-      dupesText = 'Похоже ты скидывал некоторые форварды по второму разу. Я не начислял тебе за них очки';
-    }
+        if (dataProcessed > 0) {
+          // TODO: Move out shit to strings
+          // TODO: Implement meaningfull report data regarding found usefull data
 
-    if (!_.isEmpty(beastsToValidate)) {
-      sessions[msg.from.id].state = states.WAIT_FOR_DATA_VALIDATION;
-      sessions[msg.from.id].initialForwardDate = reportData.initialForwardDate;
-      sessions[msg.from.id].lastForwardDate = reportData.lastForwardDate;
-      sessions[msg.from.id].beastsToValidate = beastsToValidate;
-      sessions[msg.from.id].beastRequest = true;
-
-      return msg.reply.text(getBeastToValidateMessage(sessions[msg.from.id].beastsToValidate, sessions[msg.from.id].beastRequest), {
-        parseMode: 'html',
-        replyMarkup: 'hide',
-      }).catch(e => console.log(e));
-    } else {
-      if (dataProcessed > 0) {
-        // TODO: Move out shit to strings
-        // TODO: Implement meaningfull report data regarding found usefull data
-
-        // setTimeout(() => {
+          // setTimeout(() => {
           if (options.silent) {
             reply = `
-    Спасибо за форвард. Я перевёл ${userForwardPoints.toFixed(1)} 💎*Шмепселей* на твой счёт.\n_${dupesText}_`;
+        Спасибо за форвард. Я перевёл ${userForwardPoints.toFixed(1)} 💎*Шмепселей* на твой счёт.\n_${dupesText}_`;
           } else {
 
-// Всего я насчитал ${dataProcessed} данных!
+            // Всего я насчитал ${dataProcessed} данных!
 
             reply = `Фух, я со всём справился - спасибо тебе огромное за информацию!
-
-Ты заработал ${userForwardPoints.toFixed(1)} 💎*Шмепселей* за свои форварды!
-_${dupesText}_
-
-${errors}
-Если ты чего-то забыл докинуть - смело жми на \`[Скинуть лог 🏃]\` и _докидывай_`;
+    
+    Ты заработал ${userForwardPoints.toFixed(1)} 💎*Шмепселей* за свои форварды!
+    _${dupesText}_
+    
+    ${errors}
+    Если ты чего-то забыл докинуть - смело жми на \`[Скинуть лог 🏃]\` и _докидывай_`;
           }
-  
+
           msg.reply.text(reply, {
             replyMarkup: defaultKeyboard,
             parseMode: 'markdown',
@@ -846,20 +870,35 @@ ${errors}
               }
             });
           }).catch(e => console.log(e));
-        // }, 1500);
-      } else {
-        // setTimeout(() => {
+          // }, 1500);
+        } else {
+          // setTimeout(() => {
           return msg.reply.text(`
-    К сожалению я ничего не смог узнать из твоих форвардов :с`, {
-            replyMarkup: defaultKeyboard,
-            parseMode: 'markdown',
-          });
-        // }, 1500);
-      }
+        К сожалению я ничего не смог узнать из твоих форвардов :с`, {
+              replyMarkup: defaultKeyboard,
+              parseMode: 'markdown',
+            });
+          // }, 1500);
+        }
 
+        sessions[msg.from.id].state = states.WAIT_FOR_DATA_VALIDATION;
+      }).catch(e => console.log(e));
+    },
+    function validatingData() {
       sessions[msg.from.id].state = states.WAIT_FOR_DATA_VALIDATION;
+      sessions[msg.from.id].initialForwardDate = reportData.initialForwardDate;
+      sessions[msg.from.id].lastForwardDate = reportData.lastForwardDate;
+      sessions[msg.from.id].beastsToValidate = beastsToValidate;
+      sessions[msg.from.id].beastRequest = true;
+
+      return msg.reply.text(getBeastToValidateMessage(sessions[msg.from.id].beastsToValidate, sessions[msg.from.id].beastRequest), {
+        parseMode: 'html',
+        replyMarkup: 'hide',
+      }).catch(e => console.log(e));
     }
-  }).catch(e => console.log(e));
+  );
+  
+  
 
   return false;
 };
@@ -1134,6 +1173,19 @@ bot.on('forward', (msg) => {
         return false;
       }
 
+      if (dataType === 'dungeonBeastFaced') {
+        if(beastValidationTimeScope.every(beast => beast.name !== beastName && beast.name !== '???')) {
+          return false;
+        }
+
+        const beastIndex = beastIndexToRemove(msg.forward_date);
+        sessions[msg.from.id].beastsToValidate = sessions[msg.from.id].beastsToValidate.filter((beast, index) => {
+          return index !== beastIndex;
+        });
+
+        return true;
+      }
+
       if(beastValidationTimeScope.every(beast => (beast.name !== beastName && beast.name !== '???') || beast.type !== beastType)) {
         return false;
       }
@@ -1148,9 +1200,11 @@ bot.on('forward', (msg) => {
 
     if (!isForwardValid({dataType, beastName, beastType})) {
       return msg.reply.text(`Этот моб не похож на того с которым ты дрался. Ты чё - наебать меня вздумал?!
+Забыл кто мне нужен? Жми /showBeastsToValidate
+
 
 Если ты передумал её кидать - жми /skipbeastforward
-<b>Но тогда я проигнорирую битву с этим мобом</b>`,{
+<b>Но тогда я проигнорирую всю ту информацию которая требует форвардов</b>`,{
         asReply: true,
         parseMode: 'html',
       });
@@ -1870,6 +1924,7 @@ bot.on(['/skipbeastforward','/skipbeastforwards'], (msg) => {
   msg.reply.text('Окей, обработаю что смогу');
 
   sessions[msg.from.id].processDataConfig.useBeastFace = false;
+  sessions[msg.from.id].beastsToValidate = [];
 
   processUserData(msg, {
     usePip: sessions[msg.from.id].processDataConfig.usePip,
@@ -2977,5 +3032,18 @@ bot.on('/state', msg => {
     return msg.reply.text(sessions ? (sessions[msg.from.id] ? sessions[msg.from.id].state : 'null') : 'null');
   }
 })
+
+bot.on('/showBeastsToValidate', msg => {
+  if(!_.isEmpty(sessions)) {
+    if(sessions[msg.from.id] !== undefined) {
+      if(sessions[msg.from.id].beastsToValidate.length > 0) {
+        return msg.reply.text(getBeastToValidateMessage(sessions[msg.from.id].beastsToValidate, sessions[msg.from.id].beastRequest), {
+          parseMode: 'html',
+          replyMarkup: 'hide',
+        }).catch(e => console.log(e));
+      }
+    }
+  }
+});
 
 bot.start();
