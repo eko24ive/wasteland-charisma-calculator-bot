@@ -246,7 +246,7 @@ const armors = [
     characteristic: 76,
     place: engineer,
     rarities: [FIRST, SECOND],
-    demand: getCharacteristic(AGILITY, 40),
+    requirements: getCharacteristic(AGILITY, 40),
   },
   {
     icon: '🦇',

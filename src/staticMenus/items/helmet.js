@@ -100,7 +100,7 @@ const helmets = [
       getResource(GENERATORS, 140), getResource(MICROCHIPS, 60)],
     characteristic: 40,
     place: engineer,
-    demand: getCharacteristic(AGILITY, 21),
+    requirements: getCharacteristic(AGILITY, 21),
   },
   {
     icon: '⚙️',
@@ -109,7 +109,7 @@ const helmets = [
       getResource(MICROCHIPS, 210), getResource(IRIDIUM, 130)],
     characteristic: 68,
     place: engineer,
-    demand: getCharacteristic(AGILITY, 35),
+    requirements: getCharacteristic(AGILITY, 35),
   },
   {
     icon: '🛠',
@@ -118,7 +118,7 @@ const helmets = [
       getResource(MICROCHIPS, 345), getResource(IRIDIUM, 320)],
     characteristic: 92,
     place: engineer,
-    demand: getCharacteristic(AGILITY, 35),
+    requirements: getCharacteristic(AGILITY, 35),
   },
 ];
 

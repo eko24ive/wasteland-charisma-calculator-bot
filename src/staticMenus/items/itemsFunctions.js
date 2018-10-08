@@ -49,9 +49,9 @@ const getItemCharacteristic = (characteristic) => {
   return '???';
 };
 
-const getItemDemand = (demand) => {
-  if (demand) {
-    return demand;
+const getItemRequirements = (requirements) => {
+  if (requirements) {
+    return requirements;
   }
 
   return '';
@@ -62,16 +62,16 @@ const showItem = ({
   title,
   characteristic,
   price,
-  demand,
+  requirements,
 }, comment) => {
   const itemIcon = getItemIcon(icon);
   const itemCharacteristic = getItemCharacteristic(characteristic);
   const itemPrice = getItemPrice(price);
-  const itemDemand = getItemDemand(demand);
+  const itemRequirements = getItemRequirements(requirements);
   return `
 ${itemIcon} *${title}*
 ${comment}${itemCharacteristic}
-💰: ${itemPrice}${itemDemand ? `\n${itemDemand}` : ''}
+💰: ${itemPrice}${itemRequirements ? `\n${itemRequirements}` : ''}
 `;
 };
 

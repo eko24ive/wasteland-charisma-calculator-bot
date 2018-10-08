@@ -282,7 +282,7 @@ const weapons = [
     characteristic: 49,
     place: workbench,
     rarities: [FIRST, SECOND],
-    demand: getCharacteristic(STRENGTH, 28),
+    requirements: getCharacteristic(STRENGTH, 28),
   },
   {
     icon: '☄️',

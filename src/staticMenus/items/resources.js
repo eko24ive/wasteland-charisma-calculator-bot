@@ -8,6 +8,7 @@ const CUBONITE = 'CUBONITE';
 const OSMIUM = 'OSMIUM';
 const TITANIUM = 'TITANIUM';
 const EPHEDRINE = 'EPHEDRINE';
+const KIPARIT = 'KIPARIT';
 const WIRES = 'WIRES';
 const MINICHARGE = 'MINICHARGE';
 const TRANSISTOR = 'TRANSISTOR';
@@ -83,6 +84,11 @@ const resources = {
   },
   EPHEDRINE: {
     title: 'Эфедрин',
+    icon: '',
+    description: '',
+  },
+  KIPARIT: {
+    title: 'Кипарит',
     icon: '',
     description: '',
   },
@@ -233,6 +239,7 @@ module.exports = {
     OSMIUM,
     TITANIUM,
     EPHEDRINE,
+    KIPARIT,
     WIRES,
     MINICHARGE,
     TRANSISTOR,
