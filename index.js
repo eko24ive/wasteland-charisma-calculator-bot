@@ -212,8 +212,13 @@ const askReachableKm = (msg) => {
     [
 
       buttons.reachableKm56.label,
-      buttons.reachableKm65.label,
-      buttons.reachableKm70.label,
+      buttons.reachableKm60.label,
+      buttons.reachableKm78.label,
+    ],
+    [
+      buttons.reachableKm85.label,
+      buttons.reachableKm95.label,
+      buttons.reachableKm100.label,
     ],
   ], {
     resize: true,
@@ -1810,7 +1815,7 @@ ${userSkills.join('\n')}
     return msg.reply.text(`
 ${skillOMaticText}
 
-Оу, похоже я ещё ничего не знаю про твой пип :с
+Оу, похоже я ещё ничего не знаю про твой пип - без него я не смогу тебе помочь :с
 Перейди в игру по кнопке внизу и перешли мне его пожалуйста!
         `, {
       replyMarkup: toGameKeyboard,
@@ -1993,9 +1998,9 @@ bot.on(/^\d+$/, (msg) => {
     case states.WAIT_FOR_DISTANCE: {
       const reachableKm = Number(msg.text);
 
-      if (reachableKm > 100) {
+      if (reachableKm > 104) {
         msg.reply.text('Бля, ну не гони - давай чуть более реалистичней, окей ?)');
-      } else if (reachableKm <= 100) {
+      } else if (reachableKm <= 104) {
         sessions[msg.from.id].reachableKm = reachableKm;
         sessions[msg.from.id].state = states.WAIT_FOR_LEVELS;
 

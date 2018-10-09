@@ -4,7 +4,8 @@ const constants = require('./constants/constants');
 const defaultSkillCost = require('./constants/defaultSkillCost');
 const defaultCharismaCost = require('./constants/defaultCharismaCost');
 const mobs = require('./constants/mobs');
-const mobsRanges = require('./constants/mobsRanges');
+const ranges = require('./utils/getRanges');
+const timeToTravel = require('./utils/timeToTravel');
 
 const skillMap = {
   '💪 Сила': 'strength',
@@ -108,9 +109,6 @@ const calculateAmountOfRaids = (
   skillRangeTo,
   upgradeSkill,
 ) => {
-  const distanceOfRanges = {};
-  const mobsFillment = [];
-
   const totalSpend = amountToSpend(
     upgradeSkill,
     charismaLevel,
@@ -122,30 +120,18 @@ const calculateAmountOfRaids = (
     return null;
   }
 
-  const scopeOfRanges = mobsRanges.filter((range) => {
-    const [start, end] = range.split('-');
+  const availableMobsOnDistance = mobs.filter((beast) => {
+    const { kmMin, kmMax } = beast;
 
-    return Number(end) <= Number(reachableDistance) || Number(reachableDistance) >= Number(start);
+    return Number(kmMin) <= Number(reachableDistance) || Number(reachableDistance) >= Number(kmMax);
   });
 
-  scopeOfRanges.forEach((range) => {
-    const [start, end] = range.split('-');
+  const mobsFillment = ranges.ranges.map((range) => {
+    const [min, max] = range;
 
-    distanceOfRanges[range] = end - start;
-  });
+    const mobsOnRange = availableMobsOnDistance.filter(({ kmMin, kmMax }) => Number(kmMin) <= Number(max) || Number(min) >= Number(kmMax));
 
-  const getRandomItem = array => array[Math.floor(Math.random() * array.length)];
-
-  scopeOfRanges.forEach((range) => {
-    const distanceOfRange = distanceOfRanges[range];
-    const amountOfIterations = distanceOfRange < 2 ? distanceOfRange : Math.floor(Math.random() * 2) + 1;
-    const mobsForRange = mobs[range];
-
-    // FIXME: Might be cause of skillupgrade issue;
-    for (let i = amountOfIterations; i > 0; i -= 1) {
-      const item = getRandomItem(mobsForRange);
-      mobsFillment.push(item);
-    }
+    return mobsOnRange[Math.floor(Math.random() * mobsOnRange.length)];
   });
 
   const bestCaseScenario = {
@@ -245,6 +231,12 @@ const calculateUpgrade = ({
 
   const spentOnSkill = calculateSpentOnSkill(currentSkillLevel);
 
+  const raidsAmount = Math.floor(calculations.raidsInfo.worstCaseScenario.amountOfRaids);
+  const timeToFarm = Math.floor((timeToTravel(pip.endurance, reachableDistance) * raidsAmount) / 60 / 60);
+
+  const displayTimeToFarm = timeToFarm === 0 ? (timeToTravel(pip.endurance, reachableDistance) * raidsAmount).toFixed(2) : timeToFarm;
+
+
   /*
     При самом удачном стечении обсоятельств тебе необходимо сделать примерно ${Math.ceil(calculations.raidsInfo.bestCaseScenario.amountOfRaids)} 👣 ходок:
 За одну ходку ты получишь примерно:
@@ -263,7 +255,11 @@ _Всего ты потратил ${formatNubmer(spentOnSkill)} 🕳 крыше�
 
 Твой текущий уровень харизмы позволил сэкономить ${formatNubmer(calculations.amountOfSavedFunds)} 🕳 крышек.
 
-Тебе необходимо сделать примерно *${Math.floor((calculations.raidsInfo.worstCaseScenario.amountOfRaids + 2) * 1.5)} 👣 ходок*:
+Тебе необходимо сделать примерно *${raidsAmount || '<1'} 👣 ходок*.
+
+${raidsAmount > 0 ? `C твоей 🔋Выносливостью на это потребуётся примерно ${displayTimeToFarm} часов.` : ''}
+_Без учёта рейдов, игровых событий, лагов, солнечных затмений и прочей хуйни_
+
 \`Из-за недавнего обновления Wasteland Wars данные для расчёта ходок работают в эксперементальном режиме\`
 `;
   /*
