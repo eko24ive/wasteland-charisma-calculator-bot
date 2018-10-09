@@ -457,20 +457,22 @@ const actualActualProcessUserData = (msg, reportData, updatesData, options) => {
     if (updatesData.beasts.length > 0) {
       async.forEach(updatesData.beasts, (iBeast, next) => {
         if (!options.useBeastFace) {
-          if (isBeastUnderValidation(iBeast.name)) {
-            next();
-          } else {
-            next();
-          }
+          next();
         } else if (iBeast.proofedByForward) {
           next();
         } else {
-          Beast.findOne({
+          const searchQuery = iBeast.subType ? {
             name: iBeast.name,
             isDungeon: iBeast.isDungeon,
             type: iBeast.type,
             subType: iBeast.subType,
-          }).then((fBeast) => {
+          } : {
+            name: iBeast.name,
+            isDungeon: iBeast.isDungeon,
+            type: iBeast.type,
+          };
+          
+          Beast.findOne(searchQuery).then((fBeast) => {
             const databaseBeast = fBeast;
             if (databaseBeast === null) {
               beastsToValidate.push({
