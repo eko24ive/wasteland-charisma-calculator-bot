@@ -212,7 +212,17 @@ const calculateUpgrade = ({
   const reachableDistance = Number(/\d*/.exec(reachableKm).pop());
 
   const calculations = {
-    amountOfSavedFunds: calculatePerkDiscount(charismaLevel),
+    amountOfSavedFunds: amountToSpend(
+      upgradeSkill,
+      1,
+      currentSkillLevel,
+      upgradeTo,
+    ) - amountToSpend(
+      upgradeSkill,
+      charismaLevel,
+      currentSkillLevel,
+      upgradeTo,
+    ),
     amountToSpend: amountToSpend(
       upgradeSkill,
       charismaLevel,
