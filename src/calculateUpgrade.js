@@ -19,7 +19,7 @@ const skillsCap = {
   precision: 1300,
   agility: 1200,
   health: 1550,
-  charisma: 1250,
+  charisma: 1200,
 };
 
 const formatNubmer = (number) => {
