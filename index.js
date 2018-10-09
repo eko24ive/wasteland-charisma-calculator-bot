@@ -399,7 +399,7 @@ ${firstTime ? `Пожалуйста, скинь <b>ОТДЕЛЬНО</b> (по о
 <i>ВНИМАНИЕ: ПРИ НАЖАТИИ НА /skipbeastforwards - БОТ ПРОИГНОРИРУЕТ ДАННЫЕ, КОТОРЫЕ ЗАВИСЯТ ОТ УКАЗАНЫХ ВЫШЕ ФОРВАРДОВ, И НЕ ЗАПИШЕТ ИХ В БАЗУ</i>`;
 };
 
-const actualProcessUserData = (msg, reportData, updatesData, options) => {
+const actualActualProcessUserData = (msg, reportData, updatesData, options) => {
   if (reportData.lastPip !== null) {
     updateOrCreate(msg, reportData.lastPip);
   }
@@ -416,14 +416,6 @@ const actualProcessUserData = (msg, reportData, updatesData, options) => {
       replyMarkup: 'hide',
     }).catch(e => console.log(e));
   }
-
-
-  if (!options.silent) {
-    msg.reply.text('Перехожу в режим обработки данных, подожди пожалуйста немного :3', {
-      replyMarkup: 'hide',
-    }).catch(e => console.log(e));
-  }
-
 
   let userForwardPoints = 0;
   const beastsToValidate = [];
@@ -467,7 +459,11 @@ const actualProcessUserData = (msg, reportData, updatesData, options) => {
         if (!options.useBeastFace) {
           if (isBeastUnderValidation(iBeast.name)) {
             next();
+          } else {
+            next();
           }
+        } else if (iBeast.proofedByForward) {
+          next();
         } else {
           Beast.findOne({
             name: iBeast.name,
@@ -477,14 +473,12 @@ const actualProcessUserData = (msg, reportData, updatesData, options) => {
           }).then((fBeast) => {
             const databaseBeast = fBeast;
             if (databaseBeast === null) {
-              if (iBeast.proofedByForward) {
-                next();
-              } else {
-                beastsToValidate.push({
-                  name: iBeast.name, distance: iBeast.distanceRange[0], type: iBeast.type, isDungeon: iBeast.isDungeon, reason: 'battle', date: iBeast.date,
-                });
-                next();
-              }
+              beastsToValidate.push({
+                name: iBeast.name, distance: iBeast.distanceRange[0], type: iBeast.type, isDungeon: iBeast.isDungeon, reason: 'battle', date: iBeast.date,
+              });
+              next();
+            } else {
+              next();
             }
           });
         }
@@ -503,6 +497,8 @@ const actualProcessUserData = (msg, reportData, updatesData, options) => {
       async.forEach(updatesData.beasts, (iBeast, next) => {
         if (!options.useBeastFace) {
           if (isBeastUnderValidation(iBeast.name)) {
+            next();
+          } else {
             next();
           }
         } else {
@@ -828,7 +824,7 @@ const actualProcessUserData = (msg, reportData, updatesData, options) => {
           dupesText = 'Похоже ты скидывал некоторые форварды по второму разу. Я не начислял тебе за них очки';
         }
 
-        if (dataProcessed > 0) {
+        if (dataProcessed > 0 && userForwardPoints > 0) {
           // TODO: Move out shit to strings
           // TODO: Implement meaningfull report data regarding found usefull data
 
@@ -892,6 +888,18 @@ const actualProcessUserData = (msg, reportData, updatesData, options) => {
 
 
   return false;
+};
+
+const actualProcessUserData = (msg, reportData, updatesData, options) => {
+  if (!options.silent) {
+    msg.reply.text('Перехожу в режим обработки данных, подожди пожалуйста немного :3', {
+      replyMarkup: 'hide',
+    }).then(() => {
+      actualActualProcessUserData(msg, reportData, updatesData, options);
+    }).catch(e => console.log(e));
+  } else {
+    actualActualProcessUserData(msg, reportData, updatesData, options);
+  }
 };
 
 const processUserData = (msg, options) => {
@@ -1904,14 +1912,14 @@ bot.on(['/skipbeastforward', '/skipbeastforwards'], (msg) => {
     });
   }
 
-  msg.reply.text('Окей, обработаю что смогу');
+  msg.reply.text('Окей, обработаю что смогу').then(() => {
+    sessions[msg.from.id].processDataConfig.useBeastFace = false;
+    sessions[msg.from.id].beastsToValidate = [];
 
-  sessions[msg.from.id].processDataConfig.useBeastFace = false;
-  sessions[msg.from.id].beastsToValidate = [];
-
-  processUserData(msg, {
-    usePip: sessions[msg.from.id].processDataConfig.usePip,
-    useBeastFace: sessions[msg.from.id].processDataConfig.useBeastFace,
+    processUserData(msg, {
+      usePip: sessions[msg.from.id].processDataConfig.usePip,
+      useBeastFace: sessions[msg.from.id].processDataConfig.useBeastFace,
+    });
   });
 });
 
