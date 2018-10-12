@@ -2887,7 +2887,7 @@ ${beastsList}
 });
 
 bot.on('/d', (msg) => {
-  if (process.env.ENV === 'STAGING') {
+  if (process.env.ENV === 'STAGING' || process.env.ENV === 'LOCAL') {
     Beast.find({
       isDungeon: true,
     }, 'battles.totalDamageReceived name id').then((beasts) => {
