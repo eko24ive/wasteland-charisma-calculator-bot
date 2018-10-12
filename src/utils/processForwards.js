@@ -50,7 +50,7 @@ const mergeBeasts = (beastsToMerge) => {
 
   const mergedBeasts = {};
 
-  proofedBeast.forEach(beast => {
+  proofedBeast.forEach((beast) => {
     if (mergedBeasts[beast.name]) {
       const existingBeast = mergedBeasts[beast.name];
 
@@ -98,14 +98,12 @@ const mergeBeasts = (beastsToMerge) => {
     } else {
       mergedBeasts[beast.name] = beast;
     }
-  })
+  });
 
-  const beasts = _.flatten([...unproofedBeasts, _.flatten(Object.keys(mergedBeasts).map(name => {
-    return mergedBeasts[name]
-  }))]);
+  const beasts = _.flatten([...unproofedBeasts, _.flatten(Object.keys(mergedBeasts).map((name) => mergedBeasts[name]))]);
 
   return beasts;
-}
+};
 
 const processForwards = (inputData) => {
   const reportData = {
@@ -163,7 +161,7 @@ const processForwards = (inputData) => {
     if (!checkPips(dataPips)) {
       reportData.criticalError = 'Пипы не соответствуют!';
       return {
-        reportData
+        reportData,
       };
     }
 
@@ -200,7 +198,7 @@ const processForwards = (inputData) => {
     dataType,
     date,
     userId,
-    ignore
+    ignore,
   }, index) => {
     if (index === 0) {
       reportData.initialForwardDate = date;
@@ -316,7 +314,7 @@ const processForwards = (inputData) => {
 
         if (reportData.lastPip) {
           beastData.concussions[0].stats = {
-            agility: reportData.lastPip.agility
+            agility: reportData.lastPip.agility,
           };
         } else {
           reportData.recalculationRequired = true;
@@ -368,11 +366,11 @@ const processForwards = (inputData) => {
             distance: data.distance,
             type: data.type,
             reason: 'battle',
-            date
+            date,
           });
         } else if (
-          (reportData.lastBeastSeenSubType === 'regular' && data.name !== reportData.lastBeastSeen.name && reportData.lastBeastSeenType !== beastData.type) ||
-          (reportData.lastBeastSeenSubType === 'walking' && data.name.indexOf(reportData.lastBeastSeen.name) === -1 && reportData.lastBeastSeenType !== beastData.type)
+          (reportData.lastBeastSeenSubType === 'regular' && data.name !== reportData.lastBeastSeen.name && reportData.lastBeastSeenType !== beastData.type)
+          || (reportData.lastBeastSeenSubType === 'walking' && data.name.indexOf(reportData.lastBeastSeen.name) === -1 && reportData.lastBeastSeenType !== beastData.type)
         ) {
           beastData.battles = [];
 
@@ -381,11 +379,10 @@ const processForwards = (inputData) => {
             distance: data.distance,
             type: data.type,
             reason: 'battle',
-            date
+            date,
           });
         }
-      } else {
-        if (!reportData.lastBeastSeen) {
+      } else if (!reportData.lastBeastSeen) {
           beastData.proofedByForward = false;
         } else if (
           (reportData.lastBeastSeenSubType === 'regular' && data.name !== reportData.lastBeastSeen.name && reportData.lastBeastSeenType !== beastData.type) ||
@@ -393,8 +390,6 @@ const processForwards = (inputData) => {
         ) {
           beastData.proofedByForward = false;
         }
-      }
-
 
 
       updatesData.beasts.push(beastData);
@@ -409,7 +404,7 @@ const processForwards = (inputData) => {
       const isDungeon = reportData.lastBeastSeenType !== 'regular';
 
       const beastData = {
-        isDungeon,
+        isDungeon: data.isDungeon || isDungeon,
         proofedByForward: true,
       };
 
@@ -494,7 +489,7 @@ const processForwards = (inputData) => {
             distance: data.distance,
             type: data.type,
             reason: 'battle',
-            date
+            date,
           });
         } else if (
           data.name !== reportData.lastBeastSeen.name && reportData.lastBeastSeenType !== beastData.type
@@ -506,18 +501,16 @@ const processForwards = (inputData) => {
             distance: data.distance,
             type: data.type,
             reason: 'battle',
-            date
+            date,
           });
         }
-      } else {
-        if (!reportData.lastBeastSeen) {
+      } else if (!reportData.lastBeastSeen) {
           beastData.proofedByForward = false;
         } else if (
           data.name !== reportData.lastBeastSeen.name && reportData.lastBeastSeenType !== beastData.type
         ) {
           beastData.proofedByForward = false;
         }
-      }
     }
 
     if (dataType === 'flee' && reportData.prcoessAllowed) {
@@ -528,7 +521,7 @@ const processForwards = (inputData) => {
       const beastData = {
         isDungeon: false,
         distanceRange: [data.distance],
-        proofedByForward: true
+        proofedByForward: true,
       };
 
       reportData.distanceHistory.push(data.distance);
@@ -567,7 +560,7 @@ const processForwards = (inputData) => {
             distance: data.distance,
             type: data.type,
             reason: 'flee',
-            date
+            date,
           });
         }
       } else {
@@ -576,7 +569,7 @@ const processForwards = (inputData) => {
           distance: data.distance,
           type: data.type,
           reason: 'flee',
-          date
+          date,
         });
       }
     }
@@ -602,7 +595,7 @@ const processForwards = (inputData) => {
 
     if (dataType === 'dungeonBeastFaced' && reportData.prcoessAllowed) {
       reportData.lastBeastSeen = {
-        name: data.name
+        name: data.name,
       };
       reportData.lastBeastSeenType = 'dungeon';
       reportData.lastBeastSeenSubType = 'regular';
@@ -610,7 +603,7 @@ const processForwards = (inputData) => {
 
     if (dataType === 'walkingBeastFaced' && reportData.prcoessAllowed) {
       reportData.lastBeastSeen = {
-        name: data.name
+        name: data.name,
       };
       reportData.lastBeastSeenSubType = 'walking';
     }
@@ -627,7 +620,6 @@ const processForwards = (inputData) => {
   }
 
 
-
   return {
     reportData,
     updatesData: {
@@ -635,8 +627,6 @@ const processForwards = (inputData) => {
       beasts: mergeBeasts(updatesData.beasts),
     },
   };
-
-
 };
 
 module.exports = processForwards;

@@ -471,7 +471,9 @@ const actualActualProcessUserData = (msg, reportData, updatesData, options) => {
             isDungeon: iBeast.isDungeon,
             type: iBeast.type,
           };
-          
+
+          console.log(searchQuery);
+
           Beast.findOne(searchQuery).then((fBeast) => {
             const databaseBeast = fBeast;
             if (databaseBeast === null) {
@@ -491,6 +493,8 @@ const actualActualProcessUserData = (msg, reportData, updatesData, options) => {
           resolve();
         }
       });
+    } else {
+      resolve();
     }
   });
 
@@ -838,12 +842,12 @@ const actualActualProcessUserData = (msg, reportData, updatesData, options) => {
             // Всего я насчитал ${dataProcessed} данных!
 
             reply = `Фух, я со всём справился - спасибо тебе огромное за информацию!
-    
-    Ты заработал ${userForwardPoints.toFixed(1)} 💎*Шмепселей* за свои форварды!
-    _${dupesText}_
-    
-    ${errors}
-    Если ты чего-то забыл докинуть - смело жми на \`[Скинуть лог 🏃]\` и _докидывай_`;
+
+Ты заработал ${userForwardPoints.toFixed(1)} 💎*Шмепселей* за свои форварды!
+_${dupesText}_
+
+${errors}
+Если ты чего-то забыл докинуть - смело жми на \`[Скинуть лог 🏃]\` и _докидывай_`;
           }
 
           msg.reply.text(reply, {
