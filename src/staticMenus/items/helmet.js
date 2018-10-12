@@ -1,6 +1,8 @@
 const {
   merchant,
   engineer,
+  wasteland,
+  highHrotgar,
 } = require('./../places.js');
 
 const {
@@ -32,9 +34,9 @@ const helmets = [
   {
     icon: false,
     title: 'Ушанка',
-    price: [getResource(CAPS, 30)],
+    price: false,
     characteristic: 1,
-    place: merchant,
+    place: wasteland,
   },
   {
     icon: false,
@@ -88,7 +90,7 @@ const helmets = [
   {
     icon: '⚙️',
     title: 'Шлем синта',
-    price: [getResource(MATERIALS, 21990), getResource(QUARZ, 250),
+    price: [getResource(MATERIALS, 21990), getResource(QUARZ, 150),
       getResource(GENERATORS, 90), getResource(MICROCHIPS, 20)],
     characteristic: 25,
     place: engineer,
@@ -120,6 +122,20 @@ const helmets = [
     place: engineer,
     requirements: getCharacteristic(AGILITY, 35),
   },
+  {
+    icon: false,
+    title: 'Рогатый шлем',
+    price: false,
+    characteristic: 115,
+    place: highHrotgar,
+  },
+  {
+    icon: false,
+    title: 'Шлем мастера',
+    price: false,
+    characteristic: 195,
+    place: wasteland,
+  },  
 ];
 
 module.exports = {
