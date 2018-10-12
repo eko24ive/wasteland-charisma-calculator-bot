@@ -17,6 +17,7 @@ const {
     GENERATORS,
     MICROCHIPS,
     IRIDIUM,
+    KIPARIT,
     WIRES,
     MINICHARGE,
     TOPAZ,
@@ -188,6 +189,7 @@ const armors = [
     characteristic: 45,
     place: workbench,
     rarities: [FIRST, SECOND],
+    requirements: getCharacteristic(AGILITY, 23),
   },
   {
     icon: '⚙️',
@@ -212,6 +214,7 @@ const armors = [
       getResource(MICROCHIPS, 10)],
     characteristic: 55,
     place: workbench,
+    requirements: getCharacteristic(AGILITY, 28),
   },
   {
     icon: '⚙️',
@@ -221,6 +224,7 @@ const armors = [
     characteristic: 66,
     place: workbench,
     rarities: [FIRST, SECOND],
+    requirements: getCharacteristic(AGILITY, 34),
   },
   {
     icon: '⚙️',
@@ -272,6 +276,7 @@ const armors = [
     characteristic: 89,
     place: engineer,
     rarities: [FIRST, SECOND],
+    requirements: getCharacteristic(AGILITY, 46),
   },
   {
     icon: '⚛️',
@@ -299,6 +304,7 @@ const armors = [
     characteristic: 127,
     place: engineer,
     rarities: [FIRST, SECOND],
+    requirements: getCharacteristic(AGILITY, 66),
   },
   {
     icon: '🛠',
@@ -321,11 +327,12 @@ const armors = [
   {
     icon: '⚡️',
     title: 'Тесла-мех',
-    price: [getResource(MATERIALS, 179990), getResource(GENERATORS, 210),
-      getResource(MICROCHIPS, 145), getResource(IRIDIUM, 116)],
+    price: [getResource(MATERIALS, 179990), getResource(GENERATORS, 190),
+      getResource(MICROCHIPS, 125), getResource(IRIDIUM, 100)],
     characteristic: 161,
     place: engineer,
     rarities: [FIRST, SECOND],
+    requirements: getCharacteristic(AGILITY, 84),
   },
   {
     icon: '⚡️',
@@ -345,6 +352,26 @@ const armors = [
     place: engineer,
     rarity: getRarityIcon(SECOND),
   },
+    {
+    icon: '☣️',
+    title: 'Броня хранителя',
+    price: [getResource(MATERIALS, 229990), getResource(MICROCHIPS, 155),
+      getResource(IRIDIUM, 132), getResource(KIPARIT, 50)],
+    characteristic: 190,
+    place: engineer,
+    rarities: [FIRST, SECOND],
+    requirements: getCharacteristic(AGILITY, 100),
+  },
+    {
+    icon: '✳️',
+    title: 'Galachi Lite',
+    price: [getResource(MATERIALS, 299990), getResource(MICROCHIPS, 245),
+      getResource(IRIDIUM, 189), getResource(KIPARIT, 85)],
+    characteristic: 230,
+    place: engineer,
+    rarities: [FIRST, SECOND],
+    requirements: getCharacteristic(AGILITY, 121),
+  },
   {
     icon: false,
     title: 'Броня Безумца',
@@ -352,6 +379,7 @@ const armors = [
     characteristic: 58,
     place: madman,
     rarities: [FIRST, SECOND],
+    requirements: getCharacteristic(AGILITY, 26),
   },
   {
     icon: false,
