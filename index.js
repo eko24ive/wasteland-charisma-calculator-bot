@@ -833,6 +833,7 @@ const actualActualProcessUserData = (msg, reportData, updatesData, options) => {
         if (dataProcessed > 0 && userForwardPoints > 0) {
           // TODO: Move out shit to strings
           // TODO: Implement meaningfull report data regarding found usefull data
+          createSession(msg.from.id);
 
           // setTimeout(() => {
           if (options.silent) {
@@ -867,6 +868,7 @@ ${errors}
           // }, 1500);
         } else {
           // setTimeout(() => {
+          createSession(msg.from.id);
           return msg.reply.text(`
         К сожалению я ничего не смог узнать из твоих форвардов :с`, {
             replyMarkup: defaultKeyboard,
@@ -942,6 +944,7 @@ const processUserData = (msg, options) => {
 
 
   if (updatesData.locations.length === 0 && updatesData.beasts.length === 0) {
+    createSession(msg.from.id);
     return msg.reply.text(`
   К сожалению я ничего не смог узнать из твоих форвардов :с`, {
       replyMarkup: defaultKeyboard,
