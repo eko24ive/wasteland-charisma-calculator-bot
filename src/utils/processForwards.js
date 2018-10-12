@@ -100,7 +100,7 @@ const mergeBeasts = (beastsToMerge) => {
     }
   });
 
-  const beasts = _.flatten([...unproofedBeasts, _.flatten(Object.keys(mergedBeasts).map((name) => mergedBeasts[name]))]);
+  const beasts = _.flatten([...unproofedBeasts, _.flatten(Object.keys(mergedBeasts).map(name => mergedBeasts[name]))]);
 
   return beasts;
 };
@@ -383,13 +383,13 @@ const processForwards = (inputData) => {
           });
         }
       } else if (!reportData.lastBeastSeen) {
-          beastData.proofedByForward = false;
-        } else if (
-          (reportData.lastBeastSeenSubType === 'regular' && data.name !== reportData.lastBeastSeen.name && reportData.lastBeastSeenType !== beastData.type) ||
-          (reportData.lastBeastSeenSubType === 'walking' && data.name.indexOf(reportData.lastBeastSeen.name) === -1 && reportData.lastBeastSeenType !== beastData.type)
-        ) {
-          beastData.proofedByForward = false;
-        }
+        beastData.proofedByForward = false;
+      } else if (
+        (reportData.lastBeastSeenSubType === 'regular' && data.name !== reportData.lastBeastSeen.name && reportData.lastBeastSeenType !== beastData.type)
+          || (reportData.lastBeastSeenSubType === 'walking' && data.name.indexOf(reportData.lastBeastSeen.name) === -1 && reportData.lastBeastSeenType !== beastData.type)
+      ) {
+        beastData.proofedByForward = false;
+      }
 
 
       updatesData.beasts.push(beastData);
@@ -445,7 +445,10 @@ const processForwards = (inputData) => {
       }
 
       if (reportData.lastPip) {
-        beastData.battles[0].armor = reportData.lastPip.armor;
+        beastData.battles[0].stats = {
+          armor: reportData.lastPip.armor,
+          damage: reportData.lastPip.damage,
+        };
       } else {
         reportData.recalculationRequired = true;
       }
@@ -505,12 +508,12 @@ const processForwards = (inputData) => {
           });
         }
       } else if (!reportData.lastBeastSeen) {
-          beastData.proofedByForward = false;
-        } else if (
-          data.name !== reportData.lastBeastSeen.name && reportData.lastBeastSeenType !== beastData.type
-        ) {
-          beastData.proofedByForward = false;
-        }
+        beastData.proofedByForward = false;
+      } else if (
+        data.name !== reportData.lastBeastSeen.name && reportData.lastBeastSeenType !== beastData.type
+      ) {
+        beastData.proofedByForward = false;
+      }
     }
 
     if (dataType === 'flee' && reportData.prcoessAllowed) {
