@@ -538,14 +538,18 @@ const actualActualProcessUserData = (msg, reportData, updatesData, options) => {
               let isSameFleeExists = true;
               let isSameConcussionExists = true;
               let isSameBattleExists = true;
+              const isThereAreBattle = true;
               let isBattleDupe = false;
               let isFleeDupe = false;
               let beastPoints = 0;
+              const uniqueBattles = [];
+              const uniqueConcussions = [];
+              const uniqueFlees = [];
 
               if (iBeast.battles) {
                 if (iBeast.battles.length > 0) {
                   // FIXME: Implement correct battle dupe detection
-                  isSameBattleExists = databaseBeast.battles.map((battle) => {
+                  isSameBattleExists = databaseBeast.battles.forEach((battle) => {
                     if (iBeast.battles === undefined) {
                       return true;
                     }
@@ -561,8 +565,10 @@ const actualActualProcessUserData = (msg, reportData, updatesData, options) => {
                       dupes.battles += 1;
                     }
 
-                    return sameStatsBattle || sameStamp;
-                  }).some(result => result === true);
+                    if (!sameStatsBattle && !sameStamp) {
+                      uniqueBattles.push(battle);
+                    }
+                  });
                 }
               }
 
