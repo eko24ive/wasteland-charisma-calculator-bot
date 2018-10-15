@@ -535,21 +535,16 @@ const actualActualProcessUserData = (msg, reportData, updatesData, options) => {
                 next();
               }
             } else {
-              let isSameFleeExists = true;
-              let isSameConcussionExists = true;
-              let isSameBattleExists = true;
-              const isThereAreBattle = true;
-              let isBattleDupe = false;
-              let isFleeDupe = false;
               let beastPoints = 0;
               const uniqueBattles = [];
               const uniqueConcussions = [];
               const uniqueFlees = [];
+              const sameBattles = [];
+              const sameFlees = [];
 
               if (iBeast.battles) {
                 if (iBeast.battles.length > 0) {
-                  // FIXME: Implement correct battle dupe detection
-                  isSameBattleExists = databaseBeast.battles.forEach((battle) => {
+                  databaseBeast.battles.forEach((battle) => {
                     if (iBeast.battles === undefined) {
                       return true;
                     }
@@ -561,12 +556,15 @@ const actualActualProcessUserData = (msg, reportData, updatesData, options) => {
                     const sameStamp = iBeast.battles.some(newBattle => newBattle.stamp === existingBattle.stamp);
 
                     if (sameStamp) {
-                      isBattleDupe = true;
                       dupes.battles += 1;
                     }
 
                     if (!sameStatsBattle && !sameStamp) {
                       uniqueBattles.push(battle);
+                    }
+
+                    if (!sameStamp && sameStatsBattle) {
+                      sameBattles.push(battle);
                     }
                   });
                 }
@@ -575,18 +573,22 @@ const actualActualProcessUserData = (msg, reportData, updatesData, options) => {
 
               if (iBeast.concussions) {
                 if (iBeast.concussions.length > 0) {
-                  isSameConcussionExists = databaseBeast.concussions.map((concussion) => {
+                  databaseBeast.concussions.forEach((concussion) => {
                     const existingConcussion = _.clone(concussion.toJSON());
 
-                    return iBeast.concussions.some(newConcussion => existingConcussion.stats.agility === newConcussion.stats.agility
+                    const sameConcussion = iBeast.concussions.some(newConcussion => existingConcussion.stats.agility === newConcussion.stats.agility
                       && existingConcussion.amount === newConcussion.amount);
-                  }).some(result => result === true);
+
+                    if (!sameConcussion) {
+                      uniqueConcussions.push(concussion);
+                    }
+                  });
                 }
               }
 
               if (iBeast.flees) {
                 if (iBeast.flees.length === 1) {
-                  isSameFleeExists = databaseBeast.flees.map((flee) => {
+                  databaseBeast.flees.forEach((flee) => {
                     const existingFlee = _.clone(flee.toJSON());
 
                     const sameStatsFlee = iBeast.flees[0].some(newFlee => existingFlee.stats.agility === newFlee.stats.agility
@@ -596,12 +598,17 @@ const actualActualProcessUserData = (msg, reportData, updatesData, options) => {
                     const sameStamp = iBeast.flees.some(newFlee => newFlee.stamp === flee.stamp);
 
                     if (sameStamp) {
-                      isFleeDupe = true;
                       dupes.flees += 1;
                     }
 
-                    return sameStatsFlee || sameStamp;
-                  }).some(result => result === true);
+                    if (!sameStatsFlee && !sameStamp) {
+                      uniqueFlees.push(flee);
+                    }
+
+                    if (!sameStamp && sameStatsFlee) {
+                      sameFlees.push(flee);
+                    }
+                  });
                 }
               }
 
@@ -628,18 +635,16 @@ const actualActualProcessUserData = (msg, reportData, updatesData, options) => {
                 }); */
               }
 
-              if (!isBattleDupe) {
-                if (
-                  !iBeast.distanceRange.some(newDistance => _.contains(databaseBeast.distanceRange, newDistance))
-                ) {
-                  beastPoints += forwardPoints.newDistance * iBeast.distanceRange.length;
+              if (
+                !iBeast.distanceRange.some(newDistance => _.contains(databaseBeast.distanceRange, newDistance))
+              ) {
+                beastPoints += forwardPoints.newDistance * iBeast.distanceRange.length;
 
-                  databaseBeast.distanceRange = _.uniq(
-                    _.flatten([databaseBeast.distanceRange, iBeast.distanceRange]),
-                  );
-                } else {
-                  beastPoints += forwardPoints.sameDistance;
-                }
+                databaseBeast.distanceRange = _.uniq(
+                  _.flatten([databaseBeast.distanceRange, iBeast.distanceRange]),
+                );
+              } else {
+                beastPoints += forwardPoints.sameDistance;
               }
 
               if (iBeast.capsReceived.length > 0) {
@@ -664,56 +669,56 @@ const actualActualProcessUserData = (msg, reportData, updatesData, options) => {
                 }
               }
 
-              if (!isBattleDupe) {
-                if (!isSameBattleExists) {
-                  iBeast.battles.forEach((newBattle) => {
-                    if (newBattle.damagesGiven.length === 1) {
-                      beastPoints += forwardPoints.oneShotBattle;
-                    } else if (newBattle.outcome === 'win') {
-                      beastPoints += forwardPoints.newBattleWin;
-                    } else {
-                      beastPoints += forwardPoints.newBattleLose;
-                    }
+              if (uniqueBattles.length > 0) {
+                uniqueBattles.forEach((newBattle) => {
+                  if (newBattle.damagesGiven.length === 1) {
+                    beastPoints += forwardPoints.oneShotBattle;
+                  } else if (newBattle.outcome === 'win') {
+                    beastPoints += forwardPoints.newBattleWin;
+                  } else {
+                    beastPoints += forwardPoints.newBattleLose;
+                  }
 
-                    databaseBeast.battles.push(newBattle);
-                  });
-                } else if (iBeast.battles !== undefined) {
-                  iBeast.battles.forEach((newBattle) => {
-                    if (newBattle.damagesGiven.length === 1) {
-                      beastPoints += forwardPoints.oneShotBattle;
-                    } else if (newBattle.outcome === 'win') {
-                      beastPoints += forwardPoints.sameBattleWin;
-                    } else {
-                      beastPoints += forwardPoints.sameBattleLose;
-                    }
-                  });
-                }
+                  databaseBeast.battles.push(newBattle);
+                });
               }
 
-              if (!isSameConcussionExists && !isBattleDupe) {
-                databaseBeast.concussions.push(_.flatten(iBeast.concussions));
+              if (sameBattles.length > 0) {
+                sameBattles.forEach((newBattle) => {
+                  if (newBattle.damagesGiven.length === 1) {
+                    beastPoints += forwardPoints.oneShotBattle;
+                  } else if (newBattle.outcome === 'win') {
+                    beastPoints += forwardPoints.sameBattleWin;
+                  } else {
+                    beastPoints += forwardPoints.sameBattleLose;
+                  }
+                });
               }
 
-              if (!isFleeDupe) {
-                if (!isSameFleeExists) {
-                  iBeast.flees.forEach((newFlee) => {
-                    if (newFlee.outcome === 'win') {
-                      beastPoints += forwardPoints.newFleeWin;
-                    } else {
-                      beastPoints += forwardPoints.newFleeLose;
-                    }
+              if (uniqueConcussions.length > 0) {
+                databaseBeast.concussions.push(_.flatten(uniqueConcussions));
+              }
 
-                    databaseBeast.flees.push(newFlee);
-                  });
-                } else if (iBeast.flees !== undefined) {
-                  iBeast.flees.forEach((newFlee) => {
-                    if (newFlee.outcome === 'win') {
-                      beastPoints += forwardPoints.sameFleeWin;
-                    } else {
-                      beastPoints += forwardPoints.sameFleeLose;
-                    }
-                  });
-                }
+              if (uniqueConcussions.length > 0) {
+                uniqueFlees.forEach((newFlee) => {
+                  if (newFlee.outcome === 'win') {
+                    beastPoints += forwardPoints.newFleeWin;
+                  } else {
+                    beastPoints += forwardPoints.newFleeLose;
+                  }
+
+                  databaseBeast.flees.push(newFlee);
+                });
+              }
+
+              if (sameFlees.length > 0) {
+                sameFlees.flees.forEach((newFlee) => {
+                  if (newFlee.outcome === 'win') {
+                    beastPoints += forwardPoints.sameFleeWin;
+                  } else {
+                    beastPoints += forwardPoints.sameFleeLose;
+                  }
+                });
               }
 
               dataProcessed += 1;
