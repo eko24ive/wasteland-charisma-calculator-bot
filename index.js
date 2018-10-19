@@ -404,6 +404,8 @@ const actualActualProcessUserData = (msg, reportData, updatesData, options) => {
     updateOrCreate(msg, reportData.lastPip);
   }
 
+  console.log(JSON.stringify(updatesData))
+
   if (options.useBeastFace && !_.isEmpty(reportData.beastsToValidate)) {
     sessions[msg.from.id].state = states.WAIT_FOR_DATA_VALIDATION;
     sessions[msg.from.id].initialForwardDate = reportData.initialForwardDate;
