@@ -5,8 +5,8 @@ const {
 
 const parseRegularBeast = (beast) => {
   const splitted = beast.split('\n');
-  let capsReceived = 0;
-  let materialsReceived = 0;
+  let capsReceived = [0];
+  let materialsReceived = [0];
   let fightResult = null;
   let type;
 
@@ -95,7 +95,8 @@ const parseDungeonBeast = (beast) => {
   const isDungeon = true;
   const [, distance] = regexps.campDistanceRegExp.exec(beast);
   const [, name] = regexps.beastNameRegExp.exec(beast);
-  let fightResult, type;
+  let fightResult;
+  let type;
 
   const damagesReceived = splitted.map((row) => {
     if (regexps.beastAttackRegExp.test(row)) {
