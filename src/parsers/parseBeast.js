@@ -5,8 +5,8 @@ const {
 
 const parseRegularBeast = (beast) => {
   const splitted = beast.split('\n');
-  let capsReceived = [0];
-  let materialsReceived = [0];
+  let capsReceived = 0;
+  let materialsReceived = 0;
   let fightResult = null;
   let type;
 
@@ -74,8 +74,8 @@ const parseRegularBeast = (beast) => {
     distance: Number(distance),
     name,
     isDungeon,
-    capsReceived: Number(capsReceived),
-    materialsReceived: Number(materialsReceived),
+    capsReceived: [Number(capsReceived)],
+    materialsReceived: [Number(materialsReceived)],
     receivedItems,
     damagesReceived,
     damagesGiven,
