@@ -123,7 +123,7 @@ const calculateAmountOfRaids = (
   const availableMobsOnDistance = mobs.filter((beast) => {
     const { kmMin, kmMax } = beast;
 
-    return Number(kmMin) <= Number(reachableDistance) || Number(reachableDistance) >= Number(kmMax);
+    return Number(kmMin) < Number(reachableDistance) || Number(reachableDistance) > Number(kmMax);
   });
 
   const mobsFillment = ranges.ranges.map((range) => {
