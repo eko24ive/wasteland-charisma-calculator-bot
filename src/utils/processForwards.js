@@ -260,8 +260,6 @@ const processForwards = (inputData) => {
     }
 
     if (dataType === 'regularBeast' && reportData.prcoessAllowed) {
-      // TODO: make it mergeble!!!
-
       if (ignore) {
         return;
       }
