@@ -797,7 +797,9 @@ const actualActualProcessUserData = (msg, reportData, updatesData, options) => {
             }
 
             if (!_.isEmpty(iLocation.receivedBonusItems)) {
-              Object.keys(iLocation.receivedBonusItems).forEach((item) => {
+              // TODO: Implement correct loot processing
+
+              /* Object.keys(iLocation.receivedBonusItems).forEach((item) => {
                 const amount = iLocation.receivedBonusItems[item];
 
                 if (!_.isEmpty(databaseLocation.receivedBonusItems)) {
@@ -811,7 +813,7 @@ const actualActualProcessUserData = (msg, reportData, updatesData, options) => {
                     databaseLocation.receivedBonusItems[item] = [amount];
                   }
                 }
-              });
+              }); */
             }
 
             dataProcessed += 1;
