@@ -38,7 +38,7 @@ const deathMessageContentRegExp = /Спустя какое-то время ты 
 const deathMessageRecourcesLostRexExp = /Потеряно: 🕳(\d+) и 📦(\d+)/;
 
 const beastFacedRegExp = /Во время вылазки на тебя напал (.+)\./;
-const randomBeastFacedRegExp = /устрашающе начал приближаться (.+)\./;
+const walkingBeastFacedRegExp = /устрашающе начал приближаться (.+)\./;
 const dungeonBeastFacedRegExp = /(.+) перегородил тебе путь./;
 
 const metalAmountRegExp = /(.+) (\d+)/; // 🔗Кубонит 192
@@ -112,6 +112,7 @@ const dungeonBeast = {
   ],
 };
 
+
 const flee = {
   contains: [
     every.contains,
@@ -149,6 +150,12 @@ const dungeonBeastFaced = {
     dungeonBeastFacedRegExp,
   ],
 };
+
+const walkingBeastFaced = {
+  contains: [
+    walkingBeastFacedRegExp
+  ],
+}
 
 const giantFaced = {
   contains: [
@@ -214,7 +221,7 @@ const regexps = {
   giantHealthOnField,
   darkZone,
   beastDungeonFlagRegExp,
-  randomBeastFacedRegExp,
+  walkingBeastFacedRegExp,
   lostCapsAndMaterialsRegExp,
 };
 
@@ -227,6 +234,7 @@ module.exports = {
   deathMessage,
   regularBeastFaced,
   dungeonBeastFaced,
+  walkingBeastFaced,
   giantFaced,
   giantFought,
   giantFacedOnField,
