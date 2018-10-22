@@ -520,11 +520,24 @@ const actualActualProcessUserData = (msg, reportData, updatesData, options) => {
           Beast.findOne(searchQuery).then((fBeast) => {
             const databaseBeast = fBeast;
             if (databaseBeast === null) {
-              beastsToValidate.push({
-                name: iBeast.name, distance: iBeast.distanceRange[0], type: iBeast.type, isDungeon: iBeast.isDungeon, reason: 'battle', date: iBeast.date,
+              iBeast.distanceRange.forEach(({ value }) => {
+                beastsToValidate.push({
+                  name: iBeast.name, distance: value, type: iBeast.type, isDungeon: iBeast.isDungeon, reason: 'battle', date: iBeast.date,
+                });
               });
               next();
             } else {
+              const actualRanges = databaseBeast.distanceRange
+                .filter(({ version }) => version === VERSION)
+                .map(({ value }) => value);
+
+              iBeast.distanceRange.forEach(({ value }) => {
+                if (!actualRanges.includes(value)) {
+                  beastsToValidate.push({
+                    name: iBeast.name, distance: value, type: iBeast.type, isDungeon: iBeast.isDungeon, reason: 'battle', date: iBeast.date,
+                  });
+                }
+              });
               next();
             }
           });
