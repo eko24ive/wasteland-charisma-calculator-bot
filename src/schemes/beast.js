@@ -50,7 +50,6 @@ const beastScheme = new Schema({
     version: String,
   }],
   lastUpdated: String,
-  version: String,
 }, {
   timestamps: {
     createdAt: 'createdAt',
