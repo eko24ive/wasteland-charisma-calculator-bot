@@ -13,7 +13,7 @@ const routedBeastView = (Beast, seachParams, route = null, config) => new Promis
 
       const beast = fBeast.toJSON();
 
-      const getDeprecatedFlair = isDepricated => (isDepricated ? '‼️ <b>Отображаються устаревшие данные</b> ‼️\n' : '');
+      const getDeprecatedFlair = isDepricated => (isDepricated ? '‼️ <b>Отображаються устаревшие данные</b> ‼️\n' : '✅ <b>Отображаються актуальные данные</b> ✅\n');
 
       const minMax = (array) => {
         const min = _.min(array);
