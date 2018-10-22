@@ -1,13 +1,21 @@
 const { Schema } = require('mongoose');
 
 // TODO: Add detailed battle output (just like from the forward) (field: battlelog)
-
 const beastScheme = new Schema({
-  distanceRange: [Number],
+  distanceRange: [{
+    value: Number,
+    version: String,
+  }],
   name: String,
   isDungeon: Boolean,
-  capsReceived: [Number],
-  materialsReceived: [Number],
+  capsReceived: [{
+    value: Number,
+    version: String,
+  }],
+  materialsReceived: [{
+    value: Number,
+    version: String,
+  }],
   receivedItems: Object,
   type: String,
   subType: String,
@@ -23,6 +31,7 @@ const beastScheme = new Schema({
     },
     healthOnStart: Number,
     stamp: String,
+    version: String,
   }],
   flees: [{
     stats: {
@@ -31,7 +40,35 @@ const beastScheme = new Schema({
     damageReceived: Number,
     outcome: String,
     stamp: String,
+    version: String,
   }],
+  concussions: [{
+    stats: {
+      agility: Number,
+    },
+    amount: Number,
+    version: String,
+  }],
+  lastUpdated: String,
+  version: String,
+}, {
+  timestamps: {
+    createdAt: 'createdAt',
+    updatedAt: 'updatedAt',
+  },
+});
+
+const oldBeastScheme = new Schema({
+  distanceRange: Schema.Types.Mixed,
+  name: String,
+  isDungeon: Boolean,
+  capsReceived: Schema.Types.Mixed,
+  materialsReceived: Schema.Types.Mixed,
+  receivedItems: Object,
+  type: String,
+  subType: String,
+  battles: Schema.Types.Mixed,
+  flees: Schema.Types.Mixed,
   concussions: [{
     stats: {
       agility: Number,
