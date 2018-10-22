@@ -1,81 +1,82 @@
+require('dotenv').config({ path: '../../.env' });
 const mongoose = require('mongoose');
 const async = require('async');
-const moment = require('moment');
 const beastSchema = require('../schemes/beast');
+const beastVersionSchema = require('../schemes/beastVersion');
 
 const Beast = mongoose.model('Beast', beastSchema);
 
+const __version = '2.0';
+let amount = 0;
+let i = 1;
 mongoose.connect(process.env.MONGODB_URI);
 
-const dzRangeStageOne = [ // 20.06
-  [21, 34],
-  [50, 62],
-];
-
-const dzRangeStageTwo = [ // 01.07
-  [23, 39],
-  [52, 64],
-];
-
-const possibleDzRange = (distances, dzRange) => dzRange.map((range) => {
-  const [from, to] = range;
-
-  return distances.some(distance => distance >= from && distance <= to);
-}).some(v => v);
-
-let amount = 0;
-let total = 0;
-let totalBeasts = 0;
-
-Beast.find({
-  type: 'Regular',
-  isDungeon: false,
-}).then((beasts) => {
+Beast.find().then((beasts) => {
   console.log('===START===');
+  amount = beasts.length;
 
   async.forEach(beasts, (beast, next) => {
-    totalBeasts += 1;
     const databaseBeast = beast;
-    if (!beast.battles) {
-      next();
-      return;
+    const jBeast = databaseBeast.toJSON();
+    
+    databaseBeast.subType = 'regular';
+    databaseBeast.version = __version;
+
+    if (databaseBeast.distanceRange.length > 0) {
+      databaseBeast.distanceRange = jBeast.distanceRange.map(range => ({
+        version: __version,
+        value: range,
+      }));
     }
 
-    const jBeast = databaseBeast.toJSON();
+    if (databaseBeast.capsReceived.length > 0) {
+      databaseBeast.capsReceived = jBeast.capsReceived.map(caps => ({
+        version: __version,
+        value: caps,
+      }));
+    }
 
-    const newBatlles = jBeast.battles.filter((battle) => {
-      total += 1;
-      if (battle.stamp) {
-        const date = moment(Number(battle.stamp.slice(0, 13)));
-        const day = Number(date.format('DD'));
-        const month = Number(date.format('MM'));
-        const year = date.year();
+    if (databaseBeast.materialsReceived.length > 0) {
+      databaseBeast.materialsReceived = jBeast.materialsReceived.map(materials => ({
+        version: __version,
+        value: materials,
+      }));
+    }
 
-        if (year !== 2018) {
-          console.log('SLICE ERROR');
-          return true;
-        }
-        if (((day >= 20 && month >= 6) || (month >= 7)) && possibleDzRange(beast.distanceRange, dzRangeStageOne)) { // Stage one
-          amount += 1;
-          return false;
-        } if (((day >= 1 && month >= 7) || month >= 8) && possibleDzRange(beast.distanceRange, dzRangeStageTwo)) { // Stage two
-          amount += 1;
-          return false;
-        }
+    if (databaseBeast.battles.length > 0) {
+      databaseBeast.battles = jBeast.battles.map(battle => ({
+        ...battle,
+        version: __version,
+      }));
+    }
 
-        return true;
-      }
+    if (databaseBeast.flees.length > 0) {
+      databaseBeast.flees = jBeast.flees.map(flee => ({
+        ...flee,
+        version: __version,
+      }));
+    }
 
-      return true;
-    });
+    if (databaseBeast.concussions.length > 0) {
+      databaseBeast.concussions = jBeast.concussions.map(concussion => ({
+        ...concussion,
+        version: __version,
+      }));
+    }
 
-    databaseBeast.battles = newBatlles;
+    databaseBeast.markModified('distanceRange');
+    databaseBeast.markModified('capsReceived');
+    databaseBeast.markModified('materialsReceived');
     databaseBeast.markModified('battles');
+    databaseBeast.markModified('flees');
+    databaseBeast.markModified('concussions');
+
     databaseBeast.save().then(() => {
+      console.log(`Updated: ${i}/${amount}`);
+      i += 1;
       next();
     });
   }, () => {
-    console.log(`Total beasts: ${totalBeasts}\nTotal battles: ${total}\nAmount: ${amount}\nPost purge: ${total - amount}`);
     mongoose.disconnect();
     console.log('===END===');
   });
