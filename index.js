@@ -401,6 +401,15 @@ ${firstTime ? `Пожалуйста, скинь <b>ОТДЕЛЬНО</b> (по о
 };
 
 const actualActualProcessUserData = (msg, reportData, updatesData, options) => {
+  if (process.env.ENV === 'STAGING' || process.env.ENV === 'LOCAL') {
+    console.log('======= DATA PROCESSING =======');
+    console.log(
+      JSON.stringify(reportData),
+      JSON.stringify(updatesData),
+      JSON.stringify(options),
+    );
+  }
+
   if (reportData.lastPip !== null) {
     updateOrCreate(msg, reportData.lastPip);
   }
@@ -446,7 +455,12 @@ const actualActualProcessUserData = (msg, reportData, updatesData, options) => {
 
   const isBeastUnderValidation = name => reportData.beastsToValidate.filter(beast => beast.name === name).length > 0;
 
-  const signWithVersion = data => data.map(entry => ({
+  const signEntryWithVersion = entry => ({
+    ...entry,
+    version: VERSION,
+  });
+
+  const signSetWithVersion = data => data.map(entry => ({
     ...entry,
     version: VERSION,
   }));
@@ -474,12 +488,12 @@ const actualActualProcessUserData = (msg, reportData, updatesData, options) => {
     };
 
     return {
-      distanceRange: signWithVersion(distanceRange),
-      capsReceived: signWithVersion(capsReceived),
-      materialsReceived: signWithVersion(materialsReceived),
-      battles: signWithVersion(battles),
-      flees: signWithVersion(flees),
-      concussions: signWithVersion(concussions),
+      distanceRange: signSetWithVersion(distanceRange),
+      capsReceived: signSetWithVersion(capsReceived),
+      materialsReceived: signSetWithVersion(materialsReceived),
+      battles: signSetWithVersion(battles),
+      flees: signSetWithVersion(flees),
+      concussions: signSetWithVersion(concussions),
       ...flattenedBeast,
     };
   };
@@ -497,12 +511,10 @@ const actualActualProcessUserData = (msg, reportData, updatesData, options) => {
             isDungeon: iBeast.isDungeon,
             type: iBeast.type,
             subType: iBeast.subType,
-            version: VERSION,
           } : {
             name: iBeast.name,
             isDungeon: iBeast.isDungeon,
             type: iBeast.type,
-            version: VERSION,
           };
 
           Beast.findOne(searchQuery).then((fBeast) => {
@@ -544,7 +556,6 @@ const actualActualProcessUserData = (msg, reportData, updatesData, options) => {
             isDungeon: iBeast.isDungeon,
             type: iBeast.type,
             subType: iBeast.subType,
-            version: VERSION,
           }).then((fBeast) => {
             const databaseBeast = fBeast;
             if (databaseBeast === null) {
@@ -580,10 +591,11 @@ const actualActualProcessUserData = (msg, reportData, updatesData, options) => {
                     if (databaseBeast.battles === undefined) {
                       uniqueBattles.push(battle);
                     } else {
-                      const sameStatsBattle = databaseBeast.battles.some(newBattle => battle.totalDamageReceived === newBattle.totalDamageReceived
+                      const battlesForValidation = databaseBeast.battles.filter(({ version }) => version === VERSION);
+                      const sameStatsBattle = battlesForValidation.some(newBattle => battle.totalDamageReceived === newBattle.totalDamageReceived
                         && battle.totalDamageGiven === newBattle.totalDamageGiven);
 
-                      const sameStamp = databaseBeast.battles.some(newBattle => newBattle.stamp === battle.stamp);
+                      const sameStamp = battlesForValidation.some(newBattle => newBattle.stamp === battle.stamp);
 
                       if (sameStamp) {
                         dupes.battles += 1;
@@ -608,7 +620,9 @@ const actualActualProcessUserData = (msg, reportData, updatesData, options) => {
                     if (databaseBeast.battles === undefined) {
                       uniqueConcussions.push(concussion);
                     } else {
-                      const sameConcussion = databaseBeast.concussions.some(newConcussion => concussion.stats.agility === newConcussion.stats.agility
+                      const concussionsForValidation = databaseBeast.concussions.filter(({ version }) => version === VERSION);
+
+                      const sameConcussion = concussionsForValidation.some(newConcussion => concussion.stats.agility === newConcussion.stats.agility
                         && concussion.amount === newConcussion.amount);
 
                       if (!sameConcussion) {
@@ -625,11 +639,13 @@ const actualActualProcessUserData = (msg, reportData, updatesData, options) => {
                     if (databaseBeast.battles === undefined) {
                       uniqueFlees.push(flee);
                     } else {
-                      const sameStatsFlee = databaseBeast.some(newFlee => flee.stats.agility === newFlee.stats.agility
+                      const fleesForValidation = databaseBeast.flees.filter(({ version }) => version === VERSION);
+
+                      const sameStatsFlee = fleesForValidation.some(newFlee => flee.stats.agility === newFlee.stats.agility
                                 && flee.outcome === newFlee.outcome
                                 && flee.damageReceived === newFlee.damageReceived);
 
-                      const sameStamp = databaseBeast.flees.some(newFlee => newFlee.stamp === flee.stamp);
+                      const sameStamp = fleesForValidation.some(newFlee => newFlee.stamp === flee.stamp);
 
                       if (sameStamp) {
                         dupes.flees += 1;
@@ -670,59 +686,63 @@ const actualActualProcessUserData = (msg, reportData, updatesData, options) => {
                 }); */
               }
 
-              if (
-                !iBeast.distanceRange.some(newDistance => _.contains(databaseBeast.distanceRange, newDistance))
-              ) {
-                beastPoints += forwardPoints.newDistance * iBeast.distanceRange.length;
+              if (iBeast.concussions.length > 0) {
+                const distanceRangesForValidation = databaseBeast.distanceRange
+                  .filter(({ version }) => (version === VERSION))
+                  .map(({ value }) => value);
 
-                databaseBeast.distanceRange = _.uniq(
-                  _.flatten([databaseBeast.distanceRange, iBeast.distanceRange]),
-                );
-              } else {
-                beastPoints += forwardPoints.sameDistance;
+                const newRanges = iBeast.distanceRange.filter(range => distanceRangesForValidation.indexOf(range.value) === -1);
+                const sameRanges = iBeast.distanceRange.filter(range => distanceRangesForValidation.indexOf(range.value) !== -1);
+
+                if (!_.isEmpty(newRanges)) {
+                  beastPoints += forwardPoints.newDistance * newRanges.length;
+
+                  databaseBeast.distanceRange = [...databaseBeast.distanceRange, ...signSetWithVersion(newRanges)];
+                } else if (!_.isEmpty(sameRanges)) {
+                  beastPoints += forwardPoints.sameDistance * sameRanges.length;
+                }
               }
+
 
               if (uniqueBattles.length > 0) {
                 uniqueBattles.forEach((newBattle) => {
-                  if (newBattle.damagesGiven.length === 1) {
-                    beastPoints += forwardPoints.oneShotBattle;
-                  } else if (newBattle.outcome === 'win') {
+                  if (newBattle.outcome === 'win') {
                     beastPoints += forwardPoints.newBattleWin;
 
                     if (iBeast.capsReceived.length > 0) {
-                      if (
-                        !iBeast.capsReceived.some(newCapsReceived => _.contains(databaseBeast.capsReceived, newCapsReceived))
-                      ) {
-                        databaseBeast.capsReceived = _.uniq(
-                          _.flatten([databaseBeast.capsReceived, iBeast.capsReceived]),
-                        );
+                      const capsReceivedForValidation = databaseBeast.capsReceived
+                        .filter(({ version }) => (version === VERSION))
+                        .map(({ value }) => value);
+
+                      const newCaps = iBeast.capsReceived.filter(caps => capsReceivedForValidation.indexOf(caps.value) === -1);
+
+                      if (!_.isEmpty(newCaps)) {
+                        databaseBeast.capsReceived = [...databaseBeast.capsReceived, ...signSetWithVersion(newCaps)];
                       }
                     }
 
                     if (iBeast.materialsReceived.length > 0) {
-                      if (!_.contains(databaseBeast.materialsReceived, iBeast.materialsReceived)) {
-                        if (
-                          !iBeast.materialsReceived.some(newMaterialsReceived => _.contains(databaseBeast.materialsReceived, newMaterialsReceived))
-                        ) {
-                          databaseBeast.materialsReceived = _.uniq(
-                            _.flatten([databaseBeast.materialsReceived, iBeast.materialsReceived]),
-                          );
-                        }
+                      const materialsReceivedForValidation = databaseBeast.materialsReceived
+                        .filter(({ version }) => (version === VERSION))
+                        .map(({ value }) => value);
+
+                      const newMaterials = iBeast.materialsReceived.filter(materials => materialsReceivedForValidation.indexOf(materials.value) === -1);
+
+                      if (!_.isEmpty(newMaterials)) {
+                        databaseBeast.materialsReceived = [...databaseBeast.materialsReceived, ...signSetWithVersion(newMaterials)];
                       }
                     }
                   } else {
                     beastPoints += forwardPoints.newBattleLose;
                   }
 
-                  databaseBeast.battles.push(newBattle);
+                  databaseBeast.battles.push(signEntryWithVersion(newBattle));
                 });
               }
 
               if (sameBattles.length > 0) {
                 sameBattles.forEach((newBattle) => {
-                  if (newBattle.damagesGiven.length === 1) {
-                    beastPoints += forwardPoints.oneShotBattle;
-                  } else if (newBattle.outcome === 'win') {
+                  if (newBattle.outcome === 'win') {
                     beastPoints += forwardPoints.sameBattleWin;
                   } else {
                     beastPoints += forwardPoints.sameBattleLose;
@@ -731,10 +751,10 @@ const actualActualProcessUserData = (msg, reportData, updatesData, options) => {
               }
 
               if (uniqueConcussions.length > 0) {
-                databaseBeast.concussions.push(_.flatten(uniqueConcussions));
+                databaseBeast.concussions.push(signEntryWithVersion(uniqueConcussions));
               }
 
-              if (uniqueConcussions.length > 0) {
+              if (uniqueFlees.length > 0) {
                 uniqueFlees.forEach((newFlee) => {
                   if (newFlee.outcome === 'win') {
                     beastPoints += forwardPoints.newFleeWin;
@@ -742,7 +762,7 @@ const actualActualProcessUserData = (msg, reportData, updatesData, options) => {
                     beastPoints += forwardPoints.newFleeLose;
                   }
 
-                  databaseBeast.flees.push(newFlee);
+                  databaseBeast.flees.push(signEntryWithVersion(newFlee));
                 });
               }
 
