@@ -68,6 +68,8 @@ const withBackButton = require('./src/utils/withBackButton');
 
 const UserManager = require('./src/database/userManager');
 
+const signedBeasts = require('./src/database/beasts_signed.json');
+
 mongoose.connect(uristring);
 
 const Beast = mongoose.model('Beast', beastSchema);
@@ -3134,6 +3136,32 @@ bot.on('/showBeastsToValidate', (msg) => {
         }).catch(e => console.log(e));
       }
     }
+  }
+});
+
+bot.on('/reset_beast_database', (msg) => {
+  if (process.env.ENV === 'STAGING' || process.env.ENV === 'LOCAL') {
+    msg.reply.text('ПЕРЕХОЖУ В РЕЖИМ СБРОСА БАЗЫ...\nЖДИ СООБЩЕНИЯ С ✅ГАЛОЧКАМИ✅');
+
+    const performBulkInsert = () => {
+      Beast.insertMany(signedBeasts, (error) => {
+        if (error) {
+          msg.reply.text(`Произошла проблема: ${error}`);
+        } else {
+          msg.reply.text('✅БАЗА МОБОВ НАПОЛНЕНА!✅');
+        }
+      });
+    };
+
+    Beast.find().then((beasts) => {
+      if (beasts.length === 0) {
+        performBulkInsert();
+      } else {
+        Beast.remove({}, () => {
+          performBulkInsert();
+        });
+      }
+    });
   }
 });
 
