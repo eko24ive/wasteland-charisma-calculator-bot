@@ -7,6 +7,7 @@ process.on('unhandledRejection', (reason) => {
 require('dotenv').config();
 
 const uristring = process.env.MONGODB_URI;
+const { VERSION } = process.env;
 
 const async = require('async');
 const mongoose = require('mongoose');
@@ -445,13 +446,41 @@ const actualActualProcessUserData = (msg, reportData, updatesData, options) => {
 
   const isBeastUnderValidation = name => reportData.beastsToValidate.filter(beast => beast.name === name).length > 0;
 
-  const flattifyBeast = (beast) => {
-    const { materialsReceived, capsReceived, ...rest } = beast;
+  const signWithVersion = data => data.map(entry => ({
+    ...entry,
+    version: VERSION,
+  }));
+
+  const createNewBeast = (beast) => {
+    const {
+      materialsReceived: unflattenedMaterialsReceived,
+      capsReceived: unflattenedCapsReceived,
+      ...rest
+    } = beast;
+
+    const {
+      distanceRange,
+      capsReceived,
+      materialsReceived,
+      battles,
+      flees,
+      concussions,
+      ...flattenedBeast
+    } = {
+      materialsReceived: _.flatten(unflattenedMaterialsReceived),
+      capsReceived: _.flatten(unflattenedCapsReceived),
+      version: VERSION,
+      ...rest,
+    };
 
     return {
-      materialsReceived: _.flatten(materialsReceived),
-      capsReceived: _.flatten(capsReceived),
-      ...rest,
+      distanceRange: signWithVersion(distanceRange),
+      capsReceived: signWithVersion(capsReceived),
+      materialsReceived: signWithVersion(materialsReceived),
+      battles: signWithVersion(battles),
+      flees: signWithVersion(flees),
+      concussions: signWithVersion(concussions),
+      ...flattenedBeast,
     };
   };
 
@@ -468,13 +497,13 @@ const actualActualProcessUserData = (msg, reportData, updatesData, options) => {
             isDungeon: iBeast.isDungeon,
             type: iBeast.type,
             subType: iBeast.subType,
+            version: VERSION,
           } : {
             name: iBeast.name,
             isDungeon: iBeast.isDungeon,
             type: iBeast.type,
+            version: VERSION,
           };
-
-          console.log(searchQuery);
 
           Beast.findOne(searchQuery).then((fBeast) => {
             const databaseBeast = fBeast;
@@ -515,11 +544,12 @@ const actualActualProcessUserData = (msg, reportData, updatesData, options) => {
             isDungeon: iBeast.isDungeon,
             type: iBeast.type,
             subType: iBeast.subType,
+            version: VERSION,
           }).then((fBeast) => {
             const databaseBeast = fBeast;
             if (databaseBeast === null) {
               if (iBeast.proofedByForward) {
-                const newBeast = new Beast(flattifyBeast(iBeast));
+                const newBeast = new Beast(createNewBeast(iBeast));
 
                 dataProcessed += 1;
 
@@ -1611,6 +1641,7 @@ bot.on('forward', (msg) => {
         subType: 'regular',
       }, null, {
         env: process.env.ENV,
+        VERSION,
       }).then(({ reply, beast }) => {
         if (reply !== false) {
           const beastReplyMarkup = getBeastKeyboard(beast._id.toJSON());
@@ -1651,6 +1682,7 @@ bot.on('forward', (msg) => {
         isDungeon: true,
       }, {
         env: process.env.ENV,
+        VERSION,
       }).then(({ reply }) => {
         if (reply !== false) {
           /* const beastReplyMarkup = getBeastKeyboard(beast._id.toJSON());
@@ -2439,8 +2471,11 @@ bot.on(/mob_(.+)/, (msg) => {
     _id: id,
   };
 
-  routedBeastView(Beast, searchParams, null, {
+  routedBeastView(Beast, {
+    ...searchParams,
+  }, null, {
     env: process.env.ENV,
+    VERSION,
   }).then(({ reply, beast }) => {
     if (reply !== false) {
       const beastReplyMarkup = getBeastKeyboard(beast._id.toJSON());
@@ -2640,6 +2675,7 @@ ${beastsList}
       isDungeon: false,
     }, route, {
       env: process.env.ENV,
+      VERSION,
     }).then(({ reply, beast }) => {
       // TODO: Fix keyboard for dungeon beasts
       const beastReplyMarkup = getBeastKeyboard(beast._id.toJSON());
@@ -2873,7 +2909,7 @@ bot.on('text', (msg) => {
   Beast.find({
     isDungeon: false,
     subType: 'regular',
-    distanceRange: {
+    'distanceRange.value': {
       $gte: Number(from),
       $lte: Number(to),
     },
