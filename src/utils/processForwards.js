@@ -54,32 +54,18 @@ const mergeBeasts = (beastsToMerge) => {
     if (mergedBeasts[beast.name]) {
       const existingBeast = mergedBeasts[beast.name];
 
-      if (existingBeast.isDungeon === beast.isDungeon && existingBeast.subType === beast.subType && existingBeast.type === beast.type && existingBeast.isDungeon === beast.isDungeon && existingBeast.isDungeon === beast.isDungeon) {
+      if (
+        existingBeast.isDungeon === beast.isDungeon
+        && existingBeast.subType === beast.subType
+        && existingBeast.type === beast.type
+        && existingBeast.isDungeon === beast.isDungeo
+        && existingBeast.isDungeon === beast.isDungeon
+      ) {
         mergedBeasts[beast.name] = beast;
 
-        if (!_.contains(existingBeast.distanceRange, beast.distanceRange[0])) {
-          existingBeast.distanceRange.push(beast.distanceRange[0]);
-        }
-
-        if (beast.capsReceived !== undefined) {
-          if (!_.contains(existingBeast.capsReceived, beast.capsReceived)) {
-            if (_.isArray(existingBeast.capsReceived)) {
-              existingBeast.capsReceived.push(beast.capsReceived);
-            }
-
-            existingBeast.capsReceived = [existingBeast.capsReceived, beast.capsReceived];
-          }
-        }
-
-        if (beast.materialsReceived !== undefined) {
-          if (!_.contains(existingBeast.materialsReceived, beast.materialsReceived)) {
-            if (_.isArray(existingBeast.materialsReceived)) {
-              existingBeast.materialsReceived.push(beast.materialsReceived);
-            }
-
-            existingBeast.materialsReceived = [existingBeast.materialsReceived, beast.capsReceived];
-          }
-        }
+        existingBeast.distanceRange.push(beast.distanceRange[0]);
+        existingBeast.capsReceived.push(beast.capsReceived);
+        existingBeast.materialsReceived.push(beast.materialsReceived);
 
         if (beast.battles !== undefined) {
           existingBeast.battles.push(beast.battles[0]);
@@ -276,7 +262,9 @@ const processForwards = (inputData) => {
       beastData.type = data.type;
       beastData.date = date;
       beastData.proofedByForward = true;
-      beastData.distanceRange = [data.distance];
+      beastData.distanceRange = [{
+        value: data.distance,
+      }];
       reportData.distance = data.distance;
       reportData.distanceHistory.push(data.distance);
 
@@ -288,12 +276,16 @@ const processForwards = (inputData) => {
         beastData.receivedItems = normalizeItems(data.receivedItems);
 
         if (Number(data.capsReceived) !== 0) {
-          beastData.capsReceived = [Number(data.capsReceived)];
+          beastData.capsReceived = [{
+            value: Number(data.capsReceived),
+          }];
           beastData.isDungeon = false;
         }
 
         if (Number(data.materialsReceived) !== 0) {
-          beastData.materialsReceived = [Number(data.materialsReceived)];
+          beastData.materialsReceived = [{
+            value: Number(data.materialsReceived),
+          }];
           beastData.isDungeon = false;
         }
       } else if (data.fightResult === 'lose') {
@@ -409,7 +401,9 @@ const processForwards = (inputData) => {
       beastData.date = date;
       beastData.name = data.name;
       beastData.type = data.type;
-      beastData.distanceRange = [data.distance];
+      beastData.distanceRange = [{
+        value: data.distance,
+      }];
       reportData.distance = data.distance;
       reportData.distanceHistory.push(data.distance);
 
@@ -419,8 +413,13 @@ const processForwards = (inputData) => {
           outcome: 'win',
         }];
         beastData.receivedItems = normalizeItems(data.receivedItems);
-        beastData.capsReceived = Number(data.capsReceived);
-        beastData.materialsReceived = Number(data.materialsReceived);
+        beastData.capsReceived = [{
+          value: Number(data.capsReceived),
+        }];
+
+        beastData.materialsReceived = [{
+          value: Number(data.materialsReceived),
+        }];
       } else if (data.fightResult === 'lose') {
         beastData.battles = [{
           outcome: 'lost',
