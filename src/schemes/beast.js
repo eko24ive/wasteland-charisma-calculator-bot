@@ -57,29 +57,4 @@ const beastScheme = new Schema({
   },
 });
 
-const oldBeastScheme = new Schema({
-  distanceRange: Schema.Types.Mixed,
-  name: String,
-  isDungeon: Boolean,
-  capsReceived: Schema.Types.Mixed,
-  materialsReceived: Schema.Types.Mixed,
-  receivedItems: Object,
-  type: String,
-  subType: String,
-  battles: Schema.Types.Mixed,
-  flees: Schema.Types.Mixed,
-  concussions: [{
-    stats: {
-      agility: Number,
-    },
-    amount: Number,
-  }],
-  lastUpdated: String,
-}, {
-  timestamps: {
-    createdAt: 'createdAt',
-    updatedAt: 'updatedAt',
-  },
-});
-
 module.exports = beastScheme;
