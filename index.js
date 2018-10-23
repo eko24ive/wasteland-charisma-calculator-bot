@@ -973,7 +973,7 @@ ${errors}
           // setTimeout(() => {
           createSession(msg.from.id);
           return msg.reply.text(`
-        К сожалению я ничего не смог узнать из твоих форвардов :с${dupesText ? `\n\n_${dupesText}_` : ''}`, {
+        К сожалению я не смог узнать ничего нового из твоих форвардов :с${dupesText ? `\n\n_${dupesText}_` : ''}`, {
             replyMarkup: defaultKeyboard,
             parseMode: 'markdown',
           });
@@ -1050,7 +1050,7 @@ const processUserData = (msg, options) => {
   if (updatesData.locations.length === 0 && updatesData.beasts.length === 0) {
     createSession(msg.from.id);
     return msg.reply.text(`
-  К сожалению я ничего не смог узнать из твоих форвардов :с`, {
+  К сожалению я не смог узнать ничего нового из твоих форвардов :с`, {
       replyMarkup: defaultKeyboard,
       parseMode: 'markdown',
     });
