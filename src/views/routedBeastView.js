@@ -1,6 +1,6 @@
 const _ = require('underscore');
 
-const actualDataThreshold = 5;
+const actualDataThreshold = 3;
 
 const INFO_ACTUAL = 0;
 const INFO_MIXED = 1;
