@@ -2726,10 +2726,14 @@ ${beastsList}
 
     const [, route, beastId] = showMobRouteRegExp.exec(msg.data);
 
-    routedBeastView(Beast, {
+    const searchParams = process.env.ENV === 'PRODUCTION' ? {
       _id: beastId,
       isDungeon: false,
-    }, route, {
+    } : {
+      _id: beastId,
+    };
+
+    routedBeastView(Beast, searchParams, route, {
       env: process.env.ENV,
       VERSION,
     }).then(({ reply, beast }) => {
