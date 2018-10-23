@@ -566,12 +566,18 @@ const actualActualProcessUserData = (msg, reportData, updatesData, options) => {
             next();
           }
         } else {
-          Beast.findOne({
+          const searchQuery = iBeast.subType ? {
             name: iBeast.name,
             isDungeon: iBeast.isDungeon,
             type: iBeast.type,
             subType: iBeast.subType,
-          }).then((fBeast) => {
+          } : {
+            name: iBeast.name,
+            isDungeon: iBeast.isDungeon,
+            type: iBeast.type,
+          };
+
+          Beast.findOne(searchQuery).then((fBeast) => {
             const databaseBeast = fBeast;
             if (databaseBeast === null) {
               if (iBeast.proofedByForward) {
@@ -793,10 +799,18 @@ const actualActualProcessUserData = (msg, reportData, updatesData, options) => {
 
               dataProcessed += 1;
 
-              if (iBeast.type === 'DarkZone') {
-                userForwardPoints += beastPoints * forwardPoints.darkZoneBattle;
-              } else {
-                userForwardPoints += beastPoints * forwardPoints.regularZoneBattle;
+              if (
+                !_.isEmpty(uniqueBattles)
+                && !_.isEmpty(sameBattles)
+                && !_.isEmpty(uniqueConcussions)
+                && !_.isEmpty(uniqueFlees)
+                && !_.isEmpty(sameFlees)
+              ) {
+                if (iBeast.type === 'DarkZone') {
+                  userForwardPoints += beastPoints * forwardPoints.darkZoneBattle;
+                } else {
+                  userForwardPoints += beastPoints * forwardPoints.regularZoneBattle;
+                }
               }
 
               databaseBeast.save().then(() => next()).catch(e => console.log(e));
@@ -960,7 +974,8 @@ ${errors}
           // }, 1500);
         }
 
-        sessions[msg.from.id].state = states.WAIT_FOR_DATA_VALIDATION;
+        // FIXME: COULD BE AN ISSUE
+        // sessions[msg.from.id].state = states.WAIT_FOR_DATA_VALIDATION;
       }).catch(e => console.log(e));
     },
     () => {
