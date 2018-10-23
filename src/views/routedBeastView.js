@@ -434,7 +434,7 @@ const routedBeastView = (Beast, seachParams, route = null, config) => new Promis
         successBattles = successBattles.map(battle => battle.battleReply);
         failBattles = failBattles.map(battle => battle.battleReply);
 
-        isBattlesDeprecated = detectInromationPrecision([successBattles, failBattlesStatus]);
+        isBattlesDeprecated = detectInromationPrecision([successBattlesStatus, failBattlesStatus]);
 
         return {
           successBattles: _.isEmpty(successBattles) ? 'Нет данных об удачных битвах' : successBattles.join('\n\n'),
