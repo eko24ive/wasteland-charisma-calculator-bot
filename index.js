@@ -701,7 +701,7 @@ const actualActualProcessUserData = (msg, reportData, updatesData, options) => {
                 }); */
               }
 
-              if (iBeast.concussions.length > 0) {
+              if (iBeast.distanceRange.length > 0) {
                 const distanceRangesForValidation = databaseBeast.distanceRange
                   .filter(({ version }) => (version === VERSION))
                   .map(({ value }) => value);
@@ -953,7 +953,7 @@ ${errors}
           // setTimeout(() => {
           createSession(msg.from.id);
           return msg.reply.text(`
-        К сожалению я ничего не смог узнать из твоих форвардов :с`, {
+        К сожалению я ничего не смог узнать из твоих форвардов :с${dupesText ? `\n\n_${dupesText}_` : ''}`, {
             replyMarkup: defaultKeyboard,
             parseMode: 'markdown',
           });

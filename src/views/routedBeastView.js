@@ -13,7 +13,7 @@ const routedBeastView = (Beast, seachParams, route = null, config) => new Promis
 
       const beast = fBeast.toJSON();
 
-      const getDeprecatedFlair = isDepricated => (isDepricated ? '‼️ <b>Отображаються устаревшие данные</b> ‼️\n' : '✅ <b>Отображаються актуальные данные</b> ✅\n');
+      const getDeprecatedFlair = isDepricated => (isDepricated ? '‼️ <b>Устаревшие данные</b> ‼️\n' : '✅ <b>Актуальные данные</b> ✅\n');
 
       const minMax = (array) => {
         const min = _.min(array);
@@ -250,17 +250,18 @@ const routedBeastView = (Beast, seachParams, route = null, config) => new Promis
 
         if (actualSuccessBattles.length > 0) {
           successBattles = actualSuccessBattles;
-        } else {
-          isBattlesDeprecated = true;
-          isInfoDeprecated = true;
+        } else if (actualSuccessBattles.length === 0) {
           successBattles = outdatedSuccessBattles;
         }
         if (actualFailBattles.length > 0) {
           failBattles = actualFailBattles;
         } else {
+          failBattles = outdatedFailBattles;
+        }
+
+        if (actualFailBattles.length === 0 && actualSuccessBattles.length === 0) {
           isBattlesDeprecated = true;
           isInfoDeprecated = true;
-          failBattles = outdatedFailBattles;
         }
 
         if (successBattles.length > trim) {
