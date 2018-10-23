@@ -462,10 +462,16 @@ const actualActualProcessUserData = (msg, reportData, updatesData, options) => {
     version: VERSION,
   });
 
-  const signSetWithVersion = data => data.map(entry => ({
-    ...entry,
-    version: VERSION,
-  }));
+  const signSetWithVersion = (data) => {
+    if (data) {
+      return data.map(entry => ({
+        ...entry,
+        version: VERSION,
+      }));
+    }
+
+    return [];
+  };
 
   const createNewBeast = (beast) => {
     const {
