@@ -807,10 +807,10 @@ const actualActualProcessUserData = (msg, reportData, updatesData, options) => {
 
               if (
                 !_.isEmpty(uniqueBattles)
-                && !_.isEmpty(sameBattles)
-                && !_.isEmpty(uniqueConcussions)
-                && !_.isEmpty(uniqueFlees)
-                && !_.isEmpty(sameFlees)
+                || !_.isEmpty(sameBattles)
+                || !_.isEmpty(uniqueConcussions)
+                || !_.isEmpty(uniqueFlees)
+                || !_.isEmpty(sameFlees)
               ) {
                 if (iBeast.type === 'DarkZone') {
                   userForwardPoints += beastPoints * forwardPoints.darkZoneBattle;
