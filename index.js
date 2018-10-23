@@ -3096,15 +3096,16 @@ bot.on(/\/ignore_(.+)/, (msg) => {
       if (beastsToValidate[index] !== undefined) {
         const { data } = sessions[msg.from.id];
 
-        sessions[msg.from.id].data = data.map((data) => {
-          if (data.date === Number(date)) {
+        sessions[msg.from.id].beastsToValidate = sessions[msg.from.id].beastsToValidate.filter((entry, key) => key !== index);
+        sessions[msg.from.id].data = data.map((entry) => {
+          if (entry.date === Number(date)) {
             return {
-              ...data,
+              ...entry,
               ignore: true,
             };
           }
 
-          return data;
+          return entry;
         });
 
         if (beastsToValidate.length === 1) {
