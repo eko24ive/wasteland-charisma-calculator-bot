@@ -2,7 +2,6 @@ require('dotenv').config({ path: '../../.env' });
 const mongoose = require('mongoose');
 const async = require('async');
 const beastSchema = require('../schemes/beast');
-const beastVersionSchema = require('../schemes/beastVersion');
 
 const Beast = mongoose.model('Beast', beastSchema);
 
@@ -18,7 +17,7 @@ Beast.find().then((beasts) => {
   async.forEach(beasts, (beast, next) => {
     const databaseBeast = beast;
     const jBeast = databaseBeast.toJSON();
-    
+
     databaseBeast.subType = 'regular';
     databaseBeast.version = __version;
 
