@@ -7,7 +7,8 @@ process.on('unhandledRejection', (reason) => {
 require('dotenv').config();
 
 const uristring = process.env.MONGODB_URI;
-const { VERSION, DATA_THRESHOLD } = process.env;
+const DATA_THRESHOLD = Number(process.env.DATA_THRESHOLD);
+const { VERSION } = process.env;
 
 const async = require('async');
 const mongoose = require('mongoose');
@@ -2974,7 +2975,7 @@ bot.on('text', (msg) => {
       $lte: Number(to),
     },
     type: beastType,
-  }, 'battles.totalDamageReceived name id').then((beasts) => {
+  }, 'battles.totalDamageReceived name id distanceRange').then((beasts) => {
     const jsonBeasts = beasts.map((b) => {
       const jsoned = b.toJSON();
 
@@ -2988,8 +2989,15 @@ bot.on('text', (msg) => {
 
     const actualBeasts = beastsByDamage.filter(({ distanceRange }) => {
       const actualRanges = distanceRange.filter(({ version }) => version === VERSION);
+      const deprecatedRanges = distanceRange.filter(({ version }) => version !== VERSION);
 
-      return actualRanges.length >= DATA_THRESHOLD;
+      if (actualRanges.length >= DATA_THRESHOLD) {
+        return true;
+      } if (actualRanges.length <= DATA_THRESHOLD && deprecatedRanges.length > 0) {
+        return true;
+      }
+
+      return false;
     });
 
     const beastsList = actualBeasts.map(beast => `
