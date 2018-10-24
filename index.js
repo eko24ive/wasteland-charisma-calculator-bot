@@ -1242,6 +1242,11 @@ bot.on('forward', (msg) => {
       regexpSet: regexps.walkingBeastFaced,
     });
 
+    const isAltInBattle = regExpSetMatcher(msg.text, {
+      regexpSet: regexps.altInBattle,
+    });
+
+
     if (isDungeonBeastFaced) {
       data = parseBeastFaced.parseDungeonBeastFaced(msg.text);
       dataType = 'dungeonBeastFaced';
@@ -1305,7 +1310,21 @@ bot.on('forward', (msg) => {
       return true;
     };
 
-    if (!isForwardValid({ dataType, beastName, beastType })) {
+    if (isAltInBattle) {
+      return msg.reply.text(`Это конечно форвард с мобом, но это не форвард встречи.
+Форвар встречи они выглядит как-то так:
+<code>Во время вылазки на тебя напал...</code>
+или
+<code>...перегородил тебе путь.</code>
+или
+<code>устрашающе начал приближаться...</code>
+
+Если у тебя нет на это времени жми /skipbeastforwards
+<i>ВНИМАНИЕ: ПРИ НАЖАТИИ НА /skipbeastforwards - БОТ ПРОИГНОРИРУЕТ ДАННЫЕ, КОТОРЫЕ ЗАВИСЯТ ОТ УКАЗАНЫХ ВЫШЕ ФОРВАРДОВ, И НЕ ЗАПИШЕТ ИХ В БАЗУ</i>`, {
+        asReply: true,
+        parseMode: 'html',
+      });
+    } if (!isForwardValid({ dataType, beastName, beastType })) {
       return msg.reply.text(`Этот моб не похож на того с которым ты дрался. Ты чё - наебать меня вздумал?!
 Забыл кто мне нужен? Жми /showBeastsToValidate
 
