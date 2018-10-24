@@ -627,6 +627,4 @@ const processForwards = (inputData) => {
   };
 };
 
-console.log(processForwards(dd).updatesData.beasts);
-
 module.exports = processForwards;
