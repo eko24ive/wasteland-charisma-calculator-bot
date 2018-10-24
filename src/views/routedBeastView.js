@@ -1,6 +1,7 @@
+require('dotenv').config({ path: '../../.env' });
 const _ = require('underscore');
 
-const actualDataThreshold = 3;
+const actualDataThreshold = process.env.DATA_THRESHOLD;
 
 const INFO_ACTUAL = 0;
 const INFO_MIXED = 1;
