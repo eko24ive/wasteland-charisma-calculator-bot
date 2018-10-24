@@ -1,8 +1,9 @@
 require('dotenv').config({ path: '../../.env' });
 const _ = require('underscore');
 
-const actualDataThreshold = process.env.DATA_THRESHOLD;
+const actualDataThreshold = Number(process.env.DATA_THRESHOLD);
 
+const INFO_ABSENT = -1;
 const INFO_ACTUAL = 0;
 const INFO_MIXED = 1;
 const INFO_DEPRECATED = 2;
@@ -25,11 +26,11 @@ const routedBeastView = (Beast, seachParams, route = null, config) => new Promis
 
   Beast.findOne(seachParams).then((fBeast) => {
     if (fBeast !== null) {
-      let isRangeDeprecated = INFO_ACTUAL;
-      let isLootDeprecated = INFO_ACTUAL;
-      let isBattlesDeprecated = INFO_ACTUAL;
-      let isFleesDeprecated = INFO_ACTUAL;
-      let isConcussionsDeprecated = INFO_ACTUAL;
+      let isRangeDeprecated = INFO_ABSENT;
+      let isLootDeprecated = INFO_ABSENT;
+      let isBattlesDeprecated = INFO_ABSENT;
+      let isFleesDeprecated = INFO_ABSENT;
+      let isConcussionsDeprecated = INFO_ABSENT;
 
       const beast = fBeast.toJSON();
 
@@ -39,6 +40,8 @@ const routedBeastView = (Beast, seachParams, route = null, config) => new Promis
             return tiny ? '✅' : '✅ <b>Актуальные данные</b> ✅\n';
           case INFO_DEPRECATED:
             return tiny ? '‼️' : '‼️ <b>Устаревшие данные</b> ‼️\n';
+          case INFO_ABSENT:
+            return '';
           case INFO_MIXED:
           default:
             return tiny ? '⚠️' : '⚠️ <b>Смешанные данные</b> ⚠️\n';
@@ -68,7 +71,12 @@ const routedBeastView = (Beast, seachParams, route = null, config) => new Promis
           }
         });
 
-        if (actualDistanceRange.length.length > 0) {
+        if (actualDistanceRange.length > 0) {
+          if (actualDistanceRange.length >= actualDataThreshold) {
+            isRangeDeprecated = INFO_ACTUAL;
+
+            return minMax(actualDistanceRange);
+          }
           if (actualDistanceRange.length <= actualDataThreshold && outdatedDistanceRange.length > 0) {
             isRangeDeprecated = INFO_MIXED;
 
@@ -77,10 +85,6 @@ const routedBeastView = (Beast, seachParams, route = null, config) => new Promis
               ...outdatedDistanceRange,
             ]);
           }
-
-          isRangeDeprecated = INFO_ACTUAL;
-
-          return minMax(actualDistanceRange);
         } if (outdatedDistanceRange.length > 0) {
           isRangeDeprecated = INFO_DEPRECATED;
 
@@ -102,7 +106,12 @@ const routedBeastView = (Beast, seachParams, route = null, config) => new Promis
           }
         });
 
-        if (actualCaps.length.length > 0) {
+        if (actualCaps.length > 0) {
+          if (actualCaps.length <= actualDataThreshold) {
+            isLootDeprecated = INFO_ACTUAL;
+
+            return minMax(actualCaps);
+          }
           if (actualCaps.length <= actualDataThreshold && outdatedCaps.length > 0) {
             isLootDeprecated = INFO_MIXED;
 
@@ -111,10 +120,6 @@ const routedBeastView = (Beast, seachParams, route = null, config) => new Promis
               ...outdatedCaps,
             ]);
           }
-
-          isLootDeprecated = INFO_ACTUAL;
-
-          return minMax(actualCaps);
         } if (outdatedCaps.length > 0) {
           isLootDeprecated = INFO_DEPRECATED;
 
@@ -136,7 +141,12 @@ const routedBeastView = (Beast, seachParams, route = null, config) => new Promis
           }
         });
 
-        if (actualMaterials.length.length > 0) {
+        if (actualMaterials.length > 0) {
+          if (actualMaterials.length >= actualDataThreshold) {
+            isLootDeprecated = INFO_ACTUAL;
+
+            return minMax(actualMaterials);
+          }
           if (actualMaterials.length <= actualDataThreshold && outdatedMaterials.length > 0) {
             isLootDeprecated = INFO_MIXED;
 
@@ -145,10 +155,6 @@ const routedBeastView = (Beast, seachParams, route = null, config) => new Promis
               ...outdatedMaterials,
             ]);
           }
-
-          isLootDeprecated = INFO_ACTUAL;
-
-          return minMax(actualMaterials);
         } if (outdatedMaterials.length > 0) {
           isLootDeprecated = INFO_DEPRECATED;
 
@@ -230,8 +236,12 @@ const routedBeastView = (Beast, seachParams, route = null, config) => new Promis
           }
         });
 
-        if (actualSuccessFlees.length.length > 0) {
-          if (actualSuccessFlees.length <= actualDataThreshold && outdatedSuccessFlees.length > 0) {
+        if (actualSuccessFlees.length > 0) {
+          if (actualSuccessFlees.length >= actualDataThreshold) {
+            successFleesStatus = INFO_ACTUAL;
+
+            successFlees = actualSuccessFlees;
+          } else if (actualSuccessFlees.length <= actualDataThreshold && outdatedSuccessFlees.length > 0) {
             successFleesStatus = INFO_MIXED;
 
             successFlees = [
@@ -239,18 +249,18 @@ const routedBeastView = (Beast, seachParams, route = null, config) => new Promis
               ...outdatedSuccessFlees,
             ];
           }
-
-          successFleesStatus = INFO_ACTUAL;
-
-          successFlees = actualSuccessFlees;
         } if (outdatedSuccessFlees.length > 0) {
           successFleesStatus = INFO_DEPRECATED;
 
           successFlees = outdatedSuccessFlees;
         }
 
-        if (actualFailFlees.length.length > 0) {
-          if (actualFailFlees.length <= actualDataThreshold && outdatedFailFlees.length > 0) {
+        if (actualFailFlees.length > 0) {
+          if (actualFailFlees.length >= actualDataThreshold) {
+            failFleesStatus = INFO_ACTUAL;
+
+            failFlees = actualFailFlees;
+          } else if (actualFailFlees.length <= actualDataThreshold && outdatedFailFlees.length > 0) {
             failFleesStatus = INFO_MIXED;
 
             failFlees = [
@@ -258,10 +268,6 @@ const routedBeastView = (Beast, seachParams, route = null, config) => new Promis
               ...outdatedFailFlees,
             ];
           }
-
-          failFleesStatus = INFO_ACTUAL;
-
-          failFlees = actualFailFlees;
         } if (outdatedFailFlees.length > 0) {
           failFleesStatus = INFO_DEPRECATED;
 
@@ -304,8 +310,12 @@ const routedBeastView = (Beast, seachParams, route = null, config) => new Promis
           }
         });
 
-        if (actualConcussions.length.length > 0) {
-          if (actualConcussions.length <= actualDataThreshold && outdatedConcussions.length > 0) {
+        if (actualConcussions.length > 0) {
+          if (actualConcussions.length >= actualDataThreshold) {
+            isConcussionsDeprecated = INFO_ACTUAL;
+
+            existingConcussions = actualConcussions;
+          } else if (actualConcussions.length <= actualDataThreshold && outdatedConcussions.length > 0) {
             isConcussionsDeprecated = INFO_MIXED;
 
             existingConcussions = [
@@ -313,10 +323,6 @@ const routedBeastView = (Beast, seachParams, route = null, config) => new Promis
               ...outdatedConcussions,
             ];
           }
-
-          isConcussionsDeprecated = INFO_ACTUAL;
-
-          existingConcussions = actualConcussions;
         } if (outdatedConcussions.length > 0) {
           isConcussionsDeprecated = INFO_DEPRECATED;
 
@@ -386,8 +392,12 @@ const routedBeastView = (Beast, seachParams, route = null, config) => new Promis
           }
         });
 
-        if (actualSuccessBattles.length.length > 0) {
-          if (actualSuccessBattles.length <= actualDataThreshold && outdatedSuccessBattles.length > 0) {
+        if (actualSuccessBattles.length > 0) {
+          if (actualSuccessBattles.length >= actualDataThreshold) {
+            successBattlesStatus = INFO_ACTUAL;
+
+            successBattles = actualSuccessBattles;
+          } else if (actualSuccessBattles.length <= actualDataThreshold && outdatedSuccessBattles.length > 0) {
             successBattlesStatus = INFO_MIXED;
 
             successBattles = [
@@ -395,18 +405,18 @@ const routedBeastView = (Beast, seachParams, route = null, config) => new Promis
               ...outdatedSuccessBattles,
             ];
           }
-
-          successBattlesStatus = INFO_ACTUAL;
-
-          successBattles = actualSuccessBattles;
-        } if (outdatedSuccessBattles.length > 0) {
+        } else if (outdatedSuccessBattles.length > 0) {
           successBattlesStatus = INFO_DEPRECATED;
 
           successBattles = outdatedSuccessBattles;
         }
 
-        if (actualFailBattles.length.length > 0) {
-          if (actualFailBattles.length <= actualDataThreshold && outdatedFailBattles.length > 0) {
+        if (actualFailBattles.length > 0) {
+          if (actualFailBattles.length >= actualDataThreshold) {
+            failBattlesStatus = INFO_ACTUAL;
+
+            failBattles = actualFailBattles;
+          } else if (actualFailBattles.length <= actualDataThreshold && outdatedFailBattles.length > 0) {
             failBattlesStatus = INFO_MIXED;
 
             failBattles = [
@@ -414,11 +424,7 @@ const routedBeastView = (Beast, seachParams, route = null, config) => new Promis
               ...outdatedFailBattles,
             ];
           }
-
-          failBattlesStatus = INFO_ACTUAL;
-
-          failBattles = actualFailBattles;
-        } if (outdatedFailBattles.length > 0) {
+        } else if (outdatedFailBattles.length > 0) {
           failBattlesStatus = INFO_DEPRECATED;
 
           failBattles = outdatedFailBattles;
