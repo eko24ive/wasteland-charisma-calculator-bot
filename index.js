@@ -7,7 +7,7 @@ process.on('unhandledRejection', (reason) => {
 require('dotenv').config();
 
 const uristring = process.env.MONGODB_URI;
-const { VERSION } = process.env;
+const { VERSION, DATA_THRESHOLD } = process.env;
 
 const async = require('async');
 const mongoose = require('mongoose');
@@ -2986,7 +2986,13 @@ bot.on('text', (msg) => {
 
     const beastsByDamage = _.sortBy(jsonBeasts, v => v.battles.totalDamageReceived);
 
-    const beastsList = beastsByDamage.map(beast => `
+    const actualBeasts = beastsByDamage.filter(({ distanceRange }) => {
+      const actualRanges = distanceRange.filter(({ version }) => version === VERSION);
+
+      return actualRanges.length >= DATA_THRESHOLD;
+    });
+
+    const beastsList = actualBeasts.map(beast => `
 ${beast.name}
 /mob_${beast.id}`).join('\n');
 
