@@ -58,8 +58,6 @@ const mergeBeasts = (beastsToMerge) => {
         existingBeast.isDungeon === beast.isDungeon
         && existingBeast.subType === beast.subType
         && existingBeast.type === beast.type
-        && existingBeast.isDungeon === beast.isDungeo
-        && existingBeast.isDungeon === beast.isDungeon
       ) {
         mergedBeasts[beast.name] = beast;
 
@@ -628,5 +626,7 @@ const processForwards = (inputData) => {
     },
   };
 };
+
+console.log(processForwards(dd).updatesData.beasts);
 
 module.exports = processForwards;
