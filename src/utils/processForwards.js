@@ -62,8 +62,8 @@ const mergeBeasts = (beastsToMerge) => {
         mergedBeasts[beast.name] = beast;
 
         existingBeast.distanceRange.push(beast.distanceRange[0]);
-        existingBeast.capsReceived.push(beast.capsReceived);
-        existingBeast.materialsReceived.push(beast.materialsReceived);
+        existingBeast.capsReceived.push(beast.capsReceived[0]);
+        existingBeast.materialsReceived.push(beast.materialsReceived[0]);
 
         if (beast.battles !== undefined) {
           existingBeast.battles.push(beast.battles[0]);
