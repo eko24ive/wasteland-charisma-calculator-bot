@@ -516,11 +516,17 @@ const processForwards = (inputData) => {
         return;
       }
 
+      const subType = reportData.lastBeastSeenSubType;
+
       const beastData = {
         isDungeon: false,
-        distanceRange: [data.distance],
+        distanceRange: [{
+          value: data.distance,
+        }],
         proofedByForward: true,
+        subType,
       };
+
 
       reportData.distanceHistory.push(data.distance);
 
