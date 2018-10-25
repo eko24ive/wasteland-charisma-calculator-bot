@@ -11,8 +11,11 @@ const INFO_DEPRECATED = 2;
 const detectInromationPrecision = (informationStatuses) => {
   const allDeprecated = informationStatuses.every(status => status === INFO_DEPRECATED);
   const allActual = informationStatuses.every(status => status === INFO_ACTUAL);
+  const allAbsent = informationStatuses.every(status => status === INFO_ABSENT);
 
-  if (allDeprecated) {
+  if (allAbsent) {
+    return INFO_ACTUAL;
+  } if (allDeprecated) {
     return INFO_DEPRECATED;
   } if (allActual) {
     return INFO_ACTUAL;
