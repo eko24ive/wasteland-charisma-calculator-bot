@@ -390,18 +390,22 @@ const processForwards = (inputData) => {
       }
 
       const isDungeon = reportData.lastBeastSeenType !== 'regular';
+      const subType = reportData.lastBeastSeenSubType;
 
       const beastData = {
         isDungeon: data.isDungeon || isDungeon,
-        proofedByForward: true,
+        subType,
       };
 
       beastData.date = date;
       beastData.name = data.name;
       beastData.type = data.type;
+      beastData.proofedByForward = true;
+
       beastData.distanceRange = [{
         value: data.distance,
       }];
+
       reportData.distance = data.distance;
       reportData.distanceHistory.push(data.distance);
 
@@ -411,20 +415,27 @@ const processForwards = (inputData) => {
           outcome: 'win',
         }];
         beastData.receivedItems = normalizeItems(data.receivedItems);
-        beastData.capsReceived = [{
-          value: Number(data.capsReceived),
-        }];
 
-        beastData.materialsReceived = [{
-          value: Number(data.materialsReceived),
-        }];
+        if (Number(data.capsReceived) !== 0) {
+          beastData.capsReceived = [{
+            value: Number(data.capsReceived),
+          }];
+          beastData.isDungeon = false;
+        }
+
+        if (Number(data.materialsReceived) !== 0) {
+          beastData.materialsReceived = [{
+            value: Number(data.materialsReceived),
+          }];
+          beastData.isDungeon = false;
+        }
       } else if (data.fightResult === 'lose') {
         beastData.battles = [{
           outcome: 'lost',
         }];
 
-        beastData.capsReceived = Number(data.capsReceived);
-        beastData.materialsReceived = Number(data.materialsReceived);
+        reportData.isDead = true;
+        reportData.errors.push(`Вижу, ты склеил ласты на ${reportData.distance} километре. Сочуствую. Я не обрабатывал форварды после твоей смерти`);
       }
 
       if (data.amountOfConcussions.length > 0) {
@@ -433,7 +444,9 @@ const processForwards = (inputData) => {
         }];
 
         if (reportData.lastPip) {
-          beastData.concussions[0].agility = reportData.lastPip.agility;
+          beastData.concussions[0].stats = {
+            agility: reportData.lastPip.agility,
+          };
         } else {
           reportData.recalculationRequired = true;
         }
@@ -472,10 +485,9 @@ const processForwards = (inputData) => {
         beastData.battles[0].damagesReceived = data.damagesReceived;
       }
 
-      beastData.battles[0].stamp = `${date}${userId}`;
       beastData.battles[0].healthOnStart = data.currentHealth + beastData.battles[0].totalDamageReceived;
+      beastData.battles[0].stamp = `${date}${userId}`;
 
-      updatesData.beasts.push(beastData);
 
       // TODO: proofedByForward for dungeon
       if (data.fightResult === 'lose') {
@@ -509,6 +521,9 @@ const processForwards = (inputData) => {
       ) {
         beastData.proofedByForward = false;
       }
+
+      updatesData.beasts.push(beastData);
+      reportData.healthCapHistory.push(data.meta.healthCap);
     }
 
     if (dataType === 'flee' && reportData.prcoessAllowed) {
