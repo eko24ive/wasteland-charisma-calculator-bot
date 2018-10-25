@@ -9,10 +9,10 @@ const INFO_MIXED = 1;
 const INFO_DEPRECATED = 2;
 
 const detectInromationPrecision = (informationStatuses) => {
-  const allDeprecated = informationStatuses.every(status => status === INFO_DEPRECATED);
-  const allActual = informationStatuses.every(status => status === INFO_ACTUAL);
+  const allDeprecated = informationStatuses.every(status => status === INFO_DEPRECATED || status === INFO_ABSENT);
+  const allActual = informationStatuses.every(status => status === INFO_ACTUAL || status === INFO_ABSENT);
   const allAbsent = informationStatuses.every(status => status === INFO_ABSENT);
-
+  
   if (allAbsent) {
     return INFO_ACTUAL;
   } if (allDeprecated) {
@@ -215,8 +215,8 @@ const routedBeastView = (Beast, seachParams, route = null, config) => new Promis
 
         let successFlees = [];
         let failFlees = [];
-        let successFleesStatus = INFO_ACTUAL;
-        let failFleesStatus = INFO_ACTUAL;
+        let successFleesStatus = INFO_ABSENT;
+        let failFleesStatus = INFO_ABSENT;
 
         const actualSuccessFlees = [];
         const actualFailFlees = [];
