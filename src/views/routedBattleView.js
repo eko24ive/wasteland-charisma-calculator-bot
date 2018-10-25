@@ -71,7 +71,7 @@ const routedBattleView = (Beast, {
 👣${beast.type === 'DarkZone' ? '🚷' : '💀'} ${getDistanceRange(beast.distanceRange)}км
 `;
       resolve({
-        reply: `${headerReply}\n${battleReply}\n\nВремя битвы: ${dateInfo}\n\n${meta}\n\nИгрок ударил моба ${hitsByPlayer} раз\nМоба ударил игрока ${hitsByBeast} раз\n\n Версия битвы: <b>${battle.version}</b>`,
+        reply: `${headerReply}\n${battleReply}\n\nВремя битвы: ${dateInfo}\n\n${meta}\n\nИгрок ударил моба ${hitsByPlayer} раз\nМоб ударил игрока ${hitsByBeast} раз\n\n Версия битвы: <b>${battle.version}</b>`,
         beast,
       });
     } else {
