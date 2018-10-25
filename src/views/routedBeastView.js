@@ -452,12 +452,12 @@ const routedBeastView = (Beast, seachParams, route = null, config) => new Promis
       const {
         successBattles: successBattlesLong,
         failBattles: failBattlesLong,
-      } = getBattles(beast.battles, 5, false, config.env === 'STAGING');
+      } = getBattles(beast.battles, 5, false, (config.env === 'STAGING' || config.env === 'LOCAL'));
 
       const {
         successBattles: successBattlesShort,
         failBattles: failBattlesShort,
-      } = getBattles(beast.battles, 1, false, config.env === 'STAGING');
+      } = getBattles(beast.battles, 1, false, (config.env === 'STAGING' || config.env === 'LOCAL'));
 
       const processedFlees = getFlees(beast.flees);
 
