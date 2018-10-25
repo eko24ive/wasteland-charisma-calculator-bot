@@ -25,6 +25,18 @@ const routedBattleView = (Beast, {
         return `${min}`;
       };
 
+      const getDistanceRange = (distanceRange) => {
+        const ranges = distanceRange
+          .filter(({ version }) => version === battle.version)
+          .map(({ value }) => value);
+
+        if (ranges.length > 0) {
+          return minMax(ranges);
+        }
+
+        return 'Нет данных о местоположении';
+      };
+
       const damageReceived = (beastBattle) => {
         if (beastBattle.damagesReceived[0] !== 0) {
           return `💔${beastBattle.totalDamageReceived} за ${beastBattle.damagesReceived.length} удар(а)`;
@@ -56,10 +68,10 @@ const routedBattleView = (Beast, {
 
 
       const headerReply = `<b>${beast.name}</b>
-👣${beast.type === 'DarkZone' ? '🚷' : '💀'} ${minMax(beast.distanceRange)}км
+👣${beast.type === 'DarkZone' ? '🚷' : '💀'} ${getDistanceRange(beast.distanceRange)}км
 `;
       resolve({
-        reply: `${headerReply}\n${battleReply}\n\nВремя битвы: ${dateInfo}\n\n${meta}\n\nИгрок ударил моба ${hitsByPlayer} раз\nМоба ударил игрока ${hitsByBeast} раз`,
+        reply: `${headerReply}\n${battleReply}\n\nВремя битвы: ${dateInfo}\n\n${meta}\n\nИгрок ударил моба ${hitsByPlayer} раз\nМоба ударил игрока ${hitsByBeast} раз\n\n Версия битвы: <b>${battle.version}</b>`,
         beast,
       });
     } else {
