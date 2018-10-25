@@ -407,17 +407,17 @@ const actualActualProcessUserData = (msg, reportData, updatesData, options) => {
   if (process.env.ENV === 'STAGING' || process.env.ENV === 'LOCAL') {
     console.log('======= DATA PROCESSING =======');
     console.log(
-      JSON.stringify(reportData),
-      JSON.stringify(updatesData),
-      JSON.stringify(options),
+      JSON.stringify({
+        reportData,
+        updatesData,
+        options,
+      }),
     );
   }
 
   if (reportData.lastPip !== null) {
     updateOrCreate(msg, reportData.lastPip);
   }
-
-  console.log(JSON.stringify(updatesData));
 
   if (options.useBeastFace && !_.isEmpty(reportData.beastsToValidate)) {
     sessions[msg.from.id].state = states.WAIT_FOR_DATA_VALIDATION;
