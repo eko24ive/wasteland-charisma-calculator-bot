@@ -3010,8 +3010,10 @@ bot.on('text', (msg) => {
       const actualRanges = distanceRange.filter(({ version }) => version === VERSION);
       const deprecatedRanges = distanceRange.filter(({ version }) => version !== VERSION);
 
+      const actualRangesFulfillGiven = actualRanges.every(({ value }) => value >= from && value <= to);
+
       if (actualRanges.length >= DATA_THRESHOLD) {
-        return true;
+        return actualRangesFulfillGiven;
       } if (actualRanges.length <= DATA_THRESHOLD && deprecatedRanges.length > 0) {
         return true;
       }
