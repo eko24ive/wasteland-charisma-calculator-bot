@@ -249,7 +249,7 @@ const routedBeastView = (Beast, seachParams, route = null, config) => new Promis
               ...outdatedSuccessFlees,
             ];
           }
-        } if (outdatedSuccessFlees.length > 0) {
+        } else if (outdatedSuccessFlees.length > 0) {
           successFleesStatus = INFO_DEPRECATED;
 
           successFlees = outdatedSuccessFlees;
@@ -268,7 +268,7 @@ const routedBeastView = (Beast, seachParams, route = null, config) => new Promis
               ...outdatedFailFlees,
             ];
           }
-        } if (outdatedFailFlees.length > 0) {
+        } else if (outdatedFailFlees.length > 0) {
           failFleesStatus = INFO_DEPRECATED;
 
           failFlees = outdatedFailFlees;
@@ -323,7 +323,7 @@ const routedBeastView = (Beast, seachParams, route = null, config) => new Promis
               ...outdatedConcussions,
             ];
           }
-        } if (outdatedConcussions.length > 0) {
+        } else if (outdatedConcussions.length > 0) {
           isConcussionsDeprecated = INFO_DEPRECATED;
 
           existingConcussions = outdatedConcussions;
