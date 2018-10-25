@@ -107,7 +107,7 @@ const routedBeastView = (Beast, seachParams, route = null, config) => new Promis
         });
 
         if (actualCaps.length > 0) {
-          if (actualCaps.length <= actualDataThreshold) {
+          if (actualCaps.length >= actualDataThreshold) {
             isLootDeprecated = INFO_ACTUAL;
 
             return minMax(actualCaps);
