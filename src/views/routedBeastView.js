@@ -223,18 +223,27 @@ const routedBeastView = (Beast, seachParams, route = null, config) => new Promis
         const outdatedSuccessFlees = [];
         const outdatedFailFlees = [];
 
-        flees.forEach((flee) => {
-          if (flee.stats) {
-            if (flee.outcome === 'win') {
-              if (flee.version === VERSION) {
-                actualSuccessFlees.push(`Успешно при 🤸‍♂️${flee.stats.agility || flee.agility}\n`);
+        flees.forEach((_flee) => {
+          const { stats, agility, ...flee } = _flee;
+
+          const parsedFlee = {
+            stats: {
+              agility: agility || stats.agility,
+            },
+            ...flee,
+          };
+
+          if (parsedFlee.stats.agility) {
+            if (parsedFlee.outcome === 'win') {
+              if (parsedFlee.version === VERSION) {
+                actualSuccessFlees.push(parsedFlee);
               } else {
-                outdatedSuccessFlees.push(`Успешно при 🤸‍♂️${flee.stats.agility || flee.agility}\n`);
+                outdatedSuccessFlees.push(parsedFlee);
               }
-            } else if (flee.version === VERSION) {
-              actualFailFlees.push(`Неудача при 🤸‍♂️${flee.stats.agility || flee.agility} (-💔${flee.damageReceived})`);
+            } else if (parsedFlee.version === VERSION) {
+              actualFailFlees.push(parsedFlee);
             } else {
-              outdatedFailFlees.push(`Неудача при 🤸‍♂️${flee.stats.agility || flee.agility} (-💔${flee.damageReceived})`);
+              outdatedFailFlees.push(parsedFlee);
             }
           }
         });
@@ -277,19 +286,14 @@ const routedBeastView = (Beast, seachParams, route = null, config) => new Promis
           failFlees = outdatedFailFlees;
         }
 
-        if (successFlees.length > 5) {
-          successFlees = successFlees.slice(0, 5);
-        }
-
-        if (failFlees.length > 5) {
-          failFlees = failFlees.slice(0, 5);
-        }
+        const successFleesText = _.sortBy(successFlees, flee => flee.stats.agility).map(flee => `Успешно при 🤸‍♂️&gt; ${flee.stats.agility || flee.agility}`).shift();
+        const failFleesText = _.sortBy(failFlees, flee => -flee.stats.agility).map(flee => `Неудача при 🤸‍♂️&lt; ${flee.stats.agility || flee.agility} (-💔${flee.damageReceived})`).shift();
 
         isFleesDeprecated = detectInromationPrecision([successFleesStatus, failFleesStatus]);
 
         return {
-          successFlees: _.isEmpty(successFlees) ? 'Нет данных об удачных побегах' : successFlees.join('\n'),
-          failFlees: _.isEmpty(failFlees) ? 'Нет данных о неудачных побегах' : failFlees.join('\n'),
+          successFlees: _.isEmpty(successFlees) ? 'Нет данных об удачных побегах' : successFleesText,
+          failFlees: _.isEmpty(failFlees) ? 'Нет данных о неудачных побегах' : failFleesText,
         };
       };
 
