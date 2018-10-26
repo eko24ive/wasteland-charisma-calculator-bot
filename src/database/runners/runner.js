@@ -1,7 +1,7 @@
-require('dotenv').config({ path: '../../.env' });
+require('dotenv').config({ path: '../../../.env' });
 const mongoose = require('mongoose');
 const async = require('async');
-const beastSchema = require('../schemes/beast');
+const beastSchema = require('../../schemes/beast');
 
 const Beast = mongoose.model('Beast', beastSchema);
 
