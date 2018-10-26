@@ -377,7 +377,7 @@ const weapons = [
   {
     icon: '🌟',
     title: 'Армагеддец',
-    price: false,
+    price: [getResource(WIRES, 40), getResource(IRONTHING, 19), getResource(TAPE, 35)],
     characteristic: 98,
     place: workbench,
     rarity: getRarityIcon(SECOND),
