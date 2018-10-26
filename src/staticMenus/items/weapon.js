@@ -608,7 +608,7 @@ const weapons = [
     title: 'Флюгегехаймен',
     price: [getResource(MATERIALS, 599900), getResource(KIPARIT, 160),
       getResource(MICROCHIPS, 500), getResource(IRIDIUM, 395)],
-    characteristic: 372,
+    characteristic: 430,
     place: core,
     requirements: getCharacteristic(STRENGTH, 245),
   },
