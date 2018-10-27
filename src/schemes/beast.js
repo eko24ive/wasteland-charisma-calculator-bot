@@ -31,6 +31,7 @@ const beastScheme = new Schema({
     },
     healthOnStart: Number,
     stamp: String,
+    distance: Number,
     version: String,
   }],
   flees: [{
