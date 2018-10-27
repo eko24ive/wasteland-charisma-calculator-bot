@@ -344,6 +344,7 @@ const processForwards = (inputData) => {
 
       beastData.battles[0].healthOnStart = data.currentHealth + beastData.battles[0].totalDamageReceived;
       beastData.battles[0].stamp = `${date}${userId}`;
+      beastData.battles[0].distance = data.distance;
 
       if (data.fightResult === 'lose') {
         if (!reportData.lastBeastSeen) {
@@ -495,6 +496,7 @@ const processForwards = (inputData) => {
 
       beastData.battles[0].healthOnStart = data.currentHealth + beastData.battles[0].totalDamageReceived;
       beastData.battles[0].stamp = `${date}${userId}`;
+      beastData.battles[0].distance = data.distance;
 
 
       // TODO: proofedByForward for dungeon
