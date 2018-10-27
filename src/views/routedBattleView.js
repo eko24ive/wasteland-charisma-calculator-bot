@@ -25,7 +25,11 @@ const routedBattleView = (Beast, {
         return `${min}`;
       };
 
-      const getDistanceRange = (distanceRange) => {
+      const getDistanceRange = (distanceRange, distance) => {
+        if (distance) {
+          return `на ${distance}`;
+        }
+
         const ranges = distanceRange
           .filter(({ version }) => version === battle.version)
           .map(({ value }) => value);
@@ -68,7 +72,7 @@ const routedBattleView = (Beast, {
 
 
       const headerReply = `<b>${beast.name}</b>
-👣${beast.type === 'DarkZone' ? '🚷' : '💀'} ${getDistanceRange(beast.distanceRange)}км
+👣${beast.type === 'DarkZone' ? '🚷' : '💀'} ${getDistanceRange(beast.distanceRange, battle.distance)}км
 `;
       resolve({
         reply: `${headerReply}\n${battleReply}\n\nВремя битвы: ${dateInfo}\n\n${meta}\n\nИгрок ударил моба ${hitsByPlayer} раз\nМоб ударил игрока ${hitsByBeast} раз\n\n Версия битвы: <b>${battle.version}</b>`,
