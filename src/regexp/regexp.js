@@ -56,6 +56,10 @@ const giantOnField = /Ты сейчас на поле боя с гигантом
 const giantNameOnField = /(.+)\n❤️/;
 const giantHealthOnField = /❤️(\d+|-\d+)\/(\d+)/;
 
+const altInBattleLocationRegExp = /Твое местоположение: Пустошь/;
+const altInBattleBeastRegExp = /Тебе не уйти от противника .+$/;
+
+
 const every = {
   contains: [healthRegExp, hungerRegExp, staminaRegExp, campDistanceRegExp],
 };
@@ -153,9 +157,9 @@ const dungeonBeastFaced = {
 
 const walkingBeastFaced = {
   contains: [
-    walkingBeastFacedRegExp
+    walkingBeastFacedRegExp,
   ],
-}
+};
 
 const giantFaced = {
   contains: [
@@ -179,6 +183,14 @@ const giantFacedOnField = {
     giantHealthOnField,
   ],
 };
+
+const altInBattle = {
+  contains: [
+    altInBattleLocationRegExp,
+    altInBattleBeastRegExp,
+  ],
+};
+
 
 const regexps = {
   locationNameRegExp,
@@ -223,6 +235,8 @@ const regexps = {
   beastDungeonFlagRegExp,
   walkingBeastFacedRegExp,
   lostCapsAndMaterialsRegExp,
+  altInBattleLocationRegExp,
+  altInBattleBeastRegExp,
 };
 
 module.exports = {
@@ -238,5 +252,6 @@ module.exports = {
   giantFaced,
   giantFought,
   giantFacedOnField,
+  altInBattle,
   regexps,
 };
