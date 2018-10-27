@@ -112,7 +112,7 @@ const parseDungeonBeast = (beast) => {
     if (regexps.playerBeastAttackRegExp.test(row)) {
       const [, dmg] = regexps.playerBeastAttackRegExp.exec(row);
 
-      return dmg;
+      return Number(dmg);
     }
 
     return false;

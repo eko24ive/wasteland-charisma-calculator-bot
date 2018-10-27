@@ -54,32 +54,16 @@ const mergeBeasts = (beastsToMerge) => {
     if (mergedBeasts[beast.name]) {
       const existingBeast = mergedBeasts[beast.name];
 
-      if (existingBeast.isDungeon === beast.isDungeon && existingBeast.subType === beast.subType && existingBeast.type === beast.type && existingBeast.isDungeon === beast.isDungeon && existingBeast.isDungeon === beast.isDungeon) {
+      if (
+        existingBeast.isDungeon === beast.isDungeon
+        && existingBeast.subType === beast.subType
+        && existingBeast.type === beast.type
+      ) {
         mergedBeasts[beast.name] = beast;
 
-        if (!_.contains(existingBeast.distanceRange, beast.distanceRange[0])) {
-          existingBeast.distanceRange.push(beast.distanceRange[0]);
-        }
-
-        if (beast.capsReceived !== undefined) {
-          if (!_.contains(existingBeast.capsReceived, beast.capsReceived)) {
-            if (_.isArray(existingBeast.capsReceived)) {
-              existingBeast.capsReceived.push(beast.capsReceived);
-            }
-
-            existingBeast.capsReceived = [existingBeast.capsReceived, beast.capsReceived];
-          }
-        }
-
-        if (beast.materialsReceived !== undefined) {
-          if (!_.contains(existingBeast.materialsReceived, beast.materialsReceived)) {
-            if (_.isArray(existingBeast.materialsReceived)) {
-              existingBeast.materialsReceived.push(beast.materialsReceived);
-            }
-
-            existingBeast.materialsReceived = [existingBeast.materialsReceived, beast.capsReceived];
-          }
-        }
+        existingBeast.distanceRange.push(beast.distanceRange[0]);
+        existingBeast.capsReceived.push(beast.capsReceived[0]);
+        existingBeast.materialsReceived.push(beast.materialsReceived[0]);
 
         if (beast.battles !== undefined) {
           existingBeast.battles.push(beast.battles[0]);
@@ -276,7 +260,9 @@ const processForwards = (inputData) => {
       beastData.type = data.type;
       beastData.date = date;
       beastData.proofedByForward = true;
-      beastData.distanceRange = [data.distance];
+      beastData.distanceRange = [{
+        value: data.distance,
+      }];
       reportData.distance = data.distance;
       reportData.distanceHistory.push(data.distance);
 
@@ -288,12 +274,16 @@ const processForwards = (inputData) => {
         beastData.receivedItems = normalizeItems(data.receivedItems);
 
         if (Number(data.capsReceived) !== 0) {
-          beastData.capsReceived = [Number(data.capsReceived)];
+          beastData.capsReceived = [{
+            value: Number(data.capsReceived),
+          }];
           beastData.isDungeon = false;
         }
 
         if (Number(data.materialsReceived) !== 0) {
-          beastData.materialsReceived = [Number(data.materialsReceived)];
+          beastData.materialsReceived = [{
+            value: Number(data.materialsReceived),
+          }];
           beastData.isDungeon = false;
         }
       } else if (data.fightResult === 'lose') {
@@ -400,16 +390,22 @@ const processForwards = (inputData) => {
       }
 
       const isDungeon = reportData.lastBeastSeenType !== 'regular';
+      const subType = reportData.lastBeastSeenSubType;
 
       const beastData = {
         isDungeon: data.isDungeon || isDungeon,
-        proofedByForward: true,
+        subType,
       };
 
       beastData.date = date;
       beastData.name = data.name;
       beastData.type = data.type;
-      beastData.distanceRange = [data.distance];
+      beastData.proofedByForward = true;
+
+      beastData.distanceRange = [{
+        value: data.distance,
+      }];
+
       reportData.distance = data.distance;
       reportData.distanceHistory.push(data.distance);
 
@@ -419,15 +415,35 @@ const processForwards = (inputData) => {
           outcome: 'win',
         }];
         beastData.receivedItems = normalizeItems(data.receivedItems);
-        beastData.capsReceived = Number(data.capsReceived);
-        beastData.materialsReceived = Number(data.materialsReceived);
+
+        if (Number(data.capsReceived) !== 0) {
+          beastData.capsReceived = [{
+            value: Number(data.capsReceived),
+          }];
+          beastData.isDungeon = false;
+        } else {
+          beastData.capsReceived = [{
+            value: Number(data.capsReceived),
+          }];
+        }
+
+        if (Number(data.materialsReceived) !== 0) {
+          beastData.materialsReceived = [{
+            value: Number(data.materialsReceived),
+          }];
+          beastData.isDungeon = false;
+        } else {
+          beastData.materialsReceived = [{
+            value: Number(data.materialsReceived),
+          }];
+        }
       } else if (data.fightResult === 'lose') {
         beastData.battles = [{
           outcome: 'lost',
         }];
 
-        beastData.capsReceived = Number(data.capsReceived);
-        beastData.materialsReceived = Number(data.materialsReceived);
+        reportData.isDead = true;
+        reportData.errors.push(`Вижу, ты склеил ласты на ${reportData.distance} километре. Сочуствую. Я не обрабатывал форварды после твоей смерти`);
       }
 
       if (data.amountOfConcussions.length > 0) {
@@ -436,7 +452,9 @@ const processForwards = (inputData) => {
         }];
 
         if (reportData.lastPip) {
-          beastData.concussions[0].agility = reportData.lastPip.agility;
+          beastData.concussions[0].stats = {
+            agility: reportData.lastPip.agility,
+          };
         } else {
           reportData.recalculationRequired = true;
         }
@@ -475,10 +493,9 @@ const processForwards = (inputData) => {
         beastData.battles[0].damagesReceived = data.damagesReceived;
       }
 
-      beastData.battles[0].stamp = `${date}${userId}`;
       beastData.battles[0].healthOnStart = data.currentHealth + beastData.battles[0].totalDamageReceived;
+      beastData.battles[0].stamp = `${date}${userId}`;
 
-      updatesData.beasts.push(beastData);
 
       // TODO: proofedByForward for dungeon
       if (data.fightResult === 'lose') {
@@ -512,6 +529,9 @@ const processForwards = (inputData) => {
       ) {
         beastData.proofedByForward = false;
       }
+
+      updatesData.beasts.push(beastData);
+      reportData.healthCapHistory.push(data.meta.healthCap);
     }
 
     if (dataType === 'flee' && reportData.prcoessAllowed) {
@@ -519,11 +539,17 @@ const processForwards = (inputData) => {
         return;
       }
 
+      const subType = reportData.lastBeastSeenSubType;
+
       const beastData = {
         isDungeon: false,
-        distanceRange: [data.distance],
+        distanceRange: [{
+          value: data.distance,
+        }],
         proofedByForward: true,
+        subType,
       };
+
 
       reportData.distanceHistory.push(data.distance);
 
