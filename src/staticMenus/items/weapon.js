@@ -583,7 +583,7 @@ const weapons = [
     title: 'Судный день',
     price: false,
     characteristic: 300,
-    place: core,
+    place: moltenCore,
   },
   {
     icon: '✝️',
