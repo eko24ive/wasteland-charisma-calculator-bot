@@ -29,7 +29,16 @@ const parseDungeonBeastFaced = (data) => {
   };
 };
 
+const parseWalkingBeastFaced = (data) => {
+  const [, name] = regexps.walkingBeastFacedRegExp.exec(data);
+
+  return {
+    name,
+  };
+}
+
 module.exports = {
   parseRegularBeastFaced,
   parseDungeonBeastFaced,
+  parseWalkingBeastFaced,
 };

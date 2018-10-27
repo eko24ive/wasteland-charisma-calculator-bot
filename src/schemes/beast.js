@@ -1,6 +1,5 @@
 const { Schema } = require('mongoose');
 
-// TODO: Add identificator of forward using id of user and timestamp of forward
 // TODO: Add detailed battle output (just like from the forward) (field: battlelog)
 
 const beastScheme = new Schema({
@@ -11,6 +10,7 @@ const beastScheme = new Schema({
   materialsReceived: [Number],
   receivedItems: Object,
   type: String,
+  subType: String,
   battles: [{
     totalDamageGiven: Number,
     totalDamageReceived: Number,

@@ -11,6 +11,10 @@ const parseFleeDefeat = (flee) => {
 
   const [, distance] = regexps.campDistanceRegExp.exec(flee);
 
+  if (regexps.lostCapsAndMaterialsRegExp.test(flee)) {
+    [, capsLost, materialsLost] = regexps.lostCapsAndMaterialsRegExp.exec(flee);
+  }
+
   if (regexps.beastDefeatCapsLostRegExp.test(flee)) {
     [, capsLost] = regexps.beastDefeatCapsLostRegExp.exec(flee);
   }
