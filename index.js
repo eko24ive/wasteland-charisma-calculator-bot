@@ -123,6 +123,7 @@ const createSession = (id) => {
     beastsToValidate: [],
     initialForwardDate: null,
     lastForwardDate: null,
+    firstForwardDate: null,
   };
 };
 
@@ -231,7 +232,7 @@ const askReachableKm = (msg) => {
     resize: true,
   });
 
-  return bot.sendMessage(msg.from.id, 'Выбери до какого километра ты ходишь (при этом оставаясь в живих)?\n'
+  return bot.sendMessage(msg.from.id, 'Выбери до какого километра ты ходишь (при этом оставаясь в живых)?\n'
         + '`Либо напиши своё количество (например: 28)`', {
     replyMarkup,
     parseMode: 'markdown',
@@ -428,6 +429,7 @@ const actualActualProcessUserData = (msg, reportData, updatesData, options) => {
     sessions[msg.from.id].state = states.WAIT_FOR_DATA_VALIDATION;
     sessions[msg.from.id].initialForwardDate = reportData.initialForwardDate;
     sessions[msg.from.id].lastForwardDate = reportData.lastForwardDate;
+    sessions[msg.from.id].firstForwardDate = reportData.firstForwardDate;
     sessions[msg.from.id].beastsToValidate = reportData.beastsToValidate;
     sessions[msg.from.id].beastRequest = false;
 
@@ -994,6 +996,7 @@ ${errors}
       sessions[msg.from.id].state = states.WAIT_FOR_DATA_VALIDATION;
       sessions[msg.from.id].initialForwardDate = reportData.initialForwardDate;
       sessions[msg.from.id].lastForwardDate = reportData.lastForwardDate;
+      sessions[msg.from.id].firstForwardDate = reportData.firstForwardDate;
       sessions[msg.from.id].beastsToValidate = beastsToValidate;
       sessions[msg.from.id].beastRequest = true;
 
@@ -1043,6 +1046,7 @@ const processUserData = (msg, options) => {
     sessions[msg.from.id].state = states.WAIT_FOR_DATA_VALIDATION;
     sessions[msg.from.id].initialForwardDate = reportData.initialForwardDate;
     sessions[msg.from.id].lastForwardDate = reportData.lastForwardDate;
+    sessions[msg.from.id].firstForwardDate = reportData.firstForwardDate;
     sessions[msg.from.id].beastsToValidate = reportData.beastsToValidate;
     sessions[msg.from.id].beastRequest = false;
 
@@ -1222,10 +1226,10 @@ bot.on('forward', (msg) => {
       });
     }
   } if (sessions[msg.from.id].state === states.WAIT_FOR_DATA_VALIDATION) {
-    const { beastsToValidate, lastForwardDate } = sessions[msg.from.id];
+    const { beastsToValidate, lastForwardDate, firstForwardDate } = sessions[msg.from.id];
 
-    if (msg.forward_date > lastForwardDate) {
-      return msg.reply.text('Дата этого форврада позже последнего форварда из твоего круга - наебать меня вздумал?', {
+    if (msg.forward_date > lastForwardDate || msg.forward_date < firstForwardDate) {
+      return msg.reply.text('Дата этого форврада за пределами форвардов из твоего круга - наебать меня вздумал?', {
         asReply: true,
       });
     }
@@ -1251,6 +1255,11 @@ bot.on('forward', (msg) => {
       regexpSet: regexps.altInBattle,
     });
 
+    const isHaloDungeonBeastFaced = regExpSetMatcher(msg.text, {
+      regexpSet: regexps.haloDungeonBeastFaced,
+    });
+ 
+
 
     if (isDungeonBeastFaced) {
       data = parseBeastFaced.parseDungeonBeastFaced(msg.text);
@@ -1265,23 +1274,33 @@ bot.on('forward', (msg) => {
       data = parseBeastFaced.parseWalkingBeastFaced(msg.text);
       dataType = 'walkingBeastFaced';
       beastName = data.name;
+    } else if (isHaloDungeonBeastFaced) {
+      data = parseBeastFaced.parseHaloDungeonBeastFaced(msg.text);
+      dataType = 'dungeonBeastFaced';
+      beastName = data.name;
     }
 
     const isForwardValid = ({ dataType, beastName, beastType }) => {
       let beastValidationTimeScope = beastsToValidate.map((beast, index) => ({ ...beast, index }));
-      let timeOffset;
-
-      if (isDungeonBeastFaced) {
-        timeOffset = msg.forward_date - (20 * 60);
-      } else if (isLocation) {
-        timeOffset = msg.forward_date - (3 * 60 * 60);
-      } else if (isWalkingBeastFaced) {
-        timeOffset = msg.forward_date - (60 * 60);
-      }
-
       const beastIndexToRemove = date => beastValidationTimeScope.sort((a, b) => Math.abs(date - a.date) - Math.abs(date - b.date))[0].index;
 
-      beastValidationTimeScope = beastValidationTimeScope.filter(({ date }) => date > (timeOffset) && date > msg.forward_date);
+      beastValidationTimeScope = beastValidationTimeScope.filter(({ date }) => {
+        let timeOffset;
+
+        if (isDungeonBeastFaced || isHaloDungeonBeastFaced) {
+          timeOffset = date - (20 * 60);
+        } else if (isLocation) {
+          timeOffset = date - (3 * 60 * 60);
+        } else if (isWalkingBeastFaced) {
+          timeOffset = date - (60 * 60);
+        }
+
+        return msg.forward_date > timeOffset;
+      });
+
+      if (beastValidationTimeScope.length === 0) {
+        return false;
+      }
 
       if (dataType === 'walkingBeastFaced') {
         if (beastValidationTimeScope.some(beast => (beast.name.indexOf(beastName) !== -1))) {
@@ -1330,7 +1349,7 @@ bot.on('forward', (msg) => {
         parseMode: 'html',
       });
     } if (!isForwardValid({ dataType, beastName, beastType })) {
-      return msg.reply.text(`Этот моб не похож на того с которым ты дрался. Ты чё - наебать меня вздумал?!
+      return msg.reply.text(`Этот моб не похож на того с которым ты дрался в это время. Ты чё - наебать меня вздумал?!
 Забыл кто мне нужен? Жми /showBeastsToValidate
 
 
@@ -1341,7 +1360,7 @@ bot.on('forward', (msg) => {
       });
     }
 
-    if (isLocation || isDungeonBeastFaced || isWalkingBeastFaced) {
+    if (isLocation || isDungeonBeastFaced || isWalkingBeastFaced || isHaloDungeonBeastFaced) {
       sessions[msg.from.id].data.push({
         data,
         dataType,
@@ -1399,6 +1418,10 @@ bot.on('forward', (msg) => {
       regexpSet: regexps.walkingBeastFaced,
     });
 
+    const isHaloDungeonBeastFaced = regExpSetMatcher(msg.text, {
+      regexpSet: regexps.haloDungeonBeastFaced,
+    });
+
     const isClassicPip = regExpSetMatcher(msg.text, {
       regexpSet: PipRegexps.classicPip,
     });
@@ -1410,10 +1433,12 @@ bot.on('forward', (msg) => {
     if (isDungeonBeastFaced) {
       data = parseBeastFaced.parseDungeonBeastFaced(msg.text);
       dataType = 'dungeonBeastFaced';
+    } else if (isHaloDungeonBeastFaced) {
+      data = parseBeastFaced.parseHaloDungeonBeastFaced(msg.text);
+      dataType = 'dungeonBeastFaced';
     } else if (isWalkingBeastFaced) {
       data = parseBeastFaced.parseWalkingBeastFaced(msg.text);
       dataType = 'walkingBeastFaced';
-      beastName = data.name;
     } else if (isFlee) {
       data = parseFlee(msg.text);
       dataType = 'flee';
@@ -1434,7 +1459,7 @@ bot.on('forward', (msg) => {
       dataType = 'dungeonBeast';
     }
 
-    if (isRegularBeast || isLocation || isFlee || isDeathMessage || isDungeonBeastFaced || (isClassicPip || isSimplePip) || isDungeonBeast || isWalkingBeastFaced) {
+    if (isRegularBeast || isLocation || isFlee || isDeathMessage || isDungeonBeastFaced || (isClassicPip || isSimplePip) || isDungeonBeast || isWalkingBeastFaced || isHaloDungeonBeastFaced) {
       sessions[msg.from.id].data.push({
         data,
         dataType,
@@ -1477,6 +1502,10 @@ bot.on('forward', (msg) => {
 
     const isDungeonBeastFaced = regExpSetMatcher(msg.text, {
       regexpSet: regexps.dungeonBeastFaced,
+    });
+
+    const isHaloDungeonBeastFaced = regExpSetMatcher(msg.text, {
+      regexpSet: regexps.haloDungeonBeastFaced,
     });
 
     const isRegularBeast = regExpSetMatcher(msg.text, {
@@ -1757,6 +1786,36 @@ bot.on('forward', (msg) => {
       }).catch(e => console.log(e));
     } else if (isDungeonBeastFaced) {
       const oBeast = parseBeastFaced.parseDungeonBeastFaced(msg.text);
+
+      routedBeastView(Beast, {
+        name: oBeast.name,
+        isDungeon: true,
+      }, {
+        env: process.env.ENV,
+        VERSION,
+      }).then(({ reply }) => {
+        if (reply !== false) {
+          /* const beastReplyMarkup = getBeastKeyboard(beast._id.toJSON());
+
+                    return msg.reply.text(reply,{
+                        replyMarkup: beastReplyMarkup,
+                        parseMode: 'html'
+                    }).catch(e => console.log(e)); */
+          msg.reply.text(`Хей, у меня есть данные про *${oBeast.name}*, но я пока что не умею их выводить, прости :с`, {
+            asReply: true,
+            parseMode: 'markdown',
+          }).catch(e => console.log(e));
+        } else {
+          return msg.reply.text(`Чёрт, я никогда не слышал про *${oBeast.name}*, прости :с`, {
+            asReply: true,
+            parseMode: 'markdown',
+          }).catch(e => console.log(e));
+        }
+
+        return false;
+      }).catch(e => console.log(e));
+    } else if (isHaloDungeonBeastFaced) {
+      const oBeast = parseBeastFaced.parseHaloDungeonBeastFaced(msg.text);
 
       routedBeastView(Beast, {
         name: oBeast.name,
@@ -2700,7 +2759,9 @@ _Если гиганта нет в списке - значит его ещё н�
 
 Гиганты имеют огромный запас здоровья. Игрок встречает гиганта, не убив которого нельзя пройти дальше. Каждый игрок может атаковать этого Гиганта.
 
-Если Гигант вас ударит в ответ и у вас не менее 11 единиц здоровья, то у вас останется 1 хп. Если у вас остается менее 11 единиц здоровья и вы получаете удар, то вы умираете.
+*Если Гигант вас ударит в ответ и у вас не менее 25% здоровья, то у вас останется 1 хп. Если у вас остается менее 25% здоровья и вы получаете удар, то вы умираете.*
+
+Если вы в числе последних добиваете гиганта - получите награду.
 
 Гиганты общие для всех фракций, соответственно, чем больше игроков их атакуют, тем быстрее все смогут ходить дальше.
 
