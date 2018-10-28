@@ -46,7 +46,7 @@ const routedBeastView = (Beast, seachParams, route = null, config) => new Promis
       const getDeprecatedFlair = (dataStatus, tiny = true) => {
         switch (dataStatus) {
           case INFO_ACTUAL:
-            return tiny ? '✅' : '✅ <b>Актуальные данные</b> ✅\n';
+            return tiny ? '' : '✅ <b>Актуальные данные</b> ✅\n';
           case INFO_DEPRECATED:
             return tiny ? '‼️' : '‼️ <b>Устаревшие данные</b> ‼️\n';
           case INFO_ABSENT:
@@ -501,7 +501,7 @@ ${processedFlees.failFlees}
 `;
 
       const headerReply = `<b>${beast.name}</b>
-👣${beast.type === 'DarkZone' ? '🚷' : '💀'} ${getDistanceRange(beast.distanceRange)}км ${getDeprecatedFlair(isRangeDeprecated)}
+👣${beast.type === 'DarkZone' ? '🚷' : '💀'} ${getDistanceRange(beast.distanceRange)}км ${getDeprecatedFlair(isRangeDeprecated, false)}
 `;
       switch (route) {
         case 'info':
