@@ -48,12 +48,12 @@ const routedBeastView = (Beast, seachParams, route = null, config) => new Promis
           case INFO_ACTUAL:
             return tiny ? '' : '✅ <b>Актуальные данные</b> ✅\n';
           case INFO_DEPRECATED:
-            return tiny ? '‼️' : '‼️ <b>Устаревшие данные</b> ‼️\n';
+            return tiny ? ' ‼️' : '‼️ <b>Устаревшие данные</b> ‼️\n';
           case INFO_ABSENT:
             return '';
           case INFO_MIXED:
           default:
-            return tiny ? '⚠️' : '⚠️ <b>Смешанные данные</b> ⚠️\n';
+            return tiny ? ' ⚠️' : '⚠️ <b>Смешанные данные</b> ⚠️\n';
         }
       };
 
