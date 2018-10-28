@@ -505,7 +505,7 @@ ${processedFlees.failFlees}
 `;
 
       const headerReply = `<b>${beast.name}</b>
-👣${beast.type === 'DarkZone' ? '🚷' : '💀'} ${getDistanceRange(beast.distanceRange)}км ${getDeprecatedFlair(isRangeDeprecated, false, true)}
+👣${beast.type === 'DarkZone' ? '🚷' : '💀'} ${getDistanceRange(beast.distanceRange)}км ${getDeprecatedFlair(isRangeDeprecated, true, true)}
 `;
       switch (route) {
         case 'info':
@@ -528,7 +528,7 @@ ${processedFlees.failFlees}
           break;
         case 'concussions':
           resolve({
-            reply: `${getDeprecatedFlair(isConcussionsDeprecated)}${headerReply}\n${concussionsReply}`,
+            reply: `${getDeprecatedFlair(isConcussionsDeprecated, false)}${headerReply}\n${concussionsReply}`,
             beast,
           });
           break;
