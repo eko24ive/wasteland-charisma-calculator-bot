@@ -8,11 +8,13 @@ const {
   openShelter,
   highHrotgar,
   moltenCore,
+  wasteland,
 } = require('./../places.js');
 
 const {
   getResource,
   getRarityIcon,
+  getCharacteristic,
   RESOURCES: {
     CAPS,
     MATERIALS,
@@ -23,6 +25,7 @@ const {
     CUBONITE,
     OSMIUM,
     TITANIUM,
+    KIPARIT,
     WIRES,
     MINICHARGE,
     TRANSISTOR,
@@ -42,65 +45,68 @@ const {
     FIRST,
     SECOND,
   },
+  CHARACTERISTICS: {
+    STRENGTH,
+  },
 } = require('./resources.js');
 
-const weaponsLongComment = '💪 Урон: +';
-const weaponsShortComment = '⚔️';
+const weaponsLongDescription = '💪 Урон: +';
+const weaponsShortDescription = '⚔️';
 
 const weapons = [
   {
     icon: false,
     title: 'Бейсбольная бита',
-    price: [getResource(CAPS, 30)],
+    price: [getResource(CAPS, 32)],
     characteristic: 1,
     place: merchant,
   },
   {
     icon: false,
     title: 'Ржавый нож',
-    price: [getResource(CAPS, 30)],
+    price: [getResource(CAPS, 77)],
     characteristic: 3,
     place: merchant,
   },
   {
     icon: false,
     title: 'Разводной ключ',
-    price: [getResource(CAPS, 30)],
+    price: [getResource(CAPS, 147)],
     characteristic: 5,
     place: merchant,
   },
   {
     icon: false,
     title: 'Топор',
-    price: [getResource(CAPS, 30)],
+    price: [getResource(CAPS, 212)],
     characteristic: 7,
     place: merchant,
   },
   {
     icon: false,
     title: 'Кинжал',
-    price: [getResource(CAPS, 30)],
+    price: [getResource(CAPS, 277)],
     characteristic: 9,
     place: merchant,
   },
   {
     icon: false,
     title: 'Мачете',
-    price: [getResource(CAPS, 30)],
+    price: [getResource(CAPS, 377)],
     characteristic: 11,
     place: merchant,
   },
   {
     icon: false,
     title: 'Хлыст',
-    price: [getResource(CAPS, 30)],
+    price: [getResource(CAPS, 487)],
     characteristic: 13,
     place: merchant,
   },
   {
     icon: false,
     title: 'Стальная бита',
-    price: [getResource(CAPS, 30)],
+    price: [getResource(CAPS, 597)],
     characteristic: 16,
     place: merchant,
   },
@@ -152,7 +158,7 @@ const weapons = [
   {
     icon: '💥',
     title: 'Лазерный тесак',
-    price: [getResource(MATERIALS, 5600), getResource(QUARZ, 4)],
+    price: [getResource(MATERIALS, 5600)],
     characteristic: 12,
     place: workbench,
     rarities: [FIRST, SECOND],
@@ -252,7 +258,7 @@ const weapons = [
     characteristic: 38,
     place: workbench,
     rarities: [FIRST, SECOND],
-
+    requirements: getCharacteristic(STRENGTH, 21),
   },
   {
     icon: '💥',
@@ -278,6 +284,7 @@ const weapons = [
     characteristic: 49,
     place: workbench,
     rarities: [FIRST, SECOND],
+    requirements: getCharacteristic(STRENGTH, 28),
   },
   {
     icon: '☄️',
@@ -305,6 +312,7 @@ const weapons = [
     characteristic: 56,
     place: workbench,
     rarities: [FIRST, SECOND],
+    requirements: getCharacteristic(STRENGTH, 32),
   },
   {
     icon: '☄️',
@@ -330,6 +338,7 @@ const weapons = [
     characteristic: 65,
     place: workbench,
     rarities: [FIRST, SECOND],
+    requirements: getCharacteristic(STRENGTH, 37),
   },
   {
     icon: '🔮',
@@ -355,6 +364,7 @@ const weapons = [
     characteristic: 79,
     place: workbench,
     rarities: [FIRST, SECOND],
+    requirements: getCharacteristic(STRENGTH, 45),
   },
   {
     icon: '🌟',
@@ -367,7 +377,7 @@ const weapons = [
   {
     icon: '🌟',
     title: 'Армагеддец',
-    price: false,
+    price: [getResource(WIRES, 40), getResource(IRONTHING, 19), getResource(TAPE, 35)],
     characteristic: 98,
     place: workbench,
     rarity: getRarityIcon(SECOND),
@@ -380,6 +390,7 @@ const weapons = [
     characteristic: 92,
     place: engineer,
     rarities: [FIRST, SECOND],
+    requirements: getCharacteristic(STRENGTH, 52),
   },
   {
     icon: '☣️',
@@ -405,6 +416,7 @@ const weapons = [
     characteristic: 125,
     place: engineer,
     rarities: [FIRST, SECOND],
+    requirements: getCharacteristic(STRENGTH, 71),
   },
   {
     icon: '☣️',
@@ -430,6 +442,7 @@ const weapons = [
     characteristic: 159,
     place: engineer,
     rarities: [FIRST, SECOND],
+    requirements: getCharacteristic(STRENGTH, 90),
   },
   {
     icon: '🌟',
@@ -457,6 +470,7 @@ const weapons = [
     characteristic: 187,
     place: engineer,
     rarities: [FIRST, SECOND],
+    requirements: getCharacteristic(STRENGTH, 106),
   },
   {
     icon: '💿',
@@ -482,6 +496,7 @@ const weapons = [
     characteristic: 206,
     place: engineer,
     rarities: [FIRST, SECOND],
+    requirements: getCharacteristic(STRENGTH, 117),
   },
   {
     icon: '♻️',
@@ -509,6 +524,7 @@ const weapons = [
     characteristic: 266,
     place: engineer,
     rarities: [FIRST, SECOND],
+    requirements: getCharacteristic(STRENGTH, 152),
   },
   {
     icon: '🐱',
@@ -531,19 +547,20 @@ const weapons = [
   {
     icon: '✳️',
     title: 'Протонный топор',
-    price: [getResource(MATERIALS, 359900), getResource(QUARZ, 2990),
-      getResource(MICROCHIPS, 289), getResource(IRIDIUM, 250)],
+    price: [getResource(MATERIALS, 359900), getResource(MICROCHIPS, 250), getResource(GENERATORS, 289)],
     characteristic: 278,
     place: core,
+    requirements: getCharacteristic(STRENGTH, 158),
   },
   {
     icon: '❇️',
     title: 'Плазмакастер',
     price: [getResource(MATERIALS, 379900), getResource(GENERATORS, 410),
-      getResource(MICROCHIPS, 359), getResource(IRIDIUM, 265)],
-    characteristic: 291,
+      getResource(MICROCHIPS, 359), getResource(IRIDIUM, 226)],
+    characteristic: 334,
     place: core,
     rarities: [FIRST, SECOND],
+    requirements: getCharacteristic(STRENGTH, 190),
   },
   {
     icon: '❇️',
@@ -564,26 +581,36 @@ const weapons = [
   {
     icon: '💣',
     title: 'Судный день',
-    price: [getResource(MATERIALS, 325900), getResource(GENERATORS, 680),
-      getResource(MICROCHIPS, 399), getResource(IRIDIUM, 280)],
-    characteristic: 305,
-    place: core,
+    price: false,
+    characteristic: 300,
+    place: moltenCore,
   },
   {
     icon: '✝️',
     title: 'Святое пламя',
-    price: [getResource(MATERIALS, 385900), getResource(GENERATORS, 720),
-      getResource(MICROCHIPS, 419), getResource(IRIDIUM, 300)],
-    characteristic: 318,
+    price: [getResource(MATERIALS, 399990), getResource(GENERATORS, 590),
+      getResource(MICROCHIPS, 435), getResource(IRIDIUM, 329)],
+    characteristic: 356,
     place: core,
+    requirements: getCharacteristic(STRENGTH, 203),
   },
   {
     icon: '💥',
     title: 'Маленький друг',
-    price: [getResource(MATERIALS, 399400), getResource(GENERATORS, 750),
+    price: [getResource(MATERIALS, 425400), getResource(GENERATORS, 710),
       getResource(MICROCHIPS, 435), getResource(IRIDIUM, 329)],
-    characteristic: 325,
+    characteristic: 372,
     place: core,
+    requirements: getCharacteristic(STRENGTH, 212),
+  },
+  {
+    icon: '💥',
+    title: 'Флюгегехаймен',
+    price: [getResource(MATERIALS, 599900), getResource(KIPARIT, 160),
+      getResource(MICROCHIPS, 500), getResource(IRIDIUM, 395)],
+    characteristic: 430,
+    place: core,
+    requirements: getCharacteristic(STRENGTH, 245),
   },
   {
     icon: '🧠',
@@ -591,6 +618,7 @@ const weapons = [
     price: [getResource(MATERIALS, 656900), getResource(CUBONITE, 38990)],
     characteristic: 344,
     place: basement,
+    requirements: getCharacteristic(STRENGTH, 196),
   },
   {
     icon: '🌡',
@@ -598,14 +626,16 @@ const weapons = [
     price: [getResource(MATERIALS, 957900), getResource(CUBONITE, 54990), getResource(OSMIUM, 30290)],
     characteristic: 416,
     place: basement,
+    requirements: getCharacteristic(STRENGTH, 237),
   },
   {
     icon: '💢',
     title: 'Плазмолив',
     price: [getResource(MATERIALS, 1135900), getResource(CUBONITE, 68490),
-      getResource(OSMIUM, 45590), getResource(TITANIUM, 43930)],
-    characteristic: false,
+      getResource(OSMIUM, 40590), getResource(TITANIUM, 13930)],
+    characteristic: 456,
     place: basement,
+    requirements: getCharacteristic(STRENGTH, 260),
   },
   {
     icon: '❇️',
@@ -614,6 +644,7 @@ const weapons = [
       getResource(OSMIUM, 79560), getResource(TITANIUM, 66980)],
     characteristic: 507,
     place: basement,
+    requirements: getCharacteristic(STRENGTH, 289),
   },
   {
     icon: false,
@@ -643,10 +674,17 @@ const weapons = [
     characteristic: 360,
     place: moltenCore,
   },
+  {
+    icon: false,
+    title: 'Супермолот',
+    price: false,
+    characteristic: 25,
+    place: wasteland,
+  },
 ];
 
 module.exports = {
   weapons,
-  weaponsShortComment,
-  weaponsLongComment,
+  weaponsShortDescription,
+  weaponsLongDescription,
 };

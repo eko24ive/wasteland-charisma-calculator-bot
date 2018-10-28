@@ -1,18 +1,18 @@
 const {
   helmets,
-  helmetsComment,
+  helmetsDescription,
 } = require('./helmet.js');
 
 const {
   weapons,
-  weaponsShortComment,
-  weaponsLongComment,
+  weaponsShortDescription,
+  weaponsLongDescription,
 } = require('./weapon.js');
 
 const {
   armors,
-  armorsShortComment,
-  armorsLongComment,
+  armorsShortDescription,
+  armorsLongDescription,
 } = require('./armor.js');
 
 const meds = require('./meds.js');
@@ -49,19 +49,40 @@ const getItemCharacteristic = (characteristic) => {
   return '???';
 };
 
+const getItemRequirements = (requirements) => {
+  if (requirements) {
+    return requirements;
+  }
+
+  return '';
+};
+
+const getItemComment = (comment) => {
+  if (comment) {
+    return comment;
+  }
+
+  return '';
+};
+
+
 const showItem = ({
   icon,
   title,
   characteristic,
   price,
-}, comment) => {
+  requirements,
+  comment,
+}, description) => {
   const itemIcon = getItemIcon(icon);
   const itemCharacteristic = getItemCharacteristic(characteristic);
   const itemPrice = getItemPrice(price);
+  const itemRequirements = getItemRequirements(requirements);
+  const itemComment = getItemComment(comment);
   return `
 ${itemIcon} *${title}*
-${comment} ${itemCharacteristic}
-💰: ${itemPrice}
+${description}${itemCharacteristic}
+💰: ${itemPrice}${itemRequirements ? `\n${itemRequirements}` : ''}${itemComment ? `\n${itemComment}` : ''}
 `;
 };
 
@@ -109,7 +130,7 @@ const showInventionWithoutTitle = ({
   return `${rarity} (${inventionCharacteristic}${comment}) - ${inventionPrice}`;
 };
 
-const showItemsByPlace = (place, items, itemsComment) => items.filter(item => item.place === place && !!item.price && !item.rarity)
+const showItemsByPlace = (place, items, itemsComment) => items.filter(item => item.place === place && !item.rarity)
   .map(item => showItem(item, itemsComment)).join('');
 
 const getItemByRarity = ({ items, title, rarityIcon }) => items.filter(item => item.title === title && item.rarity === getRarityIcon(rarityIcon)).pop() || false;
@@ -124,15 +145,15 @@ ${firstRarity ? showInventionWithoutTitle(firstRarity, itemsComment) : ''}
 ${secondRarity ? `${showInventionWithoutTitle(secondRarity, itemsComment)}\n` : ''}\n`;
   }).join('');
 
-const getHelmetsByPlace = place => showItemsByPlace(place, helmets, helmetsComment);
+const getHelmetsByPlace = place => showItemsByPlace(place, helmets, helmetsDescription);
 
-const getWeaponsByPlace = place => showItemsByPlace(place, weapons, weaponsLongComment);
+const getWeaponsByPlace = place => showItemsByPlace(place, weapons, weaponsLongDescription);
 
-const getWeaponInventionsByPlace = place => showItemsInventionsByPlace(place, weapons, weaponsShortComment);
+const getWeaponInventionsByPlace = place => showItemsInventionsByPlace(place, weapons, weaponsShortDescription);
 
-const getArmorsByPlace = place => showItemsByPlace(place, armors, armorsLongComment);
+const getArmorsByPlace = place => showItemsByPlace(place, armors, armorsLongDescription);
 
-const getArmorInventionsByPlace = place => showItemsInventionsByPlace(place, armors, armorsShortComment);
+const getArmorInventionsByPlace = place => showItemsInventionsByPlace(place, armors, armorsShortDescription);
 
 const getMedsByPlace = (place) => {
   const itemsFromPlace = meds.filter(item => (item.place === place));
