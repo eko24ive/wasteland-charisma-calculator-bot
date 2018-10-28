@@ -20,7 +20,7 @@ const skillsCap = {
   precision: 1300,
   agility: 1200,
   health: 1550,
-  charisma: 1250,
+  charisma: 1200,
 };
 
 const formatNubmer = (number) => {
@@ -258,12 +258,12 @@ const calculateUpgrade = ({
 */
 
   /* _Забавный факт #1: ты потратил на харизму ${formatNubmer(calculations.amountSpentOnCharisma)} 🕳 крышек_ */
+  /* Твой текущий уровень харизмы позволил сэкономить ${formatNubmer(calculations.amountOfSavedFunds)} 🕳 крышек. */
   const res = `
 _Всего ты потратил ${formatNubmer(spentOnSkill)} 🕳 крышек на ${upgradeSkill}_
 
 Необходимо потратить ${formatNubmer(calculations.amountToSpend)} 🕳 крышек для прокачки навыка \`${upgradeSkill}\` от ${currentSkillLevel} уровня до ${upgradeTo} уровня
 
-Твой текущий уровень харизмы позволил сэкономить ${formatNubmer(calculations.amountOfSavedFunds)} 🕳 крышек.
 
 Тебе необходимо сделать примерно *${raidsAmount || '<1'} 👣 ходок*.
 

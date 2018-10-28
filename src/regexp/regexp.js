@@ -38,7 +38,7 @@ const deathMessageContentRegExp = /Спустя какое-то время ты 
 const deathMessageRecourcesLostRexExp = /Потеряно: 🕳(\d+) и 📦(\d+)/;
 
 const beastFacedRegExp = /Во время вылазки на тебя напал (.+)\./;
-const randomBeastFacedRegExp = /устрашающе начал приближаться (.+)\./;
+const walkingBeastFacedRegExp = /устрашающе начал приближаться (.+)\./;
 const dungeonBeastFacedRegExp = /(.+) перегородил тебе путь./;
 
 const metalAmountRegExp = /(.+) (\d+)/; // 🔗Кубонит 192
@@ -55,6 +55,10 @@ const giantFoughtRegExp = /Ты нанёс \d+ урона гиганту/;
 const giantOnField = /Ты сейчас на поле боя с гигантом./;
 const giantNameOnField = /(.+)\n❤️/;
 const giantHealthOnField = /❤️(\d+|-\d+)\/(\d+)/;
+
+const altInBattleLocationRegExp = /Твое местоположение: Пустошь/;
+const altInBattleBeastRegExp = /Тебе не уйти от противника .+$/;
+
 
 const every = {
   contains: [healthRegExp, hungerRegExp, staminaRegExp, campDistanceRegExp],
@@ -112,6 +116,7 @@ const dungeonBeast = {
   ],
 };
 
+
 const flee = {
   contains: [
     every.contains,
@@ -150,6 +155,12 @@ const dungeonBeastFaced = {
   ],
 };
 
+const walkingBeastFaced = {
+  contains: [
+    walkingBeastFacedRegExp,
+  ],
+};
+
 const giantFaced = {
   contains: [
     every.contains,
@@ -172,6 +183,14 @@ const giantFacedOnField = {
     giantHealthOnField,
   ],
 };
+
+const altInBattle = {
+  contains: [
+    altInBattleLocationRegExp,
+    altInBattleBeastRegExp,
+  ],
+};
+
 
 const regexps = {
   locationNameRegExp,
@@ -214,8 +233,10 @@ const regexps = {
   giantHealthOnField,
   darkZone,
   beastDungeonFlagRegExp,
-  randomBeastFacedRegExp,
+  walkingBeastFacedRegExp,
   lostCapsAndMaterialsRegExp,
+  altInBattleLocationRegExp,
+  altInBattleBeastRegExp,
 };
 
 module.exports = {
@@ -227,8 +248,10 @@ module.exports = {
   deathMessage,
   regularBeastFaced,
   dungeonBeastFaced,
+  walkingBeastFaced,
   giantFaced,
   giantFought,
   giantFacedOnField,
+  altInBattle,
   regexps,
 };

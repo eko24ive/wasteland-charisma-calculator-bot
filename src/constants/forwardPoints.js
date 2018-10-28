@@ -15,7 +15,7 @@ const forwardPoints = {
   discoveryGiantData: 100,
   newGiantData: 5,
   sameGiantData: 0.1,
-  darkZoneBattle: 1.5,
+  darkZoneBattle: 1,
   regularZoneBattle: 1,
 };
 
