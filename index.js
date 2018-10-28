@@ -123,6 +123,7 @@ const createSession = (id) => {
     beastsToValidate: [],
     initialForwardDate: null,
     lastForwardDate: null,
+    firstForwardDate: null,
   };
 };
 
@@ -428,6 +429,7 @@ const actualActualProcessUserData = (msg, reportData, updatesData, options) => {
     sessions[msg.from.id].state = states.WAIT_FOR_DATA_VALIDATION;
     sessions[msg.from.id].initialForwardDate = reportData.initialForwardDate;
     sessions[msg.from.id].lastForwardDate = reportData.lastForwardDate;
+    sessions[msg.from.id].firstForwardDate = reportData.firstForwardDate;
     sessions[msg.from.id].beastsToValidate = reportData.beastsToValidate;
     sessions[msg.from.id].beastRequest = false;
 
@@ -994,6 +996,7 @@ ${errors}
       sessions[msg.from.id].state = states.WAIT_FOR_DATA_VALIDATION;
       sessions[msg.from.id].initialForwardDate = reportData.initialForwardDate;
       sessions[msg.from.id].lastForwardDate = reportData.lastForwardDate;
+      sessions[msg.from.id].firstForwardDate = reportData.firstForwardDate;
       sessions[msg.from.id].beastsToValidate = beastsToValidate;
       sessions[msg.from.id].beastRequest = true;
 
@@ -1043,6 +1046,7 @@ const processUserData = (msg, options) => {
     sessions[msg.from.id].state = states.WAIT_FOR_DATA_VALIDATION;
     sessions[msg.from.id].initialForwardDate = reportData.initialForwardDate;
     sessions[msg.from.id].lastForwardDate = reportData.lastForwardDate;
+    sessions[msg.from.id].firstForwardDate = reportData.firstForwardDate;
     sessions[msg.from.id].beastsToValidate = reportData.beastsToValidate;
     sessions[msg.from.id].beastRequest = false;
 
@@ -1222,11 +1226,10 @@ bot.on('forward', (msg) => {
       });
     }
   } if (sessions[msg.from.id].state === states.WAIT_FOR_DATA_VALIDATION) {
-    const { beastsToValidate, lastForwardDate } = sessions[msg.from.id];
+    const { beastsToValidate, lastForwardDate, firstForwardDate } = sessions[msg.from.id];
 
-    if (msg.forward_date > lastForwardDate) {
-      // FIXME: Add condition for "firstForwardDate"
-      return msg.reply.text('Дата этого форврада позже последнего форварда из твоего круга - наебать меня вздумал?', {
+    if (msg.forward_date > lastForwardDate || msg.forward_date < firstForwardDate) {
+      return msg.reply.text('Дата этого форврада за пределами форвардов из твоего круга - наебать меня вздумал?', {
         asReply: true,
       });
     }

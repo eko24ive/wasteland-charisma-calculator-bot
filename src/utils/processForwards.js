@@ -114,6 +114,7 @@ const processForwards = (inputData) => {
     beastsToValidate: [],
     prcoessAllowed: true,
     initialForwardDate: null,
+    firstForwardDate: null,
     lastForwardDate: null,
   };
 
@@ -190,6 +191,10 @@ const processForwards = (inputData) => {
 
     if (index === (inputData.length - 1)) {
       reportData.lastForwardDate = date;
+    }
+
+    if (index === 0) {
+      reportData.firstForwardDate = date;
     }
 
     if (reportData.prcoessAllowed) {
