@@ -1228,11 +1228,11 @@ bot.on('forward', (msg) => {
   } if (sessions[msg.from.id].state === states.WAIT_FOR_DATA_VALIDATION) {
     const { beastsToValidate, lastForwardDate, firstForwardDate } = sessions[msg.from.id];
 
-    /* if (msg.forward_date > lastForwardDate || msg.forward_date < firstForwardDate) {
+    if (msg.forward_date > lastForwardDate || msg.forward_date < firstForwardDate) {
       return msg.reply.text('Дата этого форврада за пределами форвардов из твоего круга - наебать меня вздумал?', {
         asReply: true,
       });
-    } */
+    }
 
     let data;
     let dataType;
@@ -1255,6 +1255,11 @@ bot.on('forward', (msg) => {
       regexpSet: regexps.altInBattle,
     });
 
+    const isHaloDungeonBeastFaced = regExpSetMatcher(msg.text, {
+      regexpSet: regexps.haloDungeonBeastFaced,
+    });
+ 
+
 
     if (isDungeonBeastFaced) {
       data = parseBeastFaced.parseDungeonBeastFaced(msg.text);
@@ -1269,6 +1274,10 @@ bot.on('forward', (msg) => {
       data = parseBeastFaced.parseWalkingBeastFaced(msg.text);
       dataType = 'walkingBeastFaced';
       beastName = data.name;
+    } else if (isHaloDungeonBeastFaced) {
+      data = parseBeastFaced.parseHaloDungeonBeastFaced(msg.text);
+      dataType = 'dungeonBeastFaced';
+      beastName = data.name;
     }
 
     const isForwardValid = ({ dataType, beastName, beastType }) => {
@@ -1278,7 +1287,7 @@ bot.on('forward', (msg) => {
       beastValidationTimeScope = beastValidationTimeScope.filter(({ date }) => {
         let timeOffset;
 
-        if (isDungeonBeastFaced) {
+        if (isDungeonBeastFaced || isHaloDungeonBeastFaced) {
           timeOffset = date - (20 * 60);
         } else if (isLocation) {
           timeOffset = date - (3 * 60 * 60);
@@ -1351,7 +1360,7 @@ bot.on('forward', (msg) => {
       });
     }
 
-    if (isLocation || isDungeonBeastFaced || isWalkingBeastFaced) {
+    if (isLocation || isDungeonBeastFaced || isWalkingBeastFaced || isHaloDungeonBeastFaced) {
       sessions[msg.from.id].data.push({
         data,
         dataType,
@@ -1409,6 +1418,10 @@ bot.on('forward', (msg) => {
       regexpSet: regexps.walkingBeastFaced,
     });
 
+    const isHaloDungeonBeastFaced = regExpSetMatcher(msg.text, {
+      regexpSet: regexps.haloDungeonBeastFaced,
+    });
+
     const isClassicPip = regExpSetMatcher(msg.text, {
       regexpSet: PipRegexps.classicPip,
     });
@@ -1420,10 +1433,12 @@ bot.on('forward', (msg) => {
     if (isDungeonBeastFaced) {
       data = parseBeastFaced.parseDungeonBeastFaced(msg.text);
       dataType = 'dungeonBeastFaced';
+    } else if (isHaloDungeonBeastFaced) {
+      data = parseBeastFaced.parseHaloDungeonBeastFaced(msg.text);
+      dataType = 'dungeonBeastFaced';
     } else if (isWalkingBeastFaced) {
       data = parseBeastFaced.parseWalkingBeastFaced(msg.text);
       dataType = 'walkingBeastFaced';
-      beastName = data.name;
     } else if (isFlee) {
       data = parseFlee(msg.text);
       dataType = 'flee';
@@ -1444,7 +1459,7 @@ bot.on('forward', (msg) => {
       dataType = 'dungeonBeast';
     }
 
-    if (isRegularBeast || isLocation || isFlee || isDeathMessage || isDungeonBeastFaced || (isClassicPip || isSimplePip) || isDungeonBeast || isWalkingBeastFaced) {
+    if (isRegularBeast || isLocation || isFlee || isDeathMessage || isDungeonBeastFaced || (isClassicPip || isSimplePip) || isDungeonBeast || isWalkingBeastFaced || isHaloDungeonBeastFaced) {
       sessions[msg.from.id].data.push({
         data,
         dataType,
@@ -1487,6 +1502,10 @@ bot.on('forward', (msg) => {
 
     const isDungeonBeastFaced = regExpSetMatcher(msg.text, {
       regexpSet: regexps.dungeonBeastFaced,
+    });
+
+    const isHaloDungeonBeastFaced = regExpSetMatcher(msg.text, {
+      regexpSet: regexps.haloDungeonBeastFaced,
     });
 
     const isRegularBeast = regExpSetMatcher(msg.text, {
@@ -1767,6 +1786,36 @@ bot.on('forward', (msg) => {
       }).catch(e => console.log(e));
     } else if (isDungeonBeastFaced) {
       const oBeast = parseBeastFaced.parseDungeonBeastFaced(msg.text);
+
+      routedBeastView(Beast, {
+        name: oBeast.name,
+        isDungeon: true,
+      }, {
+        env: process.env.ENV,
+        VERSION,
+      }).then(({ reply }) => {
+        if (reply !== false) {
+          /* const beastReplyMarkup = getBeastKeyboard(beast._id.toJSON());
+
+                    return msg.reply.text(reply,{
+                        replyMarkup: beastReplyMarkup,
+                        parseMode: 'html'
+                    }).catch(e => console.log(e)); */
+          msg.reply.text(`Хей, у меня есть данные про *${oBeast.name}*, но я пока что не умею их выводить, прости :с`, {
+            asReply: true,
+            parseMode: 'markdown',
+          }).catch(e => console.log(e));
+        } else {
+          return msg.reply.text(`Чёрт, я никогда не слышал про *${oBeast.name}*, прости :с`, {
+            asReply: true,
+            parseMode: 'markdown',
+          }).catch(e => console.log(e));
+        }
+
+        return false;
+      }).catch(e => console.log(e));
+    } else if (isHaloDungeonBeastFaced) {
+      const oBeast = parseBeastFaced.parseHaloDungeonBeastFaced(msg.text);
 
       routedBeastView(Beast, {
         name: oBeast.name,
