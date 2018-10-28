@@ -4,7 +4,7 @@ const constants = require('./constants/constants');
 const defaultSkillCost = require('./constants/defaultSkillCost');
 const defaultCharismaCost = require('./constants/defaultCharismaCost');
 const mobs = require('./constants/mobs');
-const ranges = require('./utils/getRanges');
+const mobsRanges = require('./constants/mobsRanges');
 const timeToTravel = require('./utils/timeToTravel');
 
 const skillMap = {
@@ -109,6 +109,9 @@ const calculateAmountOfRaids = (
   skillRangeTo,
   upgradeSkill,
 ) => {
+  const distanceOfRanges = {};
+  const mobsFillment = [];
+
   const totalSpend = amountToSpend(
     upgradeSkill,
     charismaLevel,
@@ -120,18 +123,30 @@ const calculateAmountOfRaids = (
     return null;
   }
 
-  const availableMobsOnDistance = mobs.filter((beast) => {
-    const { kmMin, kmMax } = beast;
+  const scopeOfRanges = mobsRanges.filter((range) => {
+    const [start, end] = range.split('-');
 
-    return Number(kmMin) < Number(reachableDistance) || Number(reachableDistance) > Number(kmMax);
+    return Number(end) <= Number(reachableDistance) || Number(reachableDistance) >= Number(start);
   });
 
-  const mobsFillment = ranges.ranges.map((range) => {
-    const [min, max] = range;
+  scopeOfRanges.forEach((range) => {
+    const [start, end] = range.split('-');
 
-    const mobsOnRange = availableMobsOnDistance.filter(({ kmMin, kmMax }) => Number(kmMin) <= Number(max) || Number(min) >= Number(kmMax));
+    distanceOfRanges[range] = end - start;
+  });
 
-    return mobsOnRange[Math.floor(Math.random() * mobsOnRange.length)];
+  const getRandomItem = array => array[Math.floor(Math.random() * array.length)];
+
+  scopeOfRanges.forEach((range) => {
+    const distanceOfRange = distanceOfRanges[range];
+    const amountOfIterations = distanceOfRange < 2 ? distanceOfRange : Math.floor(Math.random() * 2) + 1;
+    const mobsForRange = mobs[range];
+
+    // FIXME: Might be cause of skillupgrade issue;
+    for (let i = amountOfIterations; i > 0; i -= 1) {
+      const item = getRandomItem(mobsForRange);
+      mobsFillment.push(item);
+    }
   });
 
   const bestCaseScenario = {
@@ -210,7 +225,6 @@ const calculateUpgrade = ({
   });
   const charismaLevel = Number(pip.charisma);
   const reachableDistance = Number(/\d*/.exec(reachableKm).pop());
-
   const cap = skillsCap[skillMap[upgradeSkill]];
 
   if (currentSkillLevel >= cap) {
