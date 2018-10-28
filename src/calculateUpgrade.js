@@ -211,6 +211,13 @@ const calculateUpgrade = ({
   const charismaLevel = Number(pip.charisma);
   const reachableDistance = Number(/\d*/.exec(reachableKm).pop());
 
+  const cap = skillsCap[skillMap[upgradeSkill]];
+
+  if (currentSkillLevel >= cap) {
+    return `Хей, похоже что ты прокачал этот скил полностью, может стоит занятся другим?
+Энивей, спасибо что воспользовался нашими услугами :3`;
+  }
+
   const calculations = {
     amountOfSavedFunds: amountToSpend(
       upgradeSkill,

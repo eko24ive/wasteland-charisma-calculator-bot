@@ -231,7 +231,7 @@ const askReachableKm = (msg) => {
     resize: true,
   });
 
-  return bot.sendMessage(msg.from.id, 'Выбери до какого километра ты ходишь (при этом оставаясь в живих)?\n'
+  return bot.sendMessage(msg.from.id, 'Выбери до какого километра ты ходишь (при этом оставаясь в живых)?\n'
         + '`Либо напиши своё количество (например: 28)`', {
     replyMarkup,
     parseMode: 'markdown',
@@ -1225,6 +1225,7 @@ bot.on('forward', (msg) => {
     const { beastsToValidate, lastForwardDate } = sessions[msg.from.id];
 
     if (msg.forward_date > lastForwardDate) {
+      // FIXME: Add condition for "firstForwardDate"
       return msg.reply.text('Дата этого форврада позже последнего форварда из твоего круга - наебать меня вздумал?', {
         asReply: true,
       });
@@ -1281,7 +1282,7 @@ bot.on('forward', (msg) => {
 
       const beastIndexToRemove = date => beastValidationTimeScope.sort((a, b) => Math.abs(date - a.date) - Math.abs(date - b.date))[0].index;
 
-      beastValidationTimeScope = beastValidationTimeScope.filter(({ date }) => date > (timeOffset) && date > msg.forward_date);
+      beastValidationTimeScope = beastValidationTimeScope.filter(({ date }) => timeOffset < date && !(date > msg.forward_date));
 
       if (dataType === 'walkingBeastFaced') {
         if (beastValidationTimeScope.some(beast => (beast.name.indexOf(beastName) !== -1))) {
@@ -1330,7 +1331,7 @@ bot.on('forward', (msg) => {
         parseMode: 'html',
       });
     } if (!isForwardValid({ dataType, beastName, beastType })) {
-      return msg.reply.text(`Этот моб не похож на того с которым ты дрался. Ты чё - наебать меня вздумал?!
+      return msg.reply.text(`Этот моб не похож на того с которым ты дрался в это время. Ты чё - наебать меня вздумал?!
 Забыл кто мне нужен? Жми /showBeastsToValidate
 
 
