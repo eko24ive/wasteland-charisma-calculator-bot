@@ -399,7 +399,6 @@ const wastelandText = `
 
 Эти вещи рандомно выпадают в пустоши
 ${getWeaponsByPlace(wasteland)}
-${getArmorsByPlace(wasteland)}
 ${getHelmetsByPlace(wasteland)}
 `;
 
