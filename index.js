@@ -1228,11 +1228,11 @@ bot.on('forward', (msg) => {
   } if (sessions[msg.from.id].state === states.WAIT_FOR_DATA_VALIDATION) {
     const { beastsToValidate, lastForwardDate, firstForwardDate } = sessions[msg.from.id];
 
-    if (msg.forward_date > lastForwardDate || msg.forward_date < firstForwardDate) {
+    /* if (msg.forward_date > lastForwardDate || msg.forward_date < firstForwardDate) {
       return msg.reply.text('Дата этого форврада за пределами форвардов из твоего круга - наебать меня вздумал?', {
         asReply: true,
       });
-    }
+    } */
 
     let data;
     let dataType;
@@ -1273,19 +1273,25 @@ bot.on('forward', (msg) => {
 
     const isForwardValid = ({ dataType, beastName, beastType }) => {
       let beastValidationTimeScope = beastsToValidate.map((beast, index) => ({ ...beast, index }));
-      let timeOffset;
-
-      if (isDungeonBeastFaced) {
-        timeOffset = msg.forward_date - (20 * 60);
-      } else if (isLocation) {
-        timeOffset = msg.forward_date - (3 * 60 * 60);
-      } else if (isWalkingBeastFaced) {
-        timeOffset = msg.forward_date - (60 * 60);
-      }
-
       const beastIndexToRemove = date => beastValidationTimeScope.sort((a, b) => Math.abs(date - a.date) - Math.abs(date - b.date))[0].index;
 
-      beastValidationTimeScope = beastValidationTimeScope.filter(({ date }) => timeOffset < date && !(date > msg.forward_date));
+      beastValidationTimeScope = beastValidationTimeScope.filter(({ date }) => {
+        let timeOffset;
+
+        if (isDungeonBeastFaced) {
+          timeOffset = date - (20 * 60);
+        } else if (isLocation) {
+          timeOffset = date - (3 * 60 * 60);
+        } else if (isWalkingBeastFaced) {
+          timeOffset = date - (60 * 60);
+        }
+
+        return msg.forward_date > timeOffset;
+      });
+
+      if (beastValidationTimeScope.length === 0) {
+        return false;
+      }
 
       if (dataType === 'walkingBeastFaced') {
         if (beastValidationTimeScope.some(beast => (beast.name.indexOf(beastName) !== -1))) {
