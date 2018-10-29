@@ -89,7 +89,7 @@ const resources = {
   },
   KIPARIT: {
     title: 'Кипарит',
-    icon: '',
+    icon: '🔸',
     description: '',
   },
   WIRES: {
