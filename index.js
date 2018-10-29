@@ -1228,7 +1228,7 @@ bot.on('forward', (msg) => {
   } if (sessions[msg.from.id].state === states.WAIT_FOR_DATA_VALIDATION) {
     const { beastsToValidate, lastForwardDate, firstForwardDate } = sessions[msg.from.id];
 
-    if (msg.forward_date > lastForwardDate || msg.forward_date < firstForwardDate) {
+    if (msg.forward_date > lastForwardDate || msg.forward_date < (firstForwardDate - (3 * 60 * 60))) {
       return msg.reply.text('Дата этого форврада за пределами форвардов из твоего круга - наебать меня вздумал?', {
         asReply: true,
       });
