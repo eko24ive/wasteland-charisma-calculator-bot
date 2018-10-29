@@ -139,20 +139,50 @@ const getToken = () => {
   throw new Error('Please, specify bot token mode "--dev" for development and "--prod" production');
 };
 
-const bot = new TeleBot({
-  token: getToken(),
-  usePlugins: ['namedButtons'],
-  polling: {
-    interval: 100, // How often check updates (in ms).
-    limit: 500, // Limits the number of updates to be retrieved.
-    retryTimeout: 1000, // Reconne   cting timeout (in ms).
-  },
-  pluginConfig: {
-    namedButtons: {
-      buttons,
+const getUrl = () => {
+  process.env.ENV === 'PRODUCTION' ? process.env.URL_PRODUCTION : process.env.URL_STAGING;
+
+  if (process.env.ENV === 'PRODUCTION') {
+    return process.env.URL_PRODUCTION;
+  } if (process.env.ENV === 'STAGING') {
+    return process.env.URL_STAGING;
+  }
+
+  throw new Error('Please, specify bot token mode "--dev" for development and "--prod" production');
+};
+
+let bot;
+
+if (process.env.ENV === 'LOCAL') {
+  bot = new TeleBot({
+    token: getToken(),
+    usePlugins: ['namedButtons'],
+    polling: {
+      interval: 1, // How often check updates (in ms).
     },
-  },
-});
+    pluginConfig: {
+      namedButtons: {
+        buttons,
+      },
+    },
+  });
+} else {
+  const token = getToken();
+  const host = '0.0.0.0';
+  const port = process.env.PORT;
+  const url = getUrl();
+
+  bot = new TeleBot({
+    token,
+    usePlugins: ['namedButtons'],
+    webhook: { url, host, port },
+    pluginConfig: {
+      namedButtons: {
+        buttons,
+      },
+    },
+  });
+}
 
 const updateOrCreate = (msg, pip, cb = (() => {})) => {
   const telegramData = {
@@ -1258,7 +1288,6 @@ bot.on('forward', (msg) => {
     const isHaloDungeonBeastFaced = regExpSetMatcher(msg.text, {
       regexpSet: regexps.haloDungeonBeastFaced,
     });
-
 
 
     if (isDungeonBeastFaced) {
@@ -3292,4 +3321,4 @@ bot.on('/reset_beast_database', (msg) => {
   }
 });
 
-bot.start();
+bot.connect();
