@@ -1,10 +1,65 @@
+require('dotenv').config({ path: '../../.env' });
 const _ = require('underscore');
 
+const actualDataThreshold = Number(process.env.DATA_THRESHOLD);
+
+const INFO_ABSENT = -1;
+const INFO_ACTUAL = 0;
+const INFO_MIXED = 1;
+const INFO_DEPRECATED = 2;
+
+const detectInromationPrecision = (informationStatuses) => {
+  const allDeprecated = informationStatuses.every(status => status === INFO_DEPRECATED || status === INFO_ABSENT);
+  const allActual = informationStatuses.every(status => status === INFO_ACTUAL || status === INFO_ABSENT);
+  const allAbsent = informationStatuses.every(status => status === INFO_ABSENT);
+
+  if (allAbsent) {
+    return INFO_ACTUAL;
+  } if (allDeprecated) {
+    return INFO_DEPRECATED;
+  } if (allActual) {
+    return INFO_ACTUAL;
+  }
+
+  return INFO_MIXED;
+};
+
 const routedBeastView = (Beast, seachParams, route = null, config) => new Promise((resolve) => {
+  const { VERSION } = config;
+
   Beast.findOne(seachParams).then((fBeast) => {
     if (fBeast !== null) {
+      let isRangeDeprecated = INFO_ABSENT;
+      let isLootDeprecated = INFO_ABSENT;
+      const isBattlesDeprecated = {
+        success: INFO_ABSENT,
+        fail: INFO_ABSENT,
+      };
+      const isFleesDeprecated = {
+        success: INFO_ABSENT,
+        fail: INFO_ABSENT,
+      };
+      let isConcussionsDeprecated = INFO_ABSENT;
+
       const beast = fBeast.toJSON();
 
+      const getDeprecatedFlair = (dataStatus, tiny = true, forceActualDisaplay = false) => {
+        switch (dataStatus) {
+          case INFO_ACTUAL:
+            if (forceActualDisaplay) {
+              return tiny ? '✅' : '✅ <b>Актуальные данные</b> ✅\n';
+            }
+
+            return '';
+          case INFO_DEPRECATED:
+            return tiny ? ' ‼️' : '‼️ <b>Устаревшие данные</b> ‼️\n';
+          case INFO_ABSENT:
+            return '';
+          case INFO_MIXED:
+          default:
+            return tiny ? ' ⚠️' : '⚠️ <b>Смешанные данные</b> ⚠️\n';
+        }
+      };
 
       const minMax = (array) => {
         const min = _.min(array);
@@ -17,18 +72,139 @@ const routedBeastView = (Beast, seachParams, route = null, config) => new Promis
         return `${min}`;
       };
 
+      const getDistanceRange = (distanceRange) => {
+        const actualDistanceRange = [];
+        const outdatedDistanceRange = [];
+
+        distanceRange.forEach(({ version, value }) => {
+          if (version === VERSION) {
+            actualDistanceRange.push(value);
+          } else {
+            outdatedDistanceRange.push(value);
+          }
+        });
+
+        if (actualDistanceRange.length > 0) {
+          if (actualDistanceRange.length >= actualDataThreshold) {
+            isRangeDeprecated = INFO_ACTUAL;
+
+            return minMax(actualDistanceRange);
+          }
+          if (actualDistanceRange.length <= actualDataThreshold && outdatedDistanceRange.length > 0) {
+            isRangeDeprecated = INFO_MIXED;
+
+            return minMax([
+              ...actualDistanceRange,
+              ...outdatedDistanceRange,
+            ]);
+          }
+        } if (outdatedDistanceRange.length > 0) {
+          isRangeDeprecated = INFO_DEPRECATED;
+
+          return minMax(outdatedDistanceRange);
+        }
+
+        return 'Нет данных о местоположении';
+      };
+
+      const getCaps = (caps) => {
+        const actualCaps = [];
+        const outdatedCaps = [];
+
+        caps.forEach(({ version, value }) => {
+          if (version === VERSION) {
+            actualCaps.push(value);
+          } else {
+            outdatedCaps.push(value);
+          }
+        });
+
+        if (actualCaps.length > 0) {
+          if (actualCaps.length >= actualDataThreshold) {
+            isLootDeprecated = INFO_ACTUAL;
+
+            return minMax(actualCaps);
+          }
+          if (actualCaps.length <= actualDataThreshold && outdatedCaps.length > 0) {
+            isLootDeprecated = INFO_MIXED;
+
+            return minMax([
+              ...actualCaps,
+              ...outdatedCaps,
+            ]);
+          }
+        } if (outdatedCaps.length > 0) {
+          isLootDeprecated = INFO_DEPRECATED;
+
+          return minMax(outdatedCaps);
+        }
+
+        return null;
+      };
+
+      const getMaterials = (materials) => {
+        const actualMaterials = [];
+        const outdatedMaterials = [];
+
+        materials.forEach(({ version, value }) => {
+          if (version === VERSION) {
+            actualMaterials.push(value);
+          } else {
+            outdatedMaterials.push(value);
+          }
+        });
+
+        if (actualMaterials.length > 0) {
+          if (actualMaterials.length >= actualDataThreshold) {
+            isLootDeprecated = INFO_ACTUAL;
+
+            return minMax(actualMaterials);
+          }
+          if (actualMaterials.length <= actualDataThreshold && outdatedMaterials.length > 0) {
+            isLootDeprecated = INFO_MIXED;
+
+            return minMax([
+              ...actualMaterials,
+              ...outdatedMaterials,
+            ]);
+          }
+        } if (outdatedMaterials.length > 0) {
+          isLootDeprecated = INFO_DEPRECATED;
+
+          return minMax(outdatedMaterials);
+        }
+
+        return null;
+      };
+
       const getDrop = (capsReceived, materialsReceived) => {
+        let reply = '';
+
         if (_.isEmpty(capsReceived) && _.isEmpty(materialsReceived)) {
           return 'Нет данных';
         }
 
-        return `🕳${minMax(capsReceived)} крышек
-📦${minMax(materialsReceived)} материалов
-        `;
+        const capsInformation = getCaps(capsReceived);
+        const materialsInformation = getMaterials(materialsReceived);
+
+        if (capsInformation === null) {
+          reply += 'Нет данных о дропе крышек\n';
+        } else {
+          reply += `🕳${capsInformation} крышек\n`;
+        }
+
+        if (materialsInformation === null) {
+          reply += 'Нет данных о дропе материалов\n';
+        } else {
+          reply += `📦${materialsInformation} крышек\n`;
+        }
+
+        return reply;
       };
 
-      const getItems = (items) => {
-        if (_.isEmpty(items)) {
+      const getItems = () => 'Раздел находится на тех-профилактике';
+
+      /* if (_.isEmpty(items)) {
           return 'Неизвестно';
         }
 
@@ -37,8 +213,7 @@ const routedBeastView = (Beast, seachParams, route = null, config) => new Promis
           const dropAmount = minMax(drops);
 
           return `${key}: x${dropAmount}`;
-        }).join('\n');
-      };
+        }).join('\n'); */
 
       const getFlees = (flees) => {
         if (_.isEmpty(flees)) {
@@ -51,27 +226,80 @@ const routedBeastView = (Beast, seachParams, route = null, config) => new Promis
         let successFlees = [];
         let failFlees = [];
 
-        flees.forEach((flee) => {
-          if (flee.stats) {
-            if (flee.outcome === 'win') {
-              successFlees.push(`Успешно при 🤸‍♂️${flee.stats.agility || flee.agility}\n`);
+        const actualSuccessFlees = [];
+        const actualFailFlees = [];
+        const outdatedSuccessFlees = [];
+        const outdatedFailFlees = [];
+
+        flees.forEach((_flee) => {
+          const { stats, agility, ...flee } = _flee;
+
+          const parsedFlee = {
+            stats: {
+              agility: agility || stats.agility,
+            },
+            ...flee,
+          };
+
+          if (parsedFlee.stats.agility) {
+            if (parsedFlee.outcome === 'win') {
+              if (parsedFlee.version === VERSION) {
+                actualSuccessFlees.push(parsedFlee);
+              } else {
+                outdatedSuccessFlees.push(parsedFlee);
+              }
+            } else if (parsedFlee.version === VERSION) {
+              actualFailFlees.push(parsedFlee);
             } else {
-              failFlees.push(`Неудача при 🤸‍♂️${flee.stats.agility || flee.agility} (-💔${flee.damageReceived})`);
+              outdatedFailFlees.push(parsedFlee);
             }
           }
         });
 
-        if (successFlees.length > 5) {
-          successFlees = successFlees.slice(0, 5);
+        if (actualSuccessFlees.length > 0) {
+          if (actualSuccessFlees.length >= actualDataThreshold) {
+            isFleesDeprecated.success = INFO_ACTUAL;
+
+            successFlees = actualSuccessFlees;
+          } else if (actualSuccessFlees.length <= actualDataThreshold && outdatedSuccessFlees.length > 0) {
+            isFleesDeprecated.success = INFO_MIXED;
+
+            successFlees = [
+              ...actualSuccessFlees,
+              ...outdatedSuccessFlees,
+            ];
+          }
+        } else if (outdatedSuccessFlees.length > 0) {
+          isFleesDeprecated.success = INFO_DEPRECATED;
+
+          successFlees = outdatedSuccessFlees;
         }
 
-        if (failFlees.length > 5) {
-          failFlees = failFlees.slice(0, 5);
+        if (actualFailFlees.length > 0) {
+          if (actualFailFlees.length >= actualDataThreshold) {
+            isFleesDeprecated.fail = INFO_ACTUAL;
+
+            failFlees = actualFailFlees;
+          } else if (actualFailFlees.length <= actualDataThreshold && outdatedFailFlees.length > 0) {
+            isFleesDeprecated.fail = INFO_MIXED;
+
+            failFlees = [
+              ...actualFailFlees,
+              ...outdatedFailFlees,
+            ];
+          }
+        } else if (outdatedFailFlees.length > 0) {
+          isFleesDeprecated.fail = INFO_DEPRECATED;
+
+          failFlees = outdatedFailFlees;
         }
+
+        const successFleesText = _.sortBy(successFlees, flee => flee.stats.agility).map(flee => `Успешно при 🤸‍♂️&gt; ${flee.stats.agility || flee.agility}`).shift();
+        const failFleesText = _.sortBy(failFlees, flee => -flee.stats.agility).map(flee => `Неудача при 🤸‍♂️&lt; ${flee.stats.agility || flee.agility} (-💔${flee.damageReceived})`).shift();
 
         return {
-          successFlees: _.isEmpty(successFlees) ? 'Нет данных об удачных побегах' : successFlees.join('\n'),
-          failFlees: _.isEmpty(failFlees) ? 'Нет данных о неудачных побегах' : failFlees.join('\n'),
+          successFlees: _.isEmpty(successFlees) ? 'Нет данных об удачных побегах' : successFleesText,
+          failFlees: _.isEmpty(failFlees) ? 'Нет данных о неудачных побегах' : failFleesText,
         };
       };
 
@@ -80,20 +308,41 @@ const routedBeastView = (Beast, seachParams, route = null, config) => new Promis
           return 'Нет данных';
         }
 
-        const mappedConcussions = concussions.map((concussion) => {
-          // TODO: Fix concussion parse
-          if (concussion.stats !== undefined) {
-            return `▫️ ${concussion.amount} 💫оглушений при 🤸🏽‍♂️${concussion.stats.agility}`;
+        const filterdConcussions = concussions.filter(({ stats }) => stats !== undefined);
+
+        const actualConcussions = [];
+        const outdatedConcussions = [];
+        let existingConcussions = [];
+
+
+        filterdConcussions.forEach((concussion) => {
+          if (concussion.version === VERSION) {
+            actualConcussions.push(`▫️ ${concussion.amount} 💫оглушений при 🤸🏽‍♂️${concussion.stats.agility}`);
+          } else {
+            outdatedConcussions.push(`▫️ ${concussion.amount} 💫оглушений при 🤸🏽‍♂️${concussion.stats.agility}`);
           }
+        });
 
-          return false;
-        }).filter(concussion => concussion !== false);
+        if (actualConcussions.length > 0) {
+          if (actualConcussions.length >= actualDataThreshold) {
+            isConcussionsDeprecated = INFO_ACTUAL;
 
-        if (_.isEmpty(mappedConcussions)) {
-          return 'Нет данных';
+            existingConcussions = actualConcussions;
+          } else if (actualConcussions.length <= actualDataThreshold && outdatedConcussions.length > 0) {
+            isConcussionsDeprecated = INFO_MIXED;
+
+            existingConcussions = [
+              ...actualConcussions,
+              ...outdatedConcussions,
+            ];
+          }
+        } else if (outdatedConcussions.length > 0) {
+          isConcussionsDeprecated = INFO_DEPRECATED;
+
+          existingConcussions = outdatedConcussions;
         }
 
-        return mappedConcussions.join('\n');
+        return existingConcussions.join('\n');
       };
 
       const getBattles = (battles, trim, small, withLinks = false) => {
@@ -106,6 +355,11 @@ const routedBeastView = (Beast, seachParams, route = null, config) => new Promis
 
         let successBattles = [];
         let failBattles = [];
+
+        const actualSuccessBattles = [];
+        const actualFailBattles = [];
+        const outdatedSuccessBattles = [];
+        const outdatedFailBattles = [];
 
         const damageReceived = (battle) => {
           if (battle.damagesReceived[0] !== 0) {
@@ -127,7 +381,12 @@ const routedBeastView = (Beast, seachParams, route = null, config) => new Promis
               } else {
                 battleReply = `▫️ Успешно при уроне мобу ${battle.totalDamageGiven}.\nСтаты игрока: ⚔️Урон: ${battle.stats.damage} 🛡Броня: ${battle.stats.armor}.\nВсего урона от моба получено -${damageReceived(battle)}${battleLink}`;
               }
-              successBattles.push({ battleReply, totalDamageGiven: battle.totalDamageGiven });
+
+              if (battle.version === VERSION) {
+                actualSuccessBattles.push({ battleReply, totalDamageGiven: battle.totalDamageGiven });
+              } else {
+                outdatedSuccessBattles.push({ battleReply, totalDamageGiven: battle.totalDamageGiven });
+              }
             }
           } else if (battle.stats !== undefined) {
             if (small) {
@@ -136,9 +395,51 @@ const routedBeastView = (Beast, seachParams, route = null, config) => new Promis
               battleReply = `▫️ Неудача при уроне мобу ${battle.totalDamageGiven}.\nСтаты игрока:⚔️Урон: ${battle.stats.damage} 🛡Броня: ${battle.stats.armor}.\nВсего урона от моба получено -${damageReceived(battle)}${battleLink}`;
             }
 
-            failBattles.push({ battleReply, totalDamageReceived: battle.totalDamageReceived });
+            if (battle.version === VERSION) {
+              actualFailBattles.push({ battleReply, totalDamageGiven: battle.totalDamageGiven });
+            } else {
+              outdatedFailBattles.push({ battleReply, totalDamageGiven: battle.totalDamageGiven });
+            }
           }
         });
+
+        if (actualSuccessBattles.length > 0) {
+          if (actualSuccessBattles.length >= actualDataThreshold) {
+            isBattlesDeprecated.success = INFO_ACTUAL;
+
+            successBattles = actualSuccessBattles;
+          } else if (actualSuccessBattles.length <= actualDataThreshold && outdatedSuccessBattles.length > 0) {
+            isBattlesDeprecated.success = INFO_MIXED;
+
+            successBattles = [
+              ...actualSuccessBattles,
+              ...outdatedSuccessBattles,
+            ];
+          }
+        } else if (outdatedSuccessBattles.length > 0) {
+          isBattlesDeprecated.success = INFO_DEPRECATED;
+
+          successBattles = outdatedSuccessBattles;
+        }
+
+        if (actualFailBattles.length > 0) {
+          if (actualFailBattles.length >= actualDataThreshold) {
+            isBattlesDeprecated.fail = INFO_ACTUAL;
+
+            failBattles = actualFailBattles;
+          } else if (actualFailBattles.length <= actualDataThreshold && outdatedFailBattles.length > 0) {
+            isBattlesDeprecated.fail = INFO_MIXED;
+
+            failBattles = [
+              ...actualFailBattles,
+              ...outdatedFailBattles,
+            ];
+          }
+        } else if (outdatedFailBattles.length > 0) {
+          isBattlesDeprecated.fail = INFO_DEPRECATED;
+
+          failBattles = outdatedFailBattles;
+        }
 
         if (successBattles.length > trim) {
           successBattles = _.first(_.sortBy(successBattles, 'totalDamageGiven'), trim);
@@ -160,12 +461,12 @@ const routedBeastView = (Beast, seachParams, route = null, config) => new Promis
       const {
         successBattles: successBattlesLong,
         failBattles: failBattlesLong,
-      } = getBattles(beast.battles, 5, false, config.env === 'STAGING');
+      } = getBattles(beast.battles, 5, false, (config.env === 'STAGING' || config.env === 'LOCAL'));
 
       const {
         successBattles: successBattlesShort,
         failBattles: failBattlesShort,
-      } = getBattles(beast.battles, 1, false, config.env === 'STAGING');
+      } = getBattles(beast.battles, 1, false, (config.env === 'STAGING' || config.env === 'LOCAL'));
 
       const processedFlees = getFlees(beast.flees);
 
@@ -176,18 +477,18 @@ ${getDrop(beast.capsReceived, beast.materialsReceived)}
 ${getItems(beast.receivedItems)}
 `;
 
-      const shortBattlesReply = `<b>[ПОБЕДА]</b>
+      const shortBattlesReply = `<b>[ПОБЕДА]</b>${getDeprecatedFlair(isBattlesDeprecated.success)}
 ${successBattlesShort}
 
-<b>[НЕУДАЧА]</b>
+<b>[НЕУДАЧА]</b>${getDeprecatedFlair(isBattlesDeprecated.fail)}
 ${failBattlesShort}
 `;
 
-      const longBattlesReply = `<b>[СТЫЧКИ]</b>
+      const longBattlesReply = `<b>[ПОБЕДА]</b>${getDeprecatedFlair(isBattlesDeprecated.success)}
 ${successBattlesLong}
 
----
 
+<b>[НЕУДАЧА]</b>${getDeprecatedFlair(isBattlesDeprecated.fail)}
 ${failBattlesLong}
 `;
 
@@ -196,15 +497,16 @@ ${getConcussions(beast.concussions)}
 `;
 
       const fleesReply = `<b>[ПОБЕГ]</b>
+<i>=УСПЕШНЫЕ=</i>${getDeprecatedFlair(isFleesDeprecated.success)}
 ${processedFlees.successFlees}
 ---
+<i>=НЕУДАЧА=</i>${getDeprecatedFlair(isFleesDeprecated.fail)}
 ${processedFlees.failFlees}
 `;
 
       const headerReply = `<b>${beast.name}</b>
-👣${beast.type === 'DarkZone' ? '🚷' : '💀'} ${minMax(beast.distanceRange)}км
+👣${beast.type === 'DarkZone' ? '🚷' : '💀'} ${getDistanceRange(beast.distanceRange)}км ${getDeprecatedFlair(isRangeDeprecated, true, true)}
 `;
-
       switch (route) {
         case 'info':
           resolve({
@@ -214,7 +516,7 @@ ${processedFlees.failFlees}
           break;
         case 'loot':
           resolve({
-            reply: `${headerReply}\n${lootReply}`,
+            reply: `${getDeprecatedFlair(isLootDeprecated, false)}${headerReply}\n${lootReply}`,
             beast,
           });
           break;
@@ -226,7 +528,7 @@ ${processedFlees.failFlees}
           break;
         case 'concussions':
           resolve({
-            reply: `${headerReply}\n${concussionsReply}`,
+            reply: `${getDeprecatedFlair(isConcussionsDeprecated, false)}${headerReply}\n${concussionsReply}`,
             beast,
           });
           break;

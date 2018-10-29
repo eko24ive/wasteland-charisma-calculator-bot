@@ -158,14 +158,14 @@ const userManager = User => ({
       const topTen = users.slice(0, 10);
 
       const pastOutput = (index) => {
-        if (index > 10 && userIndex !== -1) {
+        if ((index + 1) > 10 && userIndex !== -1) {
           const user = users[userIndex];
           let reply = '\n========================\n';
 
           if (user.telegram.id === id) {
-            reply += `${index}. <b>${user.telegram.userName}</b> - ${Math.floor(user.points.score)}`;
+            reply += `${index + 1}. <b>${user.telegram.userName}</b> - ${Math.floor(user.points.score)}`;
           } else {
-            reply += `${index}. ${user.telegram.userName} - ${Math.floor(user.points.score)}`;
+            reply += `${index + 1}. ${user.telegram.userName} - ${Math.floor(user.points.score)}`;
           }
 
           return reply;

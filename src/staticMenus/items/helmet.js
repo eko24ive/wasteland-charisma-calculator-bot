@@ -1,6 +1,9 @@
 const {
   merchant,
   engineer,
+  wasteland,
+  pvpArena,
+  highHrotgar,
 } = require('./../places.js');
 
 const {
@@ -12,10 +15,14 @@ const {
     MICROCHIPS,
     IRIDIUM,
   },
+  CHARACTERISTICS: {
+    AGILITY,
+  },
   getResource,
+  getCharacteristic,
 } = require('./resources.js');
 
-const helmetsComment = '🛡 Защита: +';
+const helmetsDescription = '🛡 Защита: +';
 
 const helmets = [
   {
@@ -28,63 +35,63 @@ const helmets = [
   {
     icon: false,
     title: 'Ушанка',
-    price: [getResource(CAPS, 30)],
+    price: false,
     characteristic: 1,
-    place: merchant,
+    place: wasteland,
   },
   {
     icon: false,
     title: 'Боевой шлем',
-    price: [getResource(CAPS, 30)],
+    price: [getResource(CAPS, 437)],
     characteristic: 5,
     place: merchant,
   },
   {
     icon: false,
     title: 'Деловая шляпа',
-    price: [getResource(CAPS, 480)],
+    price: [getResource(CAPS, 1287)],
     characteristic: 1,
     place: merchant,
   },
   {
     icon: false,
     title: 'Берет',
-    price: [getResource(CAPS, 40)],
+    price: [getResource(CAPS, 847)],
     characteristic: 1,
     place: merchant,
   },
   {
     icon: false,
     title: 'Колпак повара',
-    price: [getResource(CAPS, 880)],
+    price: [getResource(CAPS, 1687)],
     characteristic: 1,
     place: merchant,
   },
   {
     icon: false,
     title: 'Шляпа минитмена',
-    price: [getResource(CAPS, 980)],
+    price: [getResource(CAPS, 1787)],
     characteristic: 15,
     place: merchant,
   },
   {
     icon: false,
     title: 'Противогаз',
-    price: [getResource(CAPS, 1620)],
+    price: [getResource(CAPS, 2427)],
     characteristic: 15,
     place: merchant,
   },
   {
     icon: false,
     title: 'Плотный капюшон',
-    price: [getResource(CAPS, 1510)],
+    price: [getResource(CAPS, 2317)],
     characteristic: 9,
     place: merchant,
   },
   {
     icon: '⚙️',
     title: 'Шлем синта',
-    price: [getResource(MATERIALS, 21990), getResource(QUARZ, 250),
+    price: [getResource(MATERIALS, 21990), getResource(QUARZ, 150),
       getResource(GENERATORS, 90), getResource(MICROCHIPS, 20)],
     characteristic: 25,
     place: engineer,
@@ -96,6 +103,7 @@ const helmets = [
       getResource(GENERATORS, 140), getResource(MICROCHIPS, 60)],
     characteristic: 40,
     place: engineer,
+    requirements: getCharacteristic(AGILITY, 21),
   },
   {
     icon: '⚙️',
@@ -104,6 +112,7 @@ const helmets = [
       getResource(MICROCHIPS, 210), getResource(IRIDIUM, 130)],
     characteristic: 68,
     place: engineer,
+    requirements: getCharacteristic(AGILITY, 35),
   },
   {
     icon: '🛠',
@@ -112,10 +121,26 @@ const helmets = [
       getResource(MICROCHIPS, 345), getResource(IRIDIUM, 320)],
     characteristic: 92,
     place: engineer,
+    requirements: getCharacteristic(AGILITY, 35),
+  },
+  {
+    icon: false,
+    title: 'Рогатый шлем',
+    price: false,
+    characteristic: 115,
+    place: highHrotgar,
+  },
+  {
+    icon: false,
+    title: 'Шлем мастера',
+    price: false,
+    characteristic: 195,
+    place: pvpArena,
+    comment: 'Этот переходящий трофей можно получить на время, став победилем сезона в Куполе. Сезон закрывается каждую неделю.',
   },
 ];
 
 module.exports = {
   helmets,
-  helmetsComment,
+  helmetsDescription,
 };

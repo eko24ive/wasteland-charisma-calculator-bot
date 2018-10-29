@@ -17,6 +17,8 @@ MongoDB should be installed at your machine
 ```
 BOT_TEST=<YOUR_BOT_TOKEN>
 MONGODB_URI=<YOUR_MONGO_DB_ADDRESS>
+ENV=LOCAL
+VERSION=<CURRENT_WW_VERSION>
 ```
 3. Visit [@botfater](https://t.me/botfather/) and generate yourself a bot token
 4. Replace `<YOUR_BOT_TOKEN>` with just generated token
