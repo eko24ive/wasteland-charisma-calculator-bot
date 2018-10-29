@@ -190,6 +190,14 @@ const accessories = [
     icon: '🏋️‍♀️',
     title: 'Карликовый атлет',
     comment: false,
+  }, {
+    icon: '💩',
+    title: 'Выбрось бяку',
+    comment: false,
+  }, {
+    icon: '🔦',
+    title: 'Фонарик',
+    comment: false,
   },
 ];
 

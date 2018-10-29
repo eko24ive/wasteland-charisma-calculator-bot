@@ -56,6 +56,16 @@ const siencelab = {
   title: 'Научная лаборатория',
   icon: '🔬',
 };
+const wasteland = {
+  name: 'wasteland',
+  title: 'Пустошь',
+  icon: '👣',
+};
+const pvpArena = {
+  name: 'pvpArena',
+  title: 'Купол Грома',
+  icon: '⚡️',
+};
 
 module.exports = {
   merchant,
@@ -70,4 +80,6 @@ module.exports = {
   moltenCore,
   hexagon,
   siencelab,
+  wasteland,
+  pvpArena,
 };
