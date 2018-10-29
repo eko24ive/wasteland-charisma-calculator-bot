@@ -71,12 +71,24 @@ module.exports = {
     label: '56км',
     command: '/reachableKm',
   },
-  reachableKm65: {
-    label: '65км',
+  reachableKm60: {
+    label: '60км',
     command: '/reachableKm',
   },
-  reachableKm70: {
-    label: '70+ км',
+  reachableKm78: {
+    label: '78км',
+    command: '/reachableKm',
+  },
+  reachableKm85: {
+    label: '85км',
+    command: '/reachableKm',
+  },
+  reachableKm95: {
+    label: '95км',
+    command: '/reachableKm',
+  },
+  reachableKm100: {
+    label: '100км',
     command: '/reachableKm',
   },
   journeyForwardStart: {

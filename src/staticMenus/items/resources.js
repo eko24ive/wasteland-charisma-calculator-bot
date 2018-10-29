@@ -8,6 +8,7 @@ const CUBONITE = 'CUBONITE';
 const OSMIUM = 'OSMIUM';
 const TITANIUM = 'TITANIUM';
 const EPHEDRINE = 'EPHEDRINE';
+const KIPARIT = 'KIPARIT';
 const WIRES = 'WIRES';
 const MINICHARGE = 'MINICHARGE';
 const TRANSISTOR = 'TRANSISTOR';
@@ -27,6 +28,12 @@ const MAGNET = 'MAGNET';
 const PLANTAIN = 'PLANTAIN';
 const STARCH = 'STARCH';
 const AIRFILTER = 'AIRFILTER';
+
+const FIRST = 'FIRST';
+const SECOND = 'SECOND';
+
+const AGILITY = 'AGILITY';
+const STRENGTH = 'STRENGTH';
 
 const resources = {
   CAPS: {
@@ -77,6 +84,11 @@ const resources = {
   },
   EPHEDRINE: {
     title: 'Эфедрин',
+    icon: '',
+    description: '',
+  },
+  KIPARIT: {
+    title: 'Кипарит',
     icon: '',
     description: '',
   },
@@ -177,14 +189,6 @@ const resources = {
   },
 };
 
-const getResource = (name, amount) => {
-  const resource = resources[name];
-  return `${resource.icon}${resource.title} x${amount}`;
-};
-
-const FIRST = 'FIRST';
-const SECOND = 'SECOND';
-
 const rarities = {
   FIRST: {
     icon: '🏅',
@@ -194,14 +198,36 @@ const rarities = {
   },
 };
 
+const characteristics = {
+  AGILITY: {
+    title: 'Ловкость',
+    icon: '🤸🏽‍♂️',
+  },
+  STRENGTH: {
+    icon: '💪',
+    title: 'Сила',
+  },
+};
+
+const getResource = (name, amount) => {
+  const resource = resources[name];
+  return `${resource.icon}${resource.title} x${amount}`;
+};
+
 const getRarityIcon = (name) => {
   const rarity = rarities[name];
   return `${rarity.icon}`;
 };
 
+const getCharacteristic = (name, amount) => {
+  const characteristic = characteristics[name];
+  return `Требования: ${characteristic.icon}${amount}+`;
+};
+
 module.exports = {
   getResource,
   getRarityIcon,
+  getCharacteristic,
   RESOURCES: {
     CAPS,
     MATERIALS,
@@ -213,6 +239,7 @@ module.exports = {
     OSMIUM,
     TITANIUM,
     EPHEDRINE,
+    KIPARIT,
     WIRES,
     MINICHARGE,
     TRANSISTOR,
@@ -236,5 +263,9 @@ module.exports = {
   RARITIES: {
     FIRST,
     SECOND,
+  },
+  CHARACTERISTICS: {
+    AGILITY,
+    STRENGTH,
   },
 };

@@ -7,6 +7,8 @@ process.on('unhandledRejection', (reason) => {
 require('dotenv').config();
 
 const uristring = process.env.MONGODB_URI;
+const DATA_THRESHOLD = Number(process.env.DATA_THRESHOLD);
+const { VERSION } = process.env;
 
 const async = require('async');
 const mongoose = require('mongoose');
@@ -67,6 +69,8 @@ const withBackButton = require('./src/utils/withBackButton');
 
 const UserManager = require('./src/database/userManager');
 
+const signedBeasts = require('./src/database/beasts_signed.json');
+
 mongoose.connect(uristring);
 
 const Beast = mongoose.model('Beast', beastSchema);
@@ -91,7 +95,7 @@ const WAIT_FOR_RESPONSE = 'WAIT_FOR_RESPONSE';
 const WAIT_FOR_FORWARD_END = 'WAIT_FOR_FORWARD_END';
 const WAIT_FOR_START = 'WAIT_FOR_START';
 const WAIT_FOR_PIP_FORWARD = 'WAIT_FOR_PIP_FORWARD';
-const WAIT_FOR_BEAST_FACE_FORWARD = 'WAIT_FOR_BEAST_FACE_FORWARD';
+const WAIT_FOR_DATA_VALIDATION = 'WAIT_FOR_DATA_VALIDATION';
 const WAIT_FOR_DATA_TO_PROCESS = 'WAIT_FOR_DATA_TO_PROCESS';
 
 const states = {
@@ -102,7 +106,7 @@ const states = {
   WAIT_FOR_START,
   WAIT_FOR_FORWARD_END,
   WAIT_FOR_PIP_FORWARD,
-  WAIT_FOR_BEAST_FACE_FORWARD,
+  WAIT_FOR_DATA_VALIDATION,
   WAIT_FOR_DATA_TO_PROCESS,
 };
 
@@ -116,6 +120,10 @@ const createSession = (id) => {
       useBeastFace: true,
       silent: false,
     },
+    beastsToValidate: [],
+    initialForwardDate: null,
+    lastForwardDate: null,
+    firstForwardDate: null,
   };
 };
 
@@ -146,7 +154,7 @@ const bot = new TeleBot({
   },
 });
 
-const updateOrCreate = (msg, pip, cb) => {
+const updateOrCreate = (msg, pip, cb = (() => {})) => {
   const telegramData = {
     first_name: msg.from.first_name,
     id: msg.from.id,
@@ -212,14 +220,19 @@ const askReachableKm = (msg) => {
     [
 
       buttons.reachableKm56.label,
-      buttons.reachableKm65.label,
-      buttons.reachableKm70.label,
+      buttons.reachableKm60.label,
+      buttons.reachableKm78.label,
+    ],
+    [
+      buttons.reachableKm85.label,
+      buttons.reachableKm95.label,
+      buttons.reachableKm100.label,
     ],
   ], {
     resize: true,
   });
 
-  return bot.sendMessage(msg.from.id, 'Выбери до какого километра ты ходишь (при этом оставаясь в живих)?\n'
+  return bot.sendMessage(msg.from.id, 'Выбери до какого километра ты ходишь (при этом оставаясь в живых)?\n'
         + '`Либо напиши своё количество (например: 28)`', {
     replyMarkup,
     parseMode: 'markdown',
@@ -317,7 +330,7 @@ bot.on(['/start', '/help'], (msg) => {
 
 <code>[Скинуть лог 🏃]</code> - Запуск режима "ЛОГ". В этом режиме ты можешь переслать сюда сообщения от игрового бота.
 
-<code>[🎓Скилокачатор]</code> - Запуск «<b>Скилокачатора</b>» - анализатора в прокачке твоих скилов 
+<code>[🎓Скилокачатор]</code> - Запуск «<b>Скилокачатора</b>» - анализатора в прокачке твоих скилов
 
 <code>[💀Мобы]</code> - Информация об <b>обычных</b> мобах
 
@@ -340,44 +353,94 @@ bot.on(['/start', '/help'], (msg) => {
   );
 });
 
-const actualProcessUserData = (msg, reportData, updatesData, options) => {
+const getBeastToValidateMessage = (beastsToValidate, beastRequest = false, firstTime = true, failing = false) => {
+  const indexedBeasts = beastsToValidate.length > 10 ? _.first(_.sortBy(beastsToValidate, 'date'), 10) : _.sortBy(beastsToValidate, 'date');
+
+  const isThereMoreBeasts = beastsToValidate.length > 10;
+
+  const getHeader = () => {
+    const failingMessage = 'Ты скинул мне какую-то хуйню, вот список того что мне нужно:';
+    const beastRequestFirstTime = 'Слушай, я первый раз слышу про этих мобов, скинь пожалуйста их форварды.';
+    const beastRequestValidate = 'Слушай, у меня тут есть пару вопросиков по поводу правдивости твоей инфы - давай-ка их обкашляем.';
+    const success = 'Отлично, продолжай в том же духе';
+
+    if (firstTime) {
+      if (beastRequest) {
+        return beastRequestFirstTime;
+      }
+      return beastRequestValidate;
+    } if (failing) {
+      return failingMessage;
+    }
+
+    return success;
+  };
+
+  const battlesToValidate = indexedBeasts.filter(({ reason }) => reason === 'battle')
+    .map(({
+      type,
+      name,
+      distance,
+      date,
+      isDungeon,
+    }) => `• ${distance}км - <b>${name}</b> в ${type === 'DarkZone' ? '🚷ТЗ' : '💀Безопасной Зоне'}${isDungeon ? ' в подземелье' : ''}\n<i>Битва произошла в ${moment(date * 1000).add(3, 'hour').format('DD.MM.YYYY HH:mm')} (МСК)</i>\nПроигнорировать: /ignore_${date}`);
+
+  const fleesToValidate = indexedBeasts.filter(({ reason }) => reason === 'flee')
+    .map(({
+      type,
+      distance,
+      date,
+    }) => `• ${distance}км -Неизвестный моб в ${type === 'DarkZone' ? '🚷ТЗ' : '💀Безопасной Зоне'}\n<i>Побег произошел в ${moment(date * 1000).add(3, 'hour').format('DD.MM.YYYY HH:mm')} (МСК)</i>\nПроигнорировать: /ignore_${date}`);
+
+  return `${getHeader(beastRequest, firstTime, failing)}
+
+${battlesToValidate.length > 0 ? '<b>[БИТВЫ]</b>' : ''}
+${`${battlesToValidate.join('\n')}\n`}
+${fleesToValidate.length > 0 ? '<b>[ПОБЕГИ]</b>' : ''}
+${`${fleesToValidate.join('\n')}\n`}
+${isThereMoreBeasts ? '<b>Там ещё есть мобы на проверку, но ты сначала с этими разберись</b>\n' : ''}
+${firstTime ? `Пожалуйста, скинь <b>ОТДЕЛЬНО</b> (по одному за раз) форвард встречи с этими красавцами, они выглядят как-то так:
+<code>Во время вылазки на тебя напал...</code>
+<i>или</i>
+<code>...перегородил тебе путь.</code>
+<i>или</i>
+<code>устрашающе начал приближаться...</code>\n` : ''}
+Если у тебя нет на это времени жми /skipbeastforwards
+<i>ВНИМАНИЕ: ПРИ НАЖАТИИ НА /skipbeastforwards - БОТ ПРОИГНОРИРУЕТ ДАННЫЕ, КОТОРЫЕ ЗАВИСЯТ ОТ УКАЗАНЫХ ВЫШЕ ФОРВАРДОВ, И НЕ ЗАПИШЕТ ИХ В БАЗУ</i>`;
+};
+
+const actualActualProcessUserData = (msg, reportData, updatesData, options) => {
+  if (process.env.ENV === 'STAGING' || process.env.ENV === 'LOCAL') {
+    console.log('======= DATA PROCESSING =======');
+    console.log(
+      JSON.stringify({
+        reportData,
+        updatesData,
+        options,
+      }),
+    );
+  }
+
   if (reportData.lastPip !== null) {
-    updateOrCreate(msg, reportData.lastPip, (result) => {
-      console.log(result);
-    });
+    updateOrCreate(msg, reportData.lastPip);
   }
 
-  if (options.useBeastFace && !_.isEmpty(reportData.beastToValidate)) {
-    sessions[msg.from.id].state = states.WAIT_FOR_BEAST_FACE_FORWARD;
-    sessions[msg.from.id].beastToValidateName = reportData.beastToValidate[0].name;
-    sessions[msg.from.id].beastToValidateType = reportData.beastToValidate[0].type;
-    sessions[msg.from.id].distance = reportData.beastToValidate[0].distance;
-    return msg.reply.text(`
-Слушай, я не могу понять с кем это были у тебя рамсы.
-Пожалуйста скинь форвард встречи с ${reportData.beastToValidate[0].type === 'DarkZone' ? '🚷' : ''}${reportData.beastToValidate[0].name} на ${reportData.beastToValidate[0].distance}км
+  if (options.useBeastFace && !_.isEmpty(reportData.beastsToValidate)) {
+    sessions[msg.from.id].state = states.WAIT_FOR_DATA_VALIDATION;
+    sessions[msg.from.id].initialForwardDate = reportData.initialForwardDate;
+    sessions[msg.from.id].lastForwardDate = reportData.lastForwardDate;
+    sessions[msg.from.id].firstForwardDate = reportData.firstForwardDate;
+    sessions[msg.from.id].beastsToValidate = reportData.beastsToValidate;
+    sessions[msg.from.id].beastRequest = false;
 
-Пожалуйста скинь форвард встречи с этим мобом:
-\`Во время вылазки на тебя напал...\`
-_или_
-\`...перегородил тебе путь.\`
-
-Если у тебя нет на это времени жми /skipbeastforward
-
-*ВНИМАНИЕ: ПРИ НАЖАТИИ НА /skipbeastforward - БОТ ПРОИГНОРИРУЕТ ТОЛЬКО РЕЗУЛЬТАТ ТВОЕЙ БИТВЫ С ${reportData.beastToValidate[0].name} НЕ ЗАПИШЕТ ИХ В БАЗУ*
-  `, {
-      parseMode: 'markdown',
-    }).catch(e => console.log(e));
-  }
-
-
-  if (!options.silent) {
-    msg.reply.text('Перехожу в режим обработки данных, подожди пожалуйста немного :3', {
+    return msg.reply.text(getBeastToValidateMessage(sessions[msg.from.id].beastsToValidate, sessions[msg.from.id].beastRequest), {
+      parseMode: 'html',
       replyMarkup: 'hide',
     }).catch(e => console.log(e));
   }
 
-
   let userForwardPoints = 0;
+  const beastsToValidate = [];
   let dataProcessed = 0;
   const dupes = {
     battles: 0,
@@ -400,7 +463,112 @@ _или_
     return false;
   }
 
-  const isBeastUnderValidation = name => reportData.beastToValidate.filter(beast => beast.name === name).length > 0;
+  const isBeastUnderValidation = name => reportData.beastsToValidate.filter(beast => beast.name === name).length > 0;
+
+  const signEntryWithVersion = entry => ({
+    ...entry,
+    version: VERSION,
+  });
+
+  const signSetWithVersion = (data) => {
+    if (data) {
+      return data.map(entry => ({
+        ...entry,
+        version: VERSION,
+      }));
+    }
+
+    return [];
+  };
+
+  const createNewBeast = (beast) => {
+    const {
+      materialsReceived: unflattenedMaterialsReceived,
+      capsReceived: unflattenedCapsReceived,
+      ...rest
+    } = beast;
+
+    const {
+      distanceRange,
+      capsReceived,
+      materialsReceived,
+      battles,
+      flees,
+      concussions,
+      ...flattenedBeast
+    } = {
+      materialsReceived: _.flatten(unflattenedMaterialsReceived),
+      capsReceived: _.flatten(unflattenedCapsReceived),
+      version: VERSION,
+      ...rest,
+    };
+
+    return {
+      distanceRange: signSetWithVersion(distanceRange),
+      capsReceived: signSetWithVersion(capsReceived),
+      materialsReceived: signSetWithVersion(materialsReceived),
+      battles: signSetWithVersion(battles),
+      flees: signSetWithVersion(flees),
+      concussions: signSetWithVersion(concussions),
+      ...flattenedBeast,
+    };
+  };
+
+  const detectBeastForValidation = () => new Promise((resolve, reject) => {
+    if (updatesData.beasts.length > 0) {
+      async.forEach(updatesData.beasts, (iBeast, next) => {
+        if (!options.useBeastFace) {
+          next();
+        } else if (iBeast.proofedByForward) {
+          next();
+        } else {
+          const searchQuery = iBeast.subType ? {
+            name: iBeast.name,
+            isDungeon: iBeast.isDungeon,
+            type: iBeast.type,
+            subType: iBeast.subType,
+          } : {
+            name: iBeast.name,
+            isDungeon: iBeast.isDungeon,
+            type: iBeast.type,
+          };
+
+          Beast.findOne(searchQuery).then((fBeast) => {
+            const databaseBeast = fBeast;
+            if (databaseBeast === null) {
+              iBeast.distanceRange.forEach(({ value }) => {
+                beastsToValidate.push({
+                  name: iBeast.name, distance: value, type: iBeast.type, isDungeon: iBeast.isDungeon, reason: 'battle', date: iBeast.date,
+                });
+              });
+              next();
+            } else {
+              const actualRanges = databaseBeast.distanceRange
+                .filter(({ version }) => version === VERSION)
+                .map(({ value }) => value);
+
+              iBeast.distanceRange.forEach(({ value }) => {
+                if (!actualRanges.includes(value)) {
+                  beastsToValidate.push({
+                    name: iBeast.name, distance: value, type: iBeast.type, isDungeon: iBeast.isDungeon, reason: 'battle', date: iBeast.date,
+                  });
+                }
+              });
+              next();
+            }
+          });
+        }
+      }, () => {
+        if (beastsToValidate.length > 0) {
+          reject();
+        } else {
+          resolve();
+        }
+      });
+    } else {
+      resolve();
+    }
+  });
 
   const processBeasts = () => new Promise((resolve) => {
     if (updatesData.beasts.length > 0 && options.usePip === true) {
@@ -408,96 +576,132 @@ _или_
         if (!options.useBeastFace) {
           if (isBeastUnderValidation(iBeast.name)) {
             next();
+          } else {
+            next();
           }
         } else {
-          Beast.findOne({
+          const searchQuery = iBeast.subType ? {
             name: iBeast.name,
             isDungeon: iBeast.isDungeon,
             type: iBeast.type,
-          }).then((fBeast) => {
+            subType: iBeast.subType,
+          } : {
+            name: iBeast.name,
+            isDungeon: iBeast.isDungeon,
+            type: iBeast.type,
+          };
+
+          Beast.findOne(searchQuery).then((fBeast) => {
             const databaseBeast = fBeast;
             if (databaseBeast === null) {
-              const newBeast = new Beast(iBeast);
+              if (iBeast.proofedByForward) {
+                const newBeast = new Beast(createNewBeast(iBeast));
 
-              dataProcessed += 1;
+                dataProcessed += 1;
 
-              if (iBeast.type === 'DarkZone') {
-                userForwardPoints += forwardPoints.newMob * forwardPoints.darkZoneBattle;
+                if (iBeast.type === 'DarkZone') {
+                  userForwardPoints += forwardPoints.newMob * forwardPoints.darkZoneBattle;
+                } else {
+                  userForwardPoints += forwardPoints.newMob * forwardPoints.regularZoneBattle;
+                }
+
+                newBeast.save().then(() => next());
               } else {
-                userForwardPoints += forwardPoints.newMob * forwardPoints.regularZoneBattle;
+                beastsToValidate.push({
+                  name: iBeast.name, distance: iBeast.distanceRange[0], type: iBeast.type, isDungeon: iBeast.isDungeon, reason: 'battle', date: iBeast.date,
+                });
+                next();
               }
-
-              newBeast.save().then(() => next());
             } else {
-              let isSameFleeExists = true;
-              let isSameConcussionExists = true;
-              let isSameBattleExists = true;
-              let isBattleDupe = false;
-              let isFleeDupe = false;
               let beastPoints = 0;
+              const uniqueBattles = [];
+              const uniqueConcussions = [];
+              const uniqueFlees = [];
+              const sameBattles = [];
+              const sameFlees = [];
 
               if (iBeast.battles) {
                 if (iBeast.battles.length > 0) {
-                  isSameBattleExists = databaseBeast.battles.map((battle) => {
-                    if (iBeast.battles === undefined) {
-                      return true;
+                  iBeast.battles.forEach((battle) => {
+                    if (databaseBeast.battles === undefined) {
+                      uniqueBattles.push(battle);
+                    } else {
+                      const battlesForValidation = databaseBeast.battles.filter(({ version }) => version === VERSION);
+                      const sameStatsBattle = battlesForValidation.some(newBattle => battle.totalDamageReceived === newBattle.totalDamageReceived
+                        && battle.totalDamageGiven === newBattle.totalDamageGiven);
+
+                      const sameStamp = battlesForValidation.some(newBattle => newBattle.stamp === battle.stamp);
+
+                      if (sameStamp) {
+                        dupes.battles += 1;
+                      }
+
+                      if (!sameStatsBattle && !sameStamp) {
+                        uniqueBattles.push(battle);
+                      }
+
+                      if (!sameStamp && sameStatsBattle) {
+                        sameBattles.push(battle);
+                      }
                     }
-
-                    const existingBattle = _.clone(battle.toJSON());
-                    const sameStatsBattle = existingBattle.totalDamageReceived === iBeast.battles[0].totalDamageReceived
-                                              && existingBattle.totalDamageGiven === iBeast.battles[0].totalDamageGiven;
-                    const sameStamp = iBeast.battles[0].stamp === existingBattle.stamp;
-
-                    if (sameStamp) {
-                      isBattleDupe = true;
-                      dupes.battles += 1;
-                    }
-
-                    return sameStatsBattle || sameStamp;
-                  }).some(result => result === true);
+                  });
                 }
               }
 
 
-              // TODO: Error logging for no stats object
               if (iBeast.concussions) {
                 if (iBeast.concussions.length > 0) {
-                  isSameConcussionExists = databaseBeast.concussions.map((concussion) => {
-                    const existingConcussion = _.clone(concussion.toJSON());
+                  iBeast.concussions.forEach((concussion) => {
+                    if (databaseBeast.battles === undefined) {
+                      uniqueConcussions.push(concussion);
+                    } else {
+                      const concussionsForValidation = databaseBeast.concussions.filter(({ version }) => version === VERSION);
 
-                    return existingConcussion.stats.agility === iBeast.concussions[0].stats.agility
-                                                  && existingConcussion.amount === iBeast.concussions[0].amount;
-                  }).some(result => result === true);
+                      const sameConcussion = concussionsForValidation.some(newConcussion => concussion.stats.agility === newConcussion.stats.agility
+                        && concussion.amount === newConcussion.amount);
+
+                      if (!sameConcussion) {
+                        uniqueConcussions.push(concussion);
+                      }
+                    }
+                  });
                 }
               }
 
               if (iBeast.flees) {
                 if (iBeast.flees.length === 1) {
-                  isSameFleeExists = databaseBeast.flees.map((flee) => {
-                    const existingFlee = _.clone(flee.toJSON());
+                  iBeast.flees.forEach((flee) => {
+                    if (databaseBeast.battles === undefined) {
+                      uniqueFlees.push(flee);
+                    } else {
+                      const fleesForValidation = databaseBeast.flees.filter(({ version }) => version === VERSION);
 
-                    if (iBeast.flees[0].outcome === 'win') {
-                      return existingFlee.stats.agility === iBeast.flees[0].stats.agility
-                                                      && existingFlee.outcome === iBeast.flees[0].outcome;
+                      const sameStatsFlee = fleesForValidation.some(newFlee => flee.stats.agility === newFlee.stats.agility
+                                && flee.outcome === newFlee.outcome
+                                && flee.damageReceived === newFlee.damageReceived);
+
+                      const sameStamp = fleesForValidation.some(newFlee => newFlee.stamp === flee.stamp);
+
+                      if (sameStamp) {
+                        dupes.flees += 1;
+                      }
+
+                      if (!sameStatsFlee && !sameStamp) {
+                        uniqueFlees.push(flee);
+                      }
+
+                      if (!sameStamp && sameStatsFlee) {
+                        sameFlees.push(flee);
+                      }
                     }
-
-                    const sameStatsFlee = existingFlee.stats.agility === iBeast.flees[0].stats.agility
-                                              && existingFlee.outcome === iBeast.flees[0].outcome
-                                              && existingFlee.damageReceived === iBeast.flees[0].damageReceived;
-                    const sameStamp = iBeast.flees[0].stamp === flee.stamp;
-
-                    if (sameStamp) {
-                      isFleeDupe = true;
-                      dupes.flees += 1;
-                    }
-
-                    return sameStatsFlee || sameStamp;
-                  }).some(result => result === true);
+                  });
                 }
               }
 
               if (!_.isEmpty(iBeast.receivedItems)) {
-                if (_.isEmpty(databaseBeast.receivedItems)) {
+                // FIXME: Implement cross-validation and cross-updation of receivedItems
+
+                /* if (_.isEmpty(databaseBeast.receivedItems)) {
                   databaseBeast.receivedItems = {};
                 }
 
@@ -514,92 +718,113 @@ _или_
                     databaseBeast.markModified('receivedItems');
                     databaseBeast.receivedItems[item] = [amount];
                   }
-                });
+                }); */
               }
 
-              if (!isBattleDupe) {
-                if (!_.contains(databaseBeast.distanceRange, iBeast.distanceRange[0])) {
-                  beastPoints += forwardPoints.newDistance;
+              if (iBeast.distanceRange.length > 0) {
+                const distanceRangesForValidation = databaseBeast.distanceRange
+                  .filter(({ version }) => (version === VERSION))
+                  .map(({ value }) => value);
 
-                  databaseBeast.distanceRange.push(iBeast.distanceRange[0]);
-                } else {
-                  beastPoints += forwardPoints.sameDistance;
+                const newRanges = iBeast.distanceRange.filter(range => distanceRangesForValidation.indexOf(range.value) === -1);
+                const sameRanges = iBeast.distanceRange.filter(range => distanceRangesForValidation.indexOf(range.value) !== -1);
+
+                if (!_.isEmpty(newRanges)) {
+                  beastPoints += forwardPoints.newDistance * newRanges.length;
+
+                  databaseBeast.distanceRange = [...databaseBeast.distanceRange, ...signSetWithVersion(newRanges)];
+                } else if (!_.isEmpty(sameRanges)) {
+                  beastPoints += forwardPoints.sameDistance * sameRanges.length;
                 }
               }
 
-              if (iBeast.capsReceived !== undefined) {
-                if (!_.contains(databaseBeast.capsReceived, iBeast.capsReceived)) {
-                  databaseBeast.capsReceived.push(iBeast.capsReceived);
-                }
-              }
 
-              if (iBeast.materialsReceived !== undefined) {
-                if (!_.contains(databaseBeast.materialsReceived, iBeast.materialsReceived)) {
-                  databaseBeast.materialsReceived.push(iBeast.materialsReceived);
-                }
-              }
-
-              if (!isBattleDupe) {
-                if (!isSameBattleExists) {
-                  const battle = iBeast.battles[0];
-
-                  if (battle.damagesGiven.length === 1) {
-                    beastPoints += forwardPoints.oneShotBattle;
-                  } else if (battle.outcome === 'win') {
+              if (uniqueBattles.length > 0) {
+                uniqueBattles.forEach((newBattle) => {
+                  if (newBattle.outcome === 'win') {
                     beastPoints += forwardPoints.newBattleWin;
+
+                    if (iBeast.capsReceived.length > 0) {
+                      const capsReceivedForValidation = databaseBeast.capsReceived
+                        .filter(({ version }) => (version === VERSION))
+                        .map(({ value }) => value);
+
+                      const newCaps = iBeast.capsReceived.filter(caps => capsReceivedForValidation.indexOf(caps.value) === -1);
+
+                      if (!_.isEmpty(newCaps)) {
+                        databaseBeast.capsReceived = [...databaseBeast.capsReceived, ...signSetWithVersion(newCaps)];
+                      }
+                    }
+
+                    if (iBeast.materialsReceived.length > 0) {
+                      const materialsReceivedForValidation = databaseBeast.materialsReceived
+                        .filter(({ version }) => (version === VERSION))
+                        .map(({ value }) => value);
+
+                      const newMaterials = iBeast.materialsReceived.filter(materials => materialsReceivedForValidation.indexOf(materials.value) === -1);
+
+                      if (!_.isEmpty(newMaterials)) {
+                        databaseBeast.materialsReceived = [...databaseBeast.materialsReceived, ...signSetWithVersion(newMaterials)];
+                      }
+                    }
                   } else {
                     beastPoints += forwardPoints.newBattleLose;
                   }
 
-                  databaseBeast.battles.push(iBeast.battles[0]);
-                } else if (iBeast.battles !== undefined) {
-                  const battle = iBeast.battles[0];
+                  databaseBeast.battles.push(signEntryWithVersion(newBattle));
+                });
+              }
 
-                  if (battle.damagesGiven.length === 1) {
-                    beastPoints += forwardPoints.oneShotBattle;
-                  } else if (battle.outcome === 'win') {
+              if (sameBattles.length > 0) {
+                sameBattles.forEach((newBattle) => {
+                  if (newBattle.outcome === 'win') {
                     beastPoints += forwardPoints.sameBattleWin;
                   } else {
                     beastPoints += forwardPoints.sameBattleLose;
                   }
-                }
+                });
               }
 
-              if (!isSameConcussionExists && !isBattleDupe) {
-                databaseBeast.concussions.push(iBeast.concussions[0]);
+              if (uniqueConcussions.length > 0) {
+                databaseBeast.concussions.push(signEntryWithVersion(uniqueConcussions));
               }
 
-              if (!isFleeDupe) {
-                if (!isSameFleeExists) {
-                  const flee = iBeast.flees[0];
-
-                  if (flee.outcome === 'win') {
+              if (uniqueFlees.length > 0) {
+                uniqueFlees.forEach((newFlee) => {
+                  if (newFlee.outcome === 'win') {
                     beastPoints += forwardPoints.newFleeWin;
                   } else {
                     beastPoints += forwardPoints.newFleeLose;
                   }
 
-                  databaseBeast.flees.push(iBeast.flees[0]);
-                } else if (iBeast.flees !== undefined) {
-                  const flee = iBeast.flees[0];
+                  databaseBeast.flees.push(signEntryWithVersion(newFlee));
+                });
+              }
 
-                  if (flee.outcome === 'win') {
+              if (sameFlees.length > 0) {
+                sameFlees.flees.forEach((newFlee) => {
+                  if (newFlee.outcome === 'win') {
                     beastPoints += forwardPoints.sameFleeWin;
                   } else {
                     beastPoints += forwardPoints.sameFleeLose;
                   }
-                }
+                });
               }
 
               dataProcessed += 1;
 
-              // TODO: Concussion
-              // TODO: Received items
-
-              if (iBeast.type === 'DarkZone') {
-                userForwardPoints += beastPoints * forwardPoints.darkZoneBattle;
-              } else {
-                userForwardPoints += beastPoints * forwardPoints.regularZoneBattle;
+              if (
+                !_.isEmpty(uniqueBattles)
+                || !_.isEmpty(sameBattles)
+                || !_.isEmpty(uniqueConcussions)
+                || !_.isEmpty(uniqueFlees)
+                || !_.isEmpty(sameFlees)
+              ) {
+                if (iBeast.type === 'DarkZone') {
+                  userForwardPoints += beastPoints * forwardPoints.darkZoneBattle;
+                } else {
+                  userForwardPoints += beastPoints * forwardPoints.regularZoneBattle;
+                }
               }
 
               databaseBeast.save().then(() => next()).catch(e => console.log(e));
@@ -612,9 +837,7 @@ _или_
     } else {
       resolve();
     }
-  }, (() => {
-    // console.log('iterating done');
-  }));
+  });
 
   const processLocations = () => new Promise((resolve) => {
     if (updatesData.locations.length > 0) {
@@ -667,7 +890,9 @@ _или_
             }
 
             if (!_.isEmpty(iLocation.receivedBonusItems)) {
-              Object.keys(iLocation.receivedBonusItems).forEach((item) => {
+              // TODO: Implement correct loot processing
+
+              /* Object.keys(iLocation.receivedBonusItems).forEach((item) => {
                 const amount = iLocation.receivedBonusItems[item];
 
                 if (!_.isEmpty(databaseLocation.receivedBonusItems)) {
@@ -681,7 +906,7 @@ _или_
                     databaseLocation.receivedBonusItems[item] = [amount];
                   }
                 }
-              });
+              }); */
             }
 
             dataProcessed += 1;
@@ -697,72 +922,105 @@ _или_
     }
   });
 
+  detectBeastForValidation().then(
+    () => {
+      Promise.all([
+        processBeasts(),
+        processLocations(),
+      ]).then(() => {
+        let errors = '';
+        let dupesText = '';
+        let reply;
 
-  Promise.all([
-    processBeasts(),
-    processLocations(),
-  ]).then(() => {
-    let errors = '';
-    let dupesText = '';
-    let reply;
-
-    if (reportData.errors.length > 0) {
-      errors = `
-      *Также я заметил такие вещи*:
-      ${reportData.errors.join('\n')}
-              `;
-    }
-
-    if (dupes.battles > 0 || dupes.flees > 0) {
-      dupesText = 'Похоже ты скидывал некоторые форварды по второму разу. Я не начислял тебе за них очки';
-    }
-
-    if (dataProcessed > 0) {
-      // TODO: Move out shit to strings
-      // TODO: Implement meaningfull report data regarding found usefull data
-      setTimeout(() => {
-        if (options.silent) {
-          reply = `
-  Спасибо за форвард. Я перевёл ${userForwardPoints.toFixed(1)} 💎*Шмепселей* на твой счёт.\n_${dupesText}_`;
-        } else {
-          reply = `Фух, я со всём справился - спасибо тебе огромное за информацию!
-Ты заработал ${userForwardPoints.toFixed(1)} 💎*Шмепселей* за свои форварды!
-_${dupesText}_
-Всего я насчитал ${dataProcessed} данных!
-
-Если ты чего-то забыл докинуть - смело жми на \`[Скинуть лог 🏃]\` и _докидывай_
-${errors}`;
+        if (reportData.errors.length > 0) {
+          errors = `*Также я заметил такие вещи*:
+    ${reportData.errors.join('\n')}`;
         }
 
-        msg.reply.text(reply, {
-          replyMarkup: defaultKeyboard,
-          parseMode: 'markdown',
-          asReply: options.silent,
-        }).then(() => {
-          userManager.addPoints(msg.from.id, userForwardPoints).then((result) => {
-            if (!result.ok) {
-              if (result.reason === 'USER_NOT_FOUND') {
-                msg.reply.text('Не могу начислить тебе шмепсели пока ты не скинешь мне свой пип-бой :с');
-              }
-              console.log(`userManager.addPoints: ${JSON.stringify(result)}`);
-            }
-          });
-        }).catch(e => console.log(e));
-      }, 1500);
-    } else {
-      setTimeout(() => {
-        msg.reply.text(`
-  К сожалению я ничего не смог узнать из твоих форвардов :с`, {
-          replyMarkup: defaultKeyboard,
-          parseMode: 'markdown',
-        });
-      }, 1500);
-    }
+        if (dupes.battles > 0 || dupes.flees > 0) {
+          dupesText = 'Похоже ты скидывал некоторые форварды по второму разу. Я не начислял тебе за них очки';
+        }
 
-    createSession(msg.from.id);
-  }).catch(e => console.log(e));
+        if (dataProcessed > 0 && userForwardPoints > 0) {
+          // TODO: Move out shit to strings
+          // TODO: Implement meaningfull report data regarding found usefull data
+          createSession(msg.from.id);
+
+          // setTimeout(() => {
+          if (options.silent) {
+            reply = `
+        Спасибо за форвард. Я перевёл ${userForwardPoints.toFixed(1)} 💎*Шмепселей* на твой счёт.\n_${dupesText}_`;
+          } else {
+            // Всего я насчитал ${dataProcessed} данных!
+
+            reply = `Фух, я со всём справился - спасибо тебе огромное за информацию!
+
+Ты заработал ${userForwardPoints.toFixed(1)} 💎*Шмепселей* за свои форварды!
+_${dupesText}_
+
+${errors}
+Если ты чего-то забыл докинуть - смело жми на \`[Скинуть лог 🏃]\` и _докидывай_`;
+          }
+
+          msg.reply.text(reply, {
+            replyMarkup: defaultKeyboard,
+            parseMode: 'markdown',
+            asReply: options.silent,
+          }).then(() => {
+            userManager.addPoints(msg.from.id, userForwardPoints).then((result) => {
+              if (!result.ok) {
+                if (result.reason === 'USER_NOT_FOUND') {
+                  msg.reply.text('Не могу начислить тебе шмепсели пока ты не скинешь мне свой пип-бой :с');
+                }
+                console.log(`userManager.addPoints: ${JSON.stringify(result)}`);
+              }
+            });
+          }).catch(e => console.log(e));
+          // }, 1500);
+        } else {
+          // setTimeout(() => {
+          createSession(msg.from.id);
+          return msg.reply.text(`
+        К сожалению я не смог узнать ничего нового из твоих форвардов :с${dupesText ? `\n\n_${dupesText}_` : ''}`, {
+            replyMarkup: defaultKeyboard,
+            parseMode: 'markdown',
+          });
+          // }, 1500);
+        }
+
+        // FIXME: COULD BE AN ISSUE
+        // sessions[msg.from.id].state = states.WAIT_FOR_DATA_VALIDATION;
+      }).catch(e => console.log(e));
+    },
+    () => {
+      sessions[msg.from.id].state = states.WAIT_FOR_DATA_VALIDATION;
+      sessions[msg.from.id].initialForwardDate = reportData.initialForwardDate;
+      sessions[msg.from.id].lastForwardDate = reportData.lastForwardDate;
+      sessions[msg.from.id].firstForwardDate = reportData.firstForwardDate;
+      sessions[msg.from.id].beastsToValidate = beastsToValidate;
+      sessions[msg.from.id].beastRequest = true;
+
+      return msg.reply.text(getBeastToValidateMessage(sessions[msg.from.id].beastsToValidate, sessions[msg.from.id].beastRequest), {
+        parseMode: 'html',
+        replyMarkup: 'hide',
+      }).catch(e => console.log(e));
+    },
+  );
+
 
   return false;
+};
+
+const actualProcessUserData = (msg, reportData, updatesData, options) => {
+  if (!options.silent) {
+    msg.reply.text('Перехожу в режим обработки данных, подожди пожалуйста немного :3', {
+      replyMarkup: 'hide',
+    }).then(() => {
+      actualActualProcessUserData(msg, reportData, updatesData, options);
+    }).catch(e => console.log(e));
+  } else {
+    actualActualProcessUserData(msg, reportData, updatesData, options);
+  }
 };
 
 const processUserData = (msg, options) => {
@@ -784,10 +1042,25 @@ const processUserData = (msg, options) => {
     });
   }
 
+  if (options.useBeastFace && !_.isEmpty(reportData.beastsToValidate)) {
+    sessions[msg.from.id].state = states.WAIT_FOR_DATA_VALIDATION;
+    sessions[msg.from.id].initialForwardDate = reportData.initialForwardDate;
+    sessions[msg.from.id].lastForwardDate = reportData.lastForwardDate;
+    sessions[msg.from.id].firstForwardDate = reportData.firstForwardDate;
+    sessions[msg.from.id].beastsToValidate = reportData.beastsToValidate;
+    sessions[msg.from.id].beastRequest = false;
+
+    return msg.reply.text(getBeastToValidateMessage(sessions[msg.from.id].beastsToValidate, sessions[msg.from.id].beastRequest), {
+      parseMode: 'html',
+      replyMarkup: 'hide',
+    }).catch(e => console.log(e));
+  }
+
 
   if (updatesData.locations.length === 0 && updatesData.beasts.length === 0) {
+    createSession(msg.from.id);
     return msg.reply.text(`
-  К сожалению я ничего не смог узнать из твоих форвардов :с`, {
+  К сожалению я не смог узнать ничего нового из твоих форвардов :с`, {
       replyMarkup: defaultKeyboard,
       parseMode: 'markdown',
     });
@@ -816,9 +1089,9 @@ const processUserData = (msg, options) => {
   Твой пип-бой, который я когда-то сохранил - устарел.
   Пожалуйста скинь мне свой новый пип-бой.
   Либо же это форвард с статами, отличными от твоих.
-  
+
   Если у тебя нет на это времени жми /skippipforward
-  
+
   *ВНИМАНИЕ: ПРИ НАЖАТИИ НА /skippipforward - БОТ ПРОИГНОРИРУЕТ ТВОИ БИТВЫ И ПОБЕГИ ОТ МОБОВ И НЕ ЗАПИШЕТ ИХ В БАЗУ*
   `, {
             parseMode: 'markdown',
@@ -839,7 +1112,7 @@ const processUserData = (msg, options) => {
         return msg.reply.text(`
   Похоже ты мне ещё не скидывал пип бой
   Если у тебя нет на это времени жми /skippipforward
-  
+
   *ВНИМАНИЕ: ПРИ НАЖАТИИ НА /skippipforward - БОТ ПРОИГНОРИРУЕТ ТВОИ БИТВЫ И ПОБЕГИ ОТ МОБОВ И НЕ ЗАПИШЕТ ИХ В БАЗУ*
   `, {
           parseMode: 'markdown',
@@ -952,8 +1225,14 @@ bot.on('forward', (msg) => {
         asReply: true,
       });
     }
-  } if (sessions[msg.from.id].state === states.WAIT_FOR_BEAST_FACE_FORWARD) {
-    // TODO: Validate forward date - should be greater that date of the first forward and less than date of last forward
+  } if (sessions[msg.from.id].state === states.WAIT_FOR_DATA_VALIDATION) {
+    const { beastsToValidate, lastForwardDate, firstForwardDate } = sessions[msg.from.id];
+
+    if (msg.forward_date > lastForwardDate || msg.forward_date < (firstForwardDate - (3 * 60 * 60))) {
+      return msg.reply.text('Дата этого форврада за пределами форвардов из твоего круга - наебать меня вздумал?', {
+        asReply: true,
+      });
+    }
 
     let data;
     let dataType;
@@ -968,6 +1247,20 @@ bot.on('forward', (msg) => {
       regexpSet: regexps.dungeonBeastFaced,
     });
 
+    const isWalkingBeastFaced = regExpSetMatcher(msg.text, {
+      regexpSet: regexps.walkingBeastFaced,
+    });
+
+    const isAltInBattle = regExpSetMatcher(msg.text, {
+      regexpSet: regexps.altInBattle,
+    });
+
+    const isHaloDungeonBeastFaced = regExpSetMatcher(msg.text, {
+      regexpSet: regexps.haloDungeonBeastFaced,
+    });
+
+
+
     if (isDungeonBeastFaced) {
       data = parseBeastFaced.parseDungeonBeastFaced(msg.text);
       dataType = 'dungeonBeastFaced';
@@ -977,39 +1270,123 @@ bot.on('forward', (msg) => {
       dataType = 'location';
       beastName = data.beastFaced.name;
       beastType = data.beastFaced.type;
+    } else if (isWalkingBeastFaced) {
+      data = parseBeastFaced.parseWalkingBeastFaced(msg.text);
+      dataType = 'walkingBeastFaced';
+      beastName = data.name;
+    } else if (isHaloDungeonBeastFaced) {
+      data = parseBeastFaced.parseHaloDungeonBeastFaced(msg.text);
+      dataType = 'dungeonBeastFaced';
+      beastName = data.name;
     }
 
-    if ((beastName !== sessions[msg.from.id].beastToValidateName && sessions[msg.from.id].beastToValidateName !== '???') || sessions[msg.from.id].beastToValidateType !== beastType) {
-      return msg.reply.text(`
-Этот моб не похож на того с которым ты дрался. Ты чё - наебать меня вздумал?!
+    const isForwardValid = ({ dataType, beastName, beastType }) => {
+      let beastValidationTimeScope = beastsToValidate.map((beast, index) => ({ ...beast, index }));
+      const beastIndexToRemove = date => beastValidationTimeScope.sort((a, b) => Math.abs(date - a.date) - Math.abs(date - b.date))[0].index;
 
-Если ты передумал её кидать - жми /skipbeastforward
-<b>Но тогда я проигнорирую битву с этим мобом</b>
-            `, {
+      beastValidationTimeScope = beastValidationTimeScope.filter(({ date }) => {
+        let timeOffset;
+
+        if (isDungeonBeastFaced || isHaloDungeonBeastFaced) {
+          timeOffset = date - (20 * 60);
+        } else if (isLocation) {
+          timeOffset = date - (3 * 60 * 60);
+        } else if (isWalkingBeastFaced) {
+          timeOffset = date - (60 * 60);
+        }
+
+        return msg.forward_date > timeOffset;
+      });
+
+      if (beastValidationTimeScope.length === 0) {
+        return false;
+      }
+
+      if (dataType === 'walkingBeastFaced') {
+        if (beastValidationTimeScope.some(beast => (beast.name.indexOf(beastName) !== -1))) {
+          const beastIndex = beastIndexToRemove(msg.forward_date);
+          sessions[msg.from.id].beastsToValidate = sessions[msg.from.id].beastsToValidate.filter((beast, index) => index !== beastIndex);
+
+          return true;
+        }
+
+        return false;
+      }
+
+      if (dataType === 'dungeonBeastFaced') {
+        if (beastValidationTimeScope.every(beast => beast.name !== beastName && beast.name !== '???')) {
+          return false;
+        }
+
+        const beastIndex = beastIndexToRemove(msg.forward_date);
+        sessions[msg.from.id].beastsToValidate = sessions[msg.from.id].beastsToValidate.filter((beast, index) => index !== beastIndex);
+
+        return true;
+      }
+
+      if (beastValidationTimeScope.every(beast => (beast.name !== beastName && beast.name !== '???') || beast.type !== beastType)) {
+        return false;
+      }
+
+      const beastIndex = beastIndexToRemove(msg.forward_date);
+      sessions[msg.from.id].beastsToValidate = sessions[msg.from.id].beastsToValidate.filter((beast, index) => index !== beastIndex);
+
+      return true;
+    };
+
+    if (isAltInBattle) {
+      return msg.reply.text(`Это конечно форвард с мобом, но это не форвард встречи.
+Форвар встречи они выглядит как-то так:
+<code>Во время вылазки на тебя напал...</code>
+или
+<code>...перегородил тебе путь.</code>
+или
+<code>устрашающе начал приближаться...</code>
+
+Если у тебя нет на это времени жми /skipbeastforwards
+<i>ВНИМАНИЕ: ПРИ НАЖАТИИ НА /skipbeastforwards - БОТ ПРОИГНОРИРУЕТ ДАННЫЕ, КОТОРЫЕ ЗАВИСЯТ ОТ УКАЗАНЫХ ВЫШЕ ФОРВАРДОВ, И НЕ ЗАПИШЕТ ИХ В БАЗУ</i>`, {
         asReply: true,
         parseMode: 'html',
       });
-    } if (isLocation || isDungeonBeastFaced) {
+    } if (!isForwardValid({ dataType, beastName, beastType })) {
+      return msg.reply.text(`Этот моб не похож на того с которым ты дрался в это время. Ты чё - наебать меня вздумал?!
+Забыл кто мне нужен? Жми /showBeastsToValidate
+
+
+Если ты передумал её кидать - жми /skipbeastforward
+<b>Но тогда я проигнорирую всю ту информацию которая требует форвардов</b>`, {
+        asReply: true,
+        parseMode: 'html',
+      });
+    }
+
+    if (isLocation || isDungeonBeastFaced || isWalkingBeastFaced || isHaloDungeonBeastFaced) {
       sessions[msg.from.id].data.push({
         data,
         dataType,
         date: msg.forward_date,
       });
 
-      msg.reply.text('Супер, я вижу встречу с мобом - сейчас обработаю её вместе с твоими форвардами').then(() => processUserData(msg, {
-        usePip: sessions[msg.from.id].processDataConfig.usePip,
-        useBeastFace: sessions[msg.from.id].processDataConfig.useBeastFace,
-      }));
-    } else {
-      return msg.reply.text(`
-Это не похоже на встречу моба. Если ты передумал её кидать - жми /skipbeastforward
+      if (sessions[msg.from.id].beastsToValidate.length === 0) {
+        return msg.reply.text('Супер, я вижу встречу с мобом - сейчас обработаю её вместе с твоими форвардами').then(() => processUserData(msg, {
+          usePip: sessions[msg.from.id].processDataConfig.usePip,
+          useBeastFace: sessions[msg.from.id].processDataConfig.useBeastFace,
+        }));
+      }
 
-*Но тогда я проигнорирую битву с этим мобом*
-            `, {
+      return msg.reply.text(getBeastToValidateMessage(sessions[msg.from.id].beastsToValidate, sessions[msg.from.id].beastRequest, false, false), {
         asReply: true,
+        parseMode: 'html',
       });
     }
-  } else if (sessions[msg.from.id].state === states.WAIT_FOR_FORWARD_END) {
+    return msg.reply.text(`
+Это не похоже на встречу моба. Если ты передумал её кидать - жми /skipbeastforward
+
+*Но тогда я проигнорирую эту "неподтверждённую"*
+            `, {
+      asReply: true,
+    });
+  } if (sessions[msg.from.id].state === states.WAIT_FOR_FORWARD_END) {
     let data;
     let dataType;
 
@@ -1037,6 +1414,14 @@ bot.on('forward', (msg) => {
       regexpSet: regexps.dungeonBeastFaced,
     });
 
+    const isWalkingBeastFaced = regExpSetMatcher(msg.text, {
+      regexpSet: regexps.walkingBeastFaced,
+    });
+
+    const isHaloDungeonBeastFaced = regExpSetMatcher(msg.text, {
+      regexpSet: regexps.haloDungeonBeastFaced,
+    });
+
     const isClassicPip = regExpSetMatcher(msg.text, {
       regexpSet: PipRegexps.classicPip,
     });
@@ -1048,6 +1433,12 @@ bot.on('forward', (msg) => {
     if (isDungeonBeastFaced) {
       data = parseBeastFaced.parseDungeonBeastFaced(msg.text);
       dataType = 'dungeonBeastFaced';
+    } else if (isHaloDungeonBeastFaced) {
+      data = parseBeastFaced.parseHaloDungeonBeastFaced(msg.text);
+      dataType = 'dungeonBeastFaced';
+    } else if (isWalkingBeastFaced) {
+      data = parseBeastFaced.parseWalkingBeastFaced(msg.text);
+      dataType = 'walkingBeastFaced';
     } else if (isFlee) {
       data = parseFlee(msg.text);
       dataType = 'flee';
@@ -1068,7 +1459,7 @@ bot.on('forward', (msg) => {
       dataType = 'dungeonBeast';
     }
 
-    if (isRegularBeast || isLocation || isFlee || isDeathMessage || isDungeonBeastFaced || (isClassicPip || isSimplePip) || isDungeonBeast) {
+    if (isRegularBeast || isLocation || isFlee || isDeathMessage || isDungeonBeastFaced || (isClassicPip || isSimplePip) || isDungeonBeast || isWalkingBeastFaced || isHaloDungeonBeastFaced) {
       sessions[msg.from.id].data.push({
         data,
         dataType,
@@ -1078,7 +1469,7 @@ bot.on('forward', (msg) => {
     }
   } else if (
     sessions[msg.from.id].state !== states.WAIT_FOR_PIP_FORWARD
-        && sessions[msg.from.id].state !== states.WAIT_FOR_BEAST_FACE_FORWARD
+        && sessions[msg.from.id].state !== states.WAIT_FOR_DATA_VALIDATION
         && sessions[msg.from.id].state !== states.WAIT_FOR_FORWARD_END
   ) {
     const isClassicPip = regExpSetMatcher(msg.text, {
@@ -1091,6 +1482,10 @@ bot.on('forward', (msg) => {
 
     const isRegularBeastFaced = regExpSetMatcher(msg.text, {
       regexpSet: regexps.regularBeastFaced,
+    });
+
+    const isWalkingBeastFaced = regExpSetMatcher(msg.text, {
+      regexpSet: regexps.walkingBeastFaced,
     });
 
     const isGiantFaced = regExpSetMatcher(msg.text, {
@@ -1109,6 +1504,10 @@ bot.on('forward', (msg) => {
       regexpSet: regexps.dungeonBeastFaced,
     });
 
+    const isHaloDungeonBeastFaced = regExpSetMatcher(msg.text, {
+      regexpSet: regexps.haloDungeonBeastFaced,
+    });
+
     const isRegularBeast = regExpSetMatcher(msg.text, {
       regexpSet: regexps.regularBeast,
     });
@@ -1119,6 +1518,10 @@ bot.on('forward', (msg) => {
 
     const isLocation = regExpSetMatcher(msg.text, {
       regexpSet: regexps.location,
+    });
+
+    const isDungeonBeast = regExpSetMatcher(msg.text, {
+      regexpSet: regexps.dungeonBeast,
     });
 
     /* const isLocation = regExpSetMatcher(msg.text, {
@@ -1338,6 +1741,153 @@ bot.on('forward', (msg) => {
 
         return false;
       });
+    } else if (isRegularBeastFaced) {
+      const beast = parseBeastFaced.parseRegularBeastFaced(msg.text);
+
+      routedBeastView(Beast, {
+        name: beast.name,
+        type: beast.type,
+        isDungeon: false,
+        subType: 'regular',
+      }, null, {
+        env: process.env.ENV,
+        VERSION,
+      }).then(({ reply, beast }) => {
+        if (reply !== false) {
+          const beastReplyMarkup = getBeastKeyboard(beast._id.toJSON());
+
+          return msg.reply.text(reply, {
+            replyMarkup: beastReplyMarkup,
+            parseMode: 'html',
+          }).catch(e => console.log(e));
+        }
+        return msg.reply.text('Прости, я никогда не слышал про этого моба :c', {
+          asReply: true,
+        }).catch(e => console.log(e));
+      }).catch(e => console.log(e));
+    } else if (isWalkingBeastFaced) {
+      const beast = parseBeastFaced.parseWalkingBeastFaced(msg.text);
+
+      Beast.findOne({
+        name: new RegExp(beast.name, 'i'),
+        subType: 'walking',
+      }).then((fBeast) => {
+        if (fBeast !== null) {
+          return msg.reply.text(`Хей, у меня есть данные про гуляющего *${beast.name}*, но я пока что не умею их выводить, прости :с`, {
+            asReply: true,
+            parseMode: 'markdown',
+          }).catch(e => console.log(e));
+        }
+
+        return msg.reply.text(`Чёрт, я никогда не слышал про гуляющего *${beast.name}*, прости :с`, {
+          asReply: true,
+          parseMode: 'markdown',
+        });
+      }).catch(e => console.log(e));
+    } else if (isDungeonBeastFaced) {
+      const oBeast = parseBeastFaced.parseDungeonBeastFaced(msg.text);
+
+      routedBeastView(Beast, {
+        name: oBeast.name,
+        isDungeon: true,
+      }, null, {
+        env: process.env.ENV,
+        VERSION,
+      }).then(({ reply }) => {
+        if (reply !== false) {
+          /* const beastReplyMarkup = getBeastKeyboard(beast._id.toJSON());
+
+                    return msg.reply.text(reply,{
+                        replyMarkup: beastReplyMarkup,
+                        parseMode: 'html'
+                    }).catch(e => console.log(e)); */
+          msg.reply.text(`Хей, у меня есть данные про *${oBeast.name}*, но я пока что не умею их выводить, прости :с`, {
+            asReply: true,
+            parseMode: 'markdown',
+          }).catch(e => console.log(e));
+        } else {
+          return msg.reply.text(`Чёрт, я никогда не слышал про *${oBeast.name}*, прости :с`, {
+            asReply: true,
+            parseMode: 'markdown',
+          }).catch(e => console.log(e));
+        }
+
+        return false;
+      }).catch(e => console.log(e));
+    } else if (isHaloDungeonBeastFaced) {
+      const oBeast = parseBeastFaced.parseHaloDungeonBeastFaced(msg.text);
+
+      routedBeastView(Beast, {
+        name: oBeast.name,
+        isDungeon: true,
+      }, {
+        env: process.env.ENV,
+        VERSION,
+      }).then(({ reply }) => {
+        if (reply !== false) {
+          /* const beastReplyMarkup = getBeastKeyboard(beast._id.toJSON());
+
+                    return msg.reply.text(reply,{
+                        replyMarkup: beastReplyMarkup,
+                        parseMode: 'html'
+                    }).catch(e => console.log(e)); */
+          msg.reply.text(`Хей, у меня есть данные про *${oBeast.name}*, но я пока что не умею их выводить, прости :с`, {
+            asReply: true,
+            parseMode: 'markdown',
+          }).catch(e => console.log(e));
+        } else {
+          return msg.reply.text(`Чёрт, я никогда не слышал про *${oBeast.name}*, прости :с`, {
+            asReply: true,
+            parseMode: 'markdown',
+          }).catch(e => console.log(e));
+        }
+
+        return false;
+      }).catch(e => console.log(e));
+    } else if (isRegularBeast || isFlee || isDungeonBeast) {
+      // || isLocation || isDungeonBeast || isFlee
+      let data;
+      let dataType;
+
+      createSession(msg.from.id);
+
+      if (isFlee) {
+        data = parseFlee(msg.text);
+        dataType = 'flee';
+      } else if (isRegularBeast) {
+        data = beastParser.parseRegularBeast(msg.text);
+        dataType = 'regularBeast';
+      } else if (isDungeonBeast) {
+        data = beastParser.parseRegularBeast(msg.text);
+        dataType = 'dungeonBeast';
+      }
+
+      /* if (isDungeonBeast) {
+                data = beastParser.parseDungeonBeast(msg.text);
+                dataType = 'dungeonBeast';
+            } else if (isFlee) {
+                data = parseFlee(msg.text);
+                dataType = 'flee';
+            } else if (isRegularBeast) {
+                data = beastParser.parseRegularBeast(msg.text);
+                dataType = 'regularBeast';
+            } else if (isLocation) {
+                data = parseLocation(msg.text);
+                dataType = 'location';
+            } */
+
+      sessions[msg.from.id].data.push({
+        data,
+        dataType,
+        date: msg.forward_date,
+        userId: msg.from.id,
+      });
+
+      processUserData(msg, {
+        usePip: sessions[msg.from.id].processDataConfig.usePip,
+        useBeastFace: sessions[msg.from.id].processDataConfig.useBeastFace,
+        silent: true,
+      });
     } else if (isLocation && !isGiantFaced) {
       const location = parseLocation(msg.text);
 
@@ -1382,98 +1932,6 @@ bot.on('forward', (msg) => {
         }
 
         return false;
-      });
-    } else if (isRegularBeastFaced) {
-      const beast = parseBeastFaced.parseRegularBeastFaced(msg.text);
-
-      routedBeastView(Beast, {
-        name: beast.name,
-        type: beast.type,
-        isDungeon: false,
-      }, null, {
-        env: process.env.ENV,
-      }).then(({ reply, rotedBeast }) => {
-        if (reply !== false) {
-          const beastReplyMarkup = getBeastKeyboard(rotedBeast._id.toJSON());
-
-          return msg.reply.text(reply, {
-            replyMarkup: beastReplyMarkup,
-            parseMode: 'html',
-          }).catch(e => console.log(e));
-        }
-        return msg.reply.text('Прости, я никогда не слышал про этого моба :c', {
-          asReply: true,
-        }).catch(e => console.log(e));
-      }).catch(e => console.log(e));
-    } else if (isDungeonBeastFaced) {
-      const oBeast = parseBeastFaced.parseDungeonBeastFaced(msg.text);
-
-      routedBeastView(Beast, {
-        name: oBeast.name,
-        isDungeon: true,
-      }, {
-        env: process.env.ENV,
-      }).then(({ reply }) => {
-        if (reply !== false) {
-          /* const beastReplyMarkup = getBeastKeyboard(beast._id.toJSON());
-
-                    return msg.reply.text(reply,{
-                        replyMarkup: beastReplyMarkup,
-                        parseMode: 'html'
-                    }).catch(e => console.log(e)); */
-          msg.reply.text(`Хей, у меня есть данные про *${oBeast.name}*, но я пока что не умею их выводить, прости :с`, {
-            asReply: true,
-            parseMode: 'markdown',
-          }).catch(e => console.log(e));
-        } else {
-          return msg.reply.text(`Чёрт, я никогда не слышал про *${oBeast.name}*, прости :с`, {
-            asReply: true,
-            parseMode: 'markdown',
-          }).catch(e => console.log(e));
-        }
-
-        return false;
-      }).catch(e => console.log(e));
-    } else if (isRegularBeast || isFlee) {
-      // || isLocation || isDungeonBeast || isFlee
-      let data;
-      let dataType;
-
-      createSession(msg.from.id);
-
-      if (isFlee) {
-        data = parseFlee(msg.text);
-        dataType = 'flee';
-      } else if (isRegularBeast) {
-        data = beastParser.parseRegularBeast(msg.text);
-        dataType = 'regularBeast';
-      }
-
-      /* if (isDungeonBeast) {
-                data = beastParser.parseDungeonBeast(msg.text);
-                dataType = 'dungeonBeast';
-            } else if (isFlee) {
-                data = parseFlee(msg.text);
-                dataType = 'flee';
-            } else if (isRegularBeast) {
-                data = beastParser.parseRegularBeast(msg.text);
-                dataType = 'regularBeast';
-            } else if (isLocation) {
-                data = parseLocation(msg.text);
-                dataType = 'location';
-            } */
-
-      sessions[msg.from.id].data.push({
-        data,
-        dataType,
-        date: msg.forward_date,
-        userId: msg.from.id,
-      });
-
-      processUserData(msg, {
-        usePip: sessions[msg.from.id].processDataConfig.usePip,
-        useBeastFace: sessions[msg.from.id].processDataConfig.useBeastFace,
-        silent: true,
       });
     }
   }
@@ -1601,7 +2059,7 @@ bot.on('/journeyforwardstart', (msg) => {
  - Побег от моба
  - Информацию о локации(километре)
 
-Обработаную информацию я занесу в базу, которая обязательно поможет другим игрокам а тебе в награду отсыплю пару 💎*Шмепселей* 
+Обработаную информацию я занесу в базу, которая обязательно поможет другим игрокам а тебе в награду отсыплю пару 💎*Шмепселей*
     `, {
     replyMarkup,
     parseMode: 'markdown',
@@ -1645,14 +2103,22 @@ bot.on('/skippipforward', (msg) => {
   });
 });
 
-bot.on('/skipbeastforward', (msg) => {
-  msg.reply.text('Окей, сейчас попробую обработать что смогу');
+bot.on(['/skipbeastforward', '/skipbeastforwards'], (msg) => {
+  if (_.isEmpty(sessions)) {
+    return msg.reply.text('Слушай, а мне собственно нечего игнорировать. Может меня опять какой-то пидор перезагрузил, не знаешь?', {
+      asReply: true,
+      replyMarkup: defaultKeyboard,
+    });
+  }
 
-  sessions[msg.from.id].processDataConfig.useBeastFace = false;
+  msg.reply.text('Окей, обработаю что смогу').then(() => {
+    sessions[msg.from.id].processDataConfig.useBeastFace = false;
+    sessions[msg.from.id].beastsToValidate = [];
 
-  processUserData(msg, {
-    usePip: sessions[msg.from.id].processDataConfig.usePip,
-    useBeastFace: sessions[msg.from.id].processDataConfig.useBeastFace,
+    processUserData(msg, {
+      usePip: sessions[msg.from.id].processDataConfig.usePip,
+      useBeastFace: sessions[msg.from.id].processDataConfig.useBeastFace,
+    });
   });
 });
 
@@ -1781,7 +2247,7 @@ ${userSkills.join('\n')}
     return msg.reply.text(`
 ${skillOMaticText}
 
-Оу, похоже я ещё ничего не знаю про твой пип :с
+Оу, похоже я ещё ничего не знаю про твой пип - без него я не смогу тебе помочь :с
 Перейди в игру по кнопке внизу и перешли мне его пожалуйста!
         `, {
       replyMarkup: toGameKeyboard,
@@ -1964,9 +2430,9 @@ bot.on(/^\d+$/, (msg) => {
     case states.WAIT_FOR_DISTANCE: {
       const reachableKm = Number(msg.text);
 
-      if (reachableKm > 100) {
+      if (reachableKm > 104) {
         msg.reply.text('Бля, ну не гони - давай чуть более реалистичней, окей ?)');
-      } else if (reachableKm <= 100) {
+      } else if (reachableKm <= 104) {
         sessions[msg.from.id].reachableKm = reachableKm;
         sessions[msg.from.id].state = states.WAIT_FOR_LEVELS;
 
@@ -2145,8 +2611,11 @@ bot.on(/mob_(.+)/, (msg) => {
     _id: id,
   };
 
-  routedBeastView(Beast, searchParams, null, {
+  routedBeastView(Beast, {
+    ...searchParams,
+  }, null, {
     env: process.env.ENV,
+    VERSION,
   }).then(({ reply, beast }) => {
     if (reply !== false) {
       const beastReplyMarkup = getBeastKeyboard(beast._id.toJSON());
@@ -2290,7 +2759,9 @@ _Если гиганта нет в списке - значит его ещё н�
 
 Гиганты имеют огромный запас здоровья. Игрок встречает гиганта, не убив которого нельзя пройти дальше. Каждый игрок может атаковать этого Гиганта.
 
-Если Гигант вас ударит в ответ и у вас не менее 11 единиц здоровья, то у вас останется 1 хп. Если у вас остается менее 11 единиц здоровья и вы получаете удар, то вы умираете.
+*Если Гигант вас ударит в ответ и у вас не менее 25% здоровья, то у вас останется 1 хп. Если у вас остается менее 25% здоровья и вы получаете удар, то вы умираете.*
+
+Если вы в числе последних добиваете гиганта - получите награду.
 
 Гиганты общие для всех фракций, соответственно, чем больше игроков их атакуют, тем быстрее все смогут ходить дальше.
 
@@ -2305,7 +2776,9 @@ _Если гиганта нет в списке - значит его ещё н�
     const [, from, to, type] = showMobRegExp.exec(msg.data);
     const beastType = type === 'regular' ? 'Regular' : 'DarkZone';
 
-    Beast.find({ isDungeon: false, distanceRange: { $gte: Number(from), $lte: Number(to) }, type: beastType }, 'battles.totalDamageReceived name id').then((beasts) => {
+    Beast.find({
+      isDungeon: false, subType: 'regular', distanceRange: { $gte: Number(from), $lte: Number(to) }, type: beastType,
+    }, 'battles.totalDamageReceived name id').then((beasts) => {
       bot.answerCallbackQuery(msg.id);
 
       const jsonBeasts = beasts.map((b) => {
@@ -2339,11 +2812,16 @@ ${beastsList}
 
     const [, route, beastId] = showMobRouteRegExp.exec(msg.data);
 
-    routedBeastView(Beast, {
+    const searchParams = process.env.ENV === 'PRODUCTION' ? {
       _id: beastId,
       isDungeon: false,
-    }, route, {
+    } : {
+      _id: beastId,
+    };
+
+    routedBeastView(Beast, searchParams, route, {
       env: process.env.ENV,
+      VERSION,
     }).then(({ reply, beast }) => {
       // TODO: Fix keyboard for dungeon beasts
       const beastReplyMarkup = getBeastKeyboard(beast._id.toJSON());
@@ -2576,12 +3054,13 @@ bot.on('text', (msg) => {
 
   Beast.find({
     isDungeon: false,
-    distanceRange: {
+    subType: 'regular',
+    'distanceRange.value': {
       $gte: Number(from),
       $lte: Number(to),
     },
     type: beastType,
-  }, 'battles.totalDamageReceived name id').then((beasts) => {
+  }, 'battles.totalDamageReceived name id distanceRange').then((beasts) => {
     const jsonBeasts = beasts.map((b) => {
       const jsoned = b.toJSON();
 
@@ -2593,7 +3072,22 @@ bot.on('text', (msg) => {
 
     const beastsByDamage = _.sortBy(jsonBeasts, v => v.battles.totalDamageReceived);
 
-    const beastsList = beastsByDamage.map(beast => `
+    const actualBeasts = beastsByDamage.filter(({ distanceRange }) => {
+      const actualRanges = distanceRange.filter(({ version }) => version === VERSION);
+      const deprecatedRanges = distanceRange.filter(({ version }) => version !== VERSION);
+
+      const actualRangesFulfillGiven = actualRanges.every(({ value }) => value >= from && value <= to);
+
+      if (actualRanges.length >= DATA_THRESHOLD) {
+        return actualRangesFulfillGiven;
+      } if (actualRanges.length <= DATA_THRESHOLD && deprecatedRanges.length > 0) {
+        return true;
+      }
+
+      return false;
+    });
+
+    const beastsList = actualBeasts.map(beast => `
 ${beast.name}
 /mob_${beast.id}`).join('\n');
 
@@ -2611,7 +3105,7 @@ ${beastsList}
 });
 
 bot.on('/d', (msg) => {
-  if (process.env.ENV === 'STAGING') {
+  if (process.env.ENV === 'STAGING' || process.env.ENV === 'LOCAL') {
     Beast.find({
       isDungeon: true,
     }, 'battles.totalDamageReceived name id').then((beasts) => {
@@ -2684,6 +3178,118 @@ bot.on(/\/battle_(.+)/, (msg) => {
   }).catch(e => console.log(e));
 
   return false;
+});
+
+bot.on(/\/ignore_(.+)/, (msg) => {
+  if (_.isEmpty(sessions)) {
+    return msg.reply.text('Слушай, а мне собственно нечего игнорировать. Может меня опять какой-то пидор перезагрузил, не знаешь?', {
+      asReply: true,
+      replyMarkup: defaultKeyboard,
+    });
+  }
+
+  const [, date] = /\/ignore_(.+)/.exec(msg.text);
+  const { beastsToValidate } = sessions[msg.from.id];
+  const index = _.findIndex(beastsToValidate, beast => beast.date === Number(date));
+
+  if (Number.isInteger(index) || !date) {
+    if (beastsToValidate !== undefined && beastsToValidate.length > 0) {
+      if (beastsToValidate[index] !== undefined) {
+        const { data } = sessions[msg.from.id];
+
+        sessions[msg.from.id].beastsToValidate = sessions[msg.from.id].beastsToValidate.filter((entry, key) => key !== index);
+        sessions[msg.from.id].data = data.map((entry) => {
+          if (entry.date === Number(date)) {
+            return {
+              ...entry,
+              ignore: true,
+            };
+          }
+
+          return entry;
+        });
+
+        if (beastsToValidate.length === 1) {
+          sessions[msg.from.id].state = states.WAIT_FOR_DATA_TO_PROCESS;
+
+          processUserData(msg, {
+            usePip: sessions[msg.from.id].processDataConfig.usePip,
+            useBeastFace: sessions[msg.from.id].processDataConfig.useBeastFace,
+          });
+
+          return;
+        }
+        return msg.reply.text(getBeastToValidateMessage(sessions[msg.from.id].beastsToValidate, sessions[msg.from.id].beastRequest), {
+          parseMode: 'html',
+          replyMarkup: 'hide',
+        });
+      }
+
+      return msg.reply.text('Эм, я такой команды тебе не давал, а туда ли ты воюешь?', {
+        asReply: true,
+      });
+    }
+
+    return msg.reply.text('Слушай, а мне собственно нечего игнорировать. Может меня опять какой-то пидор перезагрузил, не знаешь?', {
+      asReply: true,
+      replyMarkup: defaultKeyboard,
+    });
+  }
+
+  return msg.reply.text('Ты какую-то хуйню сделал. Моя твоя не понимать.', {
+    asReply: true,
+  });
+});
+
+bot.on('/delete_all_beasts', (msg) => {
+  if (process.env.ENV === 'STAGING' || process.env.ENV === 'LOCAL') {
+    mongoose.connection.db.dropCollection('beasts', (err, result) => msg.reply.text('Все мобы удалёны'));
+  }
+});
+
+bot.on('/state', (msg) => {
+  if (process.env.ENV === 'STAGING' || process.env.ENV === 'LOCAL') {
+    return msg.reply.text(sessions ? (sessions[msg.from.id] ? sessions[msg.from.id].state : 'null') : 'null');
+  }
+});
+
+bot.on('/showBeastsToValidate', (msg) => {
+  if (!_.isEmpty(sessions)) {
+    if (sessions[msg.from.id] !== undefined) {
+      if (sessions[msg.from.id].beastsToValidate.length > 0) {
+        return msg.reply.text(getBeastToValidateMessage(sessions[msg.from.id].beastsToValidate, sessions[msg.from.id].beastRequest), {
+          parseMode: 'html',
+          replyMarkup: 'hide',
+        }).catch(e => console.log(e));
+      }
+    }
+  }
+});
+
+bot.on('/reset_beast_database', (msg) => {
+  if (process.env.ENV === 'STAGING' || process.env.ENV === 'LOCAL') {
+    msg.reply.text('ПЕРЕХОЖУ В РЕЖИМ СБРОСА БАЗЫ...\nЖДИ СООБЩЕНИЯ С ✅ГАЛОЧКАМИ✅');
+
+    const performBulkInsert = () => {
+      Beast.insertMany(signedBeasts, (error) => {
+        if (error) {
+          msg.reply.text(`Произошла проблема: ${error}`);
+        } else {
+          msg.reply.text('✅БАЗА МОБОВ НАПОЛНЕНА!✅');
+        }
+      });
+    };
+
+    Beast.find().then((beasts) => {
+      if (beasts.length === 0) {
+        performBulkInsert();
+      } else {
+        Beast.remove({}, () => {
+          performBulkInsert();
+        });
+      }
+    });
+  }
 });
 
 bot.start();

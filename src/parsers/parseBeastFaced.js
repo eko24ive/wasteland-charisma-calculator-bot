@@ -29,7 +29,25 @@ const parseDungeonBeastFaced = (data) => {
   };
 };
 
+const parseWalkingBeastFaced = (data) => {
+  const [, name] = regexps.walkingBeastFacedRegExp.exec(data);
+
+  return {
+    name,
+  };
+};
+
+const parseHaloDungeonBeastFaced = (data) => {
+  const [, name] = regexps.haloDungeonBeastFacedRegExp.exec(data);
+
+  return {
+    name,
+  };
+};
+
 module.exports = {
   parseRegularBeastFaced,
   parseDungeonBeastFaced,
+  parseWalkingBeastFaced,
+  parseHaloDungeonBeastFaced,
 };

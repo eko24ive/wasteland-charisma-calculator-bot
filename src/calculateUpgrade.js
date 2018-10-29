@@ -5,6 +5,7 @@ const defaultSkillCost = require('./constants/defaultSkillCost');
 const defaultCharismaCost = require('./constants/defaultCharismaCost');
 const mobs = require('./constants/mobs');
 const mobsRanges = require('./constants/mobsRanges');
+const timeToTravel = require('./utils/timeToTravel');
 
 const skillMap = {
   '💪 Сила': 'strength',
@@ -19,7 +20,7 @@ const skillsCap = {
   precision: 1300,
   agility: 1200,
   health: 1550,
-  charisma: 1250,
+  charisma: 1200,
 };
 
 const formatNubmer = (number) => {
@@ -224,9 +225,25 @@ const calculateUpgrade = ({
   });
   const charismaLevel = Number(pip.charisma);
   const reachableDistance = Number(/\d*/.exec(reachableKm).pop());
+  const cap = skillsCap[skillMap[upgradeSkill]];
+
+  if (currentSkillLevel >= cap) {
+    return `Хей, похоже что ты прокачал этот скил полностью, может стоит занятся другим?
+Энивей, спасибо что воспользовался нашими услугами :3`;
+  }
 
   const calculations = {
-    amountOfSavedFunds: calculatePerkDiscount(charismaLevel),
+    amountOfSavedFunds: amountToSpend(
+      upgradeSkill,
+      1,
+      currentSkillLevel,
+      upgradeTo,
+    ) - amountToSpend(
+      upgradeSkill,
+      charismaLevel,
+      currentSkillLevel,
+      upgradeTo,
+    ),
     amountToSpend: amountToSpend(
       upgradeSkill,
       charismaLevel,
@@ -245,6 +262,12 @@ const calculateUpgrade = ({
 
   const spentOnSkill = calculateSpentOnSkill(currentSkillLevel);
 
+  const raidsAmount = Math.floor(calculations.raidsInfo.worstCaseScenario.amountOfRaids);
+  const timeToFarm = Math.floor((timeToTravel(pip.endurance, reachableDistance) * raidsAmount) / 60 / 60);
+
+  const displayTimeToFarm = timeToFarm === 0 ? (timeToTravel(pip.endurance, reachableDistance) * raidsAmount).toFixed(2) : timeToFarm;
+
+
   /*
     При самом удачном стечении обсоятельств тебе необходимо сделать примерно ${Math.ceil(calculations.raidsInfo.bestCaseScenario.amountOfRaids)} 👣 ходок:
 За одну ходку ты получишь примерно:
@@ -256,14 +279,18 @@ const calculateUpgrade = ({
 */
 
   /* _Забавный факт #1: ты потратил на харизму ${formatNubmer(calculations.amountSpentOnCharisma)} 🕳 крышек_ */
+  /* Твой текущий уровень харизмы позволил сэкономить ${formatNubmer(calculations.amountOfSavedFunds)} 🕳 крышек. */
   const res = `
 _Всего ты потратил ${formatNubmer(spentOnSkill)} 🕳 крышек на ${upgradeSkill}_
 
 Необходимо потратить ${formatNubmer(calculations.amountToSpend)} 🕳 крышек для прокачки навыка \`${upgradeSkill}\` от ${currentSkillLevel} уровня до ${upgradeTo} уровня
 
-Твой текущий уровень харизмы позволил сэкономить ${formatNubmer(calculations.amountOfSavedFunds)} 🕳 крышек.
 
-Тебе необходимо сделать примерно *${Math.floor((calculations.raidsInfo.worstCaseScenario.amountOfRaids + 2) * 1.5)} 👣 ходок*:
+Тебе необходимо сделать примерно *${raidsAmount || '<1'} 👣 ходок*.
+
+${raidsAmount > 0 ? `C твоей 🔋Выносливостью на это потребуётся примерно ${displayTimeToFarm} часов.` : ''}
+_Без учёта рейдов, игровых событий, лагов, солнечных затмений и прочей хуйни_
+
 \`Из-за недавнего обновления Wasteland Wars данные для расчёта ходок работают в эксперементальном режиме\`
 `;
   /*
