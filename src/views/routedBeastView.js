@@ -31,23 +31,33 @@ const routedBeastView = (Beast, seachParams, route = null, config) => new Promis
     if (fBeast !== null) {
       let isRangeDeprecated = INFO_ABSENT;
       let isLootDeprecated = INFO_ABSENT;
-      let isBattlesDeprecated = INFO_ABSENT;
-      let isFleesDeprecated = INFO_ABSENT;
+      const isBattlesDeprecated = {
+        success: INFO_ABSENT,
+        fail: INFO_ABSENT,
+      };
+      const isFleesDeprecated = {
+        success: INFO_ABSENT,
+        fail: INFO_ABSENT,
+      };
       let isConcussionsDeprecated = INFO_ABSENT;
 
       const beast = fBeast.toJSON();
 
-      const getDeprecatedFlair = (dataStatus, tiny = false) => {
+      const getDeprecatedFlair = (dataStatus, tiny = true, forceActualDisaplay = false) => {
         switch (dataStatus) {
           case INFO_ACTUAL:
-            return tiny ? '✅' : '✅ <b>Актуальные данные</b> ✅\n';
+            if (forceActualDisaplay) {
+              return tiny ? '✅' : '✅ <b>Актуальные данные</b> ✅\n';
+            }
+
+            return '';
           case INFO_DEPRECATED:
-            return tiny ? '‼️' : '‼️ <b>Устаревшие данные</b> ‼️\n';
+            return tiny ? ' ‼️' : '‼️ <b>Устаревшие данные</b> ‼️\n';
           case INFO_ABSENT:
             return '';
           case INFO_MIXED:
           default:
-            return tiny ? '⚠️' : '⚠️ <b>Смешанные данные</b> ⚠️\n';
+            return tiny ? ' ⚠️' : '⚠️ <b>Смешанные данные</b> ⚠️\n';
         }
       };
 
@@ -215,8 +225,6 @@ const routedBeastView = (Beast, seachParams, route = null, config) => new Promis
 
         let successFlees = [];
         let failFlees = [];
-        let successFleesStatus = INFO_ABSENT;
-        let failFleesStatus = INFO_ABSENT;
 
         const actualSuccessFlees = [];
         const actualFailFlees = [];
@@ -250,11 +258,11 @@ const routedBeastView = (Beast, seachParams, route = null, config) => new Promis
 
         if (actualSuccessFlees.length > 0) {
           if (actualSuccessFlees.length >= actualDataThreshold) {
-            successFleesStatus = INFO_ACTUAL;
+            isFleesDeprecated.success = INFO_ACTUAL;
 
             successFlees = actualSuccessFlees;
           } else if (actualSuccessFlees.length <= actualDataThreshold && outdatedSuccessFlees.length > 0) {
-            successFleesStatus = INFO_MIXED;
+            isFleesDeprecated.success = INFO_MIXED;
 
             successFlees = [
               ...actualSuccessFlees,
@@ -262,18 +270,18 @@ const routedBeastView = (Beast, seachParams, route = null, config) => new Promis
             ];
           }
         } else if (outdatedSuccessFlees.length > 0) {
-          successFleesStatus = INFO_DEPRECATED;
+          isFleesDeprecated.success = INFO_DEPRECATED;
 
           successFlees = outdatedSuccessFlees;
         }
 
         if (actualFailFlees.length > 0) {
           if (actualFailFlees.length >= actualDataThreshold) {
-            failFleesStatus = INFO_ACTUAL;
+            isFleesDeprecated.fail = INFO_ACTUAL;
 
             failFlees = actualFailFlees;
           } else if (actualFailFlees.length <= actualDataThreshold && outdatedFailFlees.length > 0) {
-            failFleesStatus = INFO_MIXED;
+            isFleesDeprecated.fail = INFO_MIXED;
 
             failFlees = [
               ...actualFailFlees,
@@ -281,15 +289,13 @@ const routedBeastView = (Beast, seachParams, route = null, config) => new Promis
             ];
           }
         } else if (outdatedFailFlees.length > 0) {
-          failFleesStatus = INFO_DEPRECATED;
+          isFleesDeprecated.fail = INFO_DEPRECATED;
 
           failFlees = outdatedFailFlees;
         }
 
         const successFleesText = _.sortBy(successFlees, flee => flee.stats.agility).map(flee => `Успешно при 🤸‍♂️&gt; ${flee.stats.agility || flee.agility}`).shift();
         const failFleesText = _.sortBy(failFlees, flee => -flee.stats.agility).map(flee => `Неудача при 🤸‍♂️&lt; ${flee.stats.agility || flee.agility} (-💔${flee.damageReceived})`).shift();
-
-        isFleesDeprecated = detectInromationPrecision([successFleesStatus, failFleesStatus]);
 
         return {
           successFlees: _.isEmpty(successFlees) ? 'Нет данных об удачных побегах' : successFleesText,
@@ -349,8 +355,6 @@ const routedBeastView = (Beast, seachParams, route = null, config) => new Promis
 
         let successBattles = [];
         let failBattles = [];
-        let successBattlesStatus = INFO_ABSENT;
-        let failBattlesStatus = INFO_ABSENT;
 
         const actualSuccessBattles = [];
         const actualFailBattles = [];
@@ -401,11 +405,11 @@ const routedBeastView = (Beast, seachParams, route = null, config) => new Promis
 
         if (actualSuccessBattles.length > 0) {
           if (actualSuccessBattles.length >= actualDataThreshold) {
-            successBattlesStatus = INFO_ACTUAL;
+            isBattlesDeprecated.success = INFO_ACTUAL;
 
             successBattles = actualSuccessBattles;
           } else if (actualSuccessBattles.length <= actualDataThreshold && outdatedSuccessBattles.length > 0) {
-            successBattlesStatus = INFO_MIXED;
+            isBattlesDeprecated.success = INFO_MIXED;
 
             successBattles = [
               ...actualSuccessBattles,
@@ -413,18 +417,18 @@ const routedBeastView = (Beast, seachParams, route = null, config) => new Promis
             ];
           }
         } else if (outdatedSuccessBattles.length > 0) {
-          successBattlesStatus = INFO_DEPRECATED;
+          isBattlesDeprecated.success = INFO_DEPRECATED;
 
           successBattles = outdatedSuccessBattles;
         }
 
         if (actualFailBattles.length > 0) {
           if (actualFailBattles.length >= actualDataThreshold) {
-            failBattlesStatus = INFO_ACTUAL;
+            isBattlesDeprecated.fail = INFO_ACTUAL;
 
             failBattles = actualFailBattles;
           } else if (actualFailBattles.length <= actualDataThreshold && outdatedFailBattles.length > 0) {
-            failBattlesStatus = INFO_MIXED;
+            isBattlesDeprecated.fail = INFO_MIXED;
 
             failBattles = [
               ...actualFailBattles,
@@ -432,7 +436,7 @@ const routedBeastView = (Beast, seachParams, route = null, config) => new Promis
             ];
           }
         } else if (outdatedFailBattles.length > 0) {
-          failBattlesStatus = INFO_DEPRECATED;
+          isBattlesDeprecated.fail = INFO_DEPRECATED;
 
           failBattles = outdatedFailBattles;
         }
@@ -447,8 +451,6 @@ const routedBeastView = (Beast, seachParams, route = null, config) => new Promis
 
         successBattles = successBattles.map(battle => battle.battleReply);
         failBattles = failBattles.map(battle => battle.battleReply);
-
-        isBattlesDeprecated = detectInromationPrecision([successBattlesStatus, failBattlesStatus]);
 
         return {
           successBattles: _.isEmpty(successBattles) ? 'Нет данных об удачных битвах' : successBattles.join('\n\n'),
@@ -475,18 +477,18 @@ ${getDrop(beast.capsReceived, beast.materialsReceived)}
 ${getItems(beast.receivedItems)}
 `;
 
-      const shortBattlesReply = `<b>[ПОБЕДА]</b>
+      const shortBattlesReply = `<b>[ПОБЕДА]</b>${getDeprecatedFlair(isBattlesDeprecated.success)}
 ${successBattlesShort}
 
-<b>[НЕУДАЧА]</b>
+<b>[НЕУДАЧА]</b>${getDeprecatedFlair(isBattlesDeprecated.fail)}
 ${failBattlesShort}
 `;
 
-      const longBattlesReply = `<b>[СТЫЧКИ]</b>
+      const longBattlesReply = `<b>[ПОБЕДА]</b>${getDeprecatedFlair(isBattlesDeprecated.success)}
 ${successBattlesLong}
 
----
 
+<b>[НЕУДАЧА]</b>${getDeprecatedFlair(isBattlesDeprecated.fail)}
 ${failBattlesLong}
 `;
 
@@ -495,44 +497,44 @@ ${getConcussions(beast.concussions)}
 `;
 
       const fleesReply = `<b>[ПОБЕГ]</b>
+<i>=УСПЕШНЫЕ=</i>${getDeprecatedFlair(isFleesDeprecated.success)}
 ${processedFlees.successFlees}
 ---
+<i>=НЕУДАЧА=</i>${getDeprecatedFlair(isFleesDeprecated.fail)}
 ${processedFlees.failFlees}
 `;
 
       const headerReply = `<b>${beast.name}</b>
-👣${beast.type === 'DarkZone' ? '🚷' : '💀'} ${getDistanceRange(beast.distanceRange)}км ${getDeprecatedFlair(isRangeDeprecated, true)}
+👣${beast.type === 'DarkZone' ? '🚷' : '💀'} ${getDistanceRange(beast.distanceRange)}км ${getDeprecatedFlair(isRangeDeprecated, true, true)}
 `;
-      const isTotalDeprecated = detectInromationPrecision([isLootDeprecated, isBattlesDeprecated, isFleesDeprecated]);
-
       switch (route) {
         case 'info':
           resolve({
-            reply: `${getDeprecatedFlair(isTotalDeprecated)}${headerReply}\n${shortBattlesReply}\n${fleesReply}`,
+            reply: `${headerReply}\n${shortBattlesReply}\n${fleesReply}`,
             beast,
           });
           break;
         case 'loot':
           resolve({
-            reply: `${getDeprecatedFlair(isLootDeprecated)}${headerReply}\n${lootReply}`,
+            reply: `${getDeprecatedFlair(isLootDeprecated, false)}${headerReply}\n${lootReply}`,
             beast,
           });
           break;
         case 'battles':
           resolve({
-            reply: `${getDeprecatedFlair(isBattlesDeprecated)}${headerReply}\n${longBattlesReply}`,
+            reply: `${headerReply}\n${longBattlesReply}`,
             beast,
           });
           break;
         case 'concussions':
           resolve({
-            reply: `${getDeprecatedFlair(isConcussionsDeprecated)}${headerReply}\n${concussionsReply}`,
+            reply: `${getDeprecatedFlair(isConcussionsDeprecated, false)}${headerReply}\n${concussionsReply}`,
             beast,
           });
           break;
         default:
           resolve({
-            reply: `${getDeprecatedFlair(isTotalDeprecated)}${headerReply}\n${shortBattlesReply}\n${fleesReply}`,
+            reply: `${headerReply}\n${shortBattlesReply}\n${fleesReply}`,
             beast,
           });
           break;

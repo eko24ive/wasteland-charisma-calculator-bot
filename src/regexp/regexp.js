@@ -22,6 +22,7 @@ const beastDungeonFlagRegExp = /📯/;
 const beastAttackRegExp = /.+ 💔-(\d+)/;
 const beastStunRegExp = /(.+) оглушен ударом 💫/;
 const playerBeastAttackRegExp = /👤Ты .+ 💥(\d+)/;
+const droneBeastAttackRegExp = /🛰.+💥(.+)/;
 const beastDefeatRegExp = /Тебя буквально размазали/;
 const beastDefeatFleeRegExp = /Ты проиграл в этой схватке/;
 const beastSuccessFleeRegExp = /удалось избежать схватки/;
@@ -40,6 +41,7 @@ const deathMessageRecourcesLostRexExp = /Потеряно: 🕳(\d+) и 📦(\d+
 const beastFacedRegExp = /Во время вылазки на тебя напал (.+)\./;
 const walkingBeastFacedRegExp = /устрашающе начал приближаться (.+)\./;
 const dungeonBeastFacedRegExp = /(.+) перегородил тебе путь./;
+const haloDungeonBeastFacedRegExp = /Ты углубился в пещеру...Внезапно, тварь набросилась на тебя из темноты.\n(.+)/
 
 const metalAmountRegExp = /(.+) (\d+)/; // 🔗Кубонит 192
 const multipleItemsReceived = /(.+) [x|х](\d+)/; // Провода x1
@@ -88,6 +90,7 @@ const regularBeast = {
     beastAttackRegExp,
     beastStunRegExp,
     playerBeastAttackRegExp,
+    droneBeastAttackRegExp,
     beastDefeatRegExp,
     beastVictoryRegExp,
     receivedItemRegExp,
@@ -105,6 +108,7 @@ const dungeonBeast = {
     beastAttackRegExp,
     beastStunRegExp,
     playerBeastAttackRegExp,
+    droneBeastAttackRegExp,
     beastDefeatRegExp,
     beastVictoryRegExp,
     beastDefeatCapsLostRegExp,
@@ -152,6 +156,12 @@ const regularBeastFaced = {
 const dungeonBeastFaced = {
   contains: [
     dungeonBeastFacedRegExp,
+  ],
+};
+
+const haloDungeonBeastFaced = {
+  contains: [
+    haloDungeonBeastFacedRegExp,
   ],
 };
 
@@ -211,6 +221,7 @@ const regexps = {
   beastAttackRegExp,
   beastStunRegExp,
   playerBeastAttackRegExp,
+  droneBeastAttackRegExp,
   dungeonBeastFacedRegExp,
   beastDefeatRegExp,
   beastVictoryRegExp,
@@ -237,6 +248,7 @@ const regexps = {
   lostCapsAndMaterialsRegExp,
   altInBattleLocationRegExp,
   altInBattleBeastRegExp,
+  haloDungeonBeastFacedRegExp,
 };
 
 module.exports = {
@@ -253,5 +265,6 @@ module.exports = {
   giantFought,
   giantFacedOnField,
   altInBattle,
+  haloDungeonBeastFaced,
   regexps,
 };

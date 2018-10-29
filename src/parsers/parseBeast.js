@@ -40,6 +40,16 @@ const parseRegularBeast = (beast) => {
     return false;
   }).filter(dmg => dmg !== false);
 
+  const droneDamagesGiven = splitted.map((row) => {
+    if (regexps.droneBeastAttackRegExp.test(row)) {
+      const [, dmg] = regexps.droneBeastAttackRegExp.exec(row);
+
+      return Number(dmg);
+    }
+
+    return false;
+  }).filter(dmg => dmg !== false);
+
   const damagesGiven = splitted.map((row) => {
     if (regexps.playerBeastAttackRegExp.test(row)) {
       const [, dmg] = regexps.playerBeastAttackRegExp.exec(row);
@@ -78,7 +88,10 @@ const parseRegularBeast = (beast) => {
     materialsReceived: [Number(materialsReceived)],
     receivedItems,
     damagesReceived,
-    damagesGiven,
+    damagesGiven: [
+      ...damagesGiven,
+      ...droneDamagesGiven,
+    ],
     fightResult,
     currentHealth: Number(`${negativePrefix}${currentHealth}`),
     amountOfConcussions,
@@ -118,6 +131,16 @@ const parseDungeonBeast = (beast) => {
     return false;
   }).filter(dmg => dmg !== false);
 
+  const droneDamagesGiven = splitted.map((row) => {
+    if (regexps.droneBeastAttackRegExp.test(row)) {
+      const [, dmg] = regexps.droneBeastAttackRegExp.exec(row);
+
+      return Number(dmg);
+    }
+
+    return false;
+  }).filter(dmg => dmg !== false);
+
   const amountOfConcussions = splitted.map((row) => {
     if (regexps.beastStunRegExp.test(row)) {
       return true;
@@ -149,7 +172,10 @@ const parseDungeonBeast = (beast) => {
     materialsReceived: 0,
     receivedItems: [],
     damagesReceived,
-    damagesGiven,
+    damagesGiven: [
+      ...damagesGiven,
+      ...droneDamagesGiven,
+    ],
     currentHealth,
     type,
     amountOfConcussions,
