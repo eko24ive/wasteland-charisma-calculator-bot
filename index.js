@@ -610,8 +610,6 @@ const actualActualProcessUserData = (msg, reportData, updatesData, options) => {
             const uniqueBattles = [];
             const uniqueConcussions = [];
             const uniqueFlees = [];
-            const sameBattles = [];
-            const sameFlees = [];
 
             if (iBeast.battles) {
               if (iBeast.battles.length > 0) {
@@ -620,21 +618,15 @@ const actualActualProcessUserData = (msg, reportData, updatesData, options) => {
                     uniqueBattles.push(battle);
                   } else {
                     const battlesForValidation = databaseBeast.battles.filter(({ version }) => version === VERSION);
-                    const sameStatsBattle = battlesForValidation.some(newBattle => battle.totalDamageReceived === newBattle.totalDamageReceived
-                        && battle.totalDamageGiven === newBattle.totalDamageGiven);
-
+                    
                     const sameStamp = battlesForValidation.some(newBattle => newBattle.stamp === battle.stamp);
 
                     if (sameStamp) {
                       dupes.battles += 1;
                     }
 
-                    if (!sameStatsBattle && !sameStamp) {
+                    if (!sameStamp) {
                       uniqueBattles.push(battle);
-                    }
-
-                    if (!sameStamp && sameStatsBattle) {
-                      sameBattles.push(battle);
                     }
                   }
                 });
@@ -669,22 +661,14 @@ const actualActualProcessUserData = (msg, reportData, updatesData, options) => {
                   } else {
                     const fleesForValidation = databaseBeast.flees.filter(({ version }) => version === VERSION);
 
-                    const sameStatsFlee = fleesForValidation.some(newFlee => flee.stats.agility === newFlee.stats.agility
-                                && flee.outcome === newFlee.outcome
-                                && flee.damageReceived === newFlee.damageReceived);
-
                     const sameStamp = fleesForValidation.some(newFlee => newFlee.stamp === flee.stamp);
 
                     if (sameStamp) {
                       dupes.flees += 1;
                     }
 
-                    if (!sameStatsFlee && !sameStamp) {
+                    if (!sameStamp) {
                       uniqueFlees.push(flee);
-                    }
-
-                    if (!sameStamp && sameStatsFlee) {
-                      sameFlees.push(flee);
                     }
                   }
                 });
@@ -768,16 +752,6 @@ const actualActualProcessUserData = (msg, reportData, updatesData, options) => {
               });
             }
 
-            if (sameBattles.length > 0) {
-              sameBattles.forEach((newBattle) => {
-                if (newBattle.outcome === 'win') {
-                  beastPoints += forwardPoints.sameBattleWin;
-                } else {
-                  beastPoints += forwardPoints.sameBattleLose;
-                }
-              });
-            }
-
             if (uniqueConcussions.length > 0) {
               databaseBeast.concussions.push(signEntryWithVersion(uniqueConcussions));
             }
@@ -794,25 +768,14 @@ const actualActualProcessUserData = (msg, reportData, updatesData, options) => {
               });
             }
 
-            if (sameFlees.length > 0) {
-              sameFlees.flees.forEach((newFlee) => {
-                if (newFlee.outcome === 'win') {
-                  beastPoints += forwardPoints.sameFleeWin;
-                } else {
-                  beastPoints += forwardPoints.sameFleeLose;
-                }
-              });
-            }
-
-            dataProcessed += 1;
 
             if (
               !_.isEmpty(uniqueBattles)
-                || !_.isEmpty(sameBattles)
                 || !_.isEmpty(uniqueConcussions)
                 || !_.isEmpty(uniqueFlees)
-                || !_.isEmpty(sameFlees)
             ) {
+              dataProcessed += 1;
+
               if (iBeast.type === 'DarkZone') {
                 userForwardPoints += beastPoints * forwardPoints.darkZoneBattle;
               } else {
@@ -1811,7 +1774,7 @@ bot.on('forward', (msg) => {
       routedBeastView(Beast, {
         name: oBeast.name,
         isDungeon: true,
-      }, {
+      }, null, {
         env: process.env.ENV,
         VERSION,
       }).then(({ reply }) => {
