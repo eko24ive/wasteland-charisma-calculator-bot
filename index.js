@@ -1811,7 +1811,7 @@ bot.on('forward', (msg) => {
       routedBeastView(Beast, {
         name: oBeast.name,
         isDungeon: true,
-      }, {
+      }, null, {
         env: process.env.ENV,
         VERSION,
       }).then(({ reply }) => {
