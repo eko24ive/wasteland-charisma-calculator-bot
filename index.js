@@ -610,7 +610,6 @@ const actualActualProcessUserData = (msg, reportData, updatesData, options) => {
             const uniqueBattles = [];
             const uniqueConcussions = [];
             const uniqueFlees = [];
-            const sameFlees = [];
 
             if (iBeast.battles) {
               if (iBeast.battles.length > 0) {
@@ -662,22 +661,14 @@ const actualActualProcessUserData = (msg, reportData, updatesData, options) => {
                   } else {
                     const fleesForValidation = databaseBeast.flees.filter(({ version }) => version === VERSION);
 
-                    const sameStatsFlee = fleesForValidation.some(newFlee => flee.stats.agility === newFlee.stats.agility
-                                && flee.outcome === newFlee.outcome
-                                && flee.damageReceived === newFlee.damageReceived);
-
                     const sameStamp = fleesForValidation.some(newFlee => newFlee.stamp === flee.stamp);
 
                     if (sameStamp) {
                       dupes.flees += 1;
                     }
 
-                    if (!sameStatsFlee && !sameStamp) {
+                    if (!sameStamp) {
                       uniqueFlees.push(flee);
-                    }
-
-                    if (!sameStamp && sameStatsFlee) {
-                      sameFlees.push(flee);
                     }
                   }
                 });
@@ -777,24 +768,14 @@ const actualActualProcessUserData = (msg, reportData, updatesData, options) => {
               });
             }
 
-            if (sameFlees.length > 0) {
-              sameFlees.flees.forEach((newFlee) => {
-                if (newFlee.outcome === 'win') {
-                  beastPoints += forwardPoints.sameFleeWin;
-                } else {
-                  beastPoints += forwardPoints.sameFleeLose;
-                }
-              });
-            }
-
-            dataProcessed += 1;
 
             if (
               !_.isEmpty(uniqueBattles)
                 || !_.isEmpty(uniqueConcussions)
                 || !_.isEmpty(uniqueFlees)
-                || !_.isEmpty(sameFlees)
             ) {
+              dataProcessed += 1;
+
               if (iBeast.type === 'DarkZone') {
                 userForwardPoints += beastPoints * forwardPoints.darkZoneBattle;
               } else {
