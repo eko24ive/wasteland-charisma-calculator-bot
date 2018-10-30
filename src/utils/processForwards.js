@@ -300,6 +300,14 @@ const processForwards = (inputData) => {
           outcome: 'lost',
         }];
 
+        beastData.capsReceived = [{
+          value: Number(data.capsReceived),
+        }];
+
+        beastData.materialsReceived = [{
+          value: Number(data.materialsReceived),
+        }];
+
         reportData.isDead = true;
         reportData.errors.push(`Вижу, ты склеил ласты на ${reportData.distance} километре. Сочуствую. Я не обрабатывал форварды после твоей смерти`);
       }
