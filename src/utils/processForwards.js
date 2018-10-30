@@ -283,6 +283,8 @@ const processForwards = (inputData) => {
             value: Number(data.capsReceived),
           }];
           beastData.isDungeon = false;
+        } else {
+          beastData.isDungeon = true;
         }
 
         if (Number(data.materialsReceived) !== 0) {
@@ -290,6 +292,8 @@ const processForwards = (inputData) => {
             value: Number(data.materialsReceived),
           }];
           beastData.isDungeon = false;
+        } else {
+          beastData.isDungeon = true;
         }
       } else if (data.fightResult === 'lose') {
         beastData.battles = [{
