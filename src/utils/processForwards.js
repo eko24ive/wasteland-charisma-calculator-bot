@@ -204,7 +204,7 @@ const processForwards = (inputData) => {
 
       if (mismatch) {
         reportData.prcoessAllowed = false;
-        const distanceProcessed = reportData.distanceHistory.filter((v, index) => index !== reportData.distanceHistory.length - 1);
+        const distanceProcessed = reportData.distanceHistory.filter((v, _index) => _index !== reportData.distanceHistory.length - 1);
         const lastpProcessedDistance = _.last(distanceProcessed);
 
         reportData.errors.push(`Похоже что ты скинул километры с других кругов, я не обрабатывал данные что ты скинул после ${lastpProcessedDistance}км\nЯ обработал данные за: ${distanceProcessed.join('км, ')}км`);
@@ -283,6 +283,8 @@ const processForwards = (inputData) => {
             value: Number(data.capsReceived),
           }];
           beastData.isDungeon = false;
+        } else {
+          beastData.isDungeon = true;
         }
 
         if (Number(data.materialsReceived) !== 0) {
@@ -290,6 +292,8 @@ const processForwards = (inputData) => {
             value: Number(data.materialsReceived),
           }];
           beastData.isDungeon = false;
+        } else {
+          beastData.isDungeon = true;
         }
       } else if (data.fightResult === 'lose') {
         beastData.battles = [{
@@ -554,9 +558,14 @@ const processForwards = (inputData) => {
           value: data.distance,
         }],
         proofedByForward: true,
+        capsReceived: [{
+          value: 0,
+        }],
+        materialsReceived: [{
+          value: 0,
+        }],
         subType,
       };
-
 
       reportData.distanceHistory.push(data.distance);
 
