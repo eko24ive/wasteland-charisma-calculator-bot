@@ -610,7 +610,6 @@ const actualActualProcessUserData = (msg, reportData, updatesData, options) => {
             const uniqueBattles = [];
             const uniqueConcussions = [];
             const uniqueFlees = [];
-            const sameBattles = [];
             const sameFlees = [];
 
             if (iBeast.battles) {
@@ -620,21 +619,15 @@ const actualActualProcessUserData = (msg, reportData, updatesData, options) => {
                     uniqueBattles.push(battle);
                   } else {
                     const battlesForValidation = databaseBeast.battles.filter(({ version }) => version === VERSION);
-                    const sameStatsBattle = battlesForValidation.some(newBattle => battle.totalDamageReceived === newBattle.totalDamageReceived
-                        && battle.totalDamageGiven === newBattle.totalDamageGiven);
-
+                    
                     const sameStamp = battlesForValidation.some(newBattle => newBattle.stamp === battle.stamp);
 
                     if (sameStamp) {
                       dupes.battles += 1;
                     }
 
-                    if (!sameStatsBattle && !sameStamp) {
+                    if (!sameStamp) {
                       uniqueBattles.push(battle);
-                    }
-
-                    if (!sameStamp && sameStatsBattle) {
-                      sameBattles.push(battle);
                     }
                   }
                 });
@@ -768,16 +761,6 @@ const actualActualProcessUserData = (msg, reportData, updatesData, options) => {
               });
             }
 
-            if (sameBattles.length > 0) {
-              sameBattles.forEach((newBattle) => {
-                if (newBattle.outcome === 'win') {
-                  beastPoints += forwardPoints.sameBattleWin;
-                } else {
-                  beastPoints += forwardPoints.sameBattleLose;
-                }
-              });
-            }
-
             if (uniqueConcussions.length > 0) {
               databaseBeast.concussions.push(signEntryWithVersion(uniqueConcussions));
             }
@@ -808,7 +791,6 @@ const actualActualProcessUserData = (msg, reportData, updatesData, options) => {
 
             if (
               !_.isEmpty(uniqueBattles)
-                || !_.isEmpty(sameBattles)
                 || !_.isEmpty(uniqueConcussions)
                 || !_.isEmpty(uniqueFlees)
                 || !_.isEmpty(sameFlees)
