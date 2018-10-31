@@ -169,7 +169,7 @@ const updateOrCreate = (msg, pip, cb = (() => {})) => {
         cb(createResult);
       });
     } else if (result.ok === true && result.reason === 'USER_FOUND') {
-      userManager({ telegramData, pipData }).then((updateResult) => {
+      userManager.update({ telegramData, pipData }).then((updateResult) => {
         cb(updateResult);
       });
     }
