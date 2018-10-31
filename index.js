@@ -169,7 +169,7 @@ const updateOrCreate = (msg, pip, cb = (() => {})) => {
         cb(createResult);
       });
     } else if (result.ok === true && result.reason === 'USER_FOUND') {
-      userManager.786({ telegramData, pipData }).then((updateResult) => {
+      userManager({ telegramData, pipData }).then((updateResult) => {
         cb(updateResult);
       });
     }
@@ -783,8 +783,8 @@ const actualActualProcessUserData = (msg, reportData, updatesData, options) => {
               }
             }
 
-            databaseBeast.save().then(() => next()).catch(e => {
-              console.log(`Tried to save:\n${JSON.stringify(iBeast)}\n===================`)
+            databaseBeast.save().then(() => next()).catch((e) => {
+              console.log(`Tried to save:\n${JSON.stringify(iBeast)}\n===================`);
               console.log(`Error:\n${e}\n===================\n===================\n===================`);
             });
           }
