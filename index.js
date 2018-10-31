@@ -618,7 +618,7 @@ const actualActualProcessUserData = (msg, reportData, updatesData, options) => {
                     uniqueBattles.push(battle);
                   } else {
                     const battlesForValidation = databaseBeast.battles.filter(({ version }) => version === VERSION);
-                    
+
                     const sameStamp = battlesForValidation.some(newBattle => newBattle.stamp === battle.stamp);
 
                     if (sameStamp) {
@@ -656,7 +656,7 @@ const actualActualProcessUserData = (msg, reportData, updatesData, options) => {
             if (iBeast.flees) {
               if (iBeast.flees.length === 1) {
                 iBeast.flees.forEach((flee) => {
-                  if (databaseBeast.battles === undefined) {
+                  if (databaseBeast.flee === undefined) {
                     uniqueFlees.push(flee);
                   } else {
                     const fleesForValidation = databaseBeast.flees.filter(({ version }) => version === VERSION);
