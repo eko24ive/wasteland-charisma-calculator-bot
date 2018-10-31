@@ -59,21 +59,25 @@ const mergeBeasts = (beastsToMerge) => {
         && existingBeast.subType === beast.subType
         && existingBeast.type === beast.type
       ) {
-        mergedBeasts[beast.name] = beast;
+        if (beast.distanceRange !== undefined && beast.distanceRange.length > 0) {
+          existingBeast.distanceRange.push(beast.distanceRange[0]);
+        }
+        if (beast.capsReceived !== undefined && beast.capsReceived.length > 0) {
+          existingBeast.capsReceived.push(beast.capsReceived[0]);
+        }
+        if (beast.materialsReceived !== undefined && beast.materialsReceived.length > 0) {
+          existingBeast.materialsReceived.push(beast.materialsReceived[0]);
+        }
 
-        existingBeast.distanceRange.push(beast.distanceRange[0]);
-        existingBeast.capsReceived.push(beast.capsReceived[0]);
-        existingBeast.materialsReceived.push(beast.materialsReceived[0]);
-
-        if (beast.battles !== undefined) {
+        if (beast.battles !== undefined && beast.battles.length > 0) {
           existingBeast.battles.push(beast.battles[0]);
         }
 
-        if (beast.concussions !== undefined) {
+        if (beast.concussions !== undefined && beast.concussions.length > 0) {
           existingBeast.concussions.push(beast.concussions[0]);
         }
 
-        if (beast.flees !== undefined) {
+        if (beast.flees !== undefined && beast.flees.length > 0) {
           existingBeast.flees.push(beast.flees[0]);
         }
 
@@ -298,6 +302,14 @@ const processForwards = (inputData) => {
       } else if (data.fightResult === 'lose') {
         beastData.battles = [{
           outcome: 'lost',
+        }];
+
+        beastData.capsReceived = [{
+          value: Number(data.capsReceived),
+        }];
+
+        beastData.materialsReceived = [{
+          value: Number(data.materialsReceived),
         }];
 
         reportData.isDead = true;
@@ -558,12 +570,10 @@ const processForwards = (inputData) => {
           value: data.distance,
         }],
         proofedByForward: true,
-        capsReceived: [{
-          value: 0,
-        }],
-        materialsReceived: [{
-          value: 0,
-        }],
+        capsReceived: [],
+        materialsReceived: [],
+        battles: [],
+        concussions: [],
         subType,
       };
 

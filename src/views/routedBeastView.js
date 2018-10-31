@@ -29,6 +29,10 @@ const routedBeastView = (Beast, seachParams, route = null, config) => new Promis
 
   Beast.findOne(seachParams).then((fBeast) => {
     if (fBeast !== null) {
+      console.log('==================');
+      console.log(`Browsing: ${fBeast._id.toJSON()} `);
+      console.log('==================');
+
       let isRangeDeprecated = INFO_ABSENT;
       let isLootDeprecated = INFO_ABSENT;
       const isBattlesDeprecated = {
@@ -236,7 +240,7 @@ const routedBeastView = (Beast, seachParams, route = null, config) => new Promis
 
           const parsedFlee = {
             stats: {
-              agility: agility || stats.agility,
+              agility: agility || (stats ? stats.agility : agility),
             },
             ...flee,
           };
