@@ -1,6 +1,6 @@
 {
   "name": "wasteland-charisma-calculator-bot",
-  "version": "0.1.13",
+  "version": "0.2.13",
   "description": "",
   "main": "index.js",
   "dependencies": {
