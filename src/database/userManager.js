@@ -61,18 +61,20 @@ const userManager = User => ({
         });
       }
 
-      if (databaseUser.pip.timeStamp > pipData.timeStamp) {
-        return resolve({
-          ok: false,
-          reason: 'PIP_OUTDATED',
-        });
-      }
+      if (!_.isEmpty(databaseUser.toJSON().pip)) {
+        if (databaseUser.pip.timeStamp > pipData.timeStamp) {
+          return resolve({
+            ok: false,
+            reason: 'PIP_OUTDATED',
+          });
+        }
 
-      if (!comparePips(pipData, databaseUser.pip)) {
-        return resolve({
-          ok: false,
-          reason: 'PIP_VALIDATION_FAILED',
-        });
+        if (!comparePips(pipData, databaseUser.pip)) {
+          return resolve({
+            ok: false,
+            reason: 'PIP_VALIDATION_FAILED',
+          });
+        }
       }
 
       databaseUser.pip = pipData;
