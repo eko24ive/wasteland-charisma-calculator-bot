@@ -236,7 +236,7 @@ const routedBeastView = (Beast, seachParams, route = null, config) => new Promis
 
           const parsedFlee = {
             stats: {
-              agility: agility || stats.agility,
+              agility: agility || (stats ? stats.agility : agility),
             },
             ...flee,
           };

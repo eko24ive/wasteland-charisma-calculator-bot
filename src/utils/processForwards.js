@@ -259,6 +259,7 @@ const processForwards = (inputData) => {
       const beastData = {
         isDungeon,
         subType,
+        flees: [],
       };
 
       beastData.name = data.name;
@@ -412,6 +413,7 @@ const processForwards = (inputData) => {
 
       const beastData = {
         isDungeon: data.isDungeon || isDungeon,
+        flees: [],
         subType,
       };
 
@@ -566,12 +568,10 @@ const processForwards = (inputData) => {
           value: data.distance,
         }],
         proofedByForward: true,
-        capsReceived: [{
-          value: 0,
-        }],
-        materialsReceived: [{
-          value: 0,
-        }],
+        capsReceived: [],
+        materialsReceived: [],
+        battles: [],
+        concussions: [],
         subType,
       };
 
