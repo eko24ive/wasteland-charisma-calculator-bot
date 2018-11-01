@@ -5,16 +5,19 @@ const beastScheme = new Schema({
   distanceRange: [{
     value: Number,
     version: String,
+    epoch: String,
   }],
   name: String,
   isDungeon: Boolean,
   capsReceived: [{
     value: Number,
     version: String,
+    epoch: String,
   }],
   materialsReceived: [{
     value: Number,
     version: String,
+    epoch: String,
   }],
   receivedItems: Object,
   type: String,
@@ -33,6 +36,7 @@ const beastScheme = new Schema({
     stamp: String,
     distance: Number,
     version: String,
+    epoch: String,
   }],
   flees: [{
     stats: {
@@ -42,6 +46,7 @@ const beastScheme = new Schema({
     outcome: String,
     stamp: String,
     version: String,
+    epoch: String,
   }],
   concussions: [{
     stats: {
@@ -49,6 +54,7 @@ const beastScheme = new Schema({
     },
     amount: Number,
     version: String,
+    epoch: String,
   }],
   lastUpdated: String,
 }, {

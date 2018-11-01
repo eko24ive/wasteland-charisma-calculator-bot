@@ -1,4 +1,5 @@
 const _ = require('underscore');
+const moment = require('moment');
 
 const {
   regexps,
@@ -119,7 +120,7 @@ const mergeBeasts = (beastsToMerge) => {
   return beasts;
 };
 
-const processForwards = (inputData) => {
+const processForwards = (inputData, id) => {
   const reportData = {
     capsReceived: 0,
     capsLost: 0,
@@ -146,6 +147,7 @@ const processForwards = (inputData) => {
     initialForwardDate: null,
     firstForwardDate: null,
     lastForwardDate: null,
+    epoch: `${moment.now()}+${id}`,
   };
 
   const updatesData = {
@@ -705,6 +707,7 @@ const processForwards = (inputData) => {
       locations: updatesData.locations,
       beasts: mergeBeasts(updatesData.beasts),
     },
+
   };
 };
 
