@@ -109,6 +109,13 @@ const userManager = User => ({
 
       const { pip, points } = databaseUser.toJSON();
 
+      if (pip === undefined) {
+        return resolve({
+          ok: false,
+          reason: 'PIP_IS_EMPTY',
+        });
+      }
+
       return resolve({
         ok: true,
         reason: 'USER_FOUND',
