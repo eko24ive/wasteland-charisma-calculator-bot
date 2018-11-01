@@ -421,7 +421,7 @@ const actualActualProcessUserData = (msg, reportData, updatesData, options) => {
     );
   }
 
-  if (reportData.lastPip !== null) {
+  if (reportData.lastPip !== null && reportData.lastPip !== undefined) {
     updateOrCreate(msg, reportData.lastPip);
   }
 
@@ -2392,10 +2392,44 @@ bot.on('/mypipstats', (msg) => {
   });
 });
 
-bot.on('/debug', msg => msg.reply.text(`Форварды принимаються только от @WastelandWarsBot.
-Отменяю твои фоварды - нехуй выебываться.`, {
-  asReply: false,
-}));
+bot.on('/debug', (msg) => {
+  createSession(msg.from.id);
+
+  const updatesData = {
+    locations: [],
+    beasts: [{
+      isDungeon: false,
+      subType: null,
+      name: '👤Майкл Майерс (Виновник этого торжества)',
+      type: 'DarkZone',
+      date: 1541030493,
+      proofedByForward: false,
+      distanceRange: [{ value: 64 }],
+      battles: [
+        {
+          outcome: 'win',
+          stats: { armor: 322, damage: 1384 },
+          totalDamageGiven: 2599,
+          totalDamageReceived: 0,
+          damagesGiven: [1321, 1278],
+          damagesReceived: [0],
+          healthOnStart: 411,
+          stamp: '154103049356019931',
+          distance: 64,
+        },
+      ],
+      receivedItems: { Микрочип: [1] },
+      capsReceived: [{ value: 7609 }],
+      materialsReceived: [{ value: 11370 }],
+    }],
+  };
+
+  const { processDataConfig: options } = sessions[msg.from.id];
+
+  actualProcessUserData(msg, {
+    errors: [],
+  }, updatesData, options);
+});
 
 bot.on(/^\d+$/, (msg) => {
   switch (sessions[msg.from.id].state) {
@@ -3263,5 +3297,6 @@ bot.on('/reset_beast_database', (msg) => {
     });
   }
 });
+
 
 bot.start();
