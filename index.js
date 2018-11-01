@@ -29,6 +29,7 @@ const beastSchema = require('./src/schemes/beast');
 const locationSchema = require('./src/schemes/location');
 const giantScheme = require('./src/schemes/giant');
 const userSchema = require('./src/schemes/user');
+const journeySchema = require('./src/schemes/journey');
 
 const chartGeneration = require('./src/utils/chartGeneration');
 
@@ -77,6 +78,7 @@ const Beast = mongoose.model('Beast', beastSchema);
 const Giant = mongoose.model('Giant', giantScheme);
 const Location = mongoose.model('Location', locationSchema);
 const User = mongoose.model('User', userSchema);
+const Journey = mongoose.model('Journey', journeySchema);
 
 const userManager = UserManager(User);
 
@@ -468,6 +470,7 @@ const actualActualProcessUserData = (msg, reportData, updatesData, options) => {
   const signEntryWithVersion = entry => ({
     ...entry,
     version: VERSION,
+    epoch: reportData.epoch,
   });
 
   const signSetWithVersion = (data) => {
@@ -475,6 +478,7 @@ const actualActualProcessUserData = (msg, reportData, updatesData, options) => {
       return data.map(entry => ({
         ...entry,
         version: VERSION,
+        epoch: reportData.epoch,
       }));
     }
 
@@ -568,6 +572,23 @@ const actualActualProcessUserData = (msg, reportData, updatesData, options) => {
     } else {
       resolve();
     }
+  });
+
+  const saveJourney = () => new Promise((resolve) => {
+    const newJourney = new Journey({
+      epoch: reportData.epoch,
+      user: {
+        id: msg.from.id,
+        username: msg.from.username,
+      },
+      reportData,
+      updatesData,
+      session: sessions[msg.from.id],
+    });
+
+    newJourney.save().then(() => {
+      resolve();
+    });
   });
 
   const processBeasts = () => new Promise((resolve) => {
@@ -885,6 +906,7 @@ const actualActualProcessUserData = (msg, reportData, updatesData, options) => {
       Promise.all([
         processBeasts(),
         processLocations(),
+        saveJourney(),
       ]).then(() => {
         let errors = '';
         let dupesText = '';
@@ -991,7 +1013,7 @@ const processUserData = (msg, options) => {
   let {
     reportData,
     updatesData,
-  } = processForwards(data);
+  } = processForwards(data, msg.from.id || moment.now());
 
   if (reportData.criticalError) {
     return msg.reply.text(`<b>❌ЗАМЕЧЕНА КРИТИЧЕСКАЯ ОШИБКА❌</b>\n\n${reportData.criticalError}\n\n<i>Форварды были отменены.</i>`, {
@@ -1039,7 +1061,7 @@ const processUserData = (msg, options) => {
         const {
           reportData: reportDataWithUserPip,
           updatesData: updatesDataWithUserPip,
-        } = processForwards(data);
+        } = processForwards(data, msg.from.id || moment.now());
 
         if (reportDataWithUserPip.criticalError && reportDataWithUserPip.couldBeUpdated) {
           sessions[msg.from.id].state = states.WAIT_FOR_PIP_FORWARD;
