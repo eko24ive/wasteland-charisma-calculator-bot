@@ -677,7 +677,7 @@ const actualActualProcessUserData = (msg, reportData, updatesData, options) => {
             if (iBeast.flees) {
               if (iBeast.flees.length === 1) {
                 iBeast.flees.forEach((flee) => {
-                  if (databaseBeast.flee === undefined) {
+                  if (databaseBeast.flees === undefined) {
                     uniqueFlees.push(flee);
                   } else {
                     const fleesForValidation = databaseBeast.flees.filter(({ version }) => version === VERSION);
@@ -732,7 +732,7 @@ const actualActualProcessUserData = (msg, reportData, updatesData, options) => {
 
                 databaseBeast.distanceRange = [...databaseBeast.distanceRange, ...signSetWithVersion(newRanges)];
               } else if (!_.isEmpty(sameRanges)) {
-                beastPoints += forwardPoints.sameDistance * sameRanges.length;
+                // beastPoints += forwardPoints.sameDistance * sameRanges.length;
               }
             }
 
@@ -804,9 +804,12 @@ const actualActualProcessUserData = (msg, reportData, updatesData, options) => {
               }
             }
 
+            delete databaseBeast.__v;
+
             databaseBeast.save().then(() => next()).catch((e) => {
-              console.log(`Tried to save:\n${JSON.stringify(iBeast)}\n===================`);
+              console.log(`Tried to save:\n${JSON.stringify(iBeast)}\n===================\nUserId: ${msg.from.id}\n`);
               console.log(`Error:\n${e}\n===================\n===================\n===================`);
+              next();
             });
           }
         });
@@ -3319,6 +3322,19 @@ bot.on('/reset_beast_database', (msg) => {
     });
   }
 });
+
+bot.on('/help_icons', msg => msg.reply.text(`
+✅ - Информация собрана <b>только</b> из актуальной версии ВВ
+⚠️ - Информация собрана из данных актуальной версии ВВ и прошлых версий ВВ
+‼️ - Информация собрана <b>только</b> из прошлых версий ВВ
+
+Иконки сообщают об "свежести" данных о мобе.
+    Что в нашем понимании "свежесть"? Представьте себе моба "🐲Трог (Воин)". Его урон, здоровье, лут и другие характеристики могут отличаться от каждой из версий WW (2.1/2.0/1.8). Раньше Ассистент держал все эти версии условного моба как единую запись, из за этого информация была слишком расплывчата.
+    Мы же внедрили систему в ассистента которая различает разные версии мобов как раз для поддержания максимального уровня актуальности данных. 
+    На случай если Ассистент не сможет предоставить вам актуальную информацию - он постарается найти данные о мобе со старых версий, и конечно же - он вам сообщит когда вы будете просматривать "устаревшую" информацию что бы вы понимали что вы имеете дело с рисковым выбором.`, {
+  parseMode: 'html',
+  asReply: true,
+}));
 
 
 bot.start();
