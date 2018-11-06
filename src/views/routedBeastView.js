@@ -540,7 +540,7 @@ ${processedFlees.failFlees}
           break;
         default:
           resolve({
-            reply: `${headerReply}\n${shortBattlesReply}\n${fleesReply}`,
+            reply: `${headerReply}\n${shortBattlesReply}\n${fleesReply}\n${infoFooterReply}`,
             beast,
           });
           break;
