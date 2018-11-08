@@ -46,8 +46,8 @@ const {
   },
 } = require('./resources.js');
 
-const armorsLongComment = '🛡 Защита: +';
-const armorsShortComment = '🛡';
+const armorsLongDescription = '🛡 Защита: +';
+const armorsShortDescription = '🛡';
 
 const armors = [
   {
@@ -320,7 +320,7 @@ const armors = [
     title: 'Мультизащита',
     price: [getResource(FOIL, 32), getResource(PLASMA, 29),
       getResource(THROGHEART, 21), getResource(POTENTIOMETER, 33), getResource(STEEL, 39)],
-    characteristic: false,
+    characteristic: 168,
     place: engineer,
     rarity: getRarityIcon(SECOND),
   },
@@ -359,7 +359,6 @@ const armors = [
       getResource(IRIDIUM, 132), getResource(KIPARIT, 50)],
     characteristic: 190,
     place: engineer,
-    rarities: [FIRST, SECOND],
     requirements: getCharacteristic(AGILITY, 100),
   },
   {
@@ -369,7 +368,6 @@ const armors = [
       getResource(IRIDIUM, 189), getResource(KIPARIT, 85)],
     characteristic: 230,
     place: engineer,
-    rarities: [FIRST, SECOND],
     requirements: getCharacteristic(AGILITY, 121),
   },
   {
@@ -441,6 +439,6 @@ const armors = [
 
 module.exports = {
   armors,
-  armorsLongComment,
-  armorsShortComment,
+  armorsLongDescription,
+  armorsShortDescription,
 };

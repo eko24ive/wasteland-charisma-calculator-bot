@@ -50,8 +50,8 @@ const {
   },
 } = require('./resources.js');
 
-const weaponsLongComment = '💪 Урон: +';
-const weaponsShortComment = '⚔️';
+const weaponsLongDescription = '💪 Урон: +';
+const weaponsShortDescription = '⚔️';
 
 const weapons = [
   {
@@ -685,6 +685,6 @@ const weapons = [
 
 module.exports = {
   weapons,
-  weaponsShortComment,
-  weaponsLongComment,
+  weaponsShortDescription,
+  weaponsLongDescription,
 };

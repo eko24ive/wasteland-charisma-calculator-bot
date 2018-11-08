@@ -2,6 +2,7 @@ const {
   merchant,
   engineer,
   wasteland,
+  pvpArena,
   highHrotgar,
 } = require('./../places.js');
 
@@ -21,7 +22,7 @@ const {
   getCharacteristic,
 } = require('./resources.js');
 
-const helmetsComment = '🛡 Защита: +';
+const helmetsDescription = '🛡 Защита: +';
 
 const helmets = [
   {
@@ -134,11 +135,12 @@ const helmets = [
     title: 'Шлем мастера',
     price: false,
     characteristic: 195,
-    place: wasteland,
+    place: pvpArena,
+    comment: 'Этот переходящий трофей можно получить на время, став победилем сезона в Куполе. Сезон закрывается каждую неделю.',
   },
 ];
 
 module.exports = {
   helmets,
-  helmetsComment,
+  helmetsDescription,
 };
