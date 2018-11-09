@@ -510,6 +510,7 @@ ${processedFlees.failFlees}
 
       const headerReply = `<b>${beast.name}</b>
 👣${beast.type === 'DarkZone' ? '🚷' : '💀'} ${getDistanceRange(beast.distanceRange)}км ${getDeprecatedFlair(isRangeDeprecated, true, true)}
+/mob_${fBeast._id.toJSON()}
 `;
 
       const infoFooterReply = '———————————\nЧто значат иконки ⚠️/✅/‼️? Жми /help_icons';
@@ -540,7 +541,7 @@ ${processedFlees.failFlees}
           break;
         default:
           resolve({
-            reply: `${headerReply}\n${shortBattlesReply}\n${fleesReply}`,
+            reply: `${headerReply}\n${shortBattlesReply}\n${fleesReply}\n${infoFooterReply}`,
             beast,
           });
           break;
