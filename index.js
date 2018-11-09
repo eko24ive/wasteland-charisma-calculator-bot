@@ -1294,7 +1294,7 @@ bot.on('forward', (msg) => {
           return true;
         }
 
-        return false;
+        return null;
       }
 
       if (dataType === 'dungeonBeastFaced') {
@@ -1332,13 +1332,21 @@ bot.on('forward', (msg) => {
         asReply: true,
         parseMode: 'html',
       });
-    } if (!isForwardValid({ dataType, beastName, beastType })) {
+    } if (isForwardValid({ dataType, beastName, beastType }) === false) {
       return msg.reply.text(`Этот моб не похож на того с которым ты дрался в это время. Ты чё - наебать меня вздумал?!
 Забыл кто мне нужен? Жми /showBeastsToValidate
 
 
 Если ты передумал её кидать - жми /skipbeastforward
 <b>Но тогда я проигнорирую всю ту информацию которая требует форвардов</b>`, {
+        asReply: true,
+        parseMode: 'html',
+      });
+    } if (isForwardValid({ dataType, beastName, beastType }) === null) {
+      return msg.reply.text(`Возможно ты и на самом деле убегал от этого моба, но к сожалению форвард мне это никак не докажет :с
+Рекомендую "проигнорировать" этого моба используя комманду <b>/ignore_</b>, что находиться под мобом.
+
+Список форвардов встреч, которые мне нужны - /showBeastsToValidate`, {
         asReply: true,
         parseMode: 'html',
       });
