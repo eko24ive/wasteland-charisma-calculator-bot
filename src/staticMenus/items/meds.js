@@ -1,6 +1,8 @@
 const {
-  engineer,
-  workbench,
+  PLACES: {
+    ENGINEER,
+    WORKBENCH,
+  },
 } = require('./../places.js');
 
 const {
@@ -18,7 +20,7 @@ const meds = [
     price: [getResource(MATERIALS, 30)],
     effect: '❤️',
     characteristic: 3,
-    place: workbench,
+    place: WORKBENCH,
   },
   {
     icon: '💊',
@@ -26,7 +28,7 @@ const meds = [
     price: [getResource(MATERIALS, 30), getResource(EPHEDRINE, 1)],
     effect: '🔋',
     characteristic: 5,
-    place: workbench,
+    place: WORKBENCH,
     comment: 'временный эффект',
   },
   {
@@ -35,7 +37,7 @@ const meds = [
     price: [getResource(MATERIALS, 80)],
     effect: '❤️',
     characteristic: 30,
-    place: workbench,
+    place: WORKBENCH,
   },
   {
     icon: '💉',
@@ -43,7 +45,7 @@ const meds = [
     price: [getResource(MATERIALS, '\*'), getResource(EPHEDRINE, 1)],
     effect: '❤️',
     characteristic: 'полное здоровье + 20%',
-    place: workbench,
+    place: WORKBENCH,
     comment: '\* 📦Материалы считаются по формуле = \`Ваше ❤️Здоровье * 7.2\`',
   },
   {
@@ -52,7 +54,7 @@ const meds = [
     price: [getResource(MATERIALS, 630), getResource(EPHEDRINE, 1)],
     effect: '❤️',
     characteristic: 60,
-    place: engineer,
+    place: ENGINEER,
     comment: 'Можно носить только 1 шт\n'
         + 'При наличии *👝 Сумки под медпаки* можно носить 3 шт',
   },
@@ -62,7 +64,7 @@ const meds = [
     price: [getResource(MATERIALS, 410)],
     effect: '❤️',
     characteristic: 30,
-    place: engineer,
+    place: ENGINEER,
     comment: 'Можно носить по 2 шт',
   },
   {
@@ -71,7 +73,7 @@ const meds = [
     price: [getResource(MATERIALS, 280)],
     effect: '❤️',
     characteristic: 17,
-    place: engineer,
+    place: ENGINEER,
     comment: 'Можно носить по 2 шт',
   },
 ];

@@ -17,6 +17,8 @@ const {
 
 const meds = require('./meds.js');
 
+const showPlace = require('./../places.js');
+
 const {
   RARITIES: {
     FIRST,
@@ -65,7 +67,6 @@ const getItemComment = (comment) => {
   return '';
 };
 
-
 const showItem = ({
   icon,
   title,
@@ -84,6 +85,28 @@ ${itemIcon} *${title}*
 ${description}${itemCharacteristic}
 💰: ${itemPrice}${itemRequirements ? `\n${itemRequirements}` : ''}${itemComment ? `\n${itemComment}` : ''}
 `;
+};
+
+const showItemWithPlace = ({
+  icon,
+  title,
+  characteristic,
+  price,
+  requirements,
+  comment,
+  place,
+}, description) => {
+  const itemIcon = getItemIcon(icon);
+  const itemCharacteristic = getItemCharacteristic(characteristic);
+  const itemPrice = getItemPrice(price);
+  const itemRequirements = getItemRequirements(requirements);
+  const itemComment = getItemComment(comment);
+  const itemPlace = showPlace(place);
+  return `
+${itemIcon} *${title}*
+${description}${itemCharacteristic}
+💰: ${itemPrice}${itemRequirements ? `\n${itemRequirements}` : ''}${itemComment ? `\n${itemComment}` : ''}
+${itemPlace}`;
 };
 
 const showMed = ({
@@ -160,6 +183,15 @@ const getMedsByPlace = (place) => {
   return Object.keys(itemsFromPlace).map(item => showMed(itemsFromPlace[item])).join('');
 };
 
+const showItems = (items, itemsComment) => items.sort(item => item.characteristic)
+  .map(item => showItemWithPlace(item, itemsComment)).join('');
+
+const getWeapons = showItems(weapons, weaponsLongDescription);
+
+const getArmors = showItems(armors, armorsLongDescription);
+
+const getHelmets = showItems(helmets, helmetsDescription);
+
 module.exports = {
   getHelmetsByPlace,
   getWeaponsByPlace,
@@ -167,4 +199,7 @@ module.exports = {
   getMedsByPlace,
   getWeaponInventionsByPlace,
   getArmorInventionsByPlace,
+  getWeapons,
+  getArmors,
+  getHelmets,
 };
