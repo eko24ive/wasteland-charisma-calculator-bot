@@ -1531,6 +1531,7 @@ bot.on('forward', (msg) => {
     if (isClassicPip || isSimplePip) {
       const pip = parsePip(msg, isClassicPip);
       let reply;
+
       updateOrCreate(msg, pip, (result) => {
         if (!result.ok && result.reason === 'PIP_VALIDATION_FAILED') {
           reply = `Я не вижу что бы ты прокачал какие-то скилы :c

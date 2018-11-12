@@ -12,7 +12,7 @@ const classicHealthRegExp = /❤️Здоровье: \d*\/(\d*)/;
 const classicVerisonRegExp = /📟Пип-бой 3000 v(.+)/;
 
 const simpleNameRegExp = /👤(.*)/;
-const simpleFactionRegExp = /👤.*\n├(.*)/;
+const simpleFactionRegExp = /👤.*\n├.*\n├(.*)/;
 const simpleCharismaRegExp = /🗣(\d+)/;
 const simpleAgilityRegExp = /🤸🏽‍♂️(\d+)/;
 const simpleDamageRegExp = /⚔️(\d+)/;
