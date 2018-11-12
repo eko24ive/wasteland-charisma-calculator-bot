@@ -92,23 +92,23 @@ module.exports = {
     command: '/reachableKm',
   },
   journeyForwardStart: {
-    label: 'Скинуть лог 🏃',
+    label: '🏃СкинутьЛог',
     command: '/journeyforwardstart',
   },
   journeyForwardEnd: {
-    label: 'Стоп 🙅‍♂️',
+    label: '🙅‍♂️Стоп',
     command: '/journeyforwardend',
   },
   journeyForwardCancel: {
-    label: 'Назад ↩️',
+    label: '↩️Назад',
     command: '/journeyforwardcancel',
   },
   showAllLocations: {
-    label: '🏜 Все локации',
+    label: '🏜Все локации',
     command: '/locs_text',
   },
   showRaidLocations: {
-    label: '🤘 Рейдовые локации',
+    label: '🤘Рейдовые локации',
     command: '/raids_text',
   },
   showLocations: {
@@ -140,7 +140,7 @@ module.exports = {
     command: '/show_drones',
   },
   hallOfFame: {
-    label: '🏆 Зал Славы',
+    label: '🏆Зал Славы',
     command: '/show_hall_of_fame',
   },
   showGiants: {
@@ -164,11 +164,11 @@ module.exports = {
     command: '/dng',
   },
   skillUpgrade: {
-    label: '🎓Скилокачатор',
+    label: '🎓Скилокчтр',
     command: '/skill_upgrade',
   },
   showEncyclopedia: {
-    label: '📔Энциклопедия',
+    label: '📔Энциклпдия',
     command: '/show_encyclopedia',
   },
 };
