@@ -589,7 +589,7 @@ const weapons = [
     icon: '✝️',
     title: 'Святое пламя',
     price: [getResource(MATERIALS, 399990), getResource(GENERATORS, 590),
-      getResource(MICROCHIPS, 435), getResource(IRIDIUM, 329)],
+      getResource(MICROCHIPS, 358), getResource(IRIDIUM, 245)],
     characteristic: 356,
     place: core,
     requirements: getCharacteristic(STRENGTH, 203),

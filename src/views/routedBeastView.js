@@ -89,7 +89,7 @@ const routedBeastView = (Beast, seachParams, route = null, config) => new Promis
         });
 
         if (actualDistanceRange.length > 0) {
-          if (actualDistanceRange.length >= actualDataThreshold) {
+          if (actualDistanceRange.length >= actualDataThreshold || outdatedDistanceRange.length === 0) {
             isRangeDeprecated = INFO_ACTUAL;
 
             return minMax(actualDistanceRange);
@@ -124,7 +124,7 @@ const routedBeastView = (Beast, seachParams, route = null, config) => new Promis
         });
 
         if (actualCaps.length > 0) {
-          if (actualCaps.length >= actualDataThreshold) {
+          if (actualCaps.length >= actualDataThreshold || outdatedCaps.length === 0) {
             isLootDeprecated = INFO_ACTUAL;
 
             return minMax(actualCaps);
@@ -159,7 +159,7 @@ const routedBeastView = (Beast, seachParams, route = null, config) => new Promis
         });
 
         if (actualMaterials.length > 0) {
-          if (actualMaterials.length >= actualDataThreshold) {
+          if (actualMaterials.length >= actualDataThreshold || outdatedMaterials.length === 0) {
             isLootDeprecated = INFO_ACTUAL;
 
             return minMax(actualMaterials);
@@ -261,7 +261,7 @@ const routedBeastView = (Beast, seachParams, route = null, config) => new Promis
         });
 
         if (actualSuccessFlees.length > 0) {
-          if (actualSuccessFlees.length >= actualDataThreshold) {
+          if (actualSuccessFlees.length >= actualDataThreshold || outdatedSuccessFlees.length === 0) {
             isFleesDeprecated.success = INFO_ACTUAL;
 
             successFlees = actualSuccessFlees;
@@ -280,7 +280,7 @@ const routedBeastView = (Beast, seachParams, route = null, config) => new Promis
         }
 
         if (actualFailFlees.length > 0) {
-          if (actualFailFlees.length >= actualDataThreshold) {
+          if (actualFailFlees.length >= actualDataThreshold || outdatedFailFlees.length === 0) {
             isFleesDeprecated.fail = INFO_ACTUAL;
 
             failFlees = actualFailFlees;
@@ -328,7 +328,7 @@ const routedBeastView = (Beast, seachParams, route = null, config) => new Promis
         });
 
         if (actualConcussions.length > 0) {
-          if (actualConcussions.length >= actualDataThreshold) {
+          if (actualConcussions.length >= actualDataThreshold || outdatedConcussions.length === 0) {
             isConcussionsDeprecated = INFO_ACTUAL;
 
             existingConcussions = actualConcussions;
@@ -408,7 +408,7 @@ const routedBeastView = (Beast, seachParams, route = null, config) => new Promis
         });
 
         if (actualSuccessBattles.length > 0) {
-          if (actualSuccessBattles.length >= actualDataThreshold) {
+          if (actualSuccessBattles.length >= actualDataThreshold || outdatedSuccessBattles.length === 0) {
             isBattlesDeprecated.success = INFO_ACTUAL;
 
             successBattles = actualSuccessBattles;
@@ -427,7 +427,7 @@ const routedBeastView = (Beast, seachParams, route = null, config) => new Promis
         }
 
         if (actualFailBattles.length > 0) {
-          if (actualFailBattles.length >= actualDataThreshold) {
+          if (actualFailBattles.length >= actualDataThreshold || outdatedFailBattles.length === 0) {
             isBattlesDeprecated.fail = INFO_ACTUAL;
 
             failBattles = actualFailBattles;
@@ -510,11 +510,14 @@ ${processedFlees.failFlees}
 
       const headerReply = `<b>${beast.name}</b>
 👣${beast.type === 'DarkZone' ? '🚷' : '💀'} ${getDistanceRange(beast.distanceRange)}км ${getDeprecatedFlair(isRangeDeprecated, true, true)}
+/mob_${fBeast._id.toJSON()}
 `;
+
+      const infoFooterReply = '———————————\nЧто значат иконки ⚠️/✅/‼️? Жми /help_icons';
       switch (route) {
         case 'info':
           resolve({
-            reply: `${headerReply}\n${shortBattlesReply}\n${fleesReply}`,
+            reply: `${headerReply}\n${shortBattlesReply}\n${fleesReply}\n${infoFooterReply}`,
             beast,
           });
           break;
@@ -538,7 +541,7 @@ ${processedFlees.failFlees}
           break;
         default:
           resolve({
-            reply: `${headerReply}\n${shortBattlesReply}\n${fleesReply}`,
+            reply: `${headerReply}\n${shortBattlesReply}\n${fleesReply}\n${infoFooterReply}`,
             beast,
           });
           break;

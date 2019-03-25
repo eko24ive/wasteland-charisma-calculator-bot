@@ -1,18 +1,18 @@
-const classicNameRegExp = /(.*)\n👥Фракция/;
-const classicFactionRegExp = /👥Фракция: (.*)/;
+const classicNameRegExp = /(.*),.*\n/;
+const classicFactionRegExp = /.*,(.*)\n/;
 const classicCharismaRegExp = /🗣Харизма: (\d*)/;
 const classicAgilityRegExp = /🤸🏽‍♂️Ловкость: (\d*)/;
 const classicDamageRegExp = /⚔️Урон: (\d*)/;
 const classicArmorRegExp = /🛡Броня: (\d*)/;
 const classicStrengthRegExp = /💪Сила: (\d*)/;
-const classicPrecisionRegExp = /🔫Меткость: (\d*)/;
+const classicPrecisionRegExp = /🎯Меткость: (\d*)/;
 const classicEnduranceRegExp = /🔋Выносливость: \d*\/(\d*)/;
-const classicHungerRegExp = /🍗Голод: ([\d]*)%/;
+const classicHungerRegExp = /☠️Голод: ([\d]*)%/;
 const classicHealthRegExp = /❤️Здоровье: \d*\/(\d*)/;
 const classicVerisonRegExp = /📟Пип-бой 3000 v(.+)/;
 
 const simpleNameRegExp = /👤(.*)/;
-const simpleFactionRegExp = /👤.*\n├(.*)/;
+const simpleFactionRegExp = /👤.*\n├.*\n├(.*)/;
 const simpleCharismaRegExp = /🗣(\d+)/;
 const simpleAgilityRegExp = /🤸🏽‍♂️(\d+)/;
 const simpleDamageRegExp = /⚔️(\d+)/;

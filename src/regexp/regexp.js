@@ -27,6 +27,7 @@ const beastDefeatRegExp = /Тебя буквально размазали/;
 const beastDefeatFleeRegExp = /Ты проиграл в этой схватке/;
 const beastSuccessFleeRegExp = /удалось избежать схватки/;
 const beastVictoryRegExp = /Ты одержал победу!/;
+const beastReceivedCapsRegExp = /Получено: 🕳(\d+) и 📦(\d+)/;
 const beastDefeatCapsLostRegExp = /Потеряно крышек: 🕳(\d+)/;
 const beastDefeatMaterialsLostRegExp = /Потеряно материалов: 📦(\d+)/;
 const deathMessageRegExp = /Потеряно: 🕳(\d+) и 📦(\d+)/;
@@ -41,7 +42,7 @@ const deathMessageRecourcesLostRexExp = /Потеряно: 🕳(\d+) и 📦(\d+
 const beastFacedRegExp = /Во время вылазки на тебя напал (.+)\./;
 const walkingBeastFacedRegExp = /устрашающе начал приближаться (.+)\./;
 const dungeonBeastFacedRegExp = /(.+) перегородил тебе путь./;
-const haloDungeonBeastFacedRegExp = /Ты углубился в пещеру...Внезапно, тварь набросилась на тебя из темноты.\n(.+)/
+const haloDungeonBeastFacedRegExp = /Ты углубился в пещеру...Внезапно, тварь набросилась на тебя из темноты.\n(.+)/;
 
 const metalAmountRegExp = /(.+) (\d+)/; // 🔗Кубонит 192
 const multipleItemsReceived = /(.+) [x|х](\d+)/; // Провода x1
@@ -96,7 +97,7 @@ const regularBeast = {
     receivedItemRegExp,
     beastDefeatCapsLostRegExp,
     beastDefeatMaterialsLostRegExp,
-    receivedCapsAndMaterialsRegExp,
+    beastReceivedCapsRegExp,
     darkZone,
   ],
   excludes: [beastDungeonFlagRegExp],
@@ -249,6 +250,7 @@ const regexps = {
   altInBattleLocationRegExp,
   altInBattleBeastRegExp,
   haloDungeonBeastFacedRegExp,
+  beastReceivedCapsRegExp,
 };
 
 module.exports = {

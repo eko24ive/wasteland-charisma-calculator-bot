@@ -29,6 +29,7 @@ const beastSchema = require('./src/schemes/beast');
 const locationSchema = require('./src/schemes/location');
 const giantScheme = require('./src/schemes/giant');
 const userSchema = require('./src/schemes/user');
+const journeySchema = require('./src/schemes/journey');
 
 const chartGeneration = require('./src/utils/chartGeneration');
 
@@ -77,6 +78,7 @@ const Beast = mongoose.model('Beast', beastSchema);
 const Giant = mongoose.model('Giant', giantScheme);
 const Location = mongoose.model('Location', locationSchema);
 const User = mongoose.model('User', userSchema);
+const Journey = mongoose.model('Journey', journeySchema);
 
 const userManager = UserManager(User);
 
@@ -354,13 +356,15 @@ bot.on(['/start', '/help'], (msg) => {
 
   return msg.reply.text(
     `
-Привет, меня зовут «<b>Wasteland Wars Assistant</b>», я - что-то на подобии "умной" энциклопедии.
+Привет, меня зовут «<b>Wasteland Wars Assistant</b>», я - что-то наподобие "умной" энциклопедии.
 
 ⬦ Если хочешь посмотреть что я знаю о мобе которого ты встретил - скинь форвард встречи с ним.
 
-<code>[Скинуть лог 🏃]</code> - Запуск режима "ЛОГ". В этом режиме ты можешь переслать сюда сообщения от игрового бота.
+<code>[🏃СкинутьЛог]</code> - Запуск режима "ЛОГ". В этом режиме ты можешь переслать сюда сообщения от игрового бота. Также этот режим ты можешь запустить если отправишь боту комманду <b>/go</b>
 
-<code>[🎓Скилокачатор]</code> - Запуск «<b>Скилокачатора</b>» - анализатора в прокачке твоих скилов
+<code>[🎓Скилокчтр]</code> - Запуск «<b>Скилокачатора</b>» - анализатора в прокачке твоих скилов
+
+<code>[📔Энциклпдия]</code> - Полезная информация о мире пустоши, и что в нём можно сделать/получить
 
 <code>[💀Мобы]</code> - Информация об <b>обычных</b> мобах
 
@@ -368,7 +372,7 @@ bot.on(['/start', '/help'], (msg) => {
 
 <code>[🦂Гиганты]</code> - Состояние гигантов
 
-<code>[🏆 Зал Славы]</code> - Благодарности всем тем кто когда-либо оказалась поддержку в работе над ботом
+<code>[🏆Зал Славы]</code> - Благодарности всем тем кто когда-либо оказалась поддержку в работе над ботом
 
 
 КАНАЛ С НОВОСТЯМИ @wwAssistantBotNews
@@ -451,7 +455,7 @@ const actualActualProcessUserData = (msg, reportData, updatesData, options) => {
     );
   }
 
-  if (reportData.lastPip !== null) {
+  if (reportData.lastPip !== null && reportData.lastPip !== undefined) {
     updateOrCreate(msg, reportData.lastPip);
   }
 
@@ -498,6 +502,7 @@ const actualActualProcessUserData = (msg, reportData, updatesData, options) => {
   const signEntryWithVersion = entry => ({
     ...entry,
     version: VERSION,
+    epoch: reportData.epoch,
   });
 
   const signSetWithVersion = (data) => {
@@ -505,6 +510,7 @@ const actualActualProcessUserData = (msg, reportData, updatesData, options) => {
       return data.map(entry => ({
         ...entry,
         version: VERSION,
+        epoch: reportData.epoch,
       }));
     }
 
@@ -600,6 +606,23 @@ const actualActualProcessUserData = (msg, reportData, updatesData, options) => {
     }
   });
 
+  const saveJourney = () => new Promise((resolve) => {
+    const newJourney = new Journey({
+      epoch: reportData.epoch,
+      user: {
+        id: msg.from.id,
+        username: msg.from.username,
+      },
+      reportData,
+      updatesData,
+      session: sessions[msg.from.id],
+    });
+
+    newJourney.save().then(() => {
+      resolve();
+    });
+  });
+
   const processBeasts = () => new Promise((resolve) => {
     if (updatesData.beasts.length > 0 && options.usePip === true) {
       async.forEach(updatesData.beasts, (iBeast, next) => {
@@ -686,7 +709,7 @@ const actualActualProcessUserData = (msg, reportData, updatesData, options) => {
             if (iBeast.flees) {
               if (iBeast.flees.length === 1) {
                 iBeast.flees.forEach((flee) => {
-                  if (databaseBeast.flee === undefined) {
+                  if (databaseBeast.flees === undefined) {
                     uniqueFlees.push(flee);
                   } else {
                     const fleesForValidation = databaseBeast.flees.filter(({ version }) => version === VERSION);
@@ -741,7 +764,7 @@ const actualActualProcessUserData = (msg, reportData, updatesData, options) => {
 
                 databaseBeast.distanceRange = [...databaseBeast.distanceRange, ...signSetWithVersion(newRanges)];
               } else if (!_.isEmpty(sameRanges)) {
-                beastPoints += forwardPoints.sameDistance * sameRanges.length;
+                // beastPoints += forwardPoints.sameDistance * sameRanges.length;
               }
             }
 
@@ -813,9 +836,12 @@ const actualActualProcessUserData = (msg, reportData, updatesData, options) => {
               }
             }
 
+            delete databaseBeast.__v;
+
             databaseBeast.save().then(() => next()).catch((e) => {
-              console.log(`Tried to save:\n${JSON.stringify(iBeast)}\n===================`);
+              console.log(`Tried to save:\n${JSON.stringify(iBeast)}\n===================\nUserId: ${msg.from.id}\n`);
               console.log(`Error:\n${e}\n===================\n===================\n===================`);
+              next();
             });
           }
         });
@@ -915,6 +941,7 @@ const actualActualProcessUserData = (msg, reportData, updatesData, options) => {
       Promise.all([
         processBeasts(),
         processLocations(),
+        saveJourney(),
       ]).then(() => {
         let errors = '';
         let dupesText = '';
@@ -1021,7 +1048,7 @@ const processUserData = (msg, options) => {
   let {
     reportData,
     updatesData,
-  } = processForwards(data);
+  } = processForwards(data, msg.from.id || moment.now());
 
   if (reportData.criticalError) {
     return msg.reply.text(`<b>❌ЗАМЕЧЕНА КРИТИЧЕСКАЯ ОШИБКА❌</b>\n\n${reportData.criticalError}\n\n<i>Форварды были отменены.</i>`, {
@@ -1069,7 +1096,7 @@ const processUserData = (msg, options) => {
         const {
           reportData: reportDataWithUserPip,
           updatesData: updatesDataWithUserPip,
-        } = processForwards(data);
+        } = processForwards(data, msg.from.id || moment.now());
 
         if (reportDataWithUserPip.criticalError && reportDataWithUserPip.couldBeUpdated) {
           sessions[msg.from.id].state = states.WAIT_FOR_PIP_FORWARD;
@@ -1297,7 +1324,7 @@ bot.on('forward', (msg) => {
           return true;
         }
 
-        return false;
+        return null;
       }
 
       if (dataType === 'dungeonBeastFaced') {
@@ -1335,13 +1362,21 @@ bot.on('forward', (msg) => {
         asReply: true,
         parseMode: 'html',
       });
-    } if (!isForwardValid({ dataType, beastName, beastType })) {
+    } if (isForwardValid({ dataType, beastName, beastType }) === false) {
       return msg.reply.text(`Этот моб не похож на того с которым ты дрался в это время. Ты чё - наебать меня вздумал?!
 Забыл кто мне нужен? Жми /showBeastsToValidate
 
 
 Если ты передумал её кидать - жми /skipbeastforward
 <b>Но тогда я проигнорирую всю ту информацию которая требует форвардов</b>`, {
+        asReply: true,
+        parseMode: 'html',
+      });
+    } if (isForwardValid({ dataType, beastName, beastType }) === null) {
+      return msg.reply.text(`Возможно ты и на самом деле убегал от этого моба, но к сожалению форвард мне это никак не докажет :с
+Рекомендую "проигнорировать" этого моба используя комманду <b>/ignore_</b>, что находиться под мобом.
+
+Список форвардов встреч, которые мне нужны - /showBeastsToValidate`, {
         asReply: true,
         parseMode: 'html',
       });
@@ -1526,6 +1561,7 @@ bot.on('forward', (msg) => {
     if (isClassicPip || isSimplePip) {
       const pip = parsePip(msg, isClassicPip);
       let reply;
+
       updateOrCreate(msg, pip, (result) => {
         if (!result.ok && result.reason === 'PIP_VALIDATION_FAILED') {
           reply = `Я не вижу что бы ты прокачал какие-то скилы :c
@@ -2020,7 +2056,7 @@ bot.on('/upgradeSkill', (msg) => {
   }
 });
 
-bot.on('/journeyforwardstart', (msg) => {
+bot.on(['/journeyforwardstart', '/go'], (msg) => {
   createSession(msg.from.id);
 
   const inlineReplyMarkup = bot.inlineKeyboard([
@@ -2054,7 +2090,7 @@ bot.on('/journeyforwardstart', (msg) => {
 *Я умею работать с данными только за один круг/вылазку - больше одной вылазки я пока обработать не смогу :с*
 
 Пожалуйста убедись, что ты перешлёшь _все_ сообщения - Телеграм может немного притормаживать.
-Ну а как закончишь - смело жми кнопку \`[Стоп 🙅‍♂️]\`!
+Ну а как закончишь - смело жми кнопку \`[🙅‍♂️ Стоп]\`!
             `, {
     replyMarkup: inlineReplyMarkup,
     parseMode: 'markdown',
@@ -2422,10 +2458,44 @@ bot.on('/mypipstats', (msg) => {
   });
 });
 
-bot.on('/debug', msg => msg.reply.text(`Форварды принимаються только от @WastelandWarsBot.
-Отменяю твои фоварды - нехуй выебываться.`, {
-  asReply: false,
-}));
+bot.on('/debug', (msg) => {
+  createSession(msg.from.id);
+
+  const updatesData = {
+    locations: [],
+    beasts: [{
+      isDungeon: false,
+      subType: null,
+      name: '👤Майкл Майерс (Виновник этого торжества)',
+      type: 'DarkZone',
+      date: 1541030493,
+      proofedByForward: false,
+      distanceRange: [{ value: 64 }],
+      battles: [
+        {
+          outcome: 'win',
+          stats: { armor: 322, damage: 1384 },
+          totalDamageGiven: 2599,
+          totalDamageReceived: 0,
+          damagesGiven: [1321, 1278],
+          damagesReceived: [0],
+          healthOnStart: 411,
+          stamp: '154103049356019931',
+          distance: 64,
+        },
+      ],
+      receivedItems: { Микрочип: [1] },
+      capsReceived: [{ value: 7609 }],
+      materialsReceived: [{ value: 11370 }],
+    }],
+  };
+
+  const { processDataConfig: options } = sessions[msg.from.id];
+
+  actualProcessUserData(msg, {
+    errors: [],
+  }, updatesData, options);
+});
 
 bot.on(/^\d+$/, (msg) => {
   switch (sessions[msg.from.id].state) {
@@ -3293,5 +3363,19 @@ bot.on('/reset_beast_database', (msg) => {
     });
   }
 });
+
+bot.on('/help_icons', msg => msg.reply.text(`
+✅ - Информация собрана <b>только</b> из актуальной версии ВВ
+⚠️ - Информация собрана из данных актуальной версии ВВ и прошлых версий ВВ
+‼️ - Информация собрана <b>только</b> из прошлых версий ВВ
+
+Иконки сообщают об "свежести" данных о мобе.
+    Что в нашем понимании "свежесть"? Представьте себе моба "🐲Трог (Воин)". Его урон, здоровье, лут и другие характеристики могут отличаться от каждой из версий WW (2.1/2.0/1.8). Раньше Ассистент держал все эти версии условного моба как единую запись, из за этого информация была слишком расплывчата.
+    Мы же внедрили систему в ассистента которая различает разные версии мобов как раз для поддержания максимального уровня актуальности данных.
+    На случай если Ассистент не сможет предоставить вам актуальную информацию - он постарается найти данные о мобе со старых версий, и конечно же - он вам сообщит когда вы будете просматривать "устаревшую" информацию что бы вы понимали что вы имеете дело с рисковым выбором.`, {
+  parseMode: 'html',
+  asReply: true,
+}));
+
 
 bot.connect();
