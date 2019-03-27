@@ -1038,7 +1038,9 @@ const actualProcessUserData = (msg, reportData, updatesData, options) => {
   }
 };
 
-const processUserData = (msg, options) => {
+const processUserData = (msg, options, processConfig = {
+  omitPipError: false,
+}) => {
   sessions[msg.from.id].state = states.WAIT_FOR_DATA_TO_PROCESS;
 
   const {
@@ -1048,7 +1050,7 @@ const processUserData = (msg, options) => {
   let {
     reportData,
     updatesData,
-  } = processForwards(data, msg.from.id || moment.now());
+  } = processForwards(data, msg.from.id || moment.now(), processConfig);
 
   if (reportData.criticalError) {
     return msg.reply.text(`<b>❌ЗАМЕЧЕНА КРИТИЧЕСКАЯ ОШИБКА❌</b>\n\n${reportData.criticalError}\n\n<i>Форварды были отменены.</i>`, {
@@ -1224,6 +1226,8 @@ bot.on('forward', (msg) => {
             processUserData(msg, {
               usePip: sessions[msg.from.id].processDataConfig.usePip,
               useBeastFace: sessions[msg.from.id].processDataConfig.useBeastFace,
+            }, {
+              omitPipError: true,
             });
           });
         }

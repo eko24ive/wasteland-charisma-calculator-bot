@@ -120,7 +120,7 @@ const mergeBeasts = (beastsToMerge) => {
   return beasts;
 };
 
-const processForwards = (inputData, id) => {
+const processForwards = (inputData, id, processConfig) => {
   const reportData = {
     capsReceived: 0,
     capsLost: 0,
@@ -691,7 +691,8 @@ const processForwards = (inputData, id) => {
   });
 
   if (reportData.lastPip) {
-    if (reportData.healthCapHistory.some(health => health > reportData.lastPip.health)) {
+    if (reportData.healthCapHistory.some(health => health > reportData.lastPip.health)
+     && !processConfig.omiomitPipError) {
       reportData.criticalError = 'Была замечена прокачка уровня здоровья. Во время одной вылазки подобное - не возможно.';
       reportData.couldBeUpdated = true;
     } else if (reportData.healthCapHistory.some(health => health < reportData.lastPip.health)) {
