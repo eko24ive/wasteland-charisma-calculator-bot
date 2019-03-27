@@ -6,22 +6,8 @@ const defaultCharismaCost = require('./constants/defaultCharismaCost');
 const mobs = require('./constants/mobs');
 const mobsRanges = require('./constants/mobsRanges');
 const timeToTravel = require('./utils/timeToTravel');
-
-const skillMap = {
-  '💪 Сила': 'strength',
-  '🔫 Меткость': 'precision',
-  '🤸‍♀️ Ловкость': 'agility',
-  '❤ Живучесть': 'health',
-  '🗣 Харизма': 'charisma',
-};
-
-const skillsCap = {
-  strength: 1300,
-  precision: 1300,
-  agility: 1200,
-  health: 1550,
-  charisma: 1200,
-};
+const skillsCap = require('./constants/skillCap');
+const skillMap = require('./constants/skillMap');
 
 const formatNubmer = (number) => {
   const floored = Math.floor(number);

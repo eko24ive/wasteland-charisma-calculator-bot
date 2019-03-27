@@ -1,16 +1,12 @@
-const upgradeAmountValidation = (pip, skillToUpgrade, upgradeAmount, cap) => {
-  const skillMap = {
-    '❤ Живучесть': 'health',
-    '💪 Сила': 'strength',
-    '🔫 Меткость': 'precision',
-    '🗣 Харизма': 'charisma',
-    '🤸‍♀️ Ловкость': 'agility',
-  };
+const skillCap = require('../constants/skillCap');
+const skillMap = require('../constants/skillMap');
 
-  const currentSkillLevel = pip[skillMap[skillToUpgrade]];
+const upgradeAmountValidation = (pip, skillToUpgrade, upgradeAmount) => {
+  const skill = skillMap[skillToUpgrade];
+  const currentSkillLevel = pip[skill];
   const upgradedSkillLevel = currentSkillLevel + upgradeAmount;
 
-  return upgradedSkillLevel < cap;
+  return upgradedSkillLevel < skillCap[skill];
 };
 
 

@@ -2518,7 +2518,7 @@ bot.on(/^\d+$/, (msg) => {
       const { pip } = sessions[msg.from.id];
       const skillToUpgrade = sessions[msg.from.id].upgradeSkill;
 
-      if (upgradeAmountValidation(pip, skillToUpgrade, upgradeAmount, 1300)) {
+      if (upgradeAmountValidation(pip, skillToUpgrade, upgradeAmount)) {
         getEffort(msg);
       } else {
         msg.reply.text('Чёто дохуя получилось, попробуй число поменьше.');
