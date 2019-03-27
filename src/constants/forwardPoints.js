@@ -13,8 +13,8 @@ const forwardPoints = {
   newDistance: 0.5,
   sameDistance: 0.1,
   discoveryGiantData: 100,
-  newGiantData: 0.001, //FIXME
-  sameGiantData: 0.001,
+  newGiantData: 2,
+  sameGiantData: 0.1,
   darkZoneBattle: 1,
   regularZoneBattle: 1,
 };
