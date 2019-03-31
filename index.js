@@ -112,7 +112,11 @@ const states = {
   WAIT_FOR_DATA_TO_PROCESS,
 };
 
-const createSession = (id) => {
+const getKeyboard = async (id) => {
+
+};
+
+const createSession = async (id) => {
   sessions[id] = {
     pip: null,
     state: states.WAIT_FOR_START,
@@ -126,6 +130,7 @@ const createSession = (id) => {
     initialForwardDate: null,
     lastForwardDate: null,
     firstForwardDate: null,
+    keyboard: await getKeyboard(id),
   };
 };
 
@@ -142,8 +147,6 @@ const getToken = () => {
 };
 
 const getUrl = () => {
-  process.env.ENV === 'PRODUCTION' ? process.env.URL_PRODUCTION : process.env.URL_STAGING;
-
   if (process.env.ENV === 'PRODUCTION') {
     return process.env.URL_PRODUCTION;
   } if (process.env.ENV === 'STAGING') {
@@ -158,7 +161,9 @@ let bot;
 if (process.env.ENV === 'LOCAL') {
   bot = new TeleBot({
     token: getToken(),
-    usePlugins: ['namedButtons'],
+    usePlugins: [
+      'namedButtons',
+    ],
     polling: {
       interval: 1, // How often check updates (in ms).
     },
@@ -271,25 +276,31 @@ const askReachableKm = (msg) => {
   });
 };
 
+const defaultKeyboard = async (msg) => {
+  if
 
-const defaultKeyboard = bot.keyboard([
-  [
-    buttons.journeyForwardStart.label,
-    buttons.skillUpgrade.label,
-    buttons.showEncyclopedia.label,
-  ],
-  [
-    buttons.showRegularBeasts.label,
-    buttons.showDarkZoneBeasts.label,
-    buttons.showGiants.label,
-  ],
-  [
-    buttons.hallOfFame.label,
-    buttons.showHelp.label,
-  ],
-], {
-  resize: true,
-});
+  return bot.keyboard([
+    [
+      buttons.journeyForwardStart.label,
+      buttons.skillUpgrade.label,
+      buttons.showEncyclopedia.label,
+    ],
+    [
+      buttons.showRegularBeasts.label,
+      buttons.showDarkZoneBeasts.label,
+      buttons.showGiants.label,
+    ],
+    [
+      buttons.hallOfFame.label,
+      buttons.showHelp.label,
+    ],
+    [
+      buttons.showSettings.label,
+    ],
+  ], {
+    resize: true,
+  });
+};
 
 const getEffort = (msg, toMax = false) => {
   if (sessions[msg.from.id].state === states.WAIT_FOR_START) {
@@ -309,7 +320,7 @@ const getEffort = (msg, toMax = false) => {
   createSession(msg.from.id);
 
   return msg.reply.text(effort, {
-    replyMarkup: defaultKeyboard,
+    replyMarkup: defaultKeyboard(msg),
     parseMode: 'markdown',
   });
 };
@@ -351,7 +362,7 @@ const getBeastKeyboard = beastId => bot.inlineKeyboard([
 ]);
 
 
-bot.on(['/start', '/help'], (msg) => {
+bot.on(['/start', '/help'], async (msg) => {
   createSession(msg.from.id);
 
   return msg.reply.text(
@@ -380,7 +391,7 @@ bot.on(['/start', '/help'], (msg) => {
 
 <i>Учти, что я ещё нахожусь в бета-режиме, и иногда ты можешь наткнуться на большие и маленькие баги.</i>
         `, {
-      replyMarkup: defaultKeyboard,
+      replyMarkup: await defaultKeyboard(msg),
       parseMode: 'html',
       webPreview: false,
     },
@@ -978,7 +989,7 @@ ${errors}
           }
 
           msg.reply.text(reply, {
-            replyMarkup: defaultKeyboard,
+            replyMarkup: defaultKeyboard(msg),
             parseMode: 'markdown',
             asReply: options.silent,
           }).then(() => {
@@ -997,7 +1008,7 @@ ${errors}
           createSession(msg.from.id);
           return msg.reply.text(`
         К сожалению я не смог узнать ничего нового из твоих форвардов :с${dupesText ? `\n\n_${dupesText}_` : ''}`, {
-            replyMarkup: defaultKeyboard,
+            replyMarkup: defaultKeyboard(msg),
             parseMode: 'markdown',
           });
           // }, 1500);
@@ -1052,7 +1063,7 @@ const processUserData = (msg, options) => {
 
   if (reportData.criticalError) {
     return msg.reply.text(`<b>❌ЗАМЕЧЕНА КРИТИЧЕСКАЯ ОШИБКА❌</b>\n\n${reportData.criticalError}\n\n<i>Форварды были отменены.</i>`, {
-      replyMarkup: defaultKeyboard,
+      replyMarkup: defaultKeyboard(msg),
       parseMode: 'html',
     });
   }
@@ -1076,7 +1087,7 @@ const processUserData = (msg, options) => {
     createSession(msg.from.id);
     return msg.reply.text(`
   К сожалению я не смог узнать ничего нового из твоих форвардов :с`, {
-      replyMarkup: defaultKeyboard,
+      replyMarkup: defaultKeyboard(msg),
       parseMode: 'markdown',
     });
   }
@@ -1115,7 +1126,7 @@ const processUserData = (msg, options) => {
         } if (reportDataWithUserPip.criticalError && !reportDataWithUserPip.couldBeUpdated) {
           createSession(msg.from.id);
           return msg.reply.text('Твой пип не соответсвуют твоим статам из форвардов!\nПрости, я вынужден отменить твои форварды.', {
-            replyMarkup: defaultKeyboard,
+            replyMarkup: defaultKeyboard(msg),
           });
         }
         updatesData = updatesDataWithUserPip;
@@ -1166,7 +1177,7 @@ bot.on('forward', (msg) => {
 Форварды принимаються только от @WastelandWarsBot.
             `, {
         asReply: true,
-        replyMarkup: defaultKeyboard,
+        replyMarkup: defaultKeyboard(msg),
       });
     }
   }
@@ -2103,7 +2114,7 @@ bot.on('/journeyforwardend', (msg) => {
     createSession(msg.from.id);
 
     return msg.reply.text('Чёрт, похоже меня перезагрузил какой-то мудак и твои форварды не сохранились, прости пожалуйста :с', {
-      replyMarkup: defaultKeyboard,
+      replyMarkup: defaultKeyboard(msg),
     });
   }
   sessions[msg.from.id].state = states.WAIT_FOR_DATA_TO_PROCESS;
@@ -2130,7 +2141,7 @@ bot.on(['/skipbeastforward', '/skipbeastforwards'], (msg) => {
   if (_.isEmpty(sessions)) {
     return msg.reply.text('Слушай, а мне собственно нечего игнорировать. Может меня опять какой-то пидор перезагрузил, не знаешь?', {
       asReply: true,
-      replyMarkup: defaultKeyboard,
+      replyMarkup: defaultKeyboard(msg),
     });
   }
 
@@ -2459,42 +2470,7 @@ bot.on('/mypipstats', (msg) => {
 });
 
 bot.on('/debug', (msg) => {
-  createSession(msg.from.id);
-
-  const updatesData = {
-    locations: [],
-    beasts: [{
-      isDungeon: false,
-      subType: null,
-      name: '👤Майкл Майерс (Виновник этого торжества)',
-      type: 'DarkZone',
-      date: 1541030493,
-      proofedByForward: false,
-      distanceRange: [{ value: 64 }],
-      battles: [
-        {
-          outcome: 'win',
-          stats: { armor: 322, damage: 1384 },
-          totalDamageGiven: 2599,
-          totalDamageReceived: 0,
-          damagesGiven: [1321, 1278],
-          damagesReceived: [0],
-          healthOnStart: 411,
-          stamp: '154103049356019931',
-          distance: 64,
-        },
-      ],
-      receivedItems: { Микрочип: [1] },
-      capsReceived: [{ value: 7609 }],
-      materialsReceived: [{ value: 11370 }],
-    }],
-  };
-
-  const { processDataConfig: options } = sessions[msg.from.id];
-
-  actualProcessUserData(msg, {
-    errors: [],
-  }, updatesData, options);
+  return msg.reply.text('hi')
 });
 
 bot.on(/^\d+$/, (msg) => {
@@ -2712,7 +2688,7 @@ bot.on(['/cancel', '/journeyforwardcancel', '/force_cancel'], (msg) => {
     createSession(msg.from.id);
 
     return msg.reply.text(backMessage, {
-      replyMarkup: defaultKeyboard,
+      replyMarkup: defaultKeyboard(msg),
       parseMode: 'html',
     }).catch(e => console.log(e));
   }
@@ -2726,7 +2702,7 @@ bot.on(['/cancel', '/journeyforwardcancel', '/force_cancel'], (msg) => {
   createSession(msg.from.id);
 
   return msg.reply.text(backMessage, {
-    replyMarkup: defaultKeyboard,
+    replyMarkup: defaultKeyboard(msg),
     parseMode: 'html',
   }).catch(e => console.log(e));
 });
@@ -3256,7 +3232,7 @@ bot.on(/\/ignore_(.+)/, (msg) => {
   if (_.isEmpty(sessions)) {
     return msg.reply.text('Слушай, а мне собственно нечего игнорировать. Может меня опять какой-то пидор перезагрузил, не знаешь?', {
       asReply: true,
-      replyMarkup: defaultKeyboard,
+      replyMarkup: defaultKeyboard(msg),
     });
   }
 
@@ -3304,7 +3280,7 @@ bot.on(/\/ignore_(.+)/, (msg) => {
 
     return msg.reply.text('Слушай, а мне собственно нечего игнорировать. Может меня опять какой-то пидор перезагрузил, не знаешь?', {
       asReply: true,
-      replyMarkup: defaultKeyboard,
+      replyMarkup: defaultKeyboard(msg),
     });
   }
 
@@ -3376,6 +3352,21 @@ bot.on('/help_icons', msg => msg.reply.text(`
   parseMode: 'html',
   asReply: true,
 }));
+
+bot.on('/show_settings', async (msg) => {
+  const telegramData = {
+    first_name: msg.from.first_name,
+    id: msg.from.id,
+    username: msg.from.username,
+  };
+
+  const { data } = await userManager.getOrCreateSettings({ id: msg.from.id, telegramData });
+
+  return msg.reply.text('Здесь ты можешь выбрать какие кнопки ты хочешь видеть на главном меню, а какие убрать под <code>[📔Энциклпдию]</code>', {
+    parseMode: 'html',
+    asReply: true,
+  });
+});
 
 
 bot.connect();
