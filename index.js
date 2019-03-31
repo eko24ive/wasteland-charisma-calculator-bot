@@ -1038,7 +1038,6 @@ const actualProcessUserData = (msg, reportData, updatesData, options) => {
   }
 };
 
-
 const databasePipCheck = async (msg, pips) => Promise((resolve) => {
   findPip(msg, (result) => {
     if (result.ok) {
@@ -1051,7 +1050,9 @@ const databasePipCheck = async (msg, pips) => Promise((resolve) => {
   });
 });
 
-const processUserData = async (msg, options) => {
+const processUserData = async (msg, options, processConfig = {
+  omitPipError: false,
+}) => {
   sessions[msg.from.id].state = states.WAIT_FOR_DATA_TO_PROCESS;
 
   const {
@@ -1070,7 +1071,7 @@ const processUserData = async (msg, options) => {
   let {
     reportData,
     updatesData,
-  } = processForwards(data, msg.from.id || moment.now());
+  } = processForwards(data, msg.from.id || moment.now(), processConfig);
 
   if (reportData.criticalError) {
     return msg.reply.text(`<b>❌ЗАМЕЧЕНА КРИТИЧЕСКАЯ ОШИБКА❌</b>\n\n${reportData.criticalError}\n\n<i>Форварды были отменены.</i>`, {
@@ -1246,6 +1247,8 @@ bot.on('forward', (msg) => {
             processUserData(msg, {
               usePip: sessions[msg.from.id].processDataConfig.usePip,
               useBeastFace: sessions[msg.from.id].processDataConfig.useBeastFace,
+            }, {
+              omitPipError: true,
             });
           });
         }
@@ -1615,7 +1618,6 @@ bot.on('forward', (msg) => {
 
       Giant.findOne({
         name: giant.name,
-        distance: giant.distance,
       }).then((fGiant) => {
         const databaseGiant = fGiant;
         if (databaseGiant === null) {
@@ -1653,6 +1655,10 @@ bot.on('forward', (msg) => {
           databaseGiant.health.current = giant.healthCurrent;
           databaseGiant.health.cap = giant.healthCap;
           databaseGiant.forwardStamp = msg.forward_date;
+
+          if (!databaseGiant.distance) {
+            databaseGiant.distance = giant.distance;
+          }
 
           const wasDead = databaseGiant.health.current <= 0;
           const isDead = giant.healthCurrent <= 0;
