@@ -52,6 +52,7 @@ const processForwards = require('./src/utils/processForwards');
 const { ranges, dzRanges } = require('./src/utils/getRanges');
 const processMenu = require('./src/utils/processMenu');
 const validateForwardDate = require('./src/utils/validateForwardDate');
+const comparePips = require('./src/utils/comparePips');
 
 const routedBeastView = require('./src/views/routedBeastView');
 const routedBattleView = require('./src/views/routedBattleView');
@@ -350,8 +351,7 @@ const getBeastKeyboard = beastId => bot.inlineKeyboard([
   ],
 ]);
 
-
-bot.on(['/start', '/help'], (msg) => {
+bot.on(['/start', '/help'], async (msg) => {
   createSession(msg.from.id);
 
   return msg.reply.text(
@@ -1038,7 +1038,19 @@ const actualProcessUserData = (msg, reportData, updatesData, options) => {
   }
 };
 
-const processUserData = (msg, options, processConfig = {
+const databasePipCheck = async (msg, pips) => Promise((resolve) => {
+  findPip(msg, (result) => {
+    if (result.ok) {
+      const { pip } = result.data;
+
+      resolve(comparePips([...pips, pip]));
+    } else {
+      resolve(true);
+    }
+  });
+});
+
+const processUserData = async (msg, options, processConfig = {
   omitPipError: false,
 }) => {
   sessions[msg.from.id].state = states.WAIT_FOR_DATA_TO_PROCESS;
@@ -1046,6 +1058,15 @@ const processUserData = (msg, options, processConfig = {
   const {
     data,
   } = sessions[msg.from.id];
+
+  const isPipsFraudless = await databasePipCheck(msg, data.filter(entry => entry.dataType === 'pipboy'));
+
+  if (!isPipsFraudless) {
+    return msg.reply.text('<b>❌ЗАМЕЧЕНА КРИТИЧЕСКАЯ ОШИБКА❌</b>\n\nПохоже что ты скидывал пип-бой, который тебе не пренадлежит\n\n<i>Форварды были отменены.</i>', {
+      replyMarkup: defaultKeyboard,
+      parseMode: 'html',
+    });
+  }
 
   let {
     reportData,
