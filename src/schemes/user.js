@@ -14,7 +14,7 @@ const userSchema = Schema({
     userNamesHistory: [String],
   },
   pip: {
-    version: Number,
+    version: String,
     faction: String,
     squad: String,
     name: String,
@@ -60,7 +60,7 @@ const userSchema = Schema({
   },
   history: {
     pip: [{
-      version: Number,
+      version: String,
       faction: String,
       squad: String,
       name: String,

@@ -15,7 +15,7 @@ MongoDB should be installed at your machine
 1. Create `.env` file at the root level of the project
 2. Populate it with following text:
 ```
-BOT_TEST=<YOUR_BOT_TOKEN>
+BOT_TOKEN_TEST=<YOUR_BOT_TOKEN>
 MONGODB_URI=<YOUR_MONGO_DB_ADDRESS>
 ENV=LOCAL
 VERSION=<CURRENT_WW_VERSION>
