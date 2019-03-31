@@ -31,6 +31,8 @@ const giantScheme = require('./src/schemes/giant');
 const userSchema = require('./src/schemes/user');
 const journeySchema = require('./src/schemes/journey');
 
+const userDefaults = require('./src/schemes/defaults/user');
+
 const chartGeneration = require('./src/utils/chartGeneration');
 
 const parsePip = require('./src/parsers/parsePip');
@@ -112,12 +114,45 @@ const states = {
   WAIT_FOR_DATA_TO_PROCESS,
 };
 
-const getKeyboard = async (id) => {
+const getKeyboard = (data) => {
+  const filteredButtons = data.buttons.filter(({ label, state }) => label !== buttons.showSettings.label && state === 'true');
+  const sortedButons = _.sortBy(filteredButtons, ({ order }) => order);
+  const labeledButtons = sortedButons.map(({ label }) => label);
 
+  const keyboard = [
+    ..._.chunk(labeledButtons, 3),
+    [
+      buttons.showSettings.label,
+    ],
+  ];
+
+  return keyboard;
 };
 
-const createSession = async (id) => {
-  sessions[id] = {
+const updateKeyboard = async (msg) => {
+  const { id } = msg.from;
+  const telegramData = {
+    first_name: msg.from.first_name,
+    id: msg.from.id,
+    username: msg.from.username,
+  };
+
+  const { data } = await userManager.getOrCreateSettings({ id, telegramData });
+
+  sessions[msg.from.id].keyboard = await getKeyboard(data);
+};
+
+const createSession = async (msg) => {
+  const { id } = msg.from;
+  const telegramData = {
+    first_name: msg.from.first_name,
+    id: msg.from.id,
+    username: msg.from.username,
+  };
+
+  const { data } = await userManager.getOrCreateSettings({ id, telegramData });
+
+  sessions[msg.from.id] = {
     pip: null,
     state: states.WAIT_FOR_START,
     data: [],
@@ -130,7 +165,8 @@ const createSession = async (id) => {
     initialForwardDate: null,
     lastForwardDate: null,
     firstForwardDate: null,
-    keyboard: await getKeyboard(id),
+    settings: data,
+    keyboard: getKeyboard(data),
   };
 };
 
@@ -277,27 +313,21 @@ const askReachableKm = (msg) => {
 };
 
 const defaultKeyboard = async (msg) => {
-  if
+  if (sessions[msg.from.id]) {
+    if (sessions[msg.from.id].keyboard) {
+      return bot.keyboard(sessions[msg.from.id].keyboard, {
+        resize: true,
+      });
+    }
 
-  return bot.keyboard([
-    [
-      buttons.journeyForwardStart.label,
-      buttons.skillUpgrade.label,
-      buttons.showEncyclopedia.label,
-    ],
-    [
-      buttons.showRegularBeasts.label,
-      buttons.showDarkZoneBeasts.label,
-      buttons.showGiants.label,
-    ],
-    [
-      buttons.hallOfFame.label,
-      buttons.showHelp.label,
-    ],
-    [
-      buttons.showSettings.label,
-    ],
-  ], {
+    await updateKeyboard(msg);
+    return bot.keyboard(sessions[msg.from.id].keyboard, {
+      resize: true,
+    });
+  }
+
+  await createSession(msg);
+  return bot.keyboard(sessions[msg.from.id].keyboard, {
     resize: true,
   });
 };
@@ -317,7 +347,7 @@ const getEffort = (msg, toMax = false) => {
 
   console.log(`[SKILL UPGRADE]: ${pip.faction} | ${pip.name} | ${msg.from.username}`);
 
-  createSession(msg.from.id);
+  createSession(msg);
 
   return msg.reply.text(effort, {
     replyMarkup: defaultKeyboard(msg),
@@ -363,7 +393,7 @@ const getBeastKeyboard = beastId => bot.inlineKeyboard([
 
 
 bot.on(['/start', '/help'], async (msg) => {
-  createSession(msg.from.id);
+  await createSession(msg);
 
   return msg.reply.text(
     `
@@ -970,7 +1000,7 @@ const actualActualProcessUserData = (msg, reportData, updatesData, options) => {
         if (dataProcessed > 0 && userForwardPoints > 0) {
           // TODO: Move out shit to strings
           // TODO: Implement meaningfull report data regarding found usefull data
-          createSession(msg.from.id);
+          createSession(msg);
 
           // setTimeout(() => {
           if (options.silent) {
@@ -1005,7 +1035,7 @@ ${errors}
           // }, 1500);
         } else {
           // setTimeout(() => {
-          createSession(msg.from.id);
+          createSession(msg);
           return msg.reply.text(`
         К сожалению я не смог узнать ничего нового из твоих форвардов :с${dupesText ? `\n\n_${dupesText}_` : ''}`, {
             replyMarkup: defaultKeyboard(msg),
@@ -1084,7 +1114,7 @@ const processUserData = (msg, options) => {
 
 
   if (updatesData.locations.length === 0 && updatesData.beasts.length === 0) {
-    createSession(msg.from.id);
+    createSession(msg);
     return msg.reply.text(`
   К сожалению я не смог узнать ничего нового из твоих форвардов :с`, {
       replyMarkup: defaultKeyboard(msg),
@@ -1124,7 +1154,7 @@ const processUserData = (msg, options) => {
             replyMarkup: toGameKeyboard,
           });
         } if (reportDataWithUserPip.criticalError && !reportDataWithUserPip.couldBeUpdated) {
-          createSession(msg.from.id);
+          createSession(msg);
           return msg.reply.text('Твой пип не соответсвуют твоим статам из форвардов!\nПрости, я вынужден отменить твои форварды.', {
             replyMarkup: defaultKeyboard(msg),
           });
@@ -1164,14 +1194,14 @@ const processUserData = (msg, options) => {
 
 bot.on('forward', (msg) => {
   if (sessions[msg.from.id] === undefined) {
-    createSession(msg.from.id);
+    createSession(msg);
   }
 
   if (msg.forward_from.id !== 430930191) {
     if (sessions[msg.from.id].state !== states.WAIT_FOR_FORWARD_END) {
       console.log(`[CULPRIT]: ${msg.from.id} | ${msg.from.first_name} | ${msg.from.username}`);
 
-      // createSession(msg.from.id);
+      // createSession(msg);
 
       return msg.reply.text(`
 Форварды принимаються только от @WastelandWarsBot.
@@ -1883,7 +1913,7 @@ bot.on('forward', (msg) => {
       let data;
       let dataType;
 
-      createSession(msg.from.id);
+      createSession(msg);
 
       if (isFlee) {
         data = parseFlee(msg.text);
@@ -2068,7 +2098,7 @@ bot.on('/upgradeSkill', (msg) => {
 });
 
 bot.on(['/journeyforwardstart', '/go'], (msg) => {
-  createSession(msg.from.id);
+  createSession(msg);
 
   const inlineReplyMarkup = bot.inlineKeyboard([
     [
@@ -2111,7 +2141,7 @@ bot.on(['/journeyforwardstart', '/go'], (msg) => {
 
 bot.on('/journeyforwardend', (msg) => {
   if (sessions[msg.from.id] === undefined) {
-    createSession(msg.from.id);
+    createSession(msg);
 
     return msg.reply.text('Чёрт, похоже меня перезагрузил какой-то мудак и твои форварды не сохранились, прости пожалуйста :с', {
       replyMarkup: defaultKeyboard(msg),
@@ -2247,7 +2277,7 @@ bot.on('/skill_upgrade', (msg) => {
   findPip(msg, (result) => {
     if (result.ok && result.reason === 'USER_FOUND') {
       if (sessions[msg.from.id] === undefined) {
-        createSession(msg.from.id);
+        createSession(msg);
       }
 
       sessions[msg.from.id].pip = result.data.pip;
@@ -2469,9 +2499,7 @@ bot.on('/mypipstats', (msg) => {
   });
 });
 
-bot.on('/debug', (msg) => {
-  return msg.reply.text('hi')
-});
+bot.on('/debug', msg => msg.reply.text('hi'));
 
 bot.on(/^\d+$/, (msg) => {
   switch (sessions[msg.from.id].state) {
@@ -2681,16 +2709,11 @@ bot.on(/mob_(.+)/, (msg) => {
 });
 
 
-bot.on(['/cancel', '/journeyforwardcancel', '/force_cancel'], (msg) => {
+bot.on(['/cancel', '/journeyforwardcancel', '/force_cancel'], async (msg) => {
   const backMessage = _.random(0, 100) >= 90 ? 'Ты вернусля в главное меню\n<i>Вернусля - почётный член этого сообщения, не обижайте её</i>' : 'Ты вернусля в главное меню';
 
   if (sessions[msg.from.id] === undefined) {
-    createSession(msg.from.id);
-
-    return msg.reply.text(backMessage, {
-      replyMarkup: defaultKeyboard(msg),
-      parseMode: 'html',
-    }).catch(e => console.log(e));
+    await createSession(msg);
   }
 
   if (sessions[msg.from.id].state === states.WAIT_FOR_DATA_TO_PROCESS && msg.text !== '/force_cancel') {
@@ -2699,10 +2722,8 @@ bot.on(['/cancel', '/journeyforwardcancel', '/force_cancel'], (msg) => {
     }).catch(e => console.log(e));
   }
 
-  createSession(msg.from.id);
-
   return msg.reply.text(backMessage, {
-    replyMarkup: defaultKeyboard(msg),
+    replyMarkup: await defaultKeyboard(msg),
     parseMode: 'html',
   }).catch(e => console.log(e));
 });
@@ -3011,7 +3032,7 @@ ${beastsList}
       bot.answerCallbackQuery(msg.id);
       if (result.ok && result.reason === 'USER_FOUND') {
         if (sessions[msg.from.id] === undefined) {
-          createSession(msg.from.id);
+          createSession(msg);
         }
 
         sessions[msg.from.id].pip = result.data.pip;
@@ -3354,19 +3375,144 @@ bot.on('/help_icons', msg => msg.reply.text(`
 }));
 
 bot.on('/show_settings', async (msg) => {
+  msg.reply.text('Здесь ты можешь изменить настройки отображения и персонализировать бота под себя', {
+    replyMarkup: withBackButton(bot.keyboard, [
+      [buttons.showSettingsButton.label],
+    ], {
+      resize: true,
+    }),
+  });
+});
+
+bot.on('/show_buttons', async (msg) => {
   const telegramData = {
     first_name: msg.from.first_name,
     id: msg.from.id,
     username: msg.from.username,
   };
 
+  const replyMarkup = bot.keyboard([
+    [buttons.cancelAction.label],
+  ], {
+    resize: true,
+  });
+
   const { data } = await userManager.getOrCreateSettings({ id: msg.from.id, telegramData });
 
-  return msg.reply.text('Здесь ты можешь выбрать какие кнопки ты хочешь видеть на главном меню, а какие убрать под <code>[📔Энциклпдию]</code>', {
+  const mainKeyboardButtons = data.buttons.filter(({ state, label }) => state === 'true' && label !== buttons.showSettings.label).map(({ label, index }) => `${label} /bdown_${index}\n`).join('');
+  const encyclopediaKeyboardButtons = data.buttons.filter(({ state, label }) => state !== 'true' && label !== buttons.showSettings.label).map(({ label, index }) => `${label} /bup_${index}\n`).join('');
+
+  return msg.reply.text(`
+Здесь ты можешь выбрать какие кнопки ты хочешь видеть на главном меню, а какие убрать под <code>[📔Энциклпдию]</code>
+
+Показывать все кнопки: /buttons_set_all
+Кнопоки по умолчанию: /buttons_set_default
+
+Кнопки в главном меню:
+<i>Нажми на команду напротив что бы переместить их в [📔Энциклпдию]</i>
+${mainKeyboardButtons}
+
+Кнопки в [📔Энциклпдии]:
+<i>Нажми на команду напротив что бы переместить их в Главное меню</i>
+${encyclopediaKeyboardButtons}
+`, {
     parseMode: 'html',
     asReply: true,
+    replyMarkup,
   });
 });
 
+bot.on(['/buttons_set_all', '/buttons_set_default'], async (msg) => {
+  const isRevertToDefault = msg.text.indexOf('default') !== -1;
+  let updateResult;
+
+  if (sessions[msg.from.id] === undefined) {
+    await createSession(msg);
+  }
+
+  const { settings } = sessions[msg.from.id];
+  const { buttons, ...restSettings } = settings;
+
+  if (isRevertToDefault) {
+    updateResult = await userManager.updateSettings({
+      id: msg.from.id,
+      settings: {
+        buttons: userDefaults.settings.buttons,
+        ...restSettings,
+      },
+    });
+  } else {
+    updateResult = await userManager.updateSettings({
+      id: msg.from.id,
+      settings: {
+        buttons: buttons.map(({ state, ...rest }) => ({ state: 'true', ...rest })),
+        ...restSettings,
+      },
+    });
+  }
+
+  if (updateResult.ok) {
+    await updateKeyboard(msg);
+    return msg.reply.text('Я обновил настройки');
+  }
+
+  return msg.reply.text('Произошла ошибка - я не смог найти тебя в базе. Попробуй нажать /start и повторить ещё раз.');
+});
+
+bot.on([/bup_(\d*)/, /bdown_(\d*)/], async (msg) => {
+  const isUp = msg.text.indexOf('up') !== -1;
+  let buttonIndex;
+
+  if (!sessions[msg.from.id]) {
+    await createSession(msg);
+  }
+
+  const { settings } = sessions[msg.from.id];
+
+  if (isUp) {
+    [, buttonIndex] = /bup_(\d*)/.exec(msg.text);
+    settings.buttons = settings.buttons.map(({ index, state, ...rest }) => {
+      if (index === Number(buttonIndex)) {
+        return {
+          state: 'true',
+          index,
+          ...rest,
+        };
+      }
+
+      return {
+        state,
+        index,
+        ...rest,
+      };
+    });
+  } else {
+    [, buttonIndex] = /bdown_(\d*)/.exec(msg.text);
+    settings.buttons = settings.buttons.map(({ index, state, ...rest }) => {
+      if (index === Number(buttonIndex)) {
+        return {
+          state: 'false',
+          index,
+          ...rest,
+        };
+      }
+
+      return {
+        state,
+        index,
+        ...rest,
+      };
+    });
+  }
+
+  const updateResult = await userManager.updateSettings({ id: msg.from.id, settings });
+
+  if (updateResult.ok) {
+    await updateKeyboard(msg);
+    return msg.reply.text('Я обновил настройки');
+  }
+
+  return msg.reply.text('Произошла ошибка - я не смог найти тебя в базе. Попробуй нажать /start и повторить ещё раз.');
+});
 
 bot.connect();

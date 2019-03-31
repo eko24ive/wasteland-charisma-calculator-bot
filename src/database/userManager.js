@@ -25,6 +25,7 @@ const userManager = User => ({
         history: {
           pip: pipData ? [pipData] : userDefaults.history.pip,
         },
+        settings: userDefaults.settings,
       });
 
       newUser.save().then(newDatabaseUser => resolve({
@@ -235,12 +236,12 @@ const userManager = User => ({
     return new Promise((resolve) => {
       User.findOne({ 'telegram.id': id }).then((databaseUser) => {
         if (databaseUser === null) {
-          this.create({ telegramData, pipData: undefined }).then(({
+          return this.create({ telegramData, pipData: undefined }).then(({
             data,
           }) => resolve({
             ok: true,
             reason: 'USER_FOUND',
-            data: { settings: data.settings },
+            data: data.settings,
           }));
         }
 
@@ -254,18 +255,36 @@ const userManager = User => ({
           }).then(({ data }) => resolve({
             ok: true,
             reason: 'USER_FOUND',
-            data: { settings: data.settings },
+            data: data.settings,
           }));
         }
 
         return resolve({
           ok: true,
           reason: 'USER_FOUND',
-          data: { settings },
+          data: settings,
         });
       });
     });
   },
+  updateSettings: ({ id, settings }) => new Promise((resolve) => {
+    User.findOne({ 'telegram.id': id }).then((databaseUser) => {
+      if (databaseUser === null) {
+        return resolve({
+          ok: false,
+          result: 'USER_NOT_FOUND',
+        });
+      }
+
+      databaseUser.settings = settings;
+
+      databaseUser.save().then(updatedDatabaseUser => resolve({
+        ok: true,
+        reason: 'USER_UPDATED',
+        data: updatedDatabaseUser.toJSON(),
+      }));
+    });
+  }),
 });
 
 module.exports = userManager;
