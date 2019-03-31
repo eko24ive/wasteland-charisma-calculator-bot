@@ -292,7 +292,7 @@ const defaultKeyboard = bot.keyboard([
   resize: true,
 });
 
-const getEffort = (msg, toMax = false) => {
+const getEffort = async (msg, toMax = false) => {
   if (sessions[msg.from.id].state === states.WAIT_FOR_START) {
     return false;
   }
@@ -307,7 +307,7 @@ const getEffort = (msg, toMax = false) => {
 
   console.log(`[SKILL UPGRADE]: ${pip.faction} | ${pip.name} | ${msg.from.username}`);
 
-  createSession(msg.from.id);
+  await createSession(msg);
 
   return msg.reply.text(effort, {
     replyMarkup: defaultKeyboard,
@@ -352,7 +352,7 @@ const getBeastKeyboard = beastId => bot.inlineKeyboard([
 ]);
 
 bot.on(['/start', '/help'], async (msg) => {
-  createSession(msg.from.id);
+  await createSession(msg);
 
   return msg.reply.text(
     `
@@ -942,7 +942,7 @@ const actualActualProcessUserData = (msg, reportData, updatesData, options) => {
         processBeasts(),
         processLocations(),
         saveJourney(),
-      ]).then(() => {
+      ]).then(async () => {
         let errors = '';
         let dupesText = '';
         let reply;
@@ -959,7 +959,7 @@ const actualActualProcessUserData = (msg, reportData, updatesData, options) => {
         if (dataProcessed > 0 && userForwardPoints > 0) {
           // TODO: Move out shit to strings
           // TODO: Implement meaningfull report data regarding found usefull data
-          createSession(msg.from.id);
+          await createSession(msg);
 
           // setTimeout(() => {
           if (options.silent) {
@@ -993,9 +993,7 @@ ${errors}
           }).catch(e => console.log(e));
           // }, 1500);
         } else {
-          let errors;
-
-          createSession(msg.from.id);
+          await createSession(msg);
           if (reportData.errors.length > 0) {
             errors = `*Также я заметил такие вещи*:
 ${reportData.errors.join('\n')}`;
@@ -1105,7 +1103,7 @@ const processUserData = async (msg, options, processConfig = {
   if (updatesData.locations.length === 0 && updatesData.beasts.length === 0) {
     let errors;
 
-    createSession(msg.from.id);
+    await createSession(msg);
     if (reportData.errors.length > 0) {
       errors = `*Также я заметил такие вещи*:
 ${reportData.errors.join('\n')}`;
@@ -1121,7 +1119,7 @@ ${errors}`, {
   }
 
   if (options.usePip && reportData.pipRequired) {
-    userManager.findByTelegramId(msg.from.id).then((result) => {
+    userManager.findByTelegramId(msg.from.id).then(async (result) => {
       if (result.ok && result.reason === 'USER_FOUND') {
         if (result.data.pip !== undefined) {
           sessions[msg.from.id].data.push({
@@ -1152,7 +1150,7 @@ ${errors}`, {
             replyMarkup: toGameKeyboard,
           });
         } if (reportDataWithUserPip.criticalError && !reportDataWithUserPip.couldBeUpdated) {
-          createSession(msg.from.id);
+          await createSession(msg);
           return msg.reply.text('Твой пип не соответсвуют твоим статам из форвардов!\nПрости, я вынужден отменить твои форварды.', {
             replyMarkup: defaultKeyboard,
           });
@@ -1190,15 +1188,15 @@ ${errors}`, {
   return false;
 };
 
-bot.on('forward', (msg) => {
+bot.on('forward', async (msg) => {
   if (sessions[msg.from.id] === undefined) {
-    createSession(msg.from.id);
+    await createSession(msg);
   }
 
   if (msg.forward_from.id !== 430930191 && sessions[msg.from.id].state !== states.WAIT_FOR_FORWARD_END) {
     console.log(`[CULPRIT]: ${msg.from.id} | ${msg.from.first_name} | ${msg.from.username}`);
 
-    // createSession(msg.from.id);
+    // await createSession(msg);
 
     return msg.reply.text(`
 Форварды принимаються только от @WastelandWarsBot.
@@ -1914,7 +1912,7 @@ bot.on('forward', (msg) => {
       let data;
       let dataType;
 
-      createSession(msg.from.id);
+      await createSession(msg);
 
       if (isFlee) {
         data = parseFlee(msg.text);
@@ -2098,8 +2096,8 @@ bot.on('/upgradeSkill', (msg) => {
   }
 });
 
-bot.on(['/journeyforwardstart', '/go'], (msg) => {
-  createSession(msg.from.id);
+bot.on(['/journeyforwardstart', '/go'], async (msg) => {
+  await createSession(msg);
 
   const inlineReplyMarkup = bot.inlineKeyboard([
     [
@@ -2140,9 +2138,9 @@ bot.on(['/journeyforwardstart', '/go'], (msg) => {
 });
 
 
-bot.on('/journeyforwardend', (msg) => {
+bot.on('/journeyforwardend', async (msg) => {
   if (sessions[msg.from.id] === undefined) {
-    createSession(msg.from.id);
+    await createSession(msg);
 
     return msg.reply.text('Чёрт, похоже меня перезагрузил какой-то мудак и твои форварды не сохранились, прости пожалуйста :с', {
       replyMarkup: defaultKeyboard,
@@ -2275,10 +2273,10 @@ bot.on('/skill_upgrade', (msg) => {
   const skillOMaticText = `
 В «<b>🎓 Скилокачаторе</b>» я могу помочь тебе посчитать финансовые затраты на прокачку твоих скилов.`;
 
-  findPip(msg, (result) => {
+  findPip(msg, async (result) => {
     if (result.ok && result.reason === 'USER_FOUND') {
       if (sessions[msg.from.id] === undefined) {
-        createSession(msg.from.id);
+        await createSession(msg);
       }
 
       sessions[msg.from.id].pip = result.data.pip;
@@ -2500,8 +2498,8 @@ bot.on('/mypipstats', (msg) => {
   });
 });
 
-bot.on('/debug', (msg) => {
-  createSession(msg.from.id);
+bot.on('/debug', async (msg) => {
+  await createSession(msg);
 
   const updatesData = {
     locations: [],
@@ -2747,11 +2745,11 @@ bot.on(/mob_(.+)/, (msg) => {
 });
 
 
-bot.on(['/cancel', '/journeyforwardcancel', '/force_cancel'], (msg) => {
+bot.on(['/cancel', '/journeyforwardcancel', '/force_cancel'], async (msg) => {
   const backMessage = _.random(0, 100) >= 90 ? 'Ты вернусля в главное меню\n<i>Вернусля - почётный член этого сообщения, не обижайте её</i>' : 'Ты вернусля в главное меню';
 
   if (sessions[msg.from.id] === undefined) {
-    createSession(msg.from.id);
+    await createSession(msg);
 
     return msg.reply.text(backMessage, {
       replyMarkup: defaultKeyboard,
@@ -2765,7 +2763,7 @@ bot.on(['/cancel', '/journeyforwardcancel', '/force_cancel'], (msg) => {
     }).catch(e => console.log(e));
   }
 
-  createSession(msg.from.id);
+  await createSession(msg);
 
   return msg.reply.text(backMessage, {
     replyMarkup: defaultKeyboard,
@@ -3073,11 +3071,11 @@ ${beastsList}
     const skillOMaticText = `
 В «<b>🎓 Скилокачаторе</b>» я могу помочь тебе посчитать финансовые затраты на прокачку твоих скилов.`;
 
-    findPip(msg, (result) => {
+    findPip(msg, async (result) => {
       bot.answerCallbackQuery(msg.id);
       if (result.ok && result.reason === 'USER_FOUND') {
         if (sessions[msg.from.id] === undefined) {
-          createSession(msg.from.id);
+          await createSession(msg);
         }
 
         sessions[msg.from.id].pip = result.data.pip;
