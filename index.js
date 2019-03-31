@@ -1597,7 +1597,6 @@ bot.on('forward', (msg) => {
 
       Giant.findOne({
         name: giant.name,
-        distance: giant.distance,
       }).then((fGiant) => {
         const databaseGiant = fGiant;
         if (databaseGiant === null) {
@@ -1635,6 +1634,10 @@ bot.on('forward', (msg) => {
           databaseGiant.health.current = giant.healthCurrent;
           databaseGiant.health.cap = giant.healthCap;
           databaseGiant.forwardStamp = msg.forward_date;
+
+          if (!databaseGiant.distance) {
+            databaseGiant.distance = giant.distance;
+          }
 
           const wasDead = databaseGiant.health.current <= 0;
           const isDead = giant.healthCurrent <= 0;
