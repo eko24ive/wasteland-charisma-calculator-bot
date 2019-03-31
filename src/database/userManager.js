@@ -234,7 +234,7 @@ const userManager = User => ({
   }),
   getOrCreateSettings: function _getOrCreateSettings({ id, telegramData }) {
     return new Promise((resolve) => {
-      User.findOne({ 'telegram.id': id }).then((databaseUser) => {
+      User.findOne({ 'telegram.id': id }).then(async (databaseUser) => {
         if (databaseUser === null) {
           return this.create({ telegramData, pipData: undefined }).then(({
             data,
@@ -247,9 +247,9 @@ const userManager = User => ({
 
         const { settings } = databaseUser.toJSON();
 
-        if (settings === undefined) {
-          this.update({
-            telegramData: undefined,
+        if (settings === undefined || Object.keys(settings).map(key => settings[key]).some(entry => entry.length === 0)) {
+          await this.update({
+            telegramData,
             pipData: undefined,
             settings: userDefaults.settings,
           }).then(({ data }) => resolve({
