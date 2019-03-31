@@ -589,11 +589,24 @@ const processForwards = (inputData, id, processConfig = {
         return;
       }
 
-      const nextPip = dataPipsMap.find(pip => pip.index === lastKnownPip.index + 1);
+      let nextPip = dataPipsMap.find(pip => pip.index === lastKnownPip.index + 1);
 
-      if (!nextPip || (nextPip.pip.date - date) > 30) {
-        reportData.errors.push(`Ты не предоставил пип для подтверждения побега на ${data.distance} километре. Я не обрабатывал этот побег`);
-        return;
+      if (nextPip) {
+        if ((nextPip.pip.date - date) > 30) {
+          reportData.errors.push(`Ты не предоставил пип для подтверждения побега на ${data.distance} километре. Я не обрабатывал этот побег`);
+
+          return;
+        }
+
+        nextPip = nextPip.pip;
+      } else {
+        if ((reportData.lastPip.date - date) > 30) {
+          reportData.errors.push(`Ты не предоставил пип для подтверждения побега на ${data.distance} километре. Я не обрабатывал этот побег`);
+
+          return;
+        }
+
+        nextPip = reportData.lastPip;
       }
 
       const subType = reportData.lastBeastSeenSubType;
@@ -633,7 +646,7 @@ const processForwards = (inputData, id, processConfig = {
           }
 
           beastData.flees[0].stats = {
-            agility: nextPip.pip.agility,
+            agility: nextPip.agility,
           };
 
           updatesData.beasts.push(beastData);

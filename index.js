@@ -52,7 +52,7 @@ const processForwards = require('./src/utils/processForwards');
 const { ranges, dzRanges } = require('./src/utils/getRanges');
 const processMenu = require('./src/utils/processMenu');
 const validateForwardDate = require('./src/utils/validateForwardDate');
-const comparePips = require('./src/utils/comparePips');
+const checkPips = require('./src/utils/comparePips');
 
 const routedBeastView = require('./src/views/routedBeastView');
 const routedBattleView = require('./src/views/routedBattleView');
@@ -993,14 +993,21 @@ ${errors}
           }).catch(e => console.log(e));
           // }, 1500);
         } else {
-          // setTimeout(() => {
+          let errors;
+
           createSession(msg.from.id);
+          if (reportData.errors.length > 0) {
+            errors = `*Также я заметил такие вещи*:
+${reportData.errors.join('\n')}`;
+          }
+
           return msg.reply.text(`
-        К сожалению я не смог узнать ничего нового из твоих форвардов :с${dupesText ? `\n\n_${dupesText}_` : ''}`, {
+К сожалению я не смог узнать ничего нового из твоих форвардов :с
+
+${errors}`, {
             replyMarkup: defaultKeyboard,
             parseMode: 'markdown',
           });
-          // }, 1500);
         }
 
         // FIXME: COULD BE AN ISSUE
@@ -1038,15 +1045,15 @@ const actualProcessUserData = (msg, reportData, updatesData, options) => {
   }
 };
 
-const databasePipCheck = async (msg, pips) => Promise((resolve) => {
+const databasePipCheck = async (msg, pips) => new Promise((resolve) => {
   findPip(msg, (result) => {
     if (result.ok) {
       const { pip } = result.data;
 
-      resolve(comparePips([...pips, pip]));
-    } else {
-      resolve(true);
+      return resolve(checkPips([...pips, { data: pip }]));
     }
+
+    return resolve(true);
   });
 });
 
@@ -1096,9 +1103,18 @@ const processUserData = async (msg, options, processConfig = {
 
 
   if (updatesData.locations.length === 0 && updatesData.beasts.length === 0) {
+    let errors;
+
     createSession(msg.from.id);
+    if (reportData.errors.length > 0) {
+      errors = `*Также я заметил такие вещи*:
+${reportData.errors.join('\n')}`;
+    }
+
     return msg.reply.text(`
-  К сожалению я не смог узнать ничего нового из твоих форвардов :с`, {
+К сожалению я не смог узнать ничего нового из твоих форвардов :с
+
+${errors}`, {
       replyMarkup: defaultKeyboard,
       parseMode: 'markdown',
     });
@@ -1179,19 +1195,17 @@ bot.on('forward', (msg) => {
     createSession(msg.from.id);
   }
 
-  if (msg.forward_from.id !== 430930191) {
-    if (sessions[msg.from.id].state !== states.WAIT_FOR_FORWARD_END) {
-      console.log(`[CULPRIT]: ${msg.from.id} | ${msg.from.first_name} | ${msg.from.username}`);
+  if (msg.forward_from.id !== 430930191 && sessions[msg.from.id].state !== states.WAIT_FOR_FORWARD_END) {
+    console.log(`[CULPRIT]: ${msg.from.id} | ${msg.from.first_name} | ${msg.from.username}`);
 
-      // createSession(msg.from.id);
+    // createSession(msg.from.id);
 
-      return msg.reply.text(`
+    return msg.reply.text(`
 Форварды принимаються только от @WastelandWarsBot.
-            `, {
-        asReply: true,
-        replyMarkup: defaultKeyboard,
-      });
-    }
+          `, {
+      asReply: true,
+      replyMarkup: defaultKeyboard,
+    });
   }
 
   if (!validateForwardDate(msg.forward_date)) {
