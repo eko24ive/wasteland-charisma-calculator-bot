@@ -145,7 +145,7 @@ const processForwards = (inputData, id, processConfig = {
     healthCapHistory: [],
     distanceHistory: [],
     beastsToValidate: [],
-    prcoessAllowed: true,
+    processAllowed: true,
     initialForwardDate: null,
     firstForwardDate: null,
     lastForwardDate: null,
@@ -176,6 +176,16 @@ const processForwards = (inputData, id, processConfig = {
     return 0;
   });
 
+  const dataPipsMap = dataPips.map((pip, index) => ({
+    pip,
+    index,
+  }));
+
+  let lastKnownPip = {
+    date: null,
+    index: null,
+  };
+
   if (dataPips.length > 1) {
     if (!checkPips(dataPips)) {
       reportData.criticalError = 'Пипы не соответствуют!';
@@ -190,19 +200,6 @@ const processForwards = (inputData, id, processConfig = {
     reportData.lastPip = dataPips.pop().data;
     reportData.pipRequired = false;
   }
-
-  // accept only after 24.06.2018
-  // accept only after 19.09.2018
-
-  /*
-    Validation is now perform in separate file.
-  */
-
-  /* if (inputData.filter(({ date }) => validateForwardDate(date)).length === 0) {
-    reportData.criticalError = 'Был замечен форвард, время которого меньше, чем время последнего обновления Wasteland Wars (19.09.2018)';
-
-    return { reportData };
-  } */
 
   inputData.sort((first, second) => {
     if (first.date < second.date) {
@@ -231,20 +228,20 @@ const processForwards = (inputData, id, processConfig = {
       reportData.firstForwardDate = date;
     }
 
-    if (reportData.prcoessAllowed) {
+    if (reportData.processAllowed) {
       const lastDistance = _.last(reportData.distanceHistory);
 
       const mismatch = reportData.distanceHistory.some(distance => distance > lastDistance);
 
       if (mismatch) {
-        reportData.prcoessAllowed = false;
+        reportData.processAllowed = false;
         const distanceProcessed = reportData.distanceHistory.filter((v, _index) => _index !== reportData.distanceHistory.length - 1);
         const lastpProcessedDistance = _.last(distanceProcessed);
 
         reportData.errors.push(`Похоже что ты скинул километры с других кругов, я не обрабатывал данные что ты скинул после ${lastpProcessedDistance}км\nЯ обработал данные за: ${distanceProcessed.join('км, ')}км`);
       }
     }
-    if (dataType === 'location' && reportData.prcoessAllowed) {
+    if (dataType === 'location' && reportData.processAllowed) {
       const locationData = _.clone(data);
 
       if (data.effect) {
@@ -282,7 +279,7 @@ const processForwards = (inputData, id, processConfig = {
       reportData.healthCapHistory.push(data.healthCap);
     }
 
-    if (dataType === 'regularBeast' && reportData.prcoessAllowed) {
+    if (dataType === 'regularBeast' && reportData.processAllowed) {
       if (ignore) {
         return;
       }
@@ -436,7 +433,7 @@ const processForwards = (inputData, id, processConfig = {
       reportData.healthCapHistory.push(data.meta.healthCap);
     }
 
-    if (dataType === 'dungeonBeast' && reportData.prcoessAllowed) {
+    if (dataType === 'dungeonBeast' && reportData.processAllowed) {
       if (ignore) {
         return;
       }
@@ -587,8 +584,15 @@ const processForwards = (inputData, id, processConfig = {
       reportData.healthCapHistory.push(data.meta.healthCap);
     }
 
-    if (dataType === 'flee' && reportData.prcoessAllowed) {
+    if (dataType === 'flee' && reportData.processAllowed) {
       if (ignore) {
+        return;
+      }
+
+      const nextPip = dataPipsMap.find(pip => pip.index === lastKnownPip.index + 1);
+
+      if (!nextPip || (nextPip.pip.date - date) > 30) {
+        reportData.errors.push(`Ты не предоставил пип для подтверждения побега на ${data.distance} километре. Я не обрабатывал этот побег`);
         return;
       }
 
@@ -628,13 +632,9 @@ const processForwards = (inputData, id, processConfig = {
             }
           }
 
-          if (reportData.lastPip) {
-            beastData.flees[0].stats = {
-              agility: reportData.lastPip.agility,
-            };
-          } else {
-            reportData.recalculationRequired = true;
-          }
+          beastData.flees[0].stats = {
+            agility: nextPip.pip.agility,
+          };
 
           updatesData.beasts.push(beastData);
         } else {
@@ -657,9 +657,9 @@ const processForwards = (inputData, id, processConfig = {
       }
     }
 
-    if (dataType === 'deathMessage' && !reportData.isDead && reportData.prcoessAllowed) {
+    if (dataType === 'deathMessage' && !reportData.isDead && reportData.processAllowed) {
       reportData.isDead = true;
-      reportData.prcoessAllowed = false;
+      reportData.processAllowed = false;
       reportData.capsLost -= data.capsLost;
       reportData.materialsLost -= data.materialsLost;
 
@@ -670,13 +670,18 @@ const processForwards = (inputData, id, processConfig = {
       reportData.errors.push(`Вижу, ты склеил ласты на ${reportData.distance} километре. Сочуствую. Я не обрабатывал форварды после твоей смерти`);
     }
 
-    if (dataType === 'pipboy' && reportData.prcoessAllowed) {
+    if (dataType === 'pipboy' && reportData.processAllowed) {
       reportData.lastPip = data;
       reportData.pipRequired = false;
       reportData.pips.push(data);
+
+      lastKnownPip = {
+        date,
+        index: dataPipsMap.find(pip => pip.pip.date === date),
+      };
     }
 
-    if (dataType === 'dungeonBeastFaced' && reportData.prcoessAllowed) {
+    if (dataType === 'dungeonBeastFaced' && reportData.processAllowed) {
       reportData.lastBeastSeen = {
         name: data.name,
       };
@@ -684,7 +689,7 @@ const processForwards = (inputData, id, processConfig = {
       reportData.lastBeastSeenSubType = 'regular';
     }
 
-    if (dataType === 'walkingBeastFaced' && reportData.prcoessAllowed) {
+    if (dataType === 'walkingBeastFaced' && reportData.processAllowed) {
       reportData.lastBeastSeen = {
         name: data.name,
       };
