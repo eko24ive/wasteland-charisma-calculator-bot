@@ -1,5 +1,7 @@
 const _ = require('underscore');
+
 const comparePips = require('./utils/comparePips');
+const userDefaults = require('../schemes/defaults/user');
 
 const userManager = User => ({
   create: ({ telegramData, pipData }) => new Promise((resolve) => {
@@ -21,8 +23,9 @@ const userManager = User => ({
         },
         pip: pipData,
         history: {
-          pip: [pipData],
+          pip: pipData ? [pipData] : userDefaults.history.pip,
         },
+        settings: userDefaults.settings,
       });
 
       newUser.save().then(newDatabaseUser => resolve({
@@ -52,7 +55,7 @@ const userManager = User => ({
       return false;
     });
   }),
-  update: ({ telegramData, pipData }) => new Promise((resolve) => {
+  update: ({ telegramData, pipData, settings }) => new Promise((resolve) => {
     User.findOne({ 'telegram.id': telegramData.id }).then((databaseUser) => {
       if (databaseUser === null) {
         return resolve({
@@ -61,24 +64,30 @@ const userManager = User => ({
         });
       }
 
-      if (!_.isEmpty(databaseUser.toJSON().pip)) {
-        if (databaseUser.pip.timeStamp > pipData.timeStamp) {
-          return resolve({
-            ok: false,
-            reason: 'PIP_OUTDATED',
-          });
+      if (pipData) {
+        if (!_.isEmpty(databaseUser.toJSON().pip)) {
+          if (databaseUser.pip.timeStamp > pipData.timeStamp) {
+            return resolve({
+              ok: false,
+              reason: 'PIP_OUTDATED',
+            });
+          }
+
+          if (!comparePips(pipData, databaseUser.pip)) {
+            return resolve({
+              ok: false,
+              reason: 'PIP_VALIDATION_FAILED',
+            });
+          }
         }
 
-        if (!comparePips(pipData, databaseUser.pip)) {
-          return resolve({
-            ok: false,
-            reason: 'PIP_VALIDATION_FAILED',
-          });
-        }
+        databaseUser.pip = pipData;
+        databaseUser.history.pip.push(pipData);
       }
 
-      databaseUser.pip = pipData;
-      databaseUser.history.pip.push(pipData);
+      if (settings) {
+        databaseUser.settings = settings;
+      }
 
       // TODO: Verify
       if (databaseUser.telegram.username !== telegramData.username) {
@@ -221,6 +230,59 @@ const userManager = User => ({
         reason: 'LEADERBOARD_GENERATED',
         data: leaderboard,
       });
+    });
+  }),
+  getOrCreateSettings: function _getOrCreateSettings({ id, telegramData }) {
+    return new Promise((resolve) => {
+      User.findOne({ 'telegram.id': id }).then((databaseUser) => {
+        if (databaseUser === null) {
+          return this.create({ telegramData, pipData: undefined }).then(({
+            data,
+          }) => resolve({
+            ok: true,
+            reason: 'USER_FOUND',
+            data: data.settings,
+          }));
+        }
+
+        const { settings } = databaseUser.toJSON();
+
+        if (settings === undefined) {
+          this.update({
+            telegramData: undefined,
+            pipData: undefined,
+            settings: userDefaults.settings,
+          }).then(({ data }) => resolve({
+            ok: true,
+            reason: 'USER_FOUND',
+            data: data.settings,
+          }));
+        }
+
+        return resolve({
+          ok: true,
+          reason: 'USER_FOUND',
+          data: settings,
+        });
+      });
+    });
+  },
+  updateSettings: ({ id, settings }) => new Promise((resolve) => {
+    User.findOne({ 'telegram.id': id }).then((databaseUser) => {
+      if (databaseUser === null) {
+        return resolve({
+          ok: false,
+          result: 'USER_NOT_FOUND',
+        });
+      }
+
+      databaseUser.settings = settings;
+
+      databaseUser.save().then(updatedDatabaseUser => resolve({
+        ok: true,
+        reason: 'USER_UPDATED',
+        data: updatedDatabaseUser.toJSON(),
+      }));
     });
   }),
 });

@@ -75,6 +75,15 @@ const userSchema = Schema({
       timeStamp: Number,
     }],
   },
+  settings: {
+    buttons: [{
+      index: Number,
+      name: String,
+      state: String,
+      label: String,
+      order: Number,
+    }],
+  },
 }, {
   timestamps: {
     createdAt: 'createdAt',

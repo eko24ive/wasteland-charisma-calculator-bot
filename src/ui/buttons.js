@@ -171,4 +171,12 @@ module.exports = {
     label: '📔Энциклпдия',
     command: '/show_encyclopedia',
   },
+  showSettings: {
+    label: '⚙️Настройки',
+    command: '/show_settings',
+  },
+  showSettingsButton: {
+    label: '⌨️Кнопки',
+    command: '/show_buttons',
+  },
 };
