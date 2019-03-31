@@ -54,6 +54,7 @@ const processForwards = require('./src/utils/processForwards');
 const { ranges, dzRanges } = require('./src/utils/getRanges');
 const processMenu = require('./src/utils/processMenu');
 const validateForwardDate = require('./src/utils/validateForwardDate');
+const checkPips = require('./src/utils/comparePips');
 
 const routedBeastView = require('./src/views/routedBeastView');
 const routedBattleView = require('./src/views/routedBattleView');
@@ -332,7 +333,7 @@ const defaultKeyboard = async (msg) => {
   });
 };
 
-const getEffort = (msg, toMax = false) => {
+const getEffort = async (msg, toMax = false) => {
   if (sessions[msg.from.id].state === states.WAIT_FOR_START) {
     return false;
   }
@@ -347,7 +348,7 @@ const getEffort = (msg, toMax = false) => {
 
   console.log(`[SKILL UPGRADE]: ${pip.faction} | ${pip.name} | ${msg.from.username}`);
 
-  createSession(msg);
+  await createSession(msg);
 
   return msg.reply.text(effort, {
     replyMarkup: defaultKeyboard(msg),
@@ -390,7 +391,6 @@ const getBeastKeyboard = beastId => bot.inlineKeyboard([
     bot.inlineButton('Оглушения', { callback: `show_beast_page_concussions-${beastId}` }),
   ],
 ]);
-
 
 bot.on(['/start', '/help'], async (msg) => {
   await createSession(msg);
@@ -983,7 +983,7 @@ const actualActualProcessUserData = (msg, reportData, updatesData, options) => {
         processBeasts(),
         processLocations(),
         saveJourney(),
-      ]).then(() => {
+      ]).then(async () => {
         let errors = '';
         let dupesText = '';
         let reply;
@@ -1000,7 +1000,7 @@ const actualActualProcessUserData = (msg, reportData, updatesData, options) => {
         if (dataProcessed > 0 && userForwardPoints > 0) {
           // TODO: Move out shit to strings
           // TODO: Implement meaningfull report data regarding found usefull data
-          createSession(msg);
+          await createSession(msg);
 
           // setTimeout(() => {
           if (options.silent) {
@@ -1034,14 +1034,19 @@ ${errors}
           }).catch(e => console.log(e));
           // }, 1500);
         } else {
-          // setTimeout(() => {
-          createSession(msg);
+          await createSession(msg);
+          if (reportData.errors.length > 0) {
+            errors = `*Также я заметил такие вещи*:
+${reportData.errors.join('\n')}`;
+          }
+
           return msg.reply.text(`
-        К сожалению я не смог узнать ничего нового из твоих форвардов :с${dupesText ? `\n\n_${dupesText}_` : ''}`, {
-            replyMarkup: defaultKeyboard(msg),
+К сожалению я не смог узнать ничего нового из твоих форвардов :с
+
+${errors}`, {
+            replyMarkup: defaultKeyboard,
             parseMode: 'markdown',
           });
-          // }, 1500);
         }
 
         // FIXME: COULD BE AN ISSUE
@@ -1079,17 +1084,40 @@ const actualProcessUserData = (msg, reportData, updatesData, options) => {
   }
 };
 
-const processUserData = (msg, options) => {
+const databasePipCheck = async (msg, pips) => new Promise((resolve) => {
+  findPip(msg, (result) => {
+    if (result.ok) {
+      const { pip } = result.data;
+
+      return resolve(checkPips([...pips, { data: pip }]));
+    }
+
+    return resolve(true);
+  });
+});
+
+const processUserData = async (msg, options, processConfig = {
+  omitPipError: false,
+}) => {
   sessions[msg.from.id].state = states.WAIT_FOR_DATA_TO_PROCESS;
 
   const {
     data,
   } = sessions[msg.from.id];
 
+  const isPipsFraudless = await databasePipCheck(msg, data.filter(entry => entry.dataType === 'pipboy'));
+
+  if (!isPipsFraudless) {
+    return msg.reply.text('<b>❌ЗАМЕЧЕНА КРИТИЧЕСКАЯ ОШИБКА❌</b>\n\nПохоже что ты скидывал пип-бой, который тебе не пренадлежит\n\n<i>Форварды были отменены.</i>', {
+      replyMarkup: defaultKeyboard,
+      parseMode: 'html',
+    });
+  }
+
   let {
     reportData,
     updatesData,
-  } = processForwards(data, msg.from.id || moment.now());
+  } = processForwards(data, msg.from.id || moment.now(), processConfig);
 
   if (reportData.criticalError) {
     return msg.reply.text(`<b>❌ЗАМЕЧЕНА КРИТИЧЕСКАЯ ОШИБКА❌</b>\n\n${reportData.criticalError}\n\n<i>Форварды были отменены.</i>`, {
@@ -1114,16 +1142,25 @@ const processUserData = (msg, options) => {
 
 
   if (updatesData.locations.length === 0 && updatesData.beasts.length === 0) {
-    createSession(msg);
+    let errors;
+
+    await createSession(msg);
+    if (reportData.errors.length > 0) {
+      errors = `*Также я заметил такие вещи*:
+${reportData.errors.join('\n')}`;
+    }
+
     return msg.reply.text(`
-  К сожалению я не смог узнать ничего нового из твоих форвардов :с`, {
-      replyMarkup: defaultKeyboard(msg),
+К сожалению я не смог узнать ничего нового из твоих форвардов :с
+
+${errors}`, {
+      replyMarkup: defaultKeyboard,
       parseMode: 'markdown',
     });
   }
 
   if (options.usePip && reportData.pipRequired) {
-    userManager.findByTelegramId(msg.from.id).then((result) => {
+    userManager.findByTelegramId(msg.from.id).then(async (result) => {
       if (result.ok && result.reason === 'USER_FOUND') {
         if (result.data.pip !== undefined) {
           sessions[msg.from.id].data.push({
@@ -1154,7 +1191,7 @@ const processUserData = (msg, options) => {
             replyMarkup: toGameKeyboard,
           });
         } if (reportDataWithUserPip.criticalError && !reportDataWithUserPip.couldBeUpdated) {
-          createSession(msg);
+          await createSession(msg);
           return msg.reply.text('Твой пип не соответсвуют твоим статам из форвардов!\nПрости, я вынужден отменить твои форварды.', {
             replyMarkup: defaultKeyboard(msg),
           });
@@ -1192,25 +1229,23 @@ const processUserData = (msg, options) => {
   return false;
 };
 
-bot.on('forward', (msg) => {
+bot.on('forward', async (msg) => {
   if (sessions[msg.from.id] === undefined) {
-    createSession(msg);
+    await createSession(msg);
   }
 
-  if (msg.forward_from.id !== 430930191) {
-    if (sessions[msg.from.id].state !== states.WAIT_FOR_FORWARD_END) {
-      console.log(`[CULPRIT]: ${msg.from.id} | ${msg.from.first_name} | ${msg.from.username}`);
+  if (msg.forward_from.id !== 430930191 && sessions[msg.from.id].state !== states.WAIT_FOR_FORWARD_END) {
+    console.log(`[CULPRIT]: ${msg.from.id} | ${msg.from.first_name} | ${msg.from.username}`);
 
-      // createSession(msg);
+    // await createSession(msg);
 
-      return msg.reply.text(`
+    return msg.reply.text(`
 Форварды принимаються только от @WastelandWarsBot.
             `, {
         asReply: true,
         replyMarkup: defaultKeyboard(msg),
       });
     }
-  }
 
   if (!validateForwardDate(msg.forward_date)) {
     return msg.reply.text('❌<b>ЗАМЕЧЕНА КРИТИЧЕСКАЯ ОШИБКА</b>❌\n\nБыл замечен форвард, время которого меньше, чем время последнего обновления Wasteland Wars (19.09.2018)', {
@@ -1265,6 +1300,8 @@ bot.on('forward', (msg) => {
             processUserData(msg, {
               usePip: sessions[msg.from.id].processDataConfig.usePip,
               useBeastFace: sessions[msg.from.id].processDataConfig.useBeastFace,
+            }, {
+              omitPipError: true,
             });
           });
         }
@@ -1634,7 +1671,6 @@ bot.on('forward', (msg) => {
 
       Giant.findOne({
         name: giant.name,
-        distance: giant.distance,
       }).then((fGiant) => {
         const databaseGiant = fGiant;
         if (databaseGiant === null) {
@@ -1672,6 +1708,10 @@ bot.on('forward', (msg) => {
           databaseGiant.health.current = giant.healthCurrent;
           databaseGiant.health.cap = giant.healthCap;
           databaseGiant.forwardStamp = msg.forward_date;
+
+          if (!databaseGiant.distance) {
+            databaseGiant.distance = giant.distance;
+          }
 
           const wasDead = databaseGiant.health.current <= 0;
           const isDead = giant.healthCurrent <= 0;
@@ -1913,7 +1953,7 @@ bot.on('forward', (msg) => {
       let data;
       let dataType;
 
-      createSession(msg);
+      await createSession(msg);
 
       if (isFlee) {
         data = parseFlee(msg.text);
@@ -2097,8 +2137,8 @@ bot.on('/upgradeSkill', (msg) => {
   }
 });
 
-bot.on(['/journeyforwardstart', '/go'], (msg) => {
-  createSession(msg);
+bot.on(['/journeyforwardstart', '/go'], async (msg) => {
+  await createSession(msg);
 
   const inlineReplyMarkup = bot.inlineKeyboard([
     [
@@ -2139,9 +2179,9 @@ bot.on(['/journeyforwardstart', '/go'], (msg) => {
 });
 
 
-bot.on('/journeyforwardend', (msg) => {
+bot.on('/journeyforwardend', async (msg) => {
   if (sessions[msg.from.id] === undefined) {
-    createSession(msg);
+    await createSession(msg);
 
     return msg.reply.text('Чёрт, похоже меня перезагрузил какой-то мудак и твои форварды не сохранились, прости пожалуйста :с', {
       replyMarkup: defaultKeyboard(msg),
@@ -2274,10 +2314,10 @@ bot.on('/skill_upgrade', (msg) => {
   const skillOMaticText = `
 В «<b>🎓 Скилокачаторе</b>» я могу помочь тебе посчитать финансовые затраты на прокачку твоих скилов.`;
 
-  findPip(msg, (result) => {
+  findPip(msg, async (result) => {
     if (result.ok && result.reason === 'USER_FOUND') {
       if (sessions[msg.from.id] === undefined) {
-        createSession(msg);
+        await createSession(msg);
       }
 
       sessions[msg.from.id].pip = result.data.pip;
@@ -2499,7 +2539,44 @@ bot.on('/mypipstats', (msg) => {
   });
 });
 
-bot.on('/debug', msg => msg.reply.text('hi'));
+bot.on('/debug', async (msg) => {
+  await createSession(msg);
+
+  const updatesData = {
+    locations: [],
+    beasts: [{
+      isDungeon: false,
+      subType: null,
+      name: '👤Майкл Майерс (Виновник этого торжества)',
+      type: 'DarkZone',
+      date: 1541030493,
+      proofedByForward: false,
+      distanceRange: [{ value: 64 }],
+      battles: [
+        {
+          outcome: 'win',
+          stats: { armor: 322, damage: 1384 },
+          totalDamageGiven: 2599,
+          totalDamageReceived: 0,
+          damagesGiven: [1321, 1278],
+          damagesReceived: [0],
+          healthOnStart: 411,
+          stamp: '154103049356019931',
+          distance: 64,
+        },
+      ],
+      receivedItems: { Микрочип: [1] },
+      capsReceived: [{ value: 7609 }],
+      materialsReceived: [{ value: 11370 }],
+    }],
+  };
+
+  const { processDataConfig: options } = sessions[msg.from.id];
+
+  actualProcessUserData(msg, {
+    errors: [],
+  }, updatesData, options);
+});
 
 bot.on(/^\d+$/, (msg) => {
   switch (sessions[msg.from.id].state) {
@@ -2714,6 +2791,11 @@ bot.on(['/cancel', '/journeyforwardcancel', '/force_cancel'], async (msg) => {
 
   if (sessions[msg.from.id] === undefined) {
     await createSession(msg);
+
+    return msg.reply.text(backMessage, {
+      replyMarkup: defaultKeyboard,
+      parseMode: 'html',
+    }).catch(e => console.log(e));
   }
 
   if (sessions[msg.from.id].state === states.WAIT_FOR_DATA_TO_PROCESS && msg.text !== '/force_cancel') {
@@ -2721,6 +2803,8 @@ bot.on(['/cancel', '/journeyforwardcancel', '/force_cancel'], async (msg) => {
       asReply: true,
     }).catch(e => console.log(e));
   }
+
+  await createSession(msg);
 
   return msg.reply.text(backMessage, {
     replyMarkup: await defaultKeyboard(msg),
@@ -3028,11 +3112,11 @@ ${beastsList}
     const skillOMaticText = `
 В «<b>🎓 Скилокачаторе</b>» я могу помочь тебе посчитать финансовые затраты на прокачку твоих скилов.`;
 
-    findPip(msg, (result) => {
+    findPip(msg, async (result) => {
       bot.answerCallbackQuery(msg.id);
       if (result.ok && result.reason === 'USER_FOUND') {
         if (sessions[msg.from.id] === undefined) {
-          createSession(msg);
+          await createSession(msg);
         }
 
         sessions[msg.from.id].pip = result.data.pip;
