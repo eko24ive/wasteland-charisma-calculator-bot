@@ -1142,7 +1142,7 @@ const processUserData = async (msg, options, processConfig = {
 
 
   if (updatesData.locations.length === 0 && updatesData.beasts.length === 0) {
-    let errors;
+    let errors = '';
 
     await createSession(msg);
     if (reportData.errors.length > 0) {
