@@ -1242,10 +1242,10 @@ bot.on('forward', async (msg) => {
     return msg.reply.text(`
 Форварды принимаються только от @WastelandWarsBot.
             `, {
-        asReply: true,
-        replyMarkup: defaultKeyboard(msg),
-      });
-    }
+      asReply: true,
+      replyMarkup: defaultKeyboard(msg),
+    });
+  }
 
   if (!validateForwardDate(msg.forward_date)) {
     return msg.reply.text('❌<b>ЗАМЕЧЕНА КРИТИЧЕСКАЯ ОШИБКА</b>❌\n\nБыл замечен форвард, время которого меньше, чем время последнего обновления Wasteland Wars (19.09.2018)', {
