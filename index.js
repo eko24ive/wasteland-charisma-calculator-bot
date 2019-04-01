@@ -1044,13 +1044,14 @@ ${reportData.errors.join('\n')}`;
 К сожалению я не смог узнать ничего нового из твоих форвардов :с
 
 ${errors}`, {
-            replyMarkup: defaultKeyboard,
+            replyMarkup: await defaultKeyboard(msg),
             parseMode: 'markdown',
           });
         }
 
         // FIXME: COULD BE AN ISSUE
         // sessions[msg.from.id].state = states.WAIT_FOR_DATA_VALIDATION;
+        return null;
       }).catch(e => console.log(e));
     },
     () => {
@@ -1089,7 +1090,7 @@ const databasePipCheck = async (msg, pips) => new Promise((resolve) => {
     if (result.ok) {
       const { pip } = result.data;
 
-      return resolve(checkPips([...pips, { data: pip }]));
+      return resolve(checkPips([{ data: pip }, ...pips]));
     }
 
     return resolve(true);
@@ -1109,7 +1110,7 @@ const processUserData = async (msg, options, processConfig = {
 
   if (!isPipsFraudless) {
     return msg.reply.text('<b>❌ЗАМЕЧЕНА КРИТИЧЕСКАЯ ОШИБКА❌</b>\n\nПохоже что ты скидывал пип-бой, который тебе не пренадлежит\n\n<i>Форварды были отменены.</i>', {
-      replyMarkup: defaultKeyboard,
+      replyMarkup: await defaultKeyboard(msg),
       parseMode: 'html',
     });
   }
@@ -1154,7 +1155,7 @@ ${reportData.errors.join('\n')}`;
 К сожалению я не смог узнать ничего нового из твоих форвардов :с
 
 ${errors}`, {
-      replyMarkup: defaultKeyboard,
+      replyMarkup: await defaultKeyboard(msg),
       parseMode: 'markdown',
     });
   }
@@ -2793,7 +2794,7 @@ bot.on(['/cancel', '/journeyforwardcancel', '/force_cancel'], async (msg) => {
     await createSession(msg);
 
     return msg.reply.text(backMessage, {
-      replyMarkup: defaultKeyboard,
+      replyMarkup: await defaultKeyboard(msg),
       parseMode: 'html',
     }).catch(e => console.log(e));
   }
