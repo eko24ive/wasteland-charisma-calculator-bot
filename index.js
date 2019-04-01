@@ -2813,7 +2813,7 @@ bot.on(['/cancel', '/journeyforwardcancel', '/force_cancel'], async (msg) => {
 });
 
 bot.on('/delete_accaunt', (msg) => {
-  if (process.env.ENV === 'STAGING') {
+  if (process.env.ENV === 'STAGING' || process.env.ENV === 'LOCAL') {
     userManager.delete(msg.from.id).then((result) => {
       if (!result.ok && result.reason === 'USER_NOT_FOUND') {
         return msg.reply.text('Я не смог найти твою запись в базе', {
@@ -2833,7 +2833,7 @@ bot.on('/delete_accaunt', (msg) => {
 });
 
 bot.on('/delete_beasts', (msg) => {
-  if (process.env.ENV === 'STAGING') {
+  if (process.env.ENV === 'STAGING' || process.env.ENV === 'LOCAL') {
     Beast.find({ 'battles.stamp': { $regex: `.+${msg.from.id}` } }).then((beasts) => {
       if (beasts.length === 0) {
         return msg.reply.text('Я не нашёл твоих битв', {
