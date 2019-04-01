@@ -28,9 +28,6 @@ module.exports = {
       giants: 0,
     },
   },
-  history: {
-    pip: [],
-  },
   settings: {
     buttonsAmount: 3,
     buttonsIconsMode: true,

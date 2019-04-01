@@ -1,5 +1,3 @@
-// TODO: Supply it with pip from database (with appropriate validation just like from the processForwards)
-
 process.on('unhandledRejection', (reason) => {
   console.log('Unhandled Rejection at:', reason.stack || reason);
 });
@@ -1055,19 +1053,18 @@ ${errors}
 Если ты чего-то забыл докинуть - смело жми на \`[Скинуть лог 🏃]\` и _докидывай_`;
           }
 
+          const telegramData = {
+            first_name: msg.from.first_name,
+            id: msg.from.id,
+            username: msg.from.username,
+          };
+
+          await userManager.addPoints({ id: msg.from.id, telegramData, points: userForwardPoints });
+
           msg.reply.text(reply, {
             replyMarkup: await defaultKeyboard(msg),
             parseMode: 'markdown',
             asReply: options.silent,
-          }).then(() => {
-            userManager.addPoints(msg.from.id, userForwardPoints).then((result) => {
-              if (!result.ok) {
-                if (result.reason === 'USER_NOT_FOUND') {
-                  msg.reply.text('Не могу начислить тебе шмепсели пока ты не скинешь мне свой пип-бой :с');
-                }
-                console.log(`userManager.addPoints: ${JSON.stringify(result)}`);
-              }
-            });
           }).catch(e => console.log(e));
           // }, 1500);
         } else {
@@ -1723,18 +1720,17 @@ bot.on('forward', async (msg) => {
           });
 
           newGiant.save().then(() => {
-            userManager.addPoints(msg.from.id, forwardPoints.discoveryGiantData).then((result) => {
-              if (!result.ok) {
-                if (result.reason === 'USER_NOT_FOUND') {
-                  return msg.reply.text('Не могу начислить тебе шмепсели пока ты не скинешь мне свой пип-бой :с');
-                }
-              }
+            const telegramData = {
+              first_name: msg.from.first_name,
+              id: msg.from.id,
+              username: msg.from.username,
+            };
 
-              return msg.reply.text(`Спасибо за форвард! Я добавил <b>${giant.name}</b> в базу!\nНачислил тебе ${forwardPoints.discoveryGiantData} 💎<b>Шмепселей</b>`, {
+            userManager.addPoints({ id: msg.from.id, telegramData, points: forwardPoints.discoveryGiantData })
+              .then(() => msg.reply.text(`Спасибо за форвард! Я добавил <b>${giant.name}</b> в базу!\nНачислил тебе ${forwardPoints.discoveryGiantData} 💎<b>Шмепселей</b>`, {
                 asReply: true,
                 parseMode: 'html',
-              });
-            });
+              }));
           }).catch(e => console.log(e));
         } else {
           if (databaseGiant.forwardStamp >= msg.forward_date) {
@@ -1757,18 +1753,17 @@ bot.on('forward', async (msg) => {
           const pointsToAdd = ((!wasDead && isDead) || (wasDead && !isDead)) ? forwardPoints.newGiantData : forwardPoints.sameGiantData;
 
           databaseGiant.save().then(() => {
-            userManager.addPoints(msg.from.id, pointsToAdd).then((result) => {
-              if (!result.ok) {
-                if (result.reason === 'USER_NOT_FOUND') {
-                  return msg.reply.text('Не могу начислить тебе шмепсели пока ты не скинешь мне свой пип-бой :с');
-                }
-              }
+            const telegramData = {
+              first_name: msg.from.first_name,
+              id: msg.from.id,
+              username: msg.from.username,
+            };
 
-              return msg.reply.text(`Спасибо за форвард! Я обновил <b>${giant.name}</b> в базе!\nНачислил тебе ${pointsToAdd} 💎<b>Шмепселей</b>`, {
+            userManager.addPoints({ id: msg.from.id, telegramData, points: pointsToAdd })
+              .then(() => msg.reply.text(`Спасибо за форвард! Я обновил <b>${giant.name}</b> в базе!\nНачислил тебе ${pointsToAdd} 💎<b>Шмепселей</b>`, {
                 asReply: true,
                 parseMode: 'html',
-              });
-            });
+              }));
           }).catch(e => console.log(e));
         }
 
@@ -1792,18 +1787,17 @@ bot.on('forward', async (msg) => {
           });
 
           newGiant.save().then(() => {
-            userManager.addPoints(msg.from.id, forwardPoints.discoveryGiantData).then((result) => {
-              if (!result.ok) {
-                if (result.reason === 'USER_NOT_FOUND') {
-                  return msg.reply.text('Не могу начислить тебе шмепсели пока ты не скинешь мне свой пип-бой :с');
-                }
-              }
+            const telegramData = {
+              first_name: msg.from.first_name,
+              id: msg.from.id,
+              username: msg.from.username,
+            };
 
-              return msg.reply.text(`Спасибо за форвард! Я добавил <b>${giant.name}</b> в базу!\nНачислил тебе ${forwardPoints.discoveryGiantData} 💎<b>Шмепселей</b>`, {
+            userManager.addPoints({ id: msg.from.id, telegramData, points: forwardPoints.discoveryGiantData })
+              .then(() => msg.reply.text(`Спасибо за форвард! Я добавил <b>${giant.name}</b> в базу!\nНачислил тебе ${forwardPoints.discoveryGiantData} 💎<b>Шмепселей</b>`, {
                 asReply: true,
                 parseMode: 'html',
-              });
-            });
+              }));
           }).catch(e => console.log(e));
         } else if (databaseGiant.forwardStamp >= msg.forward_date) {
           return msg.reply.text(`Прости, у меня есть более свежая иформация про *${giant.name}*`, {
@@ -1821,18 +1815,17 @@ bot.on('forward', async (msg) => {
           const pointsToAdd = ((!wasDead && isDead) || (wasDead && !isDead)) ? forwardPoints.newGiantData : forwardPoints.sameGiantData;
 
           databaseGiant.save().then(() => {
-            userManager.addPoints(msg.from.id, pointsToAdd).then((result) => {
-              if (!result.ok) {
-                if (result.reason === 'USER_NOT_FOUND') {
-                  return msg.reply.text('Не могу начислить тебе шмепсели пока ты не скинешь мне свой пип-бой :с');
-                }
-              }
+            const telegramData = {
+              first_name: msg.from.first_name,
+              id: msg.from.id,
+              username: msg.from.username,
+            };
 
-              return msg.reply.text(`Спасибо за форвард! Я обновил <b>${giant.name}</b> в базе!\nНачислил тебе ${pointsToAdd} 💎<b>Шмепселей</b>`, {
+            userManager.addPoints({ id: msg.from.id, telegramData, points: pointsToAdd })
+              .then(() => msg.reply.text(`Спасибо за форвард! Я обновил <b>${giant.name}</b> в базе!\nНачислил тебе ${pointsToAdd} 💎<b>Шмепселей</b>`, {
                 asReply: true,
                 parseMode: 'html',
-              });
-            });
+              }));
           }).catch(e => console.log(e));
         }
 
@@ -1867,18 +1860,17 @@ bot.on('forward', async (msg) => {
         const pointsToAdd = ((!wasDead && isDead) || (wasDead && !isDead)) ? forwardPoints.newGiantData : forwardPoints.sameGiantData;
 
         databaseGiant.save().then(() => {
-          userManager.addPoints(msg.from.id, pointsToAdd).then((result) => {
-            if (!result.ok) {
-              if (result.reason === 'USER_NOT_FOUND') {
-                return msg.reply.text('Не могу начислить тебе шмепсели пока ты не скинешь мне свой пип-бой :с');
-              }
-            }
+          const telegramData = {
+            first_name: msg.from.first_name,
+            id: msg.from.id,
+            username: msg.from.username,
+          };
 
-            return msg.reply.text(`Спасибо за форвард! Я обновил <b>${giant.name}</b> в базе!\nНачислил тебе ${pointsToAdd} 💎<b>Шмепселей</b>`, {
+          userManager.addPoints({ id: msg.from.id, telegramData, points: pointsToAdd })
+            .then(() => msg.reply.text(`Спасибо за форвард! Я обновил <b>${giant.name}</b> в базе!\nНачислил тебе ${pointsToAdd} 💎<b>Шмепселей</b>`, {
               asReply: true,
               parseMode: 'html',
-            });
-          });
+            }));
         }).catch(e => console.log(e));
 
         return false;
@@ -2052,18 +2044,17 @@ bot.on('forward', async (msg) => {
             databaseGiant.forwardStamp = msg.forward_date;
 
             databaseGiant.save().then(() => {
-              userManager.addPoints(msg.from.id, forwardPoints.newGiantData).then((result) => {
-                if (!result.ok) {
-                  if (result.reason === 'USER_NOT_FOUND') {
-                    msg.reply.text('Не могу начислить тебе шмепсели пока ты не скинешь мне свой пип-бой :с');
-                  }
-                }
+              const telegramData = {
+                first_name: msg.from.first_name,
+                id: msg.from.id,
+                username: msg.from.username,
+              };
 
-                return msg.reply.text(`Спасибо за форвард! Я обновил состояние <b>${databaseGiant.name}</b> в базе!\nНачислил тебе ${forwardPoints.newGiantData} 💎<b>Шмепселей</b>`, {
+              userManager.addPoints({ id: msg.from.id, telegramData, points: forwardPoints.newGiantData })
+                .then(() => msg.reply.text(`Спасибо за форвард! Я обновил состояние <b>${databaseGiant.name}</b> в базе!\nНачислил тебе ${forwardPoints.newGiantData} 💎<b>Шмепселей</b>`, {
                   asReply: true,
                   parseMode: 'html',
-                });
-              });
+                }));
             }).catch(e => console.log(e));
           }
         } else {
@@ -3460,14 +3451,22 @@ bot.on(/\/ignore_(.+)/, async (msg) => {
 
 bot.on('/delete_all_beasts', (msg) => {
   if (process.env.ENV === 'STAGING' || process.env.ENV === 'LOCAL') {
-    mongoose.connection.db.dropCollection('beasts', (err, result) => msg.reply.text('Все мобы удалёны'));
+    mongoose.connection.db.dropCollection('beasts', () => msg.reply.text('Все мобы удалёны'));
   }
 });
 
 bot.on('/state', (msg) => {
   if (process.env.ENV === 'STAGING' || process.env.ENV === 'LOCAL') {
-    return msg.reply.text(sessions ? (sessions[msg.from.id] ? sessions[msg.from.id].state : 'null') : 'null');
+    if (sessions[msg.from.id]) {
+      if (sessions[msg.from.id].state) {
+        msg.reply.text(sessions[msg.from.id].state);
+      }
+    }
+
+    msg.reply.text('null');
   }
+
+  return null;
 });
 
 bot.on('/showBeastsToValidate', (msg) => {
