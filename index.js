@@ -20,6 +20,8 @@ const objectDeepSearch = require('object-deep-search');
 
 const config = require('./package.json');
 
+const namedButtons = require('./src/plugins/namedButtons');
+
 const forwardPoints = require('./src/constants/forwardPoints');
 
 const regexps = require('./src/regexp/regexp');
@@ -117,10 +119,20 @@ const states = {
   WAIT_FOR_BUTTONS_AMOUNT,
 };
 
+const regex = /[\u{1f300}-\u{1f5ff}\u{1f900}-\u{1f9ff}\u{1f600}-\u{1f64f}\u{1f680}-\u{1f6ff}\u{2600}-\u{26ff}\u{2700}-\u{27bf}\u{1f1e6}-\u{1f1ff}\u{1f191}-\u{1f251}\u{1f004}\u{1f0cf}\u{1f170}-\u{1f171}\u{1f17e}-\u{1f17f}\u{1f18e}\u{3030}\u{2b50}\u{2b55}\u{2934}-\u{2935}\u{2b05}-\u{2b07}\u{2b1b}-\u{2b1c}\u{3297}\u{3299}\u{303d}\u{00a9}\u{00ae}\u{2122}\u{23f3}\u{24c2}\u{23e9}-\u{23ef}\u{25b6}\u{23f8}-\u{23fa}]/u;
+
 const getKeyboard = (data) => {
   const filteredButtons = data.buttons.filter(({ label, state }) => label !== buttons.showSettings.label && state === 'true');
   const sortedButons = _.sortBy(filteredButtons, ({ order }) => order);
-  const labeledButtons = sortedButons.map(({ label }) => label);
+  let labeledButtons = sortedButons.map(({ label }) => label);
+
+  if (data.buttonsIconsMode) {
+    labeledButtons = labeledButtons.map((label) => {
+      const [emoji] = regex.exec(label);
+
+      return emoji || label;
+    });
+  }
 
   const keyboard = [
     ..._.chunk(labeledButtons, data.buttonsAmount),
@@ -135,7 +147,15 @@ const getKeyboard = (data) => {
 const getEncyclopediaKeyboard = (data) => {
   const filteredButtons = data.buttons.filter(({ label, state }) => label !== buttons.showSettings.label && label !== buttons.showEncyclopedia.label && state === 'false');
   const sortedButons = _.sortBy(filteredButtons, ({ order }) => order);
-  const labeledButtons = sortedButons.map(({ label }) => label);
+  let labeledButtons = sortedButons.map(({ label }) => label);
+
+  if (data.buttonsIconsMode) {
+    labeledButtons = labeledButtons.map((label) => {
+      const [emoji] = regex.exec(label);
+
+      return emoji || label;
+    });
+  }
 
   const keyboard = [
     ..._.chunk(labeledButtons, data.buttonsAmount),
@@ -156,7 +176,6 @@ const updateKeyboard = async (msg) => {
 
   sessions[msg.from.id].keyboard = getKeyboard(data);
   sessions[msg.from.id].encyclopediaKeyboard = getEncyclopediaKeyboard(data);
-  sessions[msg.from.id].buttonsAmount = data.buttonsAmount;
 };
 
 const createSession = async (msg) => {
@@ -216,9 +235,6 @@ let bot;
 if (process.env.ENV === 'LOCAL') {
   bot = new TeleBot({
     token: getToken(),
-    usePlugins: [
-      'namedButtons',
-    ],
     polling: {
       interval: 1, // How often check updates (in ms).
     },
@@ -228,6 +244,8 @@ if (process.env.ENV === 'LOCAL') {
       },
     },
   });
+
+  bot.plug(namedButtons);
 } else {
   const token = getToken();
   const host = '0.0.0.0';
@@ -2630,8 +2648,8 @@ bot.on(/^\d+$/, async (msg) => {
     case states.WAIT_FOR_BUTTONS_AMOUNT: {
       const newButtonsAmount = Number(msg.text);
 
-      if (newButtonsAmount > 4 || newButtonsAmount < 1) {
-        return msg.reply.text('Введи количество от 1 до 4');
+      if (newButtonsAmount > 6 || newButtonsAmount < 1) {
+        return msg.reply.text('Введи количество от 1 до 6');
       }
 
       const { settings } = sessions[msg.from.id];
@@ -3507,8 +3525,7 @@ bot.on('/help_icons', msg => msg.reply.text(`
 bot.on('/show_settings', async (msg) => {
   msg.reply.text('Здесь ты можешь изменить настройки отображения и персонализировать бота под себя', {
     replyMarkup: withBackButton(bot.keyboard, [
-      [buttons.showSettingsButton.label],
-      [buttons.showSettingsAmountButton.label],
+      [buttons.showSettingsButton.label, buttons.showSettingsAmountButton.label],
     ], {
       resize: true,
     }),
@@ -3538,6 +3555,7 @@ bot.on('/show_buttons', async (msg) => {
 
 Показывать все кнопки: /buttons_set_all
 Кнопоки по умолчанию: /buttons_set_default
+Изменить режим с/без икноки: /buttons_toggle_icon
 
 Кнопки в главном меню:
 <i>Нажми на команду напротив что бы переместить их в [📔Энциклпдию]</i>
@@ -3581,6 +3599,30 @@ bot.on(['/buttons_set_all', '/buttons_set_default'], async (msg) => {
       },
     });
   }
+
+  if (updateResult.ok) {
+    await updateKeyboard(msg);
+    return msg.reply.text('Я обновил настройки');
+  }
+
+  return msg.reply.text('Произошла ошибка - я не смог найти тебя в базе. Попробуй нажать /start и повторить ещё раз.');
+});
+
+bot.on('/buttons_toggle_icon', async (msg) => {
+  if (sessions[msg.from.id] === undefined) {
+    await createSession(msg);
+  }
+
+  const { settings } = sessions[msg.from.id];
+  const { buttonsIconsMode, ...restSettings } = settings;
+
+  const updateResult = await userManager.updateSettings({
+    id: msg.from.id,
+    settings: {
+      buttonsIconsMode: !settings.buttonsIconsMode,
+      ...restSettings,
+    },
+  });
 
   if (updateResult.ok) {
     await updateKeyboard(msg);
@@ -3653,10 +3695,12 @@ bot.on('/show_amount_buttons', async (msg) => {
 
   sessions[msg.from.id].state = states.WAIT_FOR_BUTTONS_AMOUNT;
 
-  msg.reply.text('Выбери количество кнопок в ряд (для главного меню и энциклопедии) от 1 до 4:', {
-    replyMarkup: bot.keyboard([
-      ['1', '2', '3', '4'],
-    ]),
+  msg.reply.text('Выбери количество кнопок в ряд (для главного меню и энциклопедии) от 1 до 6:', {
+    replyMarkup: withBackButton(bot.keyboard, [
+      ['1', '2', '3', '4', '5', '6'],
+    ], {
+      resize: true,
+    }),
   });
 });
 
