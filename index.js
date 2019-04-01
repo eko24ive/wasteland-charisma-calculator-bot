@@ -102,6 +102,7 @@ const WAIT_FOR_START = 'WAIT_FOR_START';
 const WAIT_FOR_PIP_FORWARD = 'WAIT_FOR_PIP_FORWARD';
 const WAIT_FOR_DATA_VALIDATION = 'WAIT_FOR_DATA_VALIDATION';
 const WAIT_FOR_DATA_TO_PROCESS = 'WAIT_FOR_DATA_TO_PROCESS';
+const WAIT_FOR_BUTTONS_AMOUNT = 'WAIT_FOR_BUTTONS_AMOUNT';
 
 const states = {
   WAIT_FOR_SKILL,
@@ -113,6 +114,7 @@ const states = {
   WAIT_FOR_PIP_FORWARD,
   WAIT_FOR_DATA_VALIDATION,
   WAIT_FOR_DATA_TO_PROCESS,
+  WAIT_FOR_BUTTONS_AMOUNT,
 };
 
 const getKeyboard = (data) => {
@@ -121,10 +123,22 @@ const getKeyboard = (data) => {
   const labeledButtons = sortedButons.map(({ label }) => label);
 
   const keyboard = [
-    ..._.chunk(labeledButtons, 3),
+    ..._.chunk(labeledButtons, data.buttonsAmount),
     [
       buttons.showSettings.label,
     ],
+  ];
+
+  return keyboard;
+};
+
+const getEncyclopediaKeyboard = (data) => {
+  const filteredButtons = data.buttons.filter(({ label, state }) => label !== buttons.showSettings.label && label !== buttons.showEncyclopedia.label && state === 'false');
+  const sortedButons = _.sortBy(filteredButtons, ({ order }) => order);
+  const labeledButtons = sortedButons.map(({ label }) => label);
+
+  const keyboard = [
+    ..._.chunk(labeledButtons, data.buttonsAmount),
   ];
 
   return keyboard;
@@ -140,7 +154,9 @@ const updateKeyboard = async (msg) => {
 
   const { data } = await userManager.getOrCreateSettings({ id, telegramData });
 
-  sessions[msg.from.id].keyboard = await getKeyboard(data);
+  sessions[msg.from.id].keyboard = getKeyboard(data);
+  sessions[msg.from.id].encyclopediaKeyboard = getEncyclopediaKeyboard(data);
+  sessions[msg.from.id].buttonsAmount = data.buttonsAmount;
 };
 
 const createSession = async (msg) => {
@@ -168,6 +184,8 @@ const createSession = async (msg) => {
     firstForwardDate: null,
     settings: data,
     keyboard: getKeyboard(data),
+    encyclopediaKeyboard: getEncyclopediaKeyboard(data),
+    buttonsAmount: data.buttonsAmount,
   };
 };
 
@@ -333,6 +351,21 @@ const defaultKeyboard = async (msg) => {
   });
 };
 
+
+const encyclopediaKeyboard = async (msg) => {
+  if (sessions[msg.from.id]) {
+    if (sessions[msg.from.id].encyclopediaKeyboard) {
+      return sessions[msg.from.id].encyclopediaKeyboard;
+    }
+
+    await updateKeyboard(msg);
+    return sessions[msg.from.id].encyclopediaKeyboard;
+  }
+
+  await createSession(msg);
+  return sessions[msg.from.id].encyclopediaKeyboard;
+};
+
 const getEffort = async (msg, toMax = false) => {
   if (sessions[msg.from.id].state === states.WAIT_FOR_START) {
     return false;
@@ -351,24 +384,10 @@ const getEffort = async (msg, toMax = false) => {
   await createSession(msg);
 
   return msg.reply.text(effort, {
-    replyMarkup: defaultKeyboard(msg),
+    replyMarkup: await defaultKeyboard(msg),
     parseMode: 'markdown',
   });
 };
-
-const encyclopediaKeyboard = [
-  [
-
-    buttons.showEquipment.label,
-    buttons.showSupplies.label,
-    buttons.showDrones.label,
-  ],
-  [
-    buttons.showDungeons.label,
-    buttons.showLocations.label,
-    buttons.showAchievments.label,
-  ],
-];
 
 const toGameKeyboard = bot.inlineKeyboard([
   [
@@ -1019,7 +1038,7 @@ ${errors}
           }
 
           msg.reply.text(reply, {
-            replyMarkup: defaultKeyboard(msg),
+            replyMarkup: await defaultKeyboard(msg),
             parseMode: 'markdown',
             asReply: options.silent,
           }).then(() => {
@@ -1122,7 +1141,7 @@ const processUserData = async (msg, options, processConfig = {
 
   if (reportData.criticalError) {
     return msg.reply.text(`<b>❌ЗАМЕЧЕНА КРИТИЧЕСКАЯ ОШИБКА❌</b>\n\n${reportData.criticalError}\n\n<i>Форварды были отменены.</i>`, {
-      replyMarkup: defaultKeyboard(msg),
+      replyMarkup: await defaultKeyboard(msg),
       parseMode: 'html',
     });
   }
@@ -1194,7 +1213,7 @@ ${errors}`, {
         } if (reportDataWithUserPip.criticalError && !reportDataWithUserPip.couldBeUpdated) {
           await createSession(msg);
           return msg.reply.text('Твой пип не соответсвуют твоим статам из форвардов!\nПрости, я вынужден отменить твои форварды.', {
-            replyMarkup: defaultKeyboard(msg),
+            replyMarkup: await defaultKeyboard(msg),
           });
         }
         updatesData = updatesDataWithUserPip;
@@ -1244,7 +1263,7 @@ bot.on('forward', async (msg) => {
 Форварды принимаються только от @WastelandWarsBot.
             `, {
       asReply: true,
-      replyMarkup: defaultKeyboard(msg),
+      replyMarkup: await defaultKeyboard(msg),
     });
   }
 
@@ -2185,7 +2204,7 @@ bot.on('/journeyforwardend', async (msg) => {
     await createSession(msg);
 
     return msg.reply.text('Чёрт, похоже меня перезагрузил какой-то мудак и твои форварды не сохранились, прости пожалуйста :с', {
-      replyMarkup: defaultKeyboard(msg),
+      replyMarkup: await defaultKeyboard(msg),
     });
   }
   sessions[msg.from.id].state = states.WAIT_FOR_DATA_TO_PROCESS;
@@ -2208,11 +2227,11 @@ bot.on('/skippipforward', (msg) => {
   });
 });
 
-bot.on(['/skipbeastforward', '/skipbeastforwards'], (msg) => {
+bot.on(['/skipbeastforward', '/skipbeastforwards'], async (msg) => {
   if (_.isEmpty(sessions)) {
     return msg.reply.text('Слушай, а мне собственно нечего игнорировать. Может меня опять какой-то пидор перезагрузил, не знаешь?', {
       asReply: true,
-      replyMarkup: defaultKeyboard(msg),
+      replyMarkup: await defaultKeyboard(msg),
     });
   }
 
@@ -2579,7 +2598,7 @@ bot.on('/debug', async (msg) => {
   }, updatesData, options);
 });
 
-bot.on(/^\d+$/, (msg) => {
+bot.on(/^\d+$/, async (msg) => {
   switch (sessions[msg.from.id].state) {
     case states.WAIT_FOR_DISTANCE: {
       const reachableKm = Number(msg.text);
@@ -2607,6 +2626,32 @@ bot.on(/^\d+$/, (msg) => {
       }
 
       break;
+    }
+    case states.WAIT_FOR_BUTTONS_AMOUNT: {
+      const newButtonsAmount = Number(msg.text);
+
+      if (newButtonsAmount > 4 || newButtonsAmount < 1) {
+        return msg.reply.text('Введи количество от 1 до 4');
+      }
+
+      const { settings } = sessions[msg.from.id];
+      const { buttonsAmount, ...restSettings } = settings;
+
+      const updateResult = await userManager.updateSettings({
+        id: msg.from.id,
+        settings: {
+          buttonsAmount: newButtonsAmount,
+          ...restSettings,
+        },
+      });
+
+      if (updateResult.ok) {
+        await updateKeyboard(msg);
+        sessions[msg.from.id].state = states.WAIT_FOR_START;
+        return msg.reply.text('Я обновил настройки');
+      }
+
+      return msg.reply.text('Произошла ошибка - я не смог найти тебя в базе. Попробуй нажать /start и повторить ещё раз.');
     }
     default:
       return false;
@@ -3291,7 +3336,7 @@ ${beastsList}
   }
 });
 
-bot.on('/show_encyclopedia', (msg) => {
+bot.on('/show_encyclopedia', async (msg) => {
   msg.reply.text(`В <b>📔Энциклопедии</b> вы можете просмотреть информацию о мире Wasteland Wars
 <b>🎒Экипировка</b> - Оружие, броня и тому подобное.
 <b>🗃Припасы</b> - Еда, баффы и медицина
@@ -3300,7 +3345,7 @@ bot.on('/show_encyclopedia', (msg) => {
 <b>🏜️Локации</b> - Рейдовые и обычные локации
 <b>✅Достижения</b> - За что выдают награды
 `, {
-    replyMarkup: withBackButton(bot.keyboard, encyclopediaKeyboard, {
+    replyMarkup: withBackButton(bot.keyboard, await encyclopediaKeyboard(msg), {
       resize: true,
       position: 'bottom',
     }),
@@ -3334,11 +3379,11 @@ bot.on(/\/battle_(.+)/, (msg) => {
   return false;
 });
 
-bot.on(/\/ignore_(.+)/, (msg) => {
+bot.on(/\/ignore_(.+)/, async (msg) => {
   if (_.isEmpty(sessions)) {
     return msg.reply.text('Слушай, а мне собственно нечего игнорировать. Может меня опять какой-то пидор перезагрузил, не знаешь?', {
       asReply: true,
-      replyMarkup: defaultKeyboard(msg),
+      replyMarkup: await defaultKeyboard(msg),
     });
   }
 
@@ -3386,7 +3431,7 @@ bot.on(/\/ignore_(.+)/, (msg) => {
 
     return msg.reply.text('Слушай, а мне собственно нечего игнорировать. Может меня опять какой-то пидор перезагрузил, не знаешь?', {
       asReply: true,
-      replyMarkup: defaultKeyboard(msg),
+      replyMarkup: await defaultKeyboard(msg),
     });
   }
 
@@ -3463,6 +3508,7 @@ bot.on('/show_settings', async (msg) => {
   msg.reply.text('Здесь ты можешь изменить настройки отображения и персонализировать бота под себя', {
     replyMarkup: withBackButton(bot.keyboard, [
       [buttons.showSettingsButton.label],
+      [buttons.showSettingsAmountButton.label],
     ], {
       resize: true,
     }),
@@ -3484,8 +3530,8 @@ bot.on('/show_buttons', async (msg) => {
 
   const { data } = await userManager.getOrCreateSettings({ id: msg.from.id, telegramData });
 
-  const mainKeyboardButtons = data.buttons.filter(({ state, label }) => state === 'true' && label !== buttons.showSettings.label).map(({ label, index }) => `${label} /bdown_${index}\n`).join('');
-  const encyclopediaKeyboardButtons = data.buttons.filter(({ state, label }) => state !== 'true' && label !== buttons.showSettings.label).map(({ label, index }) => `${label} /bup_${index}\n`).join('');
+  const mainKeyboardButtons = data.buttons.filter(({ state, label }) => state === 'true' && label !== buttons.showSettings.label && label !== buttons.showEncyclopedia.label).map(({ label, index }) => `${label} /bdown_${index}\n`).join('');
+  const encyclopediaKeyboardButtons = data.buttons.filter(({ state, label }) => state !== 'true' && label !== buttons.showSettings.label && label !== buttons.showEncyclopedia.label).map(({ label, index }) => `${label} /bup_${index}\n`).join('');
 
   return msg.reply.text(`
 Здесь ты можешь выбрать какие кнопки ты хочешь видеть на главном меню, а какие убрать под <code>[📔Энциклпдию]</code>
@@ -3598,6 +3644,20 @@ bot.on([/bup_(\d*)/, /bdown_(\d*)/], async (msg) => {
   }
 
   return msg.reply.text('Произошла ошибка - я не смог найти тебя в базе. Попробуй нажать /start и повторить ещё раз.');
+});
+
+bot.on('/show_amount_buttons', async (msg) => {
+  if (!sessions[msg.from.id]) {
+    await createSession(msg);
+  }
+
+  sessions[msg.from.id].state = states.WAIT_FOR_BUTTONS_AMOUNT;
+
+  msg.reply.text('Выбери количество кнопок в ряд (для главного меню и энциклопедии) от 1 до 4:', {
+    replyMarkup: bot.keyboard([
+      ['1', '2', '3', '4'],
+    ]),
+  });
 });
 
 bot.connect();

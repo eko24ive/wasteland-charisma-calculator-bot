@@ -32,6 +32,7 @@ module.exports = {
     pip: [],
   },
   settings: {
+    buttonsAmount: 3,
     buttons: [
       {
         index: 0,

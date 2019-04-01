@@ -176,7 +176,11 @@ module.exports = {
     command: '/show_settings',
   },
   showSettingsButton: {
-    label: '⌨️Кнопки',
+    label: '⌨️ Кнопки',
     command: '/show_buttons',
+  },
+  showSettingsAmountButton: {
+    label: '🎛 Количество',
+    command: '/show_amount_buttons',
   },
 };

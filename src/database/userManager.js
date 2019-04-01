@@ -7,7 +7,7 @@ const userManager = User => ({
   create: ({ telegramData, pipData }) => new Promise((resolve) => {
     User.findOne({
       'telegram.id': telegramData.id,
-    }).then((databaseUser) => {
+    }).then(async (databaseUser) => {
       if (databaseUser !== null) {
         return resolve({
           ok: false,
@@ -28,13 +28,13 @@ const userManager = User => ({
         settings: userDefaults.settings,
       });
 
-      newUser.save().then(newDatabaseUser => resolve({
+      const newDatabaseUser = await newUser.save();
+
+      return {
         ok: true,
         reason: 'USER_CREATED',
         data: newDatabaseUser.toJSON(),
-      }));
-
-      return false;
+      };
     });
   }),
   delete: id => new Promise((resolve) => {
