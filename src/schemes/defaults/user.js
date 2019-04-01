@@ -33,6 +33,7 @@ module.exports = {
   },
   settings: {
     buttonsAmount: 3,
+    buttonsIconsMode: true,
     buttons: [
       {
         index: 0,

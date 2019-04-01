@@ -77,6 +77,7 @@ const userSchema = Schema({
   },
   settings: {
     buttonsAmount: Number,
+    buttonsIconsMode: Boolean,
     buttons: [{
       index: Number,
       name: String,
