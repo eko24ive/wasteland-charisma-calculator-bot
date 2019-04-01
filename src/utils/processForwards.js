@@ -600,7 +600,7 @@ const processForwards = (inputData, id, processConfig = {
 
         nextPip = nextPip.pip;
       } else {
-        if ((reportData.lastPip.date - date) > 30) {
+        if ((reportData.lastPip.date - date) > 30 || (reportData.lastPip.date - date) < 0) {
           reportData.errors.push(`Ты не предоставил пип для подтверждения побега на ${data.distance} километре. Я не обрабатывал этот побег`);
 
           return;
