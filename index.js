@@ -1786,18 +1786,18 @@ bot.on('forward', async (msg) => {
             forwardStamp: msg.forward_date,
           });
 
-          newGiant.save().then(() => {
+          newGiant.save().then(async () => {
             const telegramData = {
               first_name: msg.from.first_name,
               id: msg.from.id,
               username: msg.from.username,
             };
 
-            userManager.addPoints({ id: msg.from.id, telegramData, points: forwardPoints.discoveryGiantData })
-              .then(() => msg.reply.text(`Спасибо за форвард! Я добавил <b>${giant.name}</b> в базу!\nНачислил тебе ${forwardPoints.discoveryGiantData} 💎<b>Шмепселей</b>`, {
-                asReply: true,
-                parseMode: 'html',
-              }));
+            await userManager.addPoints({ id: msg.from.id, telegramData, points: forwardPoints.discoveryGiantData });
+            return msg.reply.text(`Спасибо за форвард! Я добавил <b>${giant.name}</b> в базу!\nНачислил тебе ${forwardPoints.discoveryGiantData} 💎<b>Шмепселей</b>`, {
+              asReply: true,
+              parseMode: 'html',
+            });
           }).catch(e => console.log(e));
         } else if (databaseGiant.forwardStamp >= msg.forward_date) {
           return msg.reply.text(`Прости, у меня есть более свежая иформация про *${giant.name}*`, {
@@ -2876,13 +2876,9 @@ bot.on('/delete_accaunt', (msg) => {
         }).catch(e => console.log(e));
       }
 
-      if (result.ok && result.reason === 'USER_DELETED') {
-        return msg.reply.text('Я удалил твою запись в базе', {
-          asReply: true,
-        }).catch(e => console.log(e));
-      }
-
-      return false;
+      return msg.reply.text('Я удалил твою запись в базе', {
+        asReply: true,
+      }).catch(e => console.log(e));
     });
   }
 });
