@@ -3575,21 +3575,24 @@ bot.on(['/buttons_set_all', '/buttons_set_default'], async (msg) => {
   }
 
   const { settings } = sessions[msg.from.id];
-  const { buttons, ...restSettings } = settings;
+  const { buttons: settingsButtons, ...restSettings } = settings;
 
   if (isRevertToDefault) {
+    const { buttonsAmount, buttonsIconsMode, ...rest } = restSettings;
     updateResult = await userManager.updateSettings({
       id: msg.from.id,
       settings: {
         buttons: userDefaults.settings.buttons,
-        ...restSettings,
+        buttonsAmount: userDefaults.settings.buttonsAmount,
+        buttonsIconsMode: userDefaults.settings.buttonsIconsMode,
+        ...rest,
       },
     });
   } else {
     updateResult = await userManager.updateSettings({
       id: msg.from.id,
       settings: {
-        buttons: buttons.map(({ state, ...rest }) => ({ state: 'true', ...rest })),
+        buttons: settingsButtons.map(({ state, ...rest }) => ({ state: 'true', ...rest })),
         ...restSettings,
       },
     });
