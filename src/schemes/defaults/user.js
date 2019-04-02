@@ -30,7 +30,7 @@ module.exports = {
   },
   settings: {
     buttonsAmount: 3,
-    buttonsIconsMode: true,
+    buttonsIconsMode: false,
     buttons: [
       {
         index: 0,
@@ -148,5 +148,8 @@ module.exports = {
         state: false,
         order: 17,
       }],
+  },
+  history: {
+    pip: [],
   },
 };
