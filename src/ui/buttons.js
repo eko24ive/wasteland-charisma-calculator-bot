@@ -101,7 +101,7 @@ module.exports = {
     command: '/journeyforwardend',
   },
   journeyForwardCancel: {
-    label: '↩️Назад',
+    label: '◀️Назад',
     command: '/journeyforwardcancel',
   },
   showAllLocations: {
