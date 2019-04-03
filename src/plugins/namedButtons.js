@@ -13,10 +13,11 @@ module.exports = {
         const {
           label,
           command,
+          contains,
           icon,
         } = buttons[key];
 
-        if (label === text || icon === text) {
+        if (label === text || icon === text || text.indexOf(contains) !== -1) {
           return bot.event(command, msg, props);
         }
 
