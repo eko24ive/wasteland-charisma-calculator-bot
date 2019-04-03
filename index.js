@@ -234,7 +234,7 @@ if (process.env.ENV === 'LOCAL') {
   bot = new TeleBot({
     token: getToken(),
     polling: {
-      interval: 1, // How often check updates (in ms).
+      interval: 1,
     },
     pluginConfig: {
       namedButtons: {
@@ -557,23 +557,7 @@ const actualActualProcessUserData = (msg, reportData, updatesData, options) => {
     flees: 0,
   };
 
-  /* console.log({
-          reportData,
-          updatesData,
-          telegram: {
-              id: msg.from.id,
-              firstName: msg.from.first_name,
-              userName: msg.from.username
-          }
-      }); */
-
-  try {
-    console.log(`[USAGE]: ${reportData.lastPip.faction} | ${reportData.lastPip.name} | ${msg.from.username}`);
-  } catch (e) {
-    // return false;
-  }
-
-  const isBeastUnderValidation = name => reportData.beastsToValidate.filter(beast => beast.name === name).length > 0;
+  console.log(`[USAGE]: ${reportData.lastPip && reportData.lastPip.faction} | ${reportData.lastPip && reportData.lastPip.name} | ${msg.from.username}`);
 
   const signEntryWithVersion = entry => ({
     ...entry,
@@ -1037,13 +1021,10 @@ const actualActualProcessUserData = (msg, reportData, updatesData, options) => {
           // TODO: Implement meaningfull report data regarding found usefull data
           await createSession(msg);
 
-          // setTimeout(() => {
           if (options.silent) {
             reply = `
         Спасибо за форвард. Я перевёл ${userForwardPoints.toFixed(1)} 💎*Шмепселей* на твой счёт.\n_${dupesText}_`;
           } else {
-            // Всего я насчитал ${dataProcessed} данных!
-
             reply = `Фух, я со всём справился - спасибо тебе огромное за информацию!
 
 Ты заработал ${userForwardPoints.toFixed(1)} 💎*Шмепселей* за свои форварды!
@@ -1066,7 +1047,6 @@ ${errors}
             parseMode: 'markdown',
             asReply: options.silent,
           }).catch(e => console.log(e));
-          // }, 1500);
         } else {
           await createSession(msg);
           if (reportData.errors.length > 0) {
@@ -1083,8 +1063,6 @@ ${errors}`, {
           });
         }
 
-        // FIXME: COULD BE AN ISSUE
-        // sessions[msg.from.id].state = states.WAIT_FOR_DATA_VALIDATION;
         return null;
       }).catch(e => console.log(e));
     },
@@ -1252,7 +1230,6 @@ ${errors}`, {
     }).catch(e => console.log(e));
   } else {
     userManager.findByTelegramId(msg.from.id).then((result) => {
-      // BOOK
       if (result.ok && result.reason === 'USER_FOUND') {
         actualProcessUserData(msg, reportData, updatesData, options);
       } else {
@@ -1659,18 +1636,6 @@ bot.on('forward', async (msg) => {
       regexpSet: regexps.dungeonBeast,
     });
 
-    /* const isLocation = regExpSetMatcher(msg.text, {
-            regexpSet: regexps.location
-        });
-
-        const isDungeonBeast = regExpSetMatcher(msg.text, {
-            regexpSet: regexps.dungeonBeast
-        });
-
-        const isFlee = regExpSetMatcher(msg.text, {
-            regexpSet: regexps.flee
-        }); */
-
     if (isClassicPip || isSimplePip) {
       const pip = parsePip(msg, isClassicPip);
       let reply;
@@ -1929,12 +1894,6 @@ bot.on('forward', async (msg) => {
         VERSION,
       }).then(({ reply }) => {
         if (reply !== false) {
-          /* const beastReplyMarkup = getBeastKeyboard(beast._id.toJSON());
-
-                    return msg.reply.text(reply,{
-                        replyMarkup: beastReplyMarkup,
-                        parseMode: 'html'
-                    }).catch(e => console.log(e)); */
           msg.reply.text(`Хей, у меня есть данные про *${oBeast.name}*, но я пока что не умею их выводить, прости :с`, {
             asReply: true,
             parseMode: 'markdown',
@@ -1959,12 +1918,6 @@ bot.on('forward', async (msg) => {
         VERSION,
       }).then(({ reply }) => {
         if (reply !== false) {
-          /* const beastReplyMarkup = getBeastKeyboard(beast._id.toJSON());
-
-                    return msg.reply.text(reply,{
-                        replyMarkup: beastReplyMarkup,
-                        parseMode: 'html'
-                    }).catch(e => console.log(e)); */
           msg.reply.text(`Хей, у меня есть данные про *${oBeast.name}*, но я пока что не умею их выводить, прости :с`, {
             asReply: true,
             parseMode: 'markdown',
@@ -1979,7 +1932,6 @@ bot.on('forward', async (msg) => {
         return false;
       }).catch(e => console.log(e));
     } else if (isRegularBeast || isFlee || isDungeonBeast) {
-      // || isLocation || isDungeonBeast || isFlee
       let data;
       let dataType;
 
@@ -2218,7 +2170,6 @@ bot.on('/journeyforwardend', async (msg) => {
   }
   sessions[msg.from.id].state = states.WAIT_FOR_DATA_TO_PROCESS;
 
-  // console.log(JSON.stringify(sessions[msg.from.id].data));
   return processUserData(msg, {
     usePip: sessions[msg.from.id].processDataConfig.usePip,
     useBeastFace: sessions[msg.from.id].processDataConfig.useBeastFace,
@@ -2279,7 +2230,6 @@ bot.on('/version', (msg) => {
 });
 
 bot.on('/eqp', (msg) => {
-  // TODO: Inline button resize
   const processMenuButtons = processMenu(equipmentMenu).map(menuItem => bot.inlineButton(menuItem.title, { callback: `equipment_menu-${menuItem.name}` }));
 
   const inlineReplyMarkup = bot.inlineKeyboard(_.chunk(processMenuButtons, 3));
@@ -3366,7 +3316,6 @@ bot.on(/\/battle_(.+)/, (msg) => {
   }
 
   const [, battleId] = /\/battle_(.+)/.exec(msg.text);
-  // msg.reply.text('neat!');
 
   routedBattleView(Beast, {
     battleId: mongoose.Types.ObjectId(battleId),
