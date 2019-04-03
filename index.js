@@ -185,9 +185,10 @@ const createSession = async (msg) => {
   };
 
   const { data } = await userManager.getOrCreateSettings({ id, telegramData });
+  const userPip = await userManager.findByTelegramId(id);
 
   sessions[msg.from.id] = {
-    pip: null,
+    pip: userPip ? userPip.data.pip : null,
     state: states.WAIT_FOR_START,
     data: [],
     processDataConfig: {
@@ -291,13 +292,13 @@ const findPip = (msg, cb) => {
 };
 
 const askAmountOfLevels = (msg) => {
-  const replyMarkup = bot.keyboard([
+  const { pip } = sessions[msg.from.id];
+
+  let amountsBoard = [
     [
       buttons.amountOfLevelsTen.label,
       buttons.amountOfLevelsTwenty.label,
       buttons.amountOfLevelsThirty.label,
-    ],
-    [
       buttons.amountOfLevelsFourty.label,
       buttons.amountOfLevelsFifty.label,
       buttons.amountOfLevelsSixty.label,
@@ -305,13 +306,38 @@ const askAmountOfLevels = (msg) => {
     [
       buttons.amountOfLevelsMAX.label,
     ],
-  ], {
+  ];
+
+  if (pip) {
+    if (pip.dzen) {
+      amountsBoard = [
+        [
+          buttons.amountOfLevelsFourty.label,
+          buttons.amountOfLevelsFifty.label,
+          buttons.amountOfLevelsSixty.label,
+        ],
+        [
+          `Дзен ${pip.dzen + 1}`,
+          `Дзен ${pip.dzen + 2}`,
+          `Дзен ${pip.dzen + 3}`,
+        ],
+        [
+          buttons.amountOfLevelsMAX.label,
+        ],
+      ];
+    }
+  }
+
+  const replyMarkup = bot.keyboard(amountsBoard, {
     resize: true,
   });
 
   return msg.reply.text(`
-Выбери на сколько уровней ты хочешь прокачать *${sessions[msg.from.id].upgradeSkill}*
+Выбери на сколько ты хочешь прокачать *${sessions[msg.from.id].upgradeSkill}*
 \`Либо напиши своё количество (например: 17)\`
+
+Нажми кнопку Дзена что бы прокачать *${sessions[msg.from.id].upgradeSkill}* до капа указанного Дзена.
+'МАКСИМАЛОЧКА' посчитает затраты до прокачки до капа текущего Дзена.
 `, {
     replyMarkup,
     parseMode: 'markdown',
@@ -382,7 +408,7 @@ const encyclopediaKeyboard = async (msg) => {
   return sessions[msg.from.id].encyclopediaKeyboard;
 };
 
-const getEffort = async (msg, toMax = false) => {
+const getEffort = async (msg, toMax = false, dzenAmount = 0) => {
   if (sessions[msg.from.id].state === states.WAIT_FOR_START) {
     return false;
   }
@@ -391,7 +417,7 @@ const getEffort = async (msg, toMax = false) => {
 
   sessions[msg.from.id].amountToUpgrade = toMax || msg.text;
 
-  const effort = calculateUpgrade(sessions[msg.from.id], { toMax });
+  const effort = calculateUpgrade(sessions[msg.from.id], { toMax, dzenAmount });
   const { pip } = sessions[msg.from.id];
 
 
@@ -2111,10 +2137,14 @@ bot.on('/raids_text', msg => msg.reply.text(`
 }));
 
 bot.on('/upgradeSkill', (msg) => {
+  const skillsToMax = msg.text === 'МАКСИМАЛОЧКА';
+  const dzenRegExp = /Дзен (\d+)/;
+  const [, dzenAmount] = dzenRegExp.exec(msg.text);
+
   if (msg.text === 'МАКСИМАЛОЧКА') {
-    getEffort(msg, true);
+    getEffort(msg, skillsToMax, dzenAmount);
   } else {
-    getEffort(msg);
+    getEffort(msg, skillsToMax, dzenAmount);
   }
 });
 
@@ -2324,11 +2354,14 @@ bot.on('/skill_upgrade', (msg) => {
         return `<b>${skillName}</b>: ${result.data.pip[key]}`;
       });
 
+      const dzenText = result.data.pip.dzen > 0 ? `🏵 <b>Дзен</b>: ${result.data.pip.dzen}` : 'Ты ещё не постиг Дзен 🏵';
+
       return msg.reply.text(`
 ${skillOMaticText}
 
 Вот что я знаю про твои скилы:
 ${userSkills.join('\n')}
+${dzenText}
 <i>(Если они не актуальные - просто отправь мне свой новый пип-бой)</i>
 
 

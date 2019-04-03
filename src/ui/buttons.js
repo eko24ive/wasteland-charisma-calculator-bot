@@ -55,6 +55,10 @@ module.exports = {
     label: 'МАКСИМАЛОЧКА',
     command: '/upgradeSkill',
   },
+  amountOfLevelsMaxDzen: {
+    contains: 'Дзен',
+    command: '/upgradeSkill',
+  },
   reachableKm20: {
     label: '20км',
     command: '/reachableKm',

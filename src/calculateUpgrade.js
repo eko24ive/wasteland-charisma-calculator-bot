@@ -9,6 +9,8 @@ const timeToTravel = require('./utils/timeToTravel');
 const skillsCap = require('./constants/skillCap');
 const skillMap = require('./constants/skillMap');
 
+const AVAILABLE_CAP = 2500;
+
 const formatNubmer = (number) => {
   const floored = Math.floor(number);
 
@@ -204,6 +206,7 @@ const calculateUpgrade = ({
   reachableKm,
 }, {
   toMax,
+  dzenAmount,
 }) => {
   const currentSkillLevel = pip[skillMap[upgradeSkill]];
   const upgradeTo = getCap({
