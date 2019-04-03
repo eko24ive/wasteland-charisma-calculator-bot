@@ -272,11 +272,11 @@ const updateOrCreate = (msg, pip, cb = (() => {})) => {
   const pipData = { ...pip, timeStamp: pip.date };
 
   userManager.findByTelegramId(msg.from.id).then((result) => {
-    if (result.ok === false && result.reason === 'USER_NOT_FOUND') {
+    if (!result.ok && result.reason === 'USER_NOT_FOUND') {
       userManager.create({ telegramData, pipData }).then((createResult) => {
         cb(createResult);
       });
-    } else if (result.ok === true && result.reason === 'USER_FOUND') {
+    } else if ((result.ok === true && result.reason === 'USER_FOUND') || (!result.ok && result.reason === 'PIP_IS_EMPTY')) {
       userManager.update({ telegramData, pipData }).then((updateResult) => {
         cb(updateResult);
       });

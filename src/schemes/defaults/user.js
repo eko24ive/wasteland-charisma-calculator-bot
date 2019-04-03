@@ -15,6 +15,7 @@ module.exports = {
     damage: 0,
     armor: 0,
     timeStamp: 0,
+    dzen: 0,
   },
   points: {
     score: 0,

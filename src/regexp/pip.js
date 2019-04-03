@@ -23,6 +23,8 @@ const simpleEnduranceRegExp = /🔋\d*\/(\d+)/;
 const simpleHungerRegExp = /🍗(\d+)%/;
 const simpleHealthRegExp = /❤️\d*\/(\d+)/;
 
+const dzenRegExp = /(🏵(\d+)|^🏵+$)/mu;
+
 const classicPip = {
   contains: [
     classicNameRegExp,
@@ -50,6 +52,9 @@ const classicPip = {
     simpleEnduranceRegExp,
     simpleHungerRegExp,
     simpleHealthRegExp,
+  ],
+  conditional: [
+    dzenRegExp,
   ],
 };
 
@@ -81,6 +86,9 @@ const simplePip = {
     classicHealthRegExp,
     classicVerisonRegExp,
   ],
+  conditional: [
+    dzenRegExp,
+  ],
 };
 
 const regexps = {
@@ -107,6 +115,7 @@ const regexps = {
   simpleEnduranceRegExp,
   simpleHungerRegExp,
   simpleHealthRegExp,
+  dzenRegExp,
 };
 
 module.exports = {

@@ -27,6 +27,7 @@ const userSchema = Schema({
     damage: Number,
     armor: Number,
     timeStamp: Number,
+    dzen: Number,
   },
   points: {
     score: {
@@ -73,6 +74,7 @@ const userSchema = Schema({
       damage: Number,
       armor: Number,
       timeStamp: Number,
+      dzen: Number,
     }],
   },
   settings: {

@@ -13,6 +13,17 @@ const parseClassic = (text) => {
   const [, health] = regexps.classicHealthRegExp.exec(text);
   const [, faction] = regexps.classicFactionRegExp.exec(text);
   const [, version] = regexps.classicVerisonRegExp.exec(text);
+  const [, dzens, dzensAmount] = regexps.dzenRegExp.exec(text);
+
+  let dzen = 0;
+
+  if (dzensAmount) {
+    dzen = Number(dzensAmount - 1);
+  }
+
+  if (dzens) {
+    dzen = dzens.length / 2;
+  }
 
   const data = {
     version,
@@ -27,6 +38,7 @@ const parseClassic = (text) => {
     charisma,
     agility,
     endurance,
+    dzen,
   };
 
   Object.keys(data).forEach((key) => {
@@ -49,6 +61,13 @@ const parseSimple = (text) => {
   const [, name] = regexps.simpleNameRegExp.exec(text);
   const [, faction] = regexps.simpleFactionRegExp.exec(text);
   const [, damage] = regexps.simpleDamageRegExp.exec(text);
+  const [, dzens] = regexps.dzenRegExp.exec(text);
+
+  let dzen = 0;
+
+  if (dzens) {
+    dzen = dzens.length / 2;
+  }
 
   const data = {
     name,
@@ -63,6 +82,7 @@ const parseSimple = (text) => {
     endurance,
     damage,
     version: 0,
+    dzen,
   };
 
   Object.keys(data).forEach((key) => {
