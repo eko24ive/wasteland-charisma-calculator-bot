@@ -277,7 +277,7 @@ const userManager = User => ({
     });
   },
   updateSettings: ({ id, settings }) => new Promise((resolve) => {
-    User.findOne({ 'telegram.id': id }).then((databaseUser) => {
+    User.findOne({ 'telegram.id': id }).then(async (databaseUser) => {
       if (databaseUser === null) {
         return resolve({
           ok: false,
@@ -287,11 +287,13 @@ const userManager = User => ({
 
       databaseUser.settings = settings;
 
-      databaseUser.save().then(updatedDatabaseUser => resolve({
+      const updatedDatabaseUser = await databaseUser.save();
+
+      return resolve({
         ok: true,
         reason: 'USER_UPDATED',
         data: updatedDatabaseUser.toJSON(),
-      }));
+      });
     });
   }),
 });

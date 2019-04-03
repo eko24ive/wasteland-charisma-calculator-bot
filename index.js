@@ -1384,7 +1384,7 @@ bot.on('forward', async (msg) => {
       beastName = data.name;
     }
 
-    const isForwardValid = ({ dataType, beastName, beastType }) => {
+    const isForwardValid = ({ _dataType, _beastName, _beastType }) => {
       let beastValidationTimeScope = beastsToValidate.map((beast, index) => ({ ...beast, index }));
       const beastIndexToRemove = date => beastValidationTimeScope.sort((a, b) => Math.abs(date - a.date) - Math.abs(date - b.date))[0].index;
 
@@ -1406,8 +1406,8 @@ bot.on('forward', async (msg) => {
         return false;
       }
 
-      if (dataType === 'walkingBeastFaced') {
-        if (beastValidationTimeScope.some(beast => (beast.name.indexOf(beastName) !== -1))) {
+      if (_dataType === 'walkingBeastFaced') {
+        if (beastValidationTimeScope.some(beast => (beast.name.indexOf(_beastName) !== -1))) {
           const beastIndex = beastIndexToRemove(msg.forward_date);
           sessions[msg.from.id].beastsToValidate = sessions[msg.from.id].beastsToValidate.filter((beast, index) => index !== beastIndex);
 
@@ -1417,8 +1417,8 @@ bot.on('forward', async (msg) => {
         return null;
       }
 
-      if (dataType === 'dungeonBeastFaced') {
-        if (beastValidationTimeScope.every(beast => beast.name !== beastName && beast.name !== '???')) {
+      if (_dataType === 'dungeonBeastFaced') {
+        if (beastValidationTimeScope.every(beast => beast.name !== _beastName && beast.name !== '???')) {
           return false;
         }
 
@@ -1428,7 +1428,7 @@ bot.on('forward', async (msg) => {
         return true;
       }
 
-      if (beastValidationTimeScope.every(beast => (beast.name !== beastName && beast.name !== '???') || beast.type !== beastType)) {
+      if (beastValidationTimeScope.every(beast => (beast.name !== _beastName && beast.name !== '???') || beast.type !== _beastType)) {
         return false;
       }
 
@@ -1841,11 +1841,11 @@ bot.on('forward', async (msg) => {
         return false;
       });
     } else if (isRegularBeastFaced) {
-      const beast = parseBeastFaced.parseRegularBeastFaced(msg.text);
+      const parsedBeast = parseBeastFaced.parseRegularBeastFaced(msg.text);
 
       routedBeastView(Beast, {
-        name: beast.name,
-        type: beast.type,
+        name: parsedBeast.name,
+        type: parsedBeast.type,
         isDungeon: false,
         subType: 'regular',
       }, null, {
@@ -2209,7 +2209,7 @@ bot.on(['/skipbeastforward', '/skipbeastforwards'], async (msg) => {
   });
 
 
-  msg.reply.text('Окей, обработаю что смогу').then(() => {
+  return msg.reply.text('Окей, обработаю что смогу').then(() => {
     sessions[msg.from.id].state = states.WAIT_FOR_DATA_TO_PROCESS;
     sessions[msg.from.id].processDataConfig.useBeastFace = false;
     sessions[msg.from.id].beastsToValidate = [];
@@ -3370,7 +3370,7 @@ bot.on(/\/ignore_(.+)/, async (msg) => {
             useBeastFace: sessions[msg.from.id].processDataConfig.useBeastFace,
           });
 
-          return;
+          return null;
         }
         return msg.reply.text(getBeastToValidateMessage(sessions[msg.from.id].beastsToValidate, sessions[msg.from.id].beastRequest), {
           parseMode: 'html',
@@ -3425,6 +3425,8 @@ bot.on('/showBeastsToValidate', (msg) => {
       }
     }
   }
+
+  return null;
 });
 
 bot.on('/reset_beast_database', (msg) => {
