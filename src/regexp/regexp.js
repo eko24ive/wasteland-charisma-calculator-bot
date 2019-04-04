@@ -62,6 +62,7 @@ const giantHealthOnField = /❤️(\d+|-\d+)\/(\d+)/;
 const altInBattleLocationRegExp = /Твое местоположение: Пустошь/;
 const altInBattleBeastRegExp = /Тебе не уйти от противника .+$/;
 
+const dzenRegExp = /Дзен (\d+)/;
 
 const every = {
   contains: [healthRegExp, hungerRegExp, staminaRegExp, campDistanceRegExp],
@@ -251,6 +252,7 @@ const regexps = {
   altInBattleBeastRegExp,
   haloDungeonBeastFacedRegExp,
   beastReceivedCapsRegExp,
+  dzenRegExp,
 };
 
 module.exports = {

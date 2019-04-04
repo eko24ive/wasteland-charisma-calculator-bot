@@ -188,7 +188,7 @@ const createSession = async (msg) => {
   const userPip = await userManager.findByTelegramId(id);
 
   sessions[msg.from.id] = {
-    pip: userPip ? userPip.data.pip : null,
+    pip: userPip.ok ? userPip.data.pip : null,
     state: states.WAIT_FOR_START,
     data: [],
     processDataConfig: {
@@ -309,18 +309,20 @@ const askAmountOfLevels = (msg) => {
   ];
 
   if (pip) {
-    if (pip.dzen) {
+    if (pip.dzen > 0) {
+      const dzenButtons = [];
+
+      for (let index = pip.dzen + 1; index < 11; index += 1) {
+        dzenButtons.push(index);
+      }
+
       amountsBoard = [
         [
           buttons.amountOfLevelsFourty.label,
           buttons.amountOfLevelsFifty.label,
           buttons.amountOfLevelsSixty.label,
         ],
-        [
-          `Дзен ${pip.dzen + 1}`,
-          `Дзен ${pip.dzen + 2}`,
-          `Дзен ${pip.dzen + 3}`,
-        ],
+        dzenButtons.slice(0, 3).map(button => `Дзен ${button}`),
         [
           buttons.amountOfLevelsMAX.label,
         ],
@@ -337,7 +339,10 @@ const askAmountOfLevels = (msg) => {
 \`Либо напиши своё количество (например: 17)\`
 
 Нажми кнопку Дзена что бы прокачать *${sessions[msg.from.id].upgradeSkill}* до капа указанного Дзена.
-'МАКСИМАЛОЧКА' посчитает затраты до прокачки до капа текущего Дзена.
+Либо введи нужный тебе дзен, например \`Дзен 5\`
+Введённый уровень дзена не должен превышать 10.
+
+\`МАКСИМАЛОЧКА\` посчитает затраты до прокачки до капа текущего Дзена.
 `, {
     replyMarkup,
     parseMode: 'markdown',
@@ -409,7 +414,7 @@ const encyclopediaKeyboard = async (msg) => {
 };
 
 const getEffort = async (msg, toMax = false, dzenAmount = 0) => {
-  if (sessions[msg.from.id].state === states.WAIT_FOR_START) {
+  if (sessions[msg.from.id].state !== states.WAIT_FOR_LEVELS) {
     return false;
   }
 
@@ -417,7 +422,12 @@ const getEffort = async (msg, toMax = false, dzenAmount = 0) => {
 
   sessions[msg.from.id].amountToUpgrade = toMax || msg.text;
 
-  const effort = calculateUpgrade(sessions[msg.from.id], { toMax, dzenAmount });
+  const effort = calculateUpgrade(sessions[msg.from.id], {
+    toMax,
+    dzenAmount,
+    currentDzen: sessions[msg.from.id].pip.dzen,
+  });
+
   const { pip } = sessions[msg.from.id];
 
 
@@ -2138,14 +2148,28 @@ bot.on('/raids_text', msg => msg.reply.text(`
 
 bot.on('/upgradeSkill', (msg) => {
   const skillsToMax = msg.text === 'МАКСИМАЛОЧКА';
-  const dzenRegExp = /Дзен (\d+)/;
-  const [, dzenAmount] = dzenRegExp.exec(msg.text);
+  const [, dzenAmountString] = regexps.regexps.dzenRegExp.exec(msg.text);
+  const dzenAmount = Number(dzenAmountString);
+
+  if (!Number.isInteger(dzenAmount)) {
+    return msg.reply.text('Пожалуйста используй целое число для уровеня Дзена', {
+      asReply: true,
+    });
+  }
+
+  if (dzenAmount > 10) {
+    return msg.reply.text('Пожалуйста используй уровень Дзена до 10', {
+      asReply: true,
+    });
+  }
 
   if (msg.text === 'МАКСИМАЛОЧКА') {
     getEffort(msg, skillsToMax, dzenAmount);
   } else {
     getEffort(msg, skillsToMax, dzenAmount);
   }
+
+  return null;
 });
 
 bot.on(['/journeyforwardstart', '/go'], async (msg) => {
@@ -2608,10 +2632,13 @@ bot.on(/^\d+$/, async (msg) => {
     }
     case states.WAIT_FOR_LEVELS: {
       const upgradeAmount = Number(msg.text);
+
       const { pip } = sessions[msg.from.id];
       const skillToUpgrade = sessions[msg.from.id].upgradeSkill;
 
-      if (upgradeAmountValidation(pip, skillToUpgrade, upgradeAmount)) {
+      if (upgradeAmountValidation({
+        pip, skillToUpgrade, upgradeAmount,
+      })) {
         getEffort(msg);
       } else {
         msg.reply.text('Чёто дохуя получилось, попробуй число поменьше.');

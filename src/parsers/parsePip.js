@@ -21,7 +21,7 @@ const parseClassic = (text) => {
     dzen = Number(dzensAmount - 1);
   }
 
-  if (dzens) {
+  if (dzens && !dzensAmount) {
     dzen = dzens.length / 2;
   }
 

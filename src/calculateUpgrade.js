@@ -3,13 +3,12 @@ const numeral = require('numeral');
 const constants = require('./constants/constants');
 const defaultSkillCost = require('./constants/defaultSkillCost');
 const defaultCharismaCost = require('./constants/defaultCharismaCost');
+const dzenCost = require('./constants/dzenConst');
 const mobs = require('./constants/mobs');
 const mobsRanges = require('./constants/mobsRanges');
 const timeToTravel = require('./utils/timeToTravel');
 const skillsCap = require('./constants/skillCap');
 const skillMap = require('./constants/skillMap');
-
-const AVAILABLE_CAP = 2500;
 
 const formatNubmer = (number) => {
   const floored = Math.floor(number);
@@ -96,6 +95,7 @@ const calculateAmountOfRaids = (
   skillRangeFrom,
   skillRangeTo,
   upgradeSkill,
+  additionalCaps,
 ) => {
   const distanceOfRanges = {};
   const mobsFillment = [];
@@ -105,7 +105,7 @@ const calculateAmountOfRaids = (
     charismaLevel,
     skillRangeFrom,
     skillRangeTo,
-  );
+  ) + additionalCaps;
 
   if (totalSpend === null) {
     return null;
@@ -186,17 +186,23 @@ const calculateSpentOnSkill = (
 };
 
 const getCap = ({
-  upgradeSkill, currentSkillLevel, amountToUpgrade, toMax,
+  upgradeSkill, currentSkillLevel, amountToUpgrade, dzenAmount,
 }) => {
-  const upgradeTo = Number(currentSkillLevel) + Number(amountToUpgrade);
   const skillName = skillMap[upgradeSkill];
-  const skillCap = skillsCap[skillName];
 
-  if (toMax || upgradeTo > skillCap) {
-    return skillCap;
+  let upgradeTo = Number(currentSkillLevel) + Number(amountToUpgrade);
+  let skillCap = skillsCap[skillName];
+
+  if (dzenAmount) {
+    skillCap += dzenAmount * constants.DZEN_MODIFIER;
+    upgradeTo = skillCap;
   }
 
-  return upgradeTo;
+  if (upgradeTo > skillCap && upgradeTo < constants.AVAILABLE_CAP && !dzenAmount) {
+    return upgradeTo;
+  }
+
+  return skillCap;
 };
 
 const calculateUpgrade = ({
@@ -206,19 +212,34 @@ const calculateUpgrade = ({
   reachableKm,
 }, {
   toMax,
+  currentDzen,
   dzenAmount,
 }) => {
   const currentSkillLevel = pip[skillMap[upgradeSkill]];
   const upgradeTo = getCap({
-    upgradeSkill, currentSkillLevel, amountToUpgrade, toMax,
+    upgradeSkill, currentSkillLevel, amountToUpgrade, toMax, dzenAmount,
   });
   const charismaLevel = Number(pip.charisma);
   const reachableDistance = Number(/\d*/.exec(reachableKm).pop());
-  const cap = skillsCap[skillMap[upgradeSkill]];
+  const skillName = skillMap[upgradeSkill];
+  const skillCap = skillsCap[skillName];
+  let dzenApplied = dzenAmount;
+  let additionalCaps = 0;
 
-  if (currentSkillLevel >= cap) {
-    return `Хей, похоже что ты прокачал этот скил полностью, может стоит занятся другим?
-Энивей, спасибо что воспользовался нашими услугами :3`;
+  if (upgradeTo >= constants.AVAILABLE_CAP) {
+    return 'Ух, я до таких показателей считать ещё не умею, прости :с';
+  }
+
+  if (!dzenAmount && upgradeTo > skillCap && upgradeTo < constants.AVAILABLE_CAP) {
+    if ((upgradeTo - skillCap) - currentDzen * 50 > 0) {
+      dzenApplied = Math.ceil((upgradeTo - skillCap) / 50);
+    }
+  }
+
+  if (dzenApplied) {
+    additionalCaps = dzenCost
+      .filter(({ level }) => level > currentDzen && level <= dzenApplied)
+      .map(level => level.caps).reduce((a, b) => a + b);
   }
 
   const calculations = {
@@ -238,13 +259,14 @@ const calculateUpgrade = ({
       charismaLevel,
       currentSkillLevel,
       upgradeTo,
-    ),
+    ) + additionalCaps,
     raidsInfo: calculateAmountOfRaids(
       reachableDistance,
       charismaLevel,
       currentSkillLevel,
       upgradeTo,
       upgradeSkill,
+      additionalCaps,
     ),
     amountSpentOnCharisma: calculateAmountSpentOnCharisma(charismaLevel),
   };
@@ -256,6 +278,7 @@ const calculateUpgrade = ({
 
   const displayTimeToFarm = timeToFarm === 0 ? (timeToTravel(pip.endurance, reachableDistance) * raidsAmount).toFixed(2) : timeToFarm;
 
+  const dzenText = dzenApplied ? `🏵 *Дзен*:\n<Учитывая ${additionalCaps}🕳 крышек для прокачки дзена с ${currentDzen} уровня до ${dzenApplied} уровня` : '';
 
   /*
     При самом удачном стечении обсоятельств тебе необходимо сделать примерно ${Math.ceil(calculations.raidsInfo.bestCaseScenario.amountOfRaids)} 👣 ходок:
@@ -273,7 +296,7 @@ const calculateUpgrade = ({
 _Всего ты потратил ${formatNubmer(spentOnSkill)} 🕳 крышек на ${upgradeSkill}_
 
 Необходимо потратить ${formatNubmer(calculations.amountToSpend)} 🕳 крышек для прокачки навыка \`${upgradeSkill}\` от ${currentSkillLevel} уровня до ${upgradeTo} уровня
-
+${dzenText}
 
 Тебе необходимо сделать примерно *${raidsAmount || '<1'} 👣 ходок*.
 
