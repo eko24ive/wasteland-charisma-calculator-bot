@@ -2148,28 +2148,28 @@ bot.on('/raids_text', msg => msg.reply.text(`
 
 bot.on('/upgradeSkill', (msg) => {
   const skillsToMax = msg.text === 'МАКСИМАЛОЧКА';
-  const [, dzenAmountString] = regexps.regexps.dzenRegExp.exec(msg.text);
-  const dzenAmount = Number(dzenAmountString);
 
-  if (!Number.isInteger(dzenAmount)) {
-    return msg.reply.text('Пожалуйста используй целое число для уровеня Дзена', {
-      asReply: true,
-    });
+  if (regexps.regexps.dzenRegExp.test(msg.text)) {
+    const [, dzenAmountString] = regexps.regexps.dzenRegExp.exec(msg.text);
+
+    const dzenAmount = Number(dzenAmountString);
+
+    if (!Number.isInteger(dzenAmount)) {
+      return msg.reply.text('Пожалуйста используй целое число для уровеня Дзена', {
+        asReply: true,
+      });
+    }
+
+    if (dzenAmount > 10) {
+      return msg.reply.text('Пожалуйста используй уровень Дзена до 10', {
+        asReply: true,
+      });
+    }
+
+    return getEffort(msg, false, dzenAmount);
   }
 
-  if (dzenAmount > 10) {
-    return msg.reply.text('Пожалуйста используй уровень Дзена до 10', {
-      asReply: true,
-    });
-  }
-
-  if (msg.text === 'МАКСИМАЛОЧКА') {
-    getEffort(msg, skillsToMax, dzenAmount);
-  } else {
-    getEffort(msg, skillsToMax, dzenAmount);
-  }
-
-  return null;
+  return getEffort(msg, skillsToMax, 0);
 });
 
 bot.on(['/journeyforwardstart', '/go'], async (msg) => {
