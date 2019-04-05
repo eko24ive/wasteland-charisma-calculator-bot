@@ -200,7 +200,7 @@ const routedBeastView = (Beast, seachParams, route = null, config) => new Promis
         if (materialsInformation === null) {
           reply += 'Нет данных о дропе материалов\n';
         } else {
-          reply += `📦${materialsInformation} крышек\n`;
+          reply += `📦${materialsInformation} материалов\n`;
         }
 
         return reply;
