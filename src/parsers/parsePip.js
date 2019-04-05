@@ -67,7 +67,11 @@ const parseSimple = (text) => {
   const [, name] = regexps.simpleNameRegExp.exec(text);
   const [, faction] = regexps.simpleFactionRegExp.exec(text);
   const [, damage] = regexps.simpleDamageRegExp.exec(text);
-  const [, dzens] = regexps.dzenRegExp.exec(text);
+  let dzens;
+
+  if (regexps.dzenRegExp.test(text)) {
+    [, dzens] = regexps.dzenRegExp.exec(text);
+  }
 
   let dzen = 0;
 

@@ -23,7 +23,7 @@ const simpleEnduranceRegExp = /🔋\d*\/(\d+)/;
 const simpleHungerRegExp = /🍗(\d+)%/;
 const simpleHealthRegExp = /❤️\d*\/(\d+)/;
 
-const dzenRegExp = /(🏵(\d+)|^🏵+$)/mu;
+const dzenRegExp = /(🏵(\d+)|🏵+$)/mu;
 
 const classicPip = {
   contains: [
