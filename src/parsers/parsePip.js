@@ -13,7 +13,13 @@ const parseClassic = (text) => {
   const [, health] = regexps.classicHealthRegExp.exec(text);
   const [, faction] = regexps.classicFactionRegExp.exec(text);
   const [, version] = regexps.classicVerisonRegExp.exec(text);
-  const [, dzens, dzensAmount] = regexps.dzenRegExp.exec(text);
+
+  let dzens;
+  let dzensAmount = 1;
+
+  if (regexps.dzenRegExp.test(text)) {
+    [, dzens, dzensAmount] = regexps.dzenRegExp.exec(text);
+  }
 
   let dzen = 0;
 
