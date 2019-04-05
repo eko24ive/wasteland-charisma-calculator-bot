@@ -3247,13 +3247,13 @@ const validateRange = (rangeToValidate, _from, _to) => {
   return rangeToValidate.filter(range => range[0] === from && range[1] === to).length === 1;
 };
 
-bot.on('text', (msg) => {
+bot.on('text', async (msg) => {
   const regularZoneBeastsRequestRegExp = /(\d+)-(\d+)/;
   const rangeRegExp = /(\d+)(-|—|--)(\d+)/;
 
 
   if (!rangeRegExp.test(msg.text)) {
-    return;
+    return null;
   }
 
   const range = regularZoneBeastsRequestRegExp.test(msg.text) ? ranges : dzRanges;
@@ -3262,14 +3262,14 @@ bot.on('text', (msg) => {
   const [, from,, to] = rangeRegExp.exec(msg.text);
 
   if (!validateRange(range, from, to)) {
-    msg.reply.text('Да, очень умно с твоей стороны. Начислил тебе <i>нихуя</i> 💎<b>Шмепселей</b> за смекалочку, а теперь иди нахуй и используй кнопки внизу.', {
+    return msg.reply.text('Да, очень умно с твоей стороны. Начислил тебе <i>нихуя</i> 💎<b>Шмепселей</b> за смекалочку, а теперь иди нахуй и используй кнопки внизу.', {
       parseMode: 'html',
     });
   }
 
   const beastType = regularZoneBeastsRequestRegExp.test(msg.text) ? 'Regular' : 'DarkZone';
 
-  Beast.find({
+  const beasts = await Beast.find({
     isDungeon: false,
     subType: 'regular',
     'distanceRange.value': {
@@ -3277,47 +3277,46 @@ bot.on('text', (msg) => {
       $lte: Number(to),
     },
     type: beastType,
-  }, 'battles.totalDamageReceived name id distanceRange').then((beasts) => {
-    const jsonBeasts = beasts.map((b) => {
-      const jsoned = b.toJSON();
+  }, 'battles.totalDamageReceived name id distanceRange');
+  const jsonBeasts = beasts.map((b) => {
+    const jsoned = b.toJSON();
 
-      return {
-        id: b.id,
-        ...jsoned,
-      };
-    });
+    return {
+      id: b.id,
+      ...jsoned,
+    };
+  });
 
-    const beastsByDamage = _.sortBy(jsonBeasts, v => v.battles.totalDamageReceived);
+  const beastsByDamage = _.sortBy(jsonBeasts, v => v.battles.totalDamageReceived);
 
-    const actualBeasts = beastsByDamage.filter(({ distanceRange }) => {
-      const actualRanges = distanceRange.filter(({ version }) => version === VERSION);
-      const deprecatedRanges = distanceRange.filter(({ version }) => version !== VERSION);
+  const actualBeasts = beastsByDamage.filter(({ distanceRange }) => {
+    const actualRanges = distanceRange.filter(({ version }) => version === VERSION);
+    const deprecatedRanges = distanceRange.filter(({ version }) => version !== VERSION);
 
-      const actualRangesFulfillGiven = actualRanges.every(({ value }) => value >= from && value <= to);
+    const actualRangesFulfillGiven = actualRanges.every(({ value }) => value >= from && value <= to);
 
-      if (actualRanges.length >= DATA_THRESHOLD) {
-        return actualRangesFulfillGiven;
-      } if (actualRanges.length <= DATA_THRESHOLD && deprecatedRanges.length > 0) {
-        return true;
-      }
+    if (actualRanges.length >= DATA_THRESHOLD) {
+      return actualRangesFulfillGiven;
+    } if (actualRanges.length <= DATA_THRESHOLD && deprecatedRanges.length > 0) {
+      return true;
+    }
 
-      return false;
-    });
+    return false;
+  });
 
-    const beastsList = actualBeasts.map(beast => `
+  const beastsList = actualBeasts.map(beast => `
 ${beast.name}
 /mob_${beast.id}`).join('\n');
 
-    const reply = `
+  const reply = `
 <b>Мобы(${beastType === 'DarkZone' ? '🚷' : '💀'}) на ${from}-${to}км</b>
 <i>Отсортированы от слабым к сильным</i>
 ${beastsList}
 `;
 
-    return msg.reply.text(reply, {
-      replyMarkup: beastType === 'DarkZone' ? beastRangesDarkZoneKeyboard : beastRangesKeyboard,
-      parseMode: 'html',
-    }).catch(e => console.log(e));
+  return msg.reply.text(reply, {
+    replyMarkup: beastType === 'DarkZone' ? beastRangesDarkZoneKeyboard : beastRangesKeyboard,
+    parseMode: 'html',
   }).catch(e => console.log(e));
 });
 
