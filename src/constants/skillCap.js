@@ -1,7 +1,7 @@
 module.exports = {
-  strength: 1340,
+  strength: 1300,
   precision: 1300,
-  agility: 1310,
-  health: 1645,
-  charisma: 1270,
+  agility: 1200,
+  health: 1550,
+  charisma: 1200,
 };
