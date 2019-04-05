@@ -253,7 +253,6 @@ if (process.env.ENV === 'LOCAL') {
 
   bot = new TeleBot({
     token,
-    usePlugins: ['namedButtons'],
     webhook: { url, host, port },
     pluginConfig: {
       namedButtons: {
@@ -261,6 +260,8 @@ if (process.env.ENV === 'LOCAL') {
       },
     },
   });
+
+  bot.plug(namedButtons);
 }
 
 const updateOrCreate = (msg, pip, cb = (() => {})) => {
