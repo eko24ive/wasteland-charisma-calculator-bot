@@ -298,7 +298,7 @@ const calculateUpgrade = ({
 
   const displayTimeToFarm = timeToFarm === 0 ? (timeToTravel(pip.endurance, reachableDistance) * raidsAmount).toFixed(2) : timeToFarm;
 
-  const dzenText = dzenApplied ? `🏵 *Дзен*:\nУчитывая ${formatNubmer(additionalCaps)} 🕳 крышек для прокачки дзена с ${currentDzen} уровня до ${dzenApplied} уровня` : '';
+  const dzenText = dzenApplied ? `\n🏵 *Дзен*:\nУчитывая ${formatNubmer(additionalCaps)} 🕳 крышек для прокачки дзена с ${currentDzen} уровня до ${dzenApplied} уровня` : '';
 
   /*
     При самом удачном стечении обсоятельств тебе необходимо сделать примерно ${Math.ceil(calculations.raidsInfo.bestCaseScenario.amountOfRaids)} 👣 ходок:
