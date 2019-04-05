@@ -186,12 +186,25 @@ const calculateSpentOnSkill = (
 };
 
 const getCap = ({
-  upgradeSkill, currentSkillLevel, amountToUpgrade, dzenAmount,
+  upgradeSkill,
+  currentSkillLevel,
+  amountToUpgrade,
+  dzenAmount,
+  toMax,
+  currentDzen,
 }) => {
   const skillName = skillMap[upgradeSkill];
 
   let upgradeTo = Number(currentSkillLevel) + Number(amountToUpgrade);
   let skillCap = skillsCap[skillName];
+
+  if (toMax) {
+    if (currentDzen === 0) {
+      return skillCap;
+    }
+
+    return skillCap + currentDzen * constants.DZEN_MODIFIER;
+  }
 
   if (dzenAmount) {
     skillCap += dzenAmount * constants.DZEN_MODIFIER;
@@ -217,7 +230,12 @@ const calculateUpgrade = ({
 }) => {
   const currentSkillLevel = pip[skillMap[upgradeSkill]];
   const upgradeTo = getCap({
-    upgradeSkill, currentSkillLevel, amountToUpgrade, toMax, dzenAmount,
+    upgradeSkill,
+    currentSkillLevel,
+    amountToUpgrade,
+    toMax,
+    dzenAmount,
+    currentDzen,
   });
   const charismaLevel = Number(pip.charisma);
   const reachableDistance = Number(/\d*/.exec(reachableKm).pop());
@@ -238,7 +256,9 @@ const calculateUpgrade = ({
 
   if (dzenApplied) {
     additionalCaps = dzenCost
-      .filter(({ level }) => level > currentDzen && level <= dzenApplied)
+      .filter(({
+        level,
+      }) => level > currentDzen && level <= dzenApplied)
       .map(level => level.caps).reduce((a, b) => a + b);
   }
 
@@ -278,7 +298,7 @@ const calculateUpgrade = ({
 
   const displayTimeToFarm = timeToFarm === 0 ? (timeToTravel(pip.endurance, reachableDistance) * raidsAmount).toFixed(2) : timeToFarm;
 
-  const dzenText = dzenApplied ? `🏵 *Дзен*:\nУчитывая ${additionalCaps}🕳 крышек для прокачки дзена с ${currentDzen} уровня до ${dzenApplied} уровня` : '';
+  const dzenText = dzenApplied ? `🏵 *Дзен*:\nУчитывая ${formatNubmer(additionalCaps)} 🕳 крышек для прокачки дзена с ${currentDzen} уровня до ${dzenApplied} уровня` : '';
 
   /*
     При самом удачном стечении обсоятельств тебе необходимо сделать примерно ${Math.ceil(calculations.raidsInfo.bestCaseScenario.amountOfRaids)} 👣 ходок:

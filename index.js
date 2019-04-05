@@ -2194,7 +2194,7 @@ bot.on(['/journeyforwardstart', '/go'], async (msg) => {
     resize: true,
   });
 
-  msg.reply.text(`
+  await msg.reply.text(`
 Хей, вижу ты хочешь поделиться со мной ценной информацией с пустоши - отлично!
 *Я принимаю следующую информацию*:
  - Бой с мобом
@@ -2205,7 +2205,9 @@ bot.on(['/journeyforwardstart', '/go'], async (msg) => {
     `, {
     replyMarkup,
     parseMode: 'markdown',
-  }).then(() => msg.reply.text(`
+  });
+
+  await msg.reply.text(`
 *Я умею работать с данными только за один круг/вылазку - больше одной вылазки я пока обработать не смогу :с*
 
 Пожалуйста убедись, что ты перешлёшь _все_ сообщения - Телеграм может немного притормаживать.
@@ -2213,7 +2215,7 @@ bot.on(['/journeyforwardstart', '/go'], async (msg) => {
             `, {
     replyMarkup: inlineReplyMarkup,
     parseMode: 'markdown',
-  })).catch(e => console.log(e));
+  });
 });
 
 
