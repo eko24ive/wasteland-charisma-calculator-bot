@@ -279,7 +279,7 @@ const calculateUpgrade = ({
       charismaLevel,
       currentSkillLevel,
       upgradeTo,
-    ) + additionalCaps,
+    ),
     raidsInfo: calculateAmountOfRaids(
       reachableDistance,
       charismaLevel,
@@ -298,8 +298,8 @@ const calculateUpgrade = ({
 
   const displayTimeToFarm = timeToFarm === 0 ? (timeToTravel(pip.endurance, reachableDistance) * raidsAmount).toFixed(2) : timeToFarm;
 
-  const dzenText = dzenApplied ? `\n🏵 *Дзен*:\nУчитывая ${formatNubmer(additionalCaps)} 🕳 крышек для прокачки дзена с ${currentDzen} уровня до ${dzenApplied} уровня` : '';
-
+  const dzenText = dzenApplied ? `\n🏵 *Дзен*:\n + ${formatNubmer(additionalCaps)} 🕳 крышек для прокачки дзена с ${currentDzen} уровня до ${dzenApplied} уровня` : '';
+  const totalText = dzenApplied ? `\n\nВсего: *${formatNubmer(calculations.amountToSpend + additionalCaps)}* 🕳 крышек для прокачки скила и Дзена` : '';
   /*
     При самом удачном стечении обсоятельств тебе необходимо сделать примерно ${Math.ceil(calculations.raidsInfo.bestCaseScenario.amountOfRaids)} 👣 ходок:
 За одну ходку ты получишь примерно:
@@ -316,7 +316,7 @@ const calculateUpgrade = ({
 _Всего ты потратил ${formatNubmer(spentOnSkill)} 🕳 крышек на ${upgradeSkill}_
 
 Необходимо потратить ${formatNubmer(calculations.amountToSpend)} 🕳 крышек для прокачки навыка \`${upgradeSkill}\` от ${currentSkillLevel} уровня до ${upgradeTo} уровня
-${dzenText}
+${dzenText}${totalText}
 
 Тебе необходимо сделать примерно *${raidsAmount || '<1'} 👣 ходок*.
 
