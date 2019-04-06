@@ -508,8 +508,16 @@ ${processedFlees.successFlees}
 ${processedFlees.failFlees}
 `;
 
+      let beastMarker;
+
+      if (beast.isDungeon) {
+        beastMarker = '📯';
+      } else {
+        beastMarker = beast.type === 'DarkZone' ? '🚷' : '💀';
+      }
+
       const headerReply = `<b>${beast.name}</b>
-👣${beast.type === 'DarkZone' ? '🚷' : '💀'} ${getDistanceRange(beast.distanceRange)}км ${getDeprecatedFlair(isRangeDeprecated, true, true)}
+👣${beastMarker} ${getDistanceRange(beast.distanceRange)}км ${getDeprecatedFlair(isRangeDeprecated, true, true)}
 /mob_${fBeast._id.toJSON()}
 `;
 

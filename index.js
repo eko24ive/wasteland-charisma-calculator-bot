@@ -51,7 +51,7 @@ const {
 const calculateUpgrade = require('./src/calculateUpgrade');
 const upgradeAmountValidation = require('./src/utils/upgradeAmountValidation');
 const processForwards = require('./src/utils/processForwards');
-const { ranges, dzRanges } = require('./src/utils/getRanges');
+const { ranges, dzRanges, dungeonRanges } = require('./src/utils/getRanges');
 const processMenu = require('./src/utils/processMenu');
 const validateForwardDate = require('./src/utils/validateForwardDate');
 const checkPips = require('./src/utils/comparePips');
@@ -3253,34 +3253,67 @@ const validateRange = (rangeToValidate, _from, _to) => {
 bot.on('text', async (msg) => {
   const regularZoneBeastsRequestRegExp = /(\d+)-(\d+)/;
   const rangeRegExp = /(\d+)(-|—|--)(\d+)/;
+  const dungeonRegExp = /=(\d+)=/;
 
+  let beastType;
+  let range;
+  let from;
+  let to;
+  let searchParams;
+  let mobMarker;
 
-  if (!rangeRegExp.test(msg.text)) {
+  if (!rangeRegExp.test(msg.text) && !dungeonRegExp.test(msg.text)) {
     return null;
   }
 
-  const range = regularZoneBeastsRequestRegExp.test(msg.text) ? ranges : dzRanges;
+  if (dungeonRegExp.test(msg.text)) {
+    if (process.env.ENV === 'STAGING' || process.env.ENV === 'LOCAL') {
+      range = dungeonRanges;
+      [, from] = dungeonRegExp.exec(msg.text);
 
+      if (dungeonRanges.indexOf(Number(from)) === -1) {
+        return msg.reply.text('Нет данжа на этом километре', {
+          asReply: true,
+        });
+      }
 
-  const [, from,, to] = rangeRegExp.exec(msg.text);
+      to = from;
 
-  if (!validateRange(range, from, to)) {
-    return msg.reply.text('Да, очень умно с твоей стороны. Начислил тебе <i>нихуя</i> 💎<b>Шмепселей</b> за смекалочку, а теперь иди нахуй и используй кнопки внизу.', {
-      parseMode: 'html',
-    });
+      searchParams = {
+        isDungeon: true,
+        subType: 'regular',
+        'distanceRange.value': Number(from),
+      };
+      mobMarker = '📯';
+    } else {
+      return null;
+    }
+  } else {
+    range = regularZoneBeastsRequestRegExp.test(msg.text) ? ranges : dzRanges;
+
+    [, from,, to] = rangeRegExp.exec(msg.text);
+
+    if (!validateRange(range, from, to)) {
+      return msg.reply.text('Да, очень умно с твоей стороны. Начислил тебе <i>нихуя</i> 💎<b>Шмепселей</b> за смекалочку, а теперь иди нахуй и используй кнопки внизу.', {
+        parseMode: 'html',
+      });
+    }
+
+    beastType = regularZoneBeastsRequestRegExp.test(msg.text) ? 'Regular' : 'DarkZone';
+    mobMarker = regularZoneBeastsRequestRegExp.test(msg.text) ? '💀' : '🚷';
+
+    searchParams = {
+      isDungeon: false,
+      subType: 'regular',
+      'distanceRange.value': {
+        $gte: Number(from),
+        $lte: Number(to),
+      },
+      type: beastType,
+    };
   }
 
-  const beastType = regularZoneBeastsRequestRegExp.test(msg.text) ? 'Regular' : 'DarkZone';
-
-  const beasts = await Beast.find({
-    isDungeon: false,
-    subType: 'regular',
-    'distanceRange.value': {
-      $gte: Number(from),
-      $lte: Number(to),
-    },
-    type: beastType,
-  }, 'battles.totalDamageReceived name id distanceRange');
+  const beasts = await Beast.find(searchParams, 'battles.totalDamageReceived name id distanceRange');
   const jsonBeasts = beasts.map((b) => {
     const jsoned = b.toJSON();
 
@@ -3312,7 +3345,7 @@ ${beast.name}
 /mob_${beast.id}`).join('\n');
 
   const reply = `
-<b>Мобы(${beastType === 'DarkZone' ? '🚷' : '💀'}) на ${from}-${to}км</b>
+<b>Мобы(${mobMarker}) на ${from}-${to}км</b>
 <i>Отсортированы от слабым к сильным</i>
 ${beastsList}
 `;
@@ -3321,39 +3354,6 @@ ${beastsList}
     replyMarkup: beastType === 'DarkZone' ? beastRangesDarkZoneKeyboard : beastRangesKeyboard,
     parseMode: 'html',
   }).catch(e => console.log(e));
-});
-
-bot.on('/d', (msg) => {
-  if (process.env.ENV === 'STAGING' || process.env.ENV === 'LOCAL') {
-    Beast.find({
-      isDungeon: true,
-    }, 'battles.totalDamageReceived name id').then((beasts) => {
-      const jsonBeasts = beasts.map((b) => {
-        const jsoned = b.toJSON();
-
-        return {
-          id: b.id,
-          ...jsoned,
-        };
-      });
-
-      const beastsByDamage = _.sortBy(jsonBeasts, v => v.battles.totalDamageReceived);
-
-      const beastsList = beastsByDamage.map(beast => `
-${beast.name}
-/mob_${beast.id}`).join('\n');
-
-      const reply = `
-<b>Данжевые мобы</b>
-<i>Отсортированы от слабым к сильным</i>
-${beastsList}
-`;
-
-      return msg.reply.text(reply, {
-        parseMode: 'html',
-      }).catch(e => console.log(e));
-    }).catch(e => console.log(e));
-  }
 });
 
 bot.on('/show_encyclopedia', async (msg) => {
