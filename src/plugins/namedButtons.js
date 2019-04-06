@@ -1,3 +1,5 @@
+const typingAction = require('../utils/typingAcion');
+
 module.exports = {
   id: 'namedButtons',
   defaultConfig: {
@@ -7,7 +9,9 @@ module.exports = {
   plugin(bot, pluginConfig) {
     const buttons = pluginConfig.buttons || {};
 
-    bot.on('text', (msg, props) => {
+    bot.on('text', async (msg, props) => {
+      await typingAction(bot, msg.from.id);
+
       const { text } = msg;
       Object.keys(buttons).forEach((key) => {
         const {
