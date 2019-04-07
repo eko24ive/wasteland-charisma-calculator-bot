@@ -1,8 +1,9 @@
 {
     "rules": {
-        "max-len": "warn",
+        "max-len": "off",
+        "no-console": "off",
+        "no-underscore-dangle": "off",
         "linebreak-style":"warn",
-        "no-underscore-dangle":"warn",
         "no-param-reassign": [2, { "props": false }],
         "no-useless-escape":"warn"
     },

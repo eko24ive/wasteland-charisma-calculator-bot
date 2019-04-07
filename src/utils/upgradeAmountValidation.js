@@ -1,17 +1,14 @@
-const upgradeAmountValidation = (pip, skillToUpgrade, upgradeAmount, cap) => {
-  const skillMap = {
-    '❤ Живучесть': 'health',
-    '💪 Сила': 'strength',
-    '🔫 Меткость': 'precision',
-    '🗣 Харизма': 'charisma',
-    '🤸‍♀️ Ловкость': 'agility',
-  };
+const skillMap = require('../constants/skillMap');
+const { AVAILABLE_CAP } = require('../constants/constants');
 
-  const currentSkillLevel = pip[skillMap[skillToUpgrade]];
+const upgradeAmountValidation = ({
+  pip, skillToUpgrade, upgradeAmount,
+}) => {
+  const skill = skillMap[skillToUpgrade];
+  const currentSkillLevel = pip[skill];
   const upgradedSkillLevel = currentSkillLevel + upgradeAmount;
 
-  return upgradedSkillLevel < cap;
+  return upgradedSkillLevel < AVAILABLE_CAP;
 };
-
 
 module.exports = upgradeAmountValidation;

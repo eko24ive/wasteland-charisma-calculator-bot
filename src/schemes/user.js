@@ -27,6 +27,7 @@ const userSchema = Schema({
     damage: Number,
     armor: Number,
     timeStamp: Number,
+    dzen: Number,
   },
   points: {
     score: {
@@ -73,6 +74,18 @@ const userSchema = Schema({
       damage: Number,
       armor: Number,
       timeStamp: Number,
+      dzen: Number,
+    }],
+  },
+  settings: {
+    buttonsAmount: Number,
+    buttonsIconsMode: Boolean,
+    buttons: [{
+      index: Number,
+      name: String,
+      state: String,
+      label: String,
+      order: Number,
     }],
   },
 }, {

@@ -378,10 +378,26 @@ const dzRanges = [
   [61, 64],
   [75,78],
   [79,84],
-[85,89]
+  [85,89]
+]
+
+const dungeonRanges = [
+  11,
+  19,
+  23,
+  29,
+  34,
+  39,
+  45,
+  50,
+  56,
+  69,
+  74,
+  80,
 ]
 
 module.exports = {
   ranges,
-  dzRanges
+  dzRanges,
+  dungeonRanges,
 };

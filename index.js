@@ -1,5 +1,3 @@
-// TODO: Supply it with pip from database (with appropriate validation just like from the processForwards)
-
 process.on('unhandledRejection', (reason) => {
   console.log('Unhandled Rejection at:', reason.stack || reason);
 });
@@ -20,6 +18,8 @@ const objectDeepSearch = require('object-deep-search');
 
 const config = require('./package.json');
 
+const namedButtons = require('./src/plugins/namedButtons');
+
 const forwardPoints = require('./src/constants/forwardPoints');
 
 const regexps = require('./src/regexp/regexp');
@@ -30,6 +30,8 @@ const locationSchema = require('./src/schemes/location');
 const giantScheme = require('./src/schemes/giant');
 const userSchema = require('./src/schemes/user');
 const journeySchema = require('./src/schemes/journey');
+
+const userDefaults = require('./src/schemes/defaults/user');
 
 const chartGeneration = require('./src/utils/chartGeneration');
 
@@ -49,15 +51,22 @@ const {
 const calculateUpgrade = require('./src/calculateUpgrade');
 const upgradeAmountValidation = require('./src/utils/upgradeAmountValidation');
 const processForwards = require('./src/utils/processForwards');
-const { ranges, dzRanges } = require('./src/utils/getRanges');
+const { ranges, dzRanges, dungeonRanges } = require('./src/utils/getRanges');
 const processMenu = require('./src/utils/processMenu');
 const validateForwardDate = require('./src/utils/validateForwardDate');
+const checkPips = require('./src/utils/comparePips');
+const getButtonDescriptions = require('./src/utils/getButtonDescriptions');
 
 const routedBeastView = require('./src/views/routedBeastView');
 const routedBattleView = require('./src/views/routedBattleView');
 
 const equipmentMenu = require('./src/staticMenus/equipmentMenu');
-const locationsMenu = require('./src/staticMenus/locationsMenu');
+const {
+  locationsMenu,
+  locationsAll,
+  locationsRaid,
+  locationsDungeon,
+} = require('./src/staticMenus/locationsMenu');
 const suppliesMenu = require('./src/staticMenus/suppliesMenu');
 const achievementsMenu = require('./src/staticMenus/achievementsMenu');
 const dungeonMenu = require('./src/staticMenus/dungeonMenu');
@@ -69,8 +78,6 @@ const {
 const withBackButton = require('./src/utils/withBackButton');
 
 const UserManager = require('./src/database/userManager');
-
-const signedBeasts = require('./src/database/beasts_signed.json');
 
 mongoose.connect(uristring);
 
@@ -99,6 +106,7 @@ const WAIT_FOR_START = 'WAIT_FOR_START';
 const WAIT_FOR_PIP_FORWARD = 'WAIT_FOR_PIP_FORWARD';
 const WAIT_FOR_DATA_VALIDATION = 'WAIT_FOR_DATA_VALIDATION';
 const WAIT_FOR_DATA_TO_PROCESS = 'WAIT_FOR_DATA_TO_PROCESS';
+const WAIT_FOR_BUTTONS_AMOUNT = 'WAIT_FOR_BUTTONS_AMOUNT';
 
 const states = {
   WAIT_FOR_SKILL,
@@ -110,11 +118,81 @@ const states = {
   WAIT_FOR_PIP_FORWARD,
   WAIT_FOR_DATA_VALIDATION,
   WAIT_FOR_DATA_TO_PROCESS,
+  WAIT_FOR_BUTTONS_AMOUNT,
 };
 
-const createSession = (id) => {
-  sessions[id] = {
-    pip: null,
+const emojiRegex = /[\u{1f300}-\u{1f5ff}\u{1f900}-\u{1f9ff}\u{1f600}-\u{1f64f}\u{1f680}-\u{1f6ff}\u{2600}-\u{26ff}\u{2700}-\u{27bf}\u{1f1e6}-\u{1f1ff}\u{1f191}-\u{1f251}\u{1f004}\u{1f0cf}\u{1f170}-\u{1f171}\u{1f17e}-\u{1f17f}\u{1f18e}\u{3030}\u{2b50}\u{2b55}\u{2934}-\u{2935}\u{2b05}-\u{2b07}\u{2b1b}-\u{2b1c}\u{3297}\u{3299}\u{303d}\u{00a9}\u{00ae}\u{2122}\u{23f3}\u{24c2}\u{23e9}-\u{23ef}\u{25b6}\u{23f8}-\u{23fa}]/u;
+
+const getKeyboard = (data) => {
+  const filteredButtons = data.buttons.filter(({ label, state }) => label !== buttons.showSettings.label && state === 'true');
+  const sortedButons = _.sortBy(filteredButtons, ({ order }) => order);
+  let labeledButtons = sortedButons.map(({ label }) => label);
+
+  if (data.buttonsIconsMode) {
+    labeledButtons = labeledButtons.map((label) => {
+      const [emoji] = emojiRegex.exec(label);
+
+      return emoji || label;
+    });
+  }
+
+  const keyboard = [
+    ..._.chunk(labeledButtons, data.buttonsAmount),
+    [
+      buttons.showSettings.label,
+    ],
+  ];
+
+  return keyboard;
+};
+
+const getEncyclopediaKeyboard = (data) => {
+  const filteredButtons = data.buttons.filter(({ label, state }) => label !== buttons.showSettings.label && label !== buttons.showEncyclopedia.label && state === 'false');
+  const sortedButons = _.sortBy(filteredButtons, ({ order }) => order);
+  let labeledButtons = sortedButons.map(({ label }) => label);
+
+  if (data.buttonsIconsMode) {
+    labeledButtons = labeledButtons.map((label) => {
+      const [emoji] = emojiRegex.exec(label);
+
+      return emoji || label;
+    });
+  }
+
+  const keyboard = [
+    ..._.chunk(labeledButtons, data.buttonsAmount),
+  ];
+
+  return keyboard;
+};
+
+const updateKeyboard = async (msg) => {
+  const { id } = msg.from;
+  const telegramData = {
+    first_name: msg.from.first_name,
+    id: msg.from.id,
+    username: msg.from.username,
+  };
+
+  const { data } = await userManager.getOrCreateSettings({ id, telegramData });
+
+  sessions[msg.from.id].keyboard = getKeyboard(data);
+  sessions[msg.from.id].encyclopediaKeyboard = getEncyclopediaKeyboard(data);
+};
+
+const createSession = async (msg) => {
+  const { id } = msg.from;
+  const telegramData = {
+    first_name: msg.from.first_name,
+    id: msg.from.id,
+    username: msg.from.username,
+  };
+
+  const { data } = await userManager.getOrCreateSettings({ id, telegramData });
+  const userPip = await userManager.findByTelegramId(id);
+
+  const sessionObject = {
+    pip: userPip.ok ? userPip.data.pip : null,
     state: states.WAIT_FOR_START,
     data: [],
     processDataConfig: {
@@ -126,35 +204,51 @@ const createSession = (id) => {
     initialForwardDate: null,
     lastForwardDate: null,
     firstForwardDate: null,
+    settings: data,
+    keyboard: getKeyboard(data),
+    encyclopediaKeyboard: getEncyclopediaKeyboard(data),
+    buttonsAmount: data.buttonsAmount,
   };
+
+  sessions[msg.from.id] = sessionObject;
+
+  return sessionObject;
 };
 
-const getToken = () => {
-  if (program.dev) {
-    console.log('RUNNING IN TEST MODE');
-    return process.env.BOT_TOKEN_TEST;
-  } if (program.prod) {
-    console.log('RUNNING IN PRODUCTION MODE');
-    return process.env.BOT_TOKEN;
-  }
+let bot;
 
-  throw new Error('Please, specify bot token mode "--dev" for development and "--prod" production');
-};
-
-const bot = new TeleBot({
-  token: getToken(),
-  usePlugins: ['namedButtons'],
-  polling: {
-    interval: 100, // How often check updates (in ms).
-    limit: 500, // Limits the number of updates to be retrieved.
-    retryTimeout: 1000, // Reconne   cting timeout (in ms).
-  },
-  pluginConfig: {
-    namedButtons: {
-      buttons,
+if (process.env.ENV === 'LOCAL') {
+  bot = new TeleBot({
+    token: process.env.BOT_TOKEN,
+    polling: {
+      interval: 0,
     },
-  },
-});
+    pluginConfig: {
+      namedButtons: {
+        buttons,
+      },
+    },
+  });
+
+  bot.plug(namedButtons);
+} else {
+  const token = process.env.BOT_TOKEN;
+  const host = '0.0.0.0';
+  const port = process.env.PORT;
+  const url = process.env.BOT_WEBHOOK_URL;
+
+  bot = new TeleBot({
+    token,
+    webhook: { url, host, port },
+    pluginConfig: {
+      namedButtons: {
+        buttons,
+      },
+    },
+  });
+
+  bot.plug(namedButtons);
+}
 
 const updateOrCreate = (msg, pip, cb = (() => {})) => {
   const telegramData = {
@@ -166,11 +260,11 @@ const updateOrCreate = (msg, pip, cb = (() => {})) => {
   const pipData = { ...pip, timeStamp: pip.date };
 
   userManager.findByTelegramId(msg.from.id).then((result) => {
-    if (result.ok === false && result.reason === 'USER_NOT_FOUND') {
+    if (!result.ok && result.reason === 'USER_NOT_FOUND') {
       userManager.create({ telegramData, pipData }).then((createResult) => {
         cb(createResult);
       });
-    } else if (result.ok === true && result.reason === 'USER_FOUND') {
+    } else if ((result.ok === true && result.reason === 'USER_FOUND') || (!result.ok && result.reason === 'PIP_IS_EMPTY')) {
       userManager.update({ telegramData, pipData }).then((updateResult) => {
         cb(updateResult);
       });
@@ -185,13 +279,13 @@ const findPip = (msg, cb) => {
 };
 
 const askAmountOfLevels = (msg) => {
-  const replyMarkup = bot.keyboard([
+  const { pip } = sessions[msg.from.id];
+
+  let amountsBoard = [
     [
       buttons.amountOfLevelsTen.label,
       buttons.amountOfLevelsTwenty.label,
       buttons.amountOfLevelsThirty.label,
-    ],
-    [
       buttons.amountOfLevelsFourty.label,
       buttons.amountOfLevelsFifty.label,
       buttons.amountOfLevelsSixty.label,
@@ -199,13 +293,44 @@ const askAmountOfLevels = (msg) => {
     [
       buttons.amountOfLevelsMAX.label,
     ],
-  ], {
+  ];
+
+  if (pip) {
+    if (pip.dzen > 0) {
+      const dzenButtons = [];
+
+      for (let index = pip.dzen + 1; index < 11; index += 1) {
+        dzenButtons.push(index);
+      }
+
+      amountsBoard = [
+        [
+          buttons.amountOfLevelsFourty.label,
+          buttons.amountOfLevelsFifty.label,
+          buttons.amountOfLevelsSixty.label,
+        ],
+        dzenButtons.slice(0, 3).map(button => `Дзен ${button}`),
+        [
+          buttons.amountOfLevelsMAX.label,
+        ],
+      ];
+    }
+  }
+
+  const replyMarkup = bot.keyboard(amountsBoard, {
     resize: true,
   });
 
   return msg.reply.text(`
-Выбери на сколько уровней ты хочешь прокачать *${sessions[msg.from.id].upgradeSkill}*
+Выбери на сколько ты хочешь прокачать *${sessions[msg.from.id].upgradeSkill}*
 \`Либо напиши своё количество (например: 17)\`
+Если ты введёшь количество прокачки уровня, которое выходит за обычный кап - бот посчитает тебя с Дзеном.
+
+Нажми кнопку Дзена что бы прокачать *${sessions[msg.from.id].upgradeSkill}* до капа указанного Дзена.
+Либо введи нужный тебе дзен, например \`Дзен 5\`
+Введённый уровень дзена не должен превышать 10.
+
+\`МАКСИМАЛОЧКА\` посчитает затраты до прокачки до капа текущего Дзена.
 `, {
     replyMarkup,
     parseMode: 'markdown',
@@ -241,28 +366,43 @@ const askReachableKm = (msg) => {
   });
 };
 
+const defaultKeyboard = async (msg) => {
+  if (sessions[msg.from.id]) {
+    if (sessions[msg.from.id].keyboard) {
+      return bot.keyboard(sessions[msg.from.id].keyboard, {
+        resize: true,
+      });
+    }
 
-const defaultKeyboard = bot.keyboard([
-  [
-    buttons.journeyForwardStart.label,
-    buttons.skillUpgrade.label,
-    buttons.showEncyclopedia.label,
-  ],
-  [
-    buttons.showRegularBeasts.label,
-    buttons.showDarkZoneBeasts.label,
-    buttons.showGiants.label,
-  ],
-  [
-    buttons.hallOfFame.label,
-    buttons.showHelp.label,
-  ],
-], {
-  resize: true,
-});
+    await updateKeyboard(msg);
+    return bot.keyboard(sessions[msg.from.id].keyboard, {
+      resize: true,
+    });
+  }
 
-const getEffort = (msg, toMax = false) => {
-  if (sessions[msg.from.id].state === states.WAIT_FOR_START) {
+  await createSession(msg);
+  return bot.keyboard(sessions[msg.from.id].keyboard, {
+    resize: true,
+  });
+};
+
+
+const encyclopediaKeyboard = async (msg) => {
+  if (sessions[msg.from.id]) {
+    if (sessions[msg.from.id].encyclopediaKeyboard) {
+      return sessions[msg.from.id].encyclopediaKeyboard;
+    }
+
+    await updateKeyboard(msg);
+    return sessions[msg.from.id].encyclopediaKeyboard;
+  }
+
+  await createSession(msg);
+  return sessions[msg.from.id].encyclopediaKeyboard;
+};
+
+const getEffort = async (msg, toMax = false, dzenAmount = 0) => {
+  if (sessions[msg.from.id].state !== states.WAIT_FOR_LEVELS) {
     return false;
   }
 
@@ -270,33 +410,24 @@ const getEffort = (msg, toMax = false) => {
 
   sessions[msg.from.id].amountToUpgrade = toMax || msg.text;
 
-  const effort = calculateUpgrade(sessions[msg.from.id], { toMax });
+  const effort = calculateUpgrade(sessions[msg.from.id], {
+    toMax,
+    dzenAmount,
+    currentDzen: sessions[msg.from.id].pip.dzen,
+  });
+
   const { pip } = sessions[msg.from.id];
 
 
   console.log(`[SKILL UPGRADE]: ${pip.faction} | ${pip.name} | ${msg.from.username}`);
 
-  createSession(msg.from.id);
+  await createSession(msg);
 
   return msg.reply.text(effort, {
-    replyMarkup: defaultKeyboard,
+    replyMarkup: await defaultKeyboard(msg),
     parseMode: 'markdown',
   });
 };
-
-const encyclopediaKeyboard = [
-  [
-
-    buttons.showEquipment.label,
-    buttons.showSupplies.label,
-    buttons.showDrones.label,
-  ],
-  [
-    buttons.showDungeons.label,
-    buttons.showLocations.label,
-    buttons.showAchievments.label,
-  ],
-];
 
 const toGameKeyboard = bot.inlineKeyboard([
   [
@@ -320,9 +451,10 @@ const getBeastKeyboard = beastId => bot.inlineKeyboard([
   ],
 ]);
 
+bot.on(['/start', '/help'], async (msg) => {
+  await createSession(msg);
 
-bot.on(['/start', '/help'], (msg) => {
-  createSession(msg.from.id);
+  const descriptions = getButtonDescriptions(sessions[msg.from.id].settings.buttons, 'start');
 
   return msg.reply.text(
     `
@@ -330,19 +462,7 @@ bot.on(['/start', '/help'], (msg) => {
 
 ⬦ Если хочешь посмотреть что я знаю о мобе которого ты встретил - скинь форвард встречи с ним.
 
-<code>[🏃СкинутьЛог]</code> - Запуск режима "ЛОГ". В этом режиме ты можешь переслать сюда сообщения от игрового бота. Также этот режим ты можешь запустить если отправишь боту комманду <b>/go</b>
-
-<code>[🎓Скилокчтр]</code> - Запуск «<b>Скилокачатора</b>» - анализатора в прокачке твоих скилов
-
-<code>[📔Энциклпдия]</code> - Полезная информация о мире пустоши, и что в нём можно сделать/получить
-
-<code>[💀Мобы]</code> - Информация об <b>обычных</b> мобах
-
-<code>[🚷Мобы ТЗ]</code> - Информация о мобах из <b>Тёмной Зоны</b>
-
-<code>[🦂Гиганты]</code> - Состояние гигантов
-
-<code>[🏆Зал Славы]</code> - Благодарности всем тем кто когда-либо оказалась поддержку в работе над ботом
+${descriptions}
 
 
 КАНАЛ С НОВОСТЯМИ @wwAssistantBotNews
@@ -350,7 +470,7 @@ bot.on(['/start', '/help'], (msg) => {
 
 <i>Учти, что я ещё нахожусь в бета-режиме, и иногда ты можешь наткнуться на большие и маленькие баги.</i>
         `, {
-      replyMarkup: defaultKeyboard,
+      replyMarkup: await defaultKeyboard(msg),
       parseMode: 'html',
       webPreview: false,
     },
@@ -451,23 +571,7 @@ const actualActualProcessUserData = (msg, reportData, updatesData, options) => {
     flees: 0,
   };
 
-  /* console.log({
-          reportData,
-          updatesData,
-          telegram: {
-              id: msg.from.id,
-              firstName: msg.from.first_name,
-              userName: msg.from.username
-          }
-      }); */
-
-  try {
-    console.log(`[USAGE]: ${reportData.lastPip.faction} | ${reportData.lastPip.name} | ${msg.from.username}`);
-  } catch (e) {
-    // return false;
-  }
-
-  const isBeastUnderValidation = name => reportData.beastsToValidate.filter(beast => beast.name === name).length > 0;
+  console.log(`[USAGE]: ${reportData.lastPip && reportData.lastPip.faction} | ${reportData.lastPip && reportData.lastPip.name} | ${msg.from.username}`);
 
   const signEntryWithVersion = entry => ({
     ...entry,
@@ -912,7 +1016,7 @@ const actualActualProcessUserData = (msg, reportData, updatesData, options) => {
         processBeasts(),
         processLocations(),
         saveJourney(),
-      ]).then(() => {
+      ]).then(async () => {
         let errors = '';
         let dupesText = '';
         let reply;
@@ -929,15 +1033,12 @@ const actualActualProcessUserData = (msg, reportData, updatesData, options) => {
         if (dataProcessed > 0 && userForwardPoints > 0) {
           // TODO: Move out shit to strings
           // TODO: Implement meaningfull report data regarding found usefull data
-          createSession(msg.from.id);
+          await createSession(msg);
 
-          // setTimeout(() => {
           if (options.silent) {
             reply = `
         Спасибо за форвард. Я перевёл ${userForwardPoints.toFixed(1)} 💎*Шмепселей* на твой счёт.\n_${dupesText}_`;
           } else {
-            // Всего я насчитал ${dataProcessed} данных!
-
             reply = `Фух, я со всём справился - спасибо тебе огромное за информацию!
 
 Ты заработал ${userForwardPoints.toFixed(1)} 💎*Шмепселей* за свои форварды!
@@ -947,34 +1048,36 @@ ${errors}
 Если ты чего-то забыл докинуть - смело жми на \`[Скинуть лог 🏃]\` и _докидывай_`;
           }
 
+          const telegramData = {
+            first_name: msg.from.first_name,
+            id: msg.from.id,
+            username: msg.from.username,
+          };
+
+          await userManager.addPoints({ id: msg.from.id, telegramData, points: userForwardPoints });
+
           msg.reply.text(reply, {
-            replyMarkup: defaultKeyboard,
+            replyMarkup: await defaultKeyboard(msg),
             parseMode: 'markdown',
             asReply: options.silent,
-          }).then(() => {
-            userManager.addPoints(msg.from.id, userForwardPoints).then((result) => {
-              if (!result.ok) {
-                if (result.reason === 'USER_NOT_FOUND') {
-                  msg.reply.text('Не могу начислить тебе шмепсели пока ты не скинешь мне свой пип-бой :с');
-                }
-                console.log(`userManager.addPoints: ${JSON.stringify(result)}`);
-              }
-            });
           }).catch(e => console.log(e));
-          // }, 1500);
         } else {
-          // setTimeout(() => {
-          createSession(msg.from.id);
+          await createSession(msg);
+          if (reportData.errors.length > 0) {
+            errors = `*Также я заметил такие вещи*:
+${reportData.errors.join('\n')}`;
+          }
+
           return msg.reply.text(`
-        К сожалению я не смог узнать ничего нового из твоих форвардов :с${dupesText ? `\n\n_${dupesText}_` : ''}`, {
-            replyMarkup: defaultKeyboard,
+К сожалению я не смог узнать ничего нового из твоих форвардов :с
+
+${errors}`, {
+            replyMarkup: await defaultKeyboard(msg),
             parseMode: 'markdown',
           });
-          // }, 1500);
         }
 
-        // FIXME: COULD BE AN ISSUE
-        // sessions[msg.from.id].state = states.WAIT_FOR_DATA_VALIDATION;
+        return null;
       }).catch(e => console.log(e));
     },
     () => {
@@ -1008,21 +1111,44 @@ const actualProcessUserData = (msg, reportData, updatesData, options) => {
   }
 };
 
-const processUserData = (msg, options) => {
+const databasePipCheck = async (msg, pips) => new Promise((resolve) => {
+  findPip(msg, (result) => {
+    if (result.ok) {
+      const { pip } = result.data;
+
+      return resolve(checkPips([{ data: pip }, ...pips]));
+    }
+
+    return resolve(true);
+  });
+});
+
+const processUserData = async (msg, options, processConfig = {
+  omitPipError: false,
+}) => {
   sessions[msg.from.id].state = states.WAIT_FOR_DATA_TO_PROCESS;
 
   const {
     data,
   } = sessions[msg.from.id];
 
+  const isPipsFraudless = await databasePipCheck(msg, data.filter(entry => entry.dataType === 'pipboy'));
+
+  if (!isPipsFraudless) {
+    return msg.reply.text('<b>❌ЗАМЕЧЕНА КРИТИЧЕСКАЯ ОШИБКА❌</b>\n\nПохоже что ты скидывал пип-бой, который тебе не пренадлежит\n\n<i>Форварды были отменены.</i>', {
+      replyMarkup: await defaultKeyboard(msg),
+      parseMode: 'html',
+    });
+  }
+
   let {
     reportData,
     updatesData,
-  } = processForwards(data, msg.from.id || moment.now());
+  } = processForwards(data, msg.from.id || moment.now(), processConfig);
 
   if (reportData.criticalError) {
     return msg.reply.text(`<b>❌ЗАМЕЧЕНА КРИТИЧЕСКАЯ ОШИБКА❌</b>\n\n${reportData.criticalError}\n\n<i>Форварды были отменены.</i>`, {
-      replyMarkup: defaultKeyboard,
+      replyMarkup: await defaultKeyboard(msg),
       parseMode: 'html',
     });
   }
@@ -1043,16 +1169,25 @@ const processUserData = (msg, options) => {
 
 
   if (updatesData.locations.length === 0 && updatesData.beasts.length === 0) {
-    createSession(msg.from.id);
+    let errors = '';
+
+    await createSession(msg);
+    if (reportData.errors.length > 0) {
+      errors = `*Также я заметил такие вещи*:
+${reportData.errors.join('\n')}`;
+    }
+
     return msg.reply.text(`
-  К сожалению я не смог узнать ничего нового из твоих форвардов :с`, {
-      replyMarkup: defaultKeyboard,
+К сожалению я не смог узнать ничего нового из твоих форвардов :с
+
+${errors}`, {
+      replyMarkup: await defaultKeyboard(msg),
       parseMode: 'markdown',
     });
   }
 
   if (options.usePip && reportData.pipRequired) {
-    userManager.findByTelegramId(msg.from.id).then((result) => {
+    userManager.findByTelegramId(msg.from.id).then(async (result) => {
       if (result.ok && result.reason === 'USER_FOUND') {
         if (result.data.pip !== undefined) {
           sessions[msg.from.id].data.push({
@@ -1083,9 +1218,9 @@ const processUserData = (msg, options) => {
             replyMarkup: toGameKeyboard,
           });
         } if (reportDataWithUserPip.criticalError && !reportDataWithUserPip.couldBeUpdated) {
-          createSession(msg.from.id);
+          await createSession(msg);
           return msg.reply.text('Твой пип не соответсвуют твоим статам из форвардов!\nПрости, я вынужден отменить твои форварды.', {
-            replyMarkup: defaultKeyboard,
+            replyMarkup: await defaultKeyboard(msg),
           });
         }
         updatesData = updatesDataWithUserPip;
@@ -1109,7 +1244,6 @@ const processUserData = (msg, options) => {
     }).catch(e => console.log(e));
   } else {
     userManager.findByTelegramId(msg.from.id).then((result) => {
-      // BOOK
       if (result.ok && result.reason === 'USER_FOUND') {
         actualProcessUserData(msg, reportData, updatesData, options);
       } else {
@@ -1121,24 +1255,22 @@ const processUserData = (msg, options) => {
   return false;
 };
 
-bot.on('forward', (msg) => {
+bot.on('forward', async (msg) => {
   if (sessions[msg.from.id] === undefined) {
-    createSession(msg.from.id);
+    await createSession(msg);
   }
 
-  if (msg.forward_from.id !== 430930191) {
-    if (sessions[msg.from.id].state !== states.WAIT_FOR_FORWARD_END) {
-      console.log(`[CULPRIT]: ${msg.from.id} | ${msg.from.first_name} | ${msg.from.username}`);
+  if (msg.forward_from.id !== 430930191 && sessions[msg.from.id].state !== states.WAIT_FOR_FORWARD_END) {
+    console.log(`[CULPRIT]: ${msg.from.id} | ${msg.from.first_name} | ${msg.from.username}`);
 
-      // createSession(msg.from.id);
+    // await createSession(msg);
 
-      return msg.reply.text(`
+    return msg.reply.text(`
 Форварды принимаються только от @WastelandWarsBot.
             `, {
-        asReply: true,
-        replyMarkup: defaultKeyboard,
-      });
-    }
+      asReply: true,
+      replyMarkup: await defaultKeyboard(msg),
+    });
   }
 
   if (!validateForwardDate(msg.forward_date)) {
@@ -1194,6 +1326,8 @@ bot.on('forward', (msg) => {
             processUserData(msg, {
               usePip: sessions[msg.from.id].processDataConfig.usePip,
               useBeastFace: sessions[msg.from.id].processDataConfig.useBeastFace,
+            }, {
+              omitPipError: true,
             });
           });
         }
@@ -1264,7 +1398,7 @@ bot.on('forward', (msg) => {
       beastName = data.name;
     }
 
-    const isForwardValid = ({ dataType, beastName, beastType }) => {
+    const isForwardValid = ({ _dataType, _beastName, _beastType }) => {
       let beastValidationTimeScope = beastsToValidate.map((beast, index) => ({ ...beast, index }));
       const beastIndexToRemove = date => beastValidationTimeScope.sort((a, b) => Math.abs(date - a.date) - Math.abs(date - b.date))[0].index;
 
@@ -1286,8 +1420,8 @@ bot.on('forward', (msg) => {
         return false;
       }
 
-      if (dataType === 'walkingBeastFaced') {
-        if (beastValidationTimeScope.some(beast => (beast.name.indexOf(beastName) !== -1))) {
+      if (_dataType === 'walkingBeastFaced') {
+        if (beastValidationTimeScope.some(beast => (beast.name.indexOf(_beastName) !== -1))) {
           const beastIndex = beastIndexToRemove(msg.forward_date);
           sessions[msg.from.id].beastsToValidate = sessions[msg.from.id].beastsToValidate.filter((beast, index) => index !== beastIndex);
 
@@ -1297,8 +1431,8 @@ bot.on('forward', (msg) => {
         return null;
       }
 
-      if (dataType === 'dungeonBeastFaced') {
-        if (beastValidationTimeScope.every(beast => beast.name !== beastName && beast.name !== '???')) {
+      if (_dataType === 'dungeonBeastFaced') {
+        if (beastValidationTimeScope.every(beast => beast.name !== _beastName && beast.name !== '???')) {
           return false;
         }
 
@@ -1308,7 +1442,7 @@ bot.on('forward', (msg) => {
         return true;
       }
 
-      if (beastValidationTimeScope.every(beast => (beast.name !== beastName && beast.name !== '???') || beast.type !== beastType)) {
+      if (beastValidationTimeScope.every(beast => (beast.name !== _beastName && beast.name !== '???') || beast.type !== _beastType)) {
         return false;
       }
 
@@ -1516,18 +1650,6 @@ bot.on('forward', (msg) => {
       regexpSet: regexps.dungeonBeast,
     });
 
-    /* const isLocation = regExpSetMatcher(msg.text, {
-            regexpSet: regexps.location
-        });
-
-        const isDungeonBeast = regExpSetMatcher(msg.text, {
-            regexpSet: regexps.dungeonBeast
-        });
-
-        const isFlee = regExpSetMatcher(msg.text, {
-            regexpSet: regexps.flee
-        }); */
-
     if (isClassicPip || isSimplePip) {
       const pip = parsePip(msg, isClassicPip);
       let reply;
@@ -1563,7 +1685,6 @@ bot.on('forward', (msg) => {
 
       Giant.findOne({
         name: giant.name,
-        distance: giant.distance,
       }).then((fGiant) => {
         const databaseGiant = fGiant;
         if (databaseGiant === null) {
@@ -1578,18 +1699,17 @@ bot.on('forward', (msg) => {
           });
 
           newGiant.save().then(() => {
-            userManager.addPoints(msg.from.id, forwardPoints.discoveryGiantData).then((result) => {
-              if (!result.ok) {
-                if (result.reason === 'USER_NOT_FOUND') {
-                  return msg.reply.text('Не могу начислить тебе шмепсели пока ты не скинешь мне свой пип-бой :с');
-                }
-              }
+            const telegramData = {
+              first_name: msg.from.first_name,
+              id: msg.from.id,
+              username: msg.from.username,
+            };
 
-              return msg.reply.text(`Спасибо за форвард! Я добавил <b>${giant.name}</b> в базу!\nНачислил тебе ${forwardPoints.discoveryGiantData} 💎<b>Шмепселей</b>`, {
+            userManager.addPoints({ id: msg.from.id, telegramData, points: forwardPoints.discoveryGiantData })
+              .then(() => msg.reply.text(`Спасибо за форвард! Я добавил <b>${giant.name}</b> в базу!\nНачислил тебе ${forwardPoints.discoveryGiantData} 💎<b>Шмепселей</b>`, {
                 asReply: true,
                 parseMode: 'html',
-              });
-            });
+              }));
           }).catch(e => console.log(e));
         } else {
           if (databaseGiant.forwardStamp >= msg.forward_date) {
@@ -1602,24 +1722,27 @@ bot.on('forward', (msg) => {
           databaseGiant.health.cap = giant.healthCap;
           databaseGiant.forwardStamp = msg.forward_date;
 
+          if (!databaseGiant.distance) {
+            databaseGiant.distance = giant.distance;
+          }
+
           const wasDead = databaseGiant.health.current <= 0;
           const isDead = giant.healthCurrent <= 0;
 
           const pointsToAdd = ((!wasDead && isDead) || (wasDead && !isDead)) ? forwardPoints.newGiantData : forwardPoints.sameGiantData;
 
           databaseGiant.save().then(() => {
-            userManager.addPoints(msg.from.id, pointsToAdd).then((result) => {
-              if (!result.ok) {
-                if (result.reason === 'USER_NOT_FOUND') {
-                  return msg.reply.text('Не могу начислить тебе шмепсели пока ты не скинешь мне свой пип-бой :с');
-                }
-              }
+            const telegramData = {
+              first_name: msg.from.first_name,
+              id: msg.from.id,
+              username: msg.from.username,
+            };
 
-              return msg.reply.text(`Спасибо за форвард! Я обновил <b>${giant.name}</b> в базе!\nНачислил тебе ${pointsToAdd} 💎<b>Шмепселей</b>`, {
+            userManager.addPoints({ id: msg.from.id, telegramData, points: pointsToAdd })
+              .then(() => msg.reply.text(`Спасибо за форвард! Я обновил <b>${giant.name}</b> в базе!\nНачислил тебе ${pointsToAdd} 💎<b>Шмепселей</b>`, {
                 asReply: true,
                 parseMode: 'html',
-              });
-            });
+              }));
           }).catch(e => console.log(e));
         }
 
@@ -1642,18 +1765,17 @@ bot.on('forward', (msg) => {
             forwardStamp: msg.forward_date,
           });
 
-          newGiant.save().then(() => {
-            userManager.addPoints(msg.from.id, forwardPoints.discoveryGiantData).then((result) => {
-              if (!result.ok) {
-                if (result.reason === 'USER_NOT_FOUND') {
-                  return msg.reply.text('Не могу начислить тебе шмепсели пока ты не скинешь мне свой пип-бой :с');
-                }
-              }
+          newGiant.save().then(async () => {
+            const telegramData = {
+              first_name: msg.from.first_name,
+              id: msg.from.id,
+              username: msg.from.username,
+            };
 
-              return msg.reply.text(`Спасибо за форвард! Я добавил <b>${giant.name}</b> в базу!\nНачислил тебе ${forwardPoints.discoveryGiantData} 💎<b>Шмепселей</b>`, {
-                asReply: true,
-                parseMode: 'html',
-              });
+            await userManager.addPoints({ id: msg.from.id, telegramData, points: forwardPoints.discoveryGiantData });
+            return msg.reply.text(`Спасибо за форвард! Я добавил <b>${giant.name}</b> в базу!\nНачислил тебе ${forwardPoints.discoveryGiantData} 💎<b>Шмепселей</b>`, {
+              asReply: true,
+              parseMode: 'html',
             });
           }).catch(e => console.log(e));
         } else if (databaseGiant.forwardStamp >= msg.forward_date) {
@@ -1672,18 +1794,17 @@ bot.on('forward', (msg) => {
           const pointsToAdd = ((!wasDead && isDead) || (wasDead && !isDead)) ? forwardPoints.newGiantData : forwardPoints.sameGiantData;
 
           databaseGiant.save().then(() => {
-            userManager.addPoints(msg.from.id, pointsToAdd).then((result) => {
-              if (!result.ok) {
-                if (result.reason === 'USER_NOT_FOUND') {
-                  return msg.reply.text('Не могу начислить тебе шмепсели пока ты не скинешь мне свой пип-бой :с');
-                }
-              }
+            const telegramData = {
+              first_name: msg.from.first_name,
+              id: msg.from.id,
+              username: msg.from.username,
+            };
 
-              return msg.reply.text(`Спасибо за форвард! Я обновил <b>${giant.name}</b> в базе!\nНачислил тебе ${pointsToAdd} 💎<b>Шмепселей</b>`, {
+            userManager.addPoints({ id: msg.from.id, telegramData, points: pointsToAdd })
+              .then(() => msg.reply.text(`Спасибо за форвард! Я обновил <b>${giant.name}</b> в базе!\nНачислил тебе ${pointsToAdd} 💎<b>Шмепселей</b>`, {
                 asReply: true,
                 parseMode: 'html',
-              });
-            });
+              }));
           }).catch(e => console.log(e));
         }
 
@@ -1718,28 +1839,27 @@ bot.on('forward', (msg) => {
         const pointsToAdd = ((!wasDead && isDead) || (wasDead && !isDead)) ? forwardPoints.newGiantData : forwardPoints.sameGiantData;
 
         databaseGiant.save().then(() => {
-          userManager.addPoints(msg.from.id, pointsToAdd).then((result) => {
-            if (!result.ok) {
-              if (result.reason === 'USER_NOT_FOUND') {
-                return msg.reply.text('Не могу начислить тебе шмепсели пока ты не скинешь мне свой пип-бой :с');
-              }
-            }
+          const telegramData = {
+            first_name: msg.from.first_name,
+            id: msg.from.id,
+            username: msg.from.username,
+          };
 
-            return msg.reply.text(`Спасибо за форвард! Я обновил <b>${giant.name}</b> в базе!\nНачислил тебе ${pointsToAdd} 💎<b>Шмепселей</b>`, {
+          userManager.addPoints({ id: msg.from.id, telegramData, points: pointsToAdd })
+            .then(() => msg.reply.text(`Спасибо за форвард! Я обновил <b>${giant.name}</b> в базе!\nНачислил тебе ${pointsToAdd} 💎<b>Шмепселей</b>`, {
               asReply: true,
               parseMode: 'html',
-            });
-          });
+            }));
         }).catch(e => console.log(e));
 
         return false;
       });
     } else if (isRegularBeastFaced) {
-      const beast = parseBeastFaced.parseRegularBeastFaced(msg.text);
+      const parsedBeast = parseBeastFaced.parseRegularBeastFaced(msg.text);
 
       routedBeastView(Beast, {
-        name: beast.name,
-        type: beast.type,
+        name: parsedBeast.name,
+        type: parsedBeast.type,
         isDungeon: false,
         subType: 'regular',
       }, null, {
@@ -1788,12 +1908,6 @@ bot.on('forward', (msg) => {
         VERSION,
       }).then(({ reply }) => {
         if (reply !== false) {
-          /* const beastReplyMarkup = getBeastKeyboard(beast._id.toJSON());
-
-                    return msg.reply.text(reply,{
-                        replyMarkup: beastReplyMarkup,
-                        parseMode: 'html'
-                    }).catch(e => console.log(e)); */
           msg.reply.text(`Хей, у меня есть данные про *${oBeast.name}*, но я пока что не умею их выводить, прости :с`, {
             asReply: true,
             parseMode: 'markdown',
@@ -1818,12 +1932,6 @@ bot.on('forward', (msg) => {
         VERSION,
       }).then(({ reply }) => {
         if (reply !== false) {
-          /* const beastReplyMarkup = getBeastKeyboard(beast._id.toJSON());
-
-                    return msg.reply.text(reply,{
-                        replyMarkup: beastReplyMarkup,
-                        parseMode: 'html'
-                    }).catch(e => console.log(e)); */
           msg.reply.text(`Хей, у меня есть данные про *${oBeast.name}*, но я пока что не умею их выводить, прости :с`, {
             asReply: true,
             parseMode: 'markdown',
@@ -1838,11 +1946,10 @@ bot.on('forward', (msg) => {
         return false;
       }).catch(e => console.log(e));
     } else if (isRegularBeast || isFlee || isDungeonBeast) {
-      // || isLocation || isDungeonBeast || isFlee
       let data;
       let dataType;
 
-      createSession(msg.from.id);
+      await createSession(msg);
 
       if (isFlee) {
         data = parseFlee(msg.text);
@@ -1903,18 +2010,17 @@ bot.on('forward', (msg) => {
             databaseGiant.forwardStamp = msg.forward_date;
 
             databaseGiant.save().then(() => {
-              userManager.addPoints(msg.from.id, forwardPoints.newGiantData).then((result) => {
-                if (!result.ok) {
-                  if (result.reason === 'USER_NOT_FOUND') {
-                    msg.reply.text('Не могу начислить тебе шмепсели пока ты не скинешь мне свой пип-бой :с');
-                  }
-                }
+              const telegramData = {
+                first_name: msg.from.first_name,
+                id: msg.from.id,
+                username: msg.from.username,
+              };
 
-                return msg.reply.text(`Спасибо за форвард! Я обновил состояние <b>${databaseGiant.name}</b> в базе!\nНачислил тебе ${forwardPoints.newGiantData} 💎<b>Шмепселей</b>`, {
+              userManager.addPoints({ id: msg.from.id, telegramData, points: forwardPoints.newGiantData })
+                .then(() => msg.reply.text(`Спасибо за форвард! Я обновил состояние <b>${databaseGiant.name}</b> в базе!\nНачислил тебе ${forwardPoints.newGiantData} 💎<b>Шмепселей</b>`, {
                   asReply: true,
                   parseMode: 'html',
-                });
-              });
+                }));
             }).catch(e => console.log(e));
           }
         } else {
@@ -1952,82 +2058,46 @@ bot.on('/reachableKm', (msg) => {
   askAmountOfLevels(msg);
 });
 
-bot.on('/locs_text', msg => msg.reply.text(`
-[8 км] 🧙‍♂ Безумный старик
-[11км] ⛰ Старая шахта
-[13км] ⚡️ Купол Грома
-[15км] 🛤 Ореол
-[19км] ⚠️ Пещера Ореола
-[23км] 🚽 Сточная труба
--26км- 🗿 Радиоактив. Голем
-[27км] 🏃🏿 Белое гетто
-[29км] ⚙️ Открытое Убежище
-[30км] 🕎 Ядро
-[34км] 🦇 Бэт-пещера
--36км- 🤖 Киборг Анклава
-[39км] 🦆 Перевал Уткина
-[43км] 🚪 Уютный подвальчик
--44км- 👹 Повелитель Пустоши
-[45км] 🌁 Высокий Хротгар
-[50км] 🔴 Руины Гексагона
-[51км] 🛏 Безопасный привал
--55км- ☠️ Киберкоготь
-[56км] 🔬 Научный комплекс
--64км- 🐺 Яо-Гигант
-[69км] ⛩ Храм Мудрости
-[74км] 👁‍🗨 Чёрная Меза
-    `, {
-  webPreview: false,
+bot.on('/locs_text', msg => msg.reply.text(locationsAll, {
+  parseMode: 'html',
 }));
 
-bot.on('/raids_text', msg => msg.reply.text(`
-Каждый день проходит ТРИ рейда с промежутком в ВОСЕМЬ часов (по МСК):
-<b>01:00</b> - <b>09:00</b> - <b>17:00</b>
+bot.on('/raids_text', msg => msg.reply.text(locationsRaid, {
+  parseMode: 'html',
+}));
 
-<b>Старая фабрика</b>
-[5км] 📦Материалы
-
-<b>Завод "Ядер-Кола"</b>
-[9км] 🕳Крышки
-
-<b>Тюрьма</b>
-[12км] 💊Вещества
-
-<b>Склады</b>
-[16км] 🍗Еда
-
-<b>Датацентр</b>
-[20км] 🔹Кварц
-
-<b>Госпиталь</b>
-[24км] ❤️Лечение
-
-<b>Завод "Электрон"</b>
-[28км] 💡Генераторы
-
-<b>Офисное здание</b>
-[32км] 💾Микрочипы
-
-<b>Иридиевые шахты</b>
-[38км] 🔩Иридий
-
-<b>Склад металла</b>
-[46км] 🔗Кубонит
-    `, {
-  webPreview: false,
+bot.on('/dungeon_locations', msg => msg.reply.text(locationsDungeon, {
   parseMode: 'html',
 }));
 
 bot.on('/upgradeSkill', (msg) => {
-  if (msg.text === 'МАКСИМАЛОЧКА') {
-    getEffort(msg, true);
-  } else {
-    getEffort(msg);
+  const skillsToMax = msg.text === 'МАКСИМАЛОЧКА';
+
+  if (regexps.regexps.dzenRegExp.test(msg.text)) {
+    const [, dzenAmountString] = regexps.regexps.dzenRegExp.exec(msg.text);
+
+    const dzenAmount = Number(dzenAmountString);
+
+    if (!Number.isInteger(dzenAmount)) {
+      return msg.reply.text('Пожалуйста используй целое число для уровеня Дзена', {
+        asReply: true,
+      });
+    }
+
+    if (dzenAmount > 10) {
+      return msg.reply.text('Пожалуйста используй уровень Дзена до 10', {
+        asReply: true,
+      });
+    }
+
+    return getEffort(msg, false, dzenAmount);
   }
+
+  return getEffort(msg, skillsToMax, 0);
 });
 
-bot.on(['/journeyforwardstart', '/go'], (msg) => {
-  createSession(msg.from.id);
+bot.on(['/journeyforwardstart', '/go'], async (msg) => {
+  await createSession(msg);
 
   const inlineReplyMarkup = bot.inlineKeyboard([
     [
@@ -2045,7 +2115,7 @@ bot.on(['/journeyforwardstart', '/go'], (msg) => {
     resize: true,
   });
 
-  msg.reply.text(`
+  await msg.reply.text(`
 Хей, вижу ты хочешь поделиться со мной ценной информацией с пустоши - отлично!
 *Я принимаю следующую информацию*:
  - Бой с мобом
@@ -2056,7 +2126,9 @@ bot.on(['/journeyforwardstart', '/go'], (msg) => {
     `, {
     replyMarkup,
     parseMode: 'markdown',
-  }).then(() => msg.reply.text(`
+  });
+
+  await msg.reply.text(`
 *Я умею работать с данными только за один круг/вылазку - больше одной вылазки я пока обработать не смогу :с*
 
 Пожалуйста убедись, что ты перешлёшь _все_ сообщения - Телеграм может немного притормаживать.
@@ -2064,21 +2136,19 @@ bot.on(['/journeyforwardstart', '/go'], (msg) => {
             `, {
     replyMarkup: inlineReplyMarkup,
     parseMode: 'markdown',
-  })).catch(e => console.log(e));
+  });
 });
 
-
-bot.on('/journeyforwardend', (msg) => {
+bot.on('/journeyforwardend', async (msg) => {
   if (sessions[msg.from.id] === undefined) {
-    createSession(msg.from.id);
+    await createSession(msg);
 
     return msg.reply.text('Чёрт, похоже меня перезагрузил какой-то мудак и твои форварды не сохранились, прости пожалуйста :с', {
-      replyMarkup: defaultKeyboard,
+      replyMarkup: await defaultKeyboard(msg),
     });
   }
   sessions[msg.from.id].state = states.WAIT_FOR_DATA_TO_PROCESS;
 
-  // console.log(JSON.stringify(sessions[msg.from.id].data));
   return processUserData(msg, {
     usePip: sessions[msg.from.id].processDataConfig.usePip,
     useBeastFace: sessions[msg.from.id].processDataConfig.useBeastFace,
@@ -2096,11 +2166,11 @@ bot.on('/skippipforward', (msg) => {
   });
 });
 
-bot.on(['/skipbeastforward', '/skipbeastforwards'], (msg) => {
+bot.on(['/skipbeastforward', '/skipbeastforwards'], async (msg) => {
   if (_.isEmpty(sessions)) {
     return msg.reply.text('Слушай, а мне собственно нечего игнорировать. Может меня опять какой-то пидор перезагрузил, не знаешь?', {
       asReply: true,
-      replyMarkup: defaultKeyboard,
+      replyMarkup: await defaultKeyboard(msg),
     });
   }
 
@@ -2118,7 +2188,7 @@ bot.on(['/skipbeastforward', '/skipbeastforwards'], (msg) => {
   });
 
 
-  msg.reply.text('Окей, обработаю что смогу').then(() => {
+  return msg.reply.text('Окей, обработаю что смогу').then(() => {
     sessions[msg.from.id].state = states.WAIT_FOR_DATA_TO_PROCESS;
     sessions[msg.from.id].processDataConfig.useBeastFace = false;
     sessions[msg.from.id].beastsToValidate = [];
@@ -2130,7 +2200,6 @@ bot.on(['/skipbeastforward', '/skipbeastforwards'], (msg) => {
   });
 });
 
-
 bot.on('/version', (msg) => {
   msg.reply.text(`Текущая версия бота - <b>${config.version}</b> [β]`, {
     asReply: true,
@@ -2139,7 +2208,6 @@ bot.on('/version', (msg) => {
 });
 
 bot.on('/eqp', (msg) => {
-  // TODO: Inline button resize
   const processMenuButtons = processMenu(equipmentMenu).map(menuItem => bot.inlineButton(menuItem.title, { callback: `equipment_menu-${menuItem.name}` }));
 
   const inlineReplyMarkup = bot.inlineKeyboard(_.chunk(processMenuButtons, 3));
@@ -2203,10 +2271,10 @@ bot.on('/skill_upgrade', (msg) => {
   const skillOMaticText = `
 В «<b>🎓 Скилокачаторе</b>» я могу помочь тебе посчитать финансовые затраты на прокачку твоих скилов.`;
 
-  findPip(msg, (result) => {
+  findPip(msg, async (result) => {
     if (result.ok && result.reason === 'USER_FOUND') {
       if (sessions[msg.from.id] === undefined) {
-        createSession(msg.from.id);
+        await createSession(msg);
       }
 
       sessions[msg.from.id].pip = result.data.pip;
@@ -2234,11 +2302,14 @@ bot.on('/skill_upgrade', (msg) => {
         return `<b>${skillName}</b>: ${result.data.pip[key]}`;
       });
 
+      const dzenText = result.data.pip.dzen > 0 ? `🏵 <b>Дзен</b>: ${result.data.pip.dzen}` : 'Ты ещё не постиг Дзен 🏵';
+
       return msg.reply.text(`
 ${skillOMaticText}
 
 Вот что я знаю про твои скилы:
 ${userSkills.join('\n')}
+${dzenText}
 <i>(Если они не актуальные - просто отправь мне свой новый пип-бой)</i>
 
 
@@ -2279,15 +2350,21 @@ bot.on(['/leaderboard', '/top'], (msg) => {
   });
 });
 
-bot.on('/mypipstats', (msg) => {
+bot.on('/mypipstats', async (msg) => {
+  await msg.reply.text('Эта фича работает в эксперементальном режиме. Пожалуйста сообщи если столкнёшся с неожиданными проблемами :3', {
+    asReply: true,
+  });
+
   User.findOne({ 'telegram.id': msg.from.id }, (err, person) => {
     if (err) {
       console.log(err);
-      return;
+      return msg.reply.text('¯\\_(ツ)_/¯', {
+        asReply: true,
+      });
     }
 
-    if (person === null) {
-      msg.reply.text('Я не могу показать тебе твой график прогресса - ты мне ещё не скидывал своего пип-боя');
+    if (person === null || !person.history) {
+      return msg.reply.text('Я не могу показать тебе твой график прогресса - ты мне ещё не скидывал своего пип-боя');
     }
 
     let pips = person.history.pip.toObject();
@@ -2295,7 +2372,7 @@ bot.on('/mypipstats', (msg) => {
     const limit = 10;
 
     if (pips.length <= 1) {
-      msg.reply.text(
+      return msg.reply.text(
         'Я не видел что бы прокачивался в скилах. Скинь свой пип-бой когда прокачаешь какой-то скил',
         { asReply: true },
       );
@@ -2419,17 +2496,15 @@ bot.on('/mypipstats', (msg) => {
       },
     };
 
-    chartGeneration(chartConfig, (buffer) => {
-      msg.reply.photo(buffer, {
-        asReply: true,
-        caption: 'Получи и распишись!',
-      }).catch(e => console.log(e));
-    });
+    chartGeneration(chartConfig, buffer => msg.reply.photo(buffer, {
+      asReply: true,
+      caption: 'Получи и распишись!',
+    }).catch(e => console.log(e)));
   });
 });
 
-bot.on('/debug', (msg) => {
-  createSession(msg.from.id);
+bot.on('/debug', async (msg) => {
+  await createSession(msg);
 
   const updatesData = {
     locations: [],
@@ -2467,7 +2542,7 @@ bot.on('/debug', (msg) => {
   }, updatesData, options);
 });
 
-bot.on(/^\d+$/, (msg) => {
+bot.on(/^\d+$/, async (msg) => {
   switch (sessions[msg.from.id].state) {
     case states.WAIT_FOR_DISTANCE: {
       const reachableKm = Number(msg.text);
@@ -2485,16 +2560,45 @@ bot.on(/^\d+$/, (msg) => {
     }
     case states.WAIT_FOR_LEVELS: {
       const upgradeAmount = Number(msg.text);
+
       const { pip } = sessions[msg.from.id];
       const skillToUpgrade = sessions[msg.from.id].upgradeSkill;
 
-      if (upgradeAmountValidation(pip, skillToUpgrade, upgradeAmount, 1300)) {
+      if (upgradeAmountValidation({
+        pip, skillToUpgrade, upgradeAmount,
+      })) {
         getEffort(msg);
       } else {
         msg.reply.text('Чёто дохуя получилось, попробуй число поменьше.');
       }
 
       break;
+    }
+    case states.WAIT_FOR_BUTTONS_AMOUNT: {
+      const newButtonsAmount = Number(msg.text);
+
+      if (newButtonsAmount > 6 || newButtonsAmount < 1) {
+        return msg.reply.text('Введи количество от 1 до 6');
+      }
+
+      const { settings } = sessions[msg.from.id];
+      const { buttonsAmount, ...restSettings } = settings;
+
+      const updateResult = await userManager.updateSettings({
+        id: msg.from.id,
+        settings: {
+          buttonsAmount: newButtonsAmount,
+          ...restSettings,
+        },
+      });
+
+      if (updateResult.ok) {
+        await updateKeyboard(msg);
+        sessions[msg.from.id].state = states.WAIT_FOR_START;
+        return msg.reply.text('Я обновил настройки');
+      }
+
+      return msg.reply.text('Произошла ошибка - я не смог найти тебя в базе. Попробуй нажать /start и повторить ещё раз.');
     }
     default:
       return false;
@@ -2674,15 +2778,14 @@ bot.on(/mob_(.+)/, (msg) => {
   });
 });
 
-
-bot.on(['/cancel', '/journeyforwardcancel', '/force_cancel'], (msg) => {
+bot.on(['/cancel', '/journeyforwardcancel', '/force_cancel'], async (msg) => {
   const backMessage = _.random(0, 100) >= 90 ? 'Ты вернусля в главное меню\n<i>Вернусля - почётный член этого сообщения, не обижайте её</i>' : 'Ты вернусля в главное меню';
 
   if (sessions[msg.from.id] === undefined) {
-    createSession(msg.from.id);
+    await createSession(msg);
 
     return msg.reply.text(backMessage, {
-      replyMarkup: defaultKeyboard,
+      replyMarkup: await defaultKeyboard(msg),
       parseMode: 'html',
     }).catch(e => console.log(e));
   }
@@ -2693,36 +2796,36 @@ bot.on(['/cancel', '/journeyforwardcancel', '/force_cancel'], (msg) => {
     }).catch(e => console.log(e));
   }
 
-  createSession(msg.from.id);
+  await createSession(msg);
 
   return msg.reply.text(backMessage, {
-    replyMarkup: defaultKeyboard,
+    replyMarkup: await defaultKeyboard(msg),
     parseMode: 'html',
   }).catch(e => console.log(e));
 });
 
-bot.on('/delete_accaunt', (msg) => {
-  if (process.env.ENV === 'STAGING') {
-    userManager.delete(msg.from.id).then((result) => {
-      if (!result.ok && result.reason === 'USER_NOT_FOUND') {
-        return msg.reply.text('Я не смог найти твою запись в базе', {
-          asReply: true,
-        }).catch(e => console.log(e));
-      }
+bot.on('/delete_accaunt', async (msg) => {
+  if (process.env.ENV === 'STAGING' || process.env.ENV === 'LOCAL') {
+    const result = await userManager.delete(msg.from.id);
 
-      if (result.ok && result.reason === 'USER_DELETED') {
-        return msg.reply.text('Я удалил твою запись в базе', {
-          asReply: true,
-        }).catch(e => console.log(e));
-      }
+    if (!result.ok && result.reason === 'USER_NOT_FOUND') {
+      return msg.reply.text('Я не смог найти твою запись в базе', {
+        asReply: true,
+        replyMarkup: await defaultKeyboard(msg),
+      }).catch(e => console.log(e));
+    }
 
-      return false;
-    });
+    return msg.reply.text('Я удалил твою запись в базе', {
+      asReply: true,
+      replyMarkup: await defaultKeyboard(msg),
+    }).catch(e => console.log(e));
   }
+
+  return null;
 });
 
 bot.on('/delete_beasts', (msg) => {
-  if (process.env.ENV === 'STAGING') {
+  if (process.env.ENV === 'STAGING' || process.env.ENV === 'LOCAL') {
     Beast.find({ 'battles.stamp': { $regex: `.+${msg.from.id}` } }).then((beasts) => {
       if (beasts.length === 0) {
         return msg.reply.text('Я не нашёл твоих битв', {
@@ -3001,11 +3104,11 @@ ${beastsList}
     const skillOMaticText = `
 В «<b>🎓 Скилокачаторе</b>» я могу помочь тебе посчитать финансовые затраты на прокачку твоих скилов.`;
 
-    findPip(msg, (result) => {
+    findPip(msg, async (result) => {
       bot.answerCallbackQuery(msg.id);
       if (result.ok && result.reason === 'USER_FOUND') {
         if (sessions[msg.from.id] === undefined) {
-          createSession(msg.from.id);
+          await createSession(msg);
         }
 
         sessions[msg.from.id].pip = result.data.pip;
@@ -3072,123 +3175,121 @@ const validateRange = (rangeToValidate, _from, _to) => {
   return rangeToValidate.filter(range => range[0] === from && range[1] === to).length === 1;
 };
 
-bot.on('text', (msg) => {
+bot.on('text', async (msg) => {
   const regularZoneBeastsRequestRegExp = /(\d+)-(\d+)/;
   const rangeRegExp = /(\d+)(-|—|--)(\d+)/;
+  const dungeonRegExp = /=(\d+)=/;
 
+  let beastType;
+  let range;
+  let from;
+  let to;
+  let searchParams;
+  let mobMarker;
 
-  if (!rangeRegExp.test(msg.text)) {
-    return;
+  if (!rangeRegExp.test(msg.text) && !dungeonRegExp.test(msg.text)) {
+    return null;
   }
 
-  const range = regularZoneBeastsRequestRegExp.test(msg.text) ? ranges : dzRanges;
+  if (dungeonRegExp.test(msg.text)) {
+    if (process.env.ENV === 'STAGING' || process.env.ENV === 'LOCAL') {
+      range = dungeonRanges;
+      [, from] = dungeonRegExp.exec(msg.text);
 
-
-  const [, from,, to] = rangeRegExp.exec(msg.text);
-
-  if (!validateRange(range, from, to)) {
-    msg.reply.text('Да, очень умно с твоей стороны. Начислил тебе <i>нихуя</i> 💎<b>Шмепселей</b> за смекалочку, а теперь иди нахуй и используй кнопки внизу.', {
-      parseMode: 'html',
-    });
-  }
-
-  const beastType = regularZoneBeastsRequestRegExp.test(msg.text) ? 'Regular' : 'DarkZone';
-
-  Beast.find({
-    isDungeon: false,
-    subType: 'regular',
-    'distanceRange.value': {
-      $gte: Number(from),
-      $lte: Number(to),
-    },
-    type: beastType,
-  }, 'battles.totalDamageReceived name id distanceRange').then((beasts) => {
-    const jsonBeasts = beasts.map((b) => {
-      const jsoned = b.toJSON();
-
-      return {
-        id: b.id,
-        ...jsoned,
-      };
-    });
-
-    const beastsByDamage = _.sortBy(jsonBeasts, v => v.battles.totalDamageReceived);
-
-    const actualBeasts = beastsByDamage.filter(({ distanceRange }) => {
-      const actualRanges = distanceRange.filter(({ version }) => version === VERSION);
-      const deprecatedRanges = distanceRange.filter(({ version }) => version !== VERSION);
-
-      const actualRangesFulfillGiven = actualRanges.every(({ value }) => value >= from && value <= to);
-
-      if (actualRanges.length >= DATA_THRESHOLD) {
-        return actualRangesFulfillGiven;
-      } if (actualRanges.length <= DATA_THRESHOLD && deprecatedRanges.length > 0) {
-        return true;
+      if (dungeonRanges.indexOf(Number(from)) === -1) {
+        return msg.reply.text('Нет данжа на этом километре', {
+          asReply: true,
+        });
       }
 
-      return false;
-    });
+      to = from;
 
-    const beastsList = actualBeasts.map(beast => `
+      searchParams = {
+        isDungeon: true,
+        subType: 'regular',
+        'distanceRange.value': Number(from),
+      };
+      mobMarker = '📯';
+    } else {
+      return null;
+    }
+  } else {
+    range = regularZoneBeastsRequestRegExp.test(msg.text) ? ranges : dzRanges;
+
+    [, from,, to] = rangeRegExp.exec(msg.text);
+
+    if (!validateRange(range, from, to)) {
+      return msg.reply.text('Да, очень умно с твоей стороны. Начислил тебе <i>нихуя</i> 💎<b>Шмепселей</b> за смекалочку, а теперь иди нахуй и используй кнопки внизу.', {
+        parseMode: 'html',
+      });
+    }
+
+    beastType = regularZoneBeastsRequestRegExp.test(msg.text) ? 'Regular' : 'DarkZone';
+    mobMarker = regularZoneBeastsRequestRegExp.test(msg.text) ? '💀' : '🚷';
+
+    searchParams = {
+      isDungeon: false,
+      subType: 'regular',
+      'distanceRange.value': {
+        $gte: Number(from),
+        $lte: Number(to),
+      },
+      type: beastType,
+    };
+  }
+
+  const beasts = await Beast.find(searchParams, 'battles.totalDamageReceived name id distanceRange');
+  const jsonBeasts = beasts.map((b) => {
+    const jsoned = b.toJSON();
+
+    return {
+      id: b.id,
+      ...jsoned,
+    };
+  });
+
+  const beastsByDamage = _.sortBy(jsonBeasts, v => v.battles.totalDamageReceived);
+
+  const actualBeasts = beastsByDamage.filter(({ distanceRange }) => {
+    const actualRanges = distanceRange.filter(({ version }) => version === VERSION);
+    const deprecatedRanges = distanceRange.filter(({ version }) => version !== VERSION);
+
+    const actualRangesFulfillGiven = actualRanges.every(({ value }) => value >= from && value <= to);
+
+    if (actualRanges.length >= DATA_THRESHOLD) {
+      return actualRangesFulfillGiven;
+    } if (actualRanges.length <= DATA_THRESHOLD && deprecatedRanges.length > 0) {
+      return true;
+    }
+
+    return false;
+  });
+
+  const beastsList = actualBeasts.map(beast => `
 ${beast.name}
 /mob_${beast.id}`).join('\n');
 
-    const reply = `
-<b>Мобы(${beastType === 'DarkZone' ? '🚷' : '💀'}) на ${from}-${to}км</b>
+  const reply = `
+<b>Мобы(${mobMarker}) на ${from}-${to}км</b>
 <i>Отсортированы от слабым к сильным</i>
 ${beastsList}
 `;
 
-    return msg.reply.text(reply, {
-      replyMarkup: beastType === 'DarkZone' ? beastRangesDarkZoneKeyboard : beastRangesKeyboard,
-      parseMode: 'html',
-    }).catch(e => console.log(e));
+  return msg.reply.text(reply, {
+    replyMarkup: beastType === 'DarkZone' ? beastRangesDarkZoneKeyboard : beastRangesKeyboard,
+    parseMode: 'html',
   }).catch(e => console.log(e));
 });
 
-bot.on('/d', (msg) => {
-  if (process.env.ENV === 'STAGING' || process.env.ENV === 'LOCAL') {
-    Beast.find({
-      isDungeon: true,
-    }, 'battles.totalDamageReceived name id').then((beasts) => {
-      const jsonBeasts = beasts.map((b) => {
-        const jsoned = b.toJSON();
+bot.on('/show_encyclopedia', async (msg) => {
+  await createSession(msg);
 
-        return {
-          id: b.id,
-          ...jsoned,
-        };
-      });
+  const descriptions = getButtonDescriptions(sessions[msg.from.id].settings.buttons, 'encyclopedia');
 
-      const beastsByDamage = _.sortBy(jsonBeasts, v => v.battles.totalDamageReceived);
+  msg.reply.text(`Здесь ты можей найти полезную информацию и данные о Пустоши.
 
-      const beastsList = beastsByDamage.map(beast => `
-${beast.name}
-/mob_${beast.id}`).join('\n');
-
-      const reply = `
-<b>Данжевые мобы</b>
-<i>Отсортированы от слабым к сильным</i>
-${beastsList}
-`;
-
-      return msg.reply.text(reply, {
-        parseMode: 'html',
-      }).catch(e => console.log(e));
-    }).catch(e => console.log(e));
-  }
-});
-
-bot.on('/show_encyclopedia', (msg) => {
-  msg.reply.text(`В <b>📔Энциклопедии</b> вы можете просмотреть информацию о мире Wasteland Wars
-<b>🎒Экипировка</b> - Оружие, броня и тому подобное.
-<b>🗃Припасы</b> - Еда, баффы и медицина
-<b>🛰Дроны</b> - Характеристики ваших верных спутников
-<b>⚠️Подземелья</b> - Рекомендации к прохождению, инфа о луте и мобах
-<b>🏜️Локации</b> - Рейдовые и обычные локации
-<b>✅Достижения</b> - За что выдают награды
-`, {
-    replyMarkup: withBackButton(bot.keyboard, encyclopediaKeyboard, {
+${descriptions}`, {
+    replyMarkup: withBackButton(bot.keyboard, await encyclopediaKeyboard(msg), {
       resize: true,
       position: 'bottom',
     }),
@@ -3204,7 +3305,6 @@ bot.on(/\/battle_(.+)/, (msg) => {
   }
 
   const [, battleId] = /\/battle_(.+)/.exec(msg.text);
-  // msg.reply.text('neat!');
 
   routedBattleView(Beast, {
     battleId: mongoose.Types.ObjectId(battleId),
@@ -3222,11 +3322,11 @@ bot.on(/\/battle_(.+)/, (msg) => {
   return false;
 });
 
-bot.on(/\/ignore_(.+)/, (msg) => {
+bot.on(/\/ignore_(.+)/, async (msg) => {
   if (_.isEmpty(sessions)) {
     return msg.reply.text('Слушай, а мне собственно нечего игнорировать. Может меня опять какой-то пидор перезагрузил, не знаешь?', {
       asReply: true,
-      replyMarkup: defaultKeyboard,
+      replyMarkup: await defaultKeyboard(msg),
     });
   }
 
@@ -3259,7 +3359,7 @@ bot.on(/\/ignore_(.+)/, (msg) => {
             useBeastFace: sessions[msg.from.id].processDataConfig.useBeastFace,
           });
 
-          return;
+          return null;
         }
         return msg.reply.text(getBeastToValidateMessage(sessions[msg.from.id].beastsToValidate, sessions[msg.from.id].beastRequest), {
           parseMode: 'html',
@@ -3274,7 +3374,7 @@ bot.on(/\/ignore_(.+)/, (msg) => {
 
     return msg.reply.text('Слушай, а мне собственно нечего игнорировать. Может меня опять какой-то пидор перезагрузил, не знаешь?', {
       asReply: true,
-      replyMarkup: defaultKeyboard,
+      replyMarkup: await defaultKeyboard(msg),
     });
   }
 
@@ -3285,14 +3385,22 @@ bot.on(/\/ignore_(.+)/, (msg) => {
 
 bot.on('/delete_all_beasts', (msg) => {
   if (process.env.ENV === 'STAGING' || process.env.ENV === 'LOCAL') {
-    mongoose.connection.db.dropCollection('beasts', (err, result) => msg.reply.text('Все мобы удалёны'));
+    mongoose.connection.db.dropCollection('beasts', () => msg.reply.text('Все мобы удалёны'));
   }
 });
 
 bot.on('/state', (msg) => {
   if (process.env.ENV === 'STAGING' || process.env.ENV === 'LOCAL') {
-    return msg.reply.text(sessions ? (sessions[msg.from.id] ? sessions[msg.from.id].state : 'null') : 'null');
+    if (sessions[msg.from.id]) {
+      if (sessions[msg.from.id].state) {
+        msg.reply.text(sessions[msg.from.id].state);
+      }
+    }
+
+    msg.reply.text('null');
   }
+
+  return null;
 });
 
 bot.on('/showBeastsToValidate', (msg) => {
@@ -3306,32 +3414,8 @@ bot.on('/showBeastsToValidate', (msg) => {
       }
     }
   }
-});
 
-bot.on('/reset_beast_database', (msg) => {
-  if (process.env.ENV === 'STAGING' || process.env.ENV === 'LOCAL') {
-    msg.reply.text('ПЕРЕХОЖУ В РЕЖИМ СБРОСА БАЗЫ...\nЖДИ СООБЩЕНИЯ С ✅ГАЛОЧКАМИ✅');
-
-    const performBulkInsert = () => {
-      Beast.insertMany(signedBeasts, (error) => {
-        if (error) {
-          msg.reply.text(`Произошла проблема: ${error}`);
-        } else {
-          msg.reply.text('✅БАЗА МОБОВ НАПОЛНЕНА!✅');
-        }
-      });
-    };
-
-    Beast.find().then((beasts) => {
-      if (beasts.length === 0) {
-        performBulkInsert();
-      } else {
-        Beast.remove({}, () => {
-          performBulkInsert();
-        });
-      }
-    });
-  }
+  return null;
 });
 
 bot.on('/help_icons', msg => msg.reply.text(`
@@ -3339,13 +3423,228 @@ bot.on('/help_icons', msg => msg.reply.text(`
 ⚠️ - Информация собрана из данных актуальной версии ВВ и прошлых версий ВВ
 ‼️ - Информация собрана <b>только</b> из прошлых версий ВВ
 
-Иконки сообщают об "свежести" данных о мобе.
-    Что в нашем понимании "свежесть"? Представьте себе моба "🐲Трог (Воин)". Его урон, здоровье, лут и другие характеристики могут отличаться от каждой из версий WW (2.1/2.0/1.8). Раньше Ассистент держал все эти версии условного моба как единую запись, из за этого информация была слишком расплывчата.
-    Мы же внедрили систему в ассистента которая различает разные версии мобов как раз для поддержания максимального уровня актуальности данных. 
-    На случай если Ассистент не сможет предоставить вам актуальную информацию - он постарается найти данные о мобе со старых версий, и конечно же - он вам сообщит когда вы будете просматривать "устаревшую" информацию что бы вы понимали что вы имеете дело с рисковым выбором.`, {
+Иконки сообщают о "свежести" данных о мобе.
+
+  Что в нашем понимании "свежесть"? Представьте себе моба "🐲Трог (Воин)". Его урон, здоровье, лут и другие характеристики могут отличаться от каждой из версий WW (2.1/2.0/1.8). Раньше Ассистент держал все эти версии условного моба как единую запись, из за этого информация была слишком расплывчата.
+
+  Мы же внедрили систему в ассистента которая различает разные версии мобов как раз для поддержания максимального уровня актуальности данных.
+
+  На случай если Ассистент не сможет предоставить вам актуальную информацию - он постарается найти данные о мобе со старых версий, и конечно же - он вам сообщит когда вы будете просматривать "устаревшую" информацию что бы вы понимали что вы имеете дело с рисковым выбором.`, {
   parseMode: 'html',
   asReply: true,
 }));
 
+bot.on('/show_settings', async (msg) => {
+  msg.reply.text('Здесь ты можешь изменить настройки отображения и персонализировать бота под себя', {
+    replyMarkup: withBackButton(bot.keyboard, [
+      [buttons.showSettingsButton.label, buttons.showSettingsAmountButton.label],
+    ], {
+      resize: true,
+    }),
+  });
+});
 
-bot.start();
+bot.on('/show_buttons', async (msg) => {
+  const telegramData = {
+    first_name: msg.from.first_name,
+    id: msg.from.id,
+    username: msg.from.username,
+  };
+
+  const replyMarkup = bot.keyboard([
+    [buttons.cancelAction.label],
+  ], {
+    resize: true,
+  });
+
+  const { data } = await userManager.getOrCreateSettings({ id: msg.from.id, telegramData });
+
+  const mainKeyboardButtons = data.buttons.filter(({ state, label }) => state === 'true' && label !== buttons.showSettings.label && label !== buttons.showEncyclopedia.label).map(({ label, index }) => `${label} /bdown_${index}\n`).join('');
+  const encyclopediaKeyboardButtons = data.buttons.filter(({ state, label }) => state !== 'true' && label !== buttons.showSettings.label && label !== buttons.showEncyclopedia.label).map(({ label, index }) => `${label} /bup_${index}\n`).join('');
+
+  return msg.reply.text(`
+Здесь ты можешь выбрать какие кнопки ты хочешь видеть на главном меню, а какие убрать под <code>[📔Энциклпдию]</code>
+
+Показывать все кнопки: /buttons_set_all
+Кнопоки по умолчанию: /buttons_set_default
+Изменить режим с/без икноки: /buttons_toggle_icon
+
+Кнопки в главном меню:
+<i>Нажми на команду напротив что бы переместить их в [📔Энциклпдию]</i>
+${mainKeyboardButtons}
+
+Кнопки в [📔Энциклпдии]:
+<i>Нажми на команду напротив что бы переместить их в Главное меню</i>
+${encyclopediaKeyboardButtons}
+`, {
+    parseMode: 'html',
+    asReply: true,
+    replyMarkup,
+  });
+});
+
+bot.on(['/buttons_set_all', '/buttons_set_default'], async (msg) => {
+  const isRevertToDefault = msg.text.indexOf('default') !== -1;
+  let updateResult;
+
+  if (sessions[msg.from.id] === undefined) {
+    await createSession(msg);
+  }
+
+  const { settings } = sessions[msg.from.id];
+  const { buttons: settingsButtons, ...restSettings } = settings;
+
+  if (isRevertToDefault) {
+    const { buttonsAmount, buttonsIconsMode, ...rest } = restSettings;
+    updateResult = await userManager.updateSettings({
+      id: msg.from.id,
+      settings: {
+        buttons: userDefaults.settings.buttons,
+        buttonsAmount: userDefaults.settings.buttonsAmount,
+        buttonsIconsMode: userDefaults.settings.buttonsIconsMode,
+        ...rest,
+      },
+    });
+  } else {
+    updateResult = await userManager.updateSettings({
+      id: msg.from.id,
+      settings: {
+        buttons: settingsButtons.map(({ state, ...rest }) => ({ state: 'true', ...rest })),
+        ...restSettings,
+      },
+    });
+  }
+
+  if (updateResult.ok) {
+    await updateKeyboard(msg);
+    return msg.reply.text('Я обновил настройки');
+  }
+
+  return msg.reply.text('Произошла ошибка - я не смог найти тебя в базе. Попробуй нажать /start и повторить ещё раз.');
+});
+
+bot.on('/buttons_toggle_icon', async (msg) => {
+  if (sessions[msg.from.id] === undefined) {
+    await createSession(msg);
+  }
+
+  const { settings } = sessions[msg.from.id];
+  const { buttonsIconsMode, ...restSettings } = settings;
+
+  const updateResult = await userManager.updateSettings({
+    id: msg.from.id,
+    settings: {
+      buttonsIconsMode: !settings.buttonsIconsMode,
+      ...restSettings,
+    },
+  });
+
+  if (updateResult.ok) {
+    await updateKeyboard(msg);
+    return msg.reply.text('Я обновил настройки');
+  }
+
+  return msg.reply.text('Произошла ошибка - я не смог найти тебя в базе. Попробуй нажать /start и повторить ещё раз.');
+});
+
+bot.on([/bup_(\d*)/, /bdown_(\d*)/], async (msg) => {
+  const isUp = msg.text.indexOf('up') !== -1;
+  let buttonIndex;
+
+  if (!sessions[msg.from.id]) {
+    await createSession(msg);
+  }
+
+  if (isUp) {
+    [, buttonIndex] = /bup_(\d*)/.exec(msg.text);
+  } else {
+    [, buttonIndex] = /bdown_(\d*)/.exec(msg.text);
+  }
+
+  buttonIndex = Number(buttonIndex);
+
+  const { settings } = sessions[msg.from.id];
+
+  const isReserved = (index) => {
+    if (settings.buttons[index] === undefined) {
+      return false;
+    }
+
+    const { label } = settings.buttons[index];
+
+    if (label === buttons.showSettings.label || label === buttons.showEncyclopedia.label) {
+      return true;
+    }
+
+    return false;
+  };
+
+  if (isReserved(buttonIndex) || !settings.buttons.find(({ index }) => index === buttonIndex)) {
+    return msg.reply.text('Нет такой кнопки, пошол в жопу :3', {
+      asReply: true,
+    });
+  }
+
+  if (isUp) {
+    [, buttonIndex] = /bup_(\d*)/.exec(msg.text);
+    settings.buttons = settings.buttons.map(({ index, state, ...rest }) => {
+      if (index === Number(buttonIndex)) {
+        return {
+          state: 'true',
+          index,
+          ...rest,
+        };
+      }
+
+      return {
+        state,
+        index,
+        ...rest,
+      };
+    });
+  } else {
+    [, buttonIndex] = /bdown_(\d*)/.exec(msg.text);
+    settings.buttons = settings.buttons.map(({ index, state, ...rest }) => {
+      if (index === Number(buttonIndex)) {
+        return {
+          state: 'false',
+          index,
+          ...rest,
+        };
+      }
+
+      return {
+        state,
+        index,
+        ...rest,
+      };
+    });
+  }
+
+  const updateResult = await userManager.updateSettings({ id: msg.from.id, settings });
+
+  if (updateResult.ok) {
+    await updateKeyboard(msg);
+    return msg.reply.text('Я обновил настройки');
+  }
+
+  return msg.reply.text('Произошла ошибка - я не смог найти тебя в базе. Попробуй нажать /start и повторить ещё раз.');
+});
+
+bot.on('/show_amount_buttons', async (msg) => {
+  if (!sessions[msg.from.id]) {
+    await createSession(msg);
+  }
+
+  sessions[msg.from.id].state = states.WAIT_FOR_BUTTONS_AMOUNT;
+
+  msg.reply.text('Выбери количество кнопок в ряд (для главного меню и энциклопедии) от 1 до 6:', {
+    replyMarkup: withBackButton(bot.keyboard, [
+      ['1', '2', '3', '4', '5', '6'],
+    ], {
+      resize: true,
+    }),
+  });
+});
+
+bot.connect();

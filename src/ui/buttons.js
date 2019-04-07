@@ -55,6 +55,10 @@ module.exports = {
     label: 'МАКСИМАЛОЧКА',
     command: '/upgradeSkill',
   },
+  amountOfLevelsMaxDzen: {
+    contains: 'Дзен',
+    command: '/upgradeSkill',
+  },
   reachableKm20: {
     label: '20км',
     command: '/reachableKm',
@@ -92,6 +96,7 @@ module.exports = {
     command: '/reachableKm',
   },
   journeyForwardStart: {
+    icon: '🏃',
     label: '🏃СкинутьЛог',
     command: '/journeyforwardstart',
   },
@@ -100,58 +105,71 @@ module.exports = {
     command: '/journeyforwardend',
   },
   journeyForwardCancel: {
-    label: '↩️Назад',
+    label: '◀️Назад',
     command: '/journeyforwardcancel',
   },
   showAllLocations: {
+    icon: '🏜',
     label: '🏜Все локации',
     command: '/locs_text',
   },
   showRaidLocations: {
+    icon: '🤘',
     label: '🤘Рейдовые локации',
     command: '/raids_text',
   },
-  showLocations: {
-    label: '🏜️Локации',
-    command: '/locations',
+  showDungeonsLocations: {
+    icon: '📯',
+    label: '📯Входы в подземелья',
+    command: '/dungeon_locations',
   },
   showInGameCommands: {
+    icon: '🔄',
     label: '🔄Команды при лагах',
     command: '/commands_for_lag',
   },
   showEquipment: {
+    icon: '🎒',
     label: '🎒Экипировка',
     command: '/eqp',
   },
   showSupplies: {
+    icon: '🗃',
     label: '🗃Припасы',
     command: '/sppl',
   },
   showAchievments: {
+    icon: '✅',
     label: '✅Достижения',
     command: '/achv',
   },
   showHelp: {
+    icon: '💬',
     label: '💬Помощь',
     command: '/help',
   },
   showDrones: {
+    icon: '🛰',
     label: '🛰Дроны',
     command: '/show_drones',
   },
   hallOfFame: {
+    icon: '🏆',
     label: '🏆Зал Славы',
     command: '/show_hall_of_fame',
   },
   showGiants: {
+    icon: '🦂',
     label: '🦂Гиганты',
     command: '/show_giants',
   },
   showRegularBeasts: {
+    icon: '💀',
     label: '💀Мобы',
     command: '/show_beasts(regular)',
   },
   showDarkZoneBeasts: {
+    icon: '🚷',
     label: '🚷Мобы ТЗ',
     command: '/show_beasts(darkzone)',
   },
@@ -160,15 +178,36 @@ module.exports = {
     command: '/cancel',
   },
   showDungeons: {
+    icon: '⚠',
     label: '⚠️Подземелья',
     command: '/dng',
   },
   skillUpgrade: {
+    icon: '🎓',
     label: '🎓Скилокчтр',
     command: '/skill_upgrade',
   },
   showEncyclopedia: {
+    icon: '📔',
     label: '📔Энциклпдия',
     command: '/show_encyclopedia',
+  },
+  showSettings: {
+    icon: '⚙️',
+    label: '⚙️Настройки',
+    command: '/show_settings',
+  },
+  showSettingsButton: {
+    label: '⌨️ Кнопки',
+    command: '/show_buttons',
+  },
+  showSettingsAmountButton: {
+    label: '🎛 Количество',
+    command: '/show_amount_buttons',
+  },
+  showMyPipStats: {
+    icon: '📈',
+    label: '📈 Прогресс',
+    command: '/mypipstats',
   },
 };

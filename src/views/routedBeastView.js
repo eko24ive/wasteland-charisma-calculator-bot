@@ -200,7 +200,7 @@ const routedBeastView = (Beast, seachParams, route = null, config) => new Promis
         if (materialsInformation === null) {
           reply += 'Нет данных о дропе материалов\n';
         } else {
-          reply += `📦${materialsInformation} крышек\n`;
+          reply += `📦${materialsInformation} материалов\n`;
         }
 
         return reply;
@@ -508,8 +508,16 @@ ${processedFlees.successFlees}
 ${processedFlees.failFlees}
 `;
 
+      let beastMarker;
+
+      if (beast.isDungeon) {
+        beastMarker = '📯';
+      } else {
+        beastMarker = beast.type === 'DarkZone' ? '🚷' : '💀';
+      }
+
       const headerReply = `<b>${beast.name}</b>
-👣${beast.type === 'DarkZone' ? '🚷' : '💀'} ${getDistanceRange(beast.distanceRange)}км ${getDeprecatedFlair(isRangeDeprecated, true, true)}
+👣${beastMarker} ${getDistanceRange(beast.distanceRange)}км ${getDeprecatedFlair(isRangeDeprecated, true, true)}
 /mob_${fBeast._id.toJSON()}
 `;
 

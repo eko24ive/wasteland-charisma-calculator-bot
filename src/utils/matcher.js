@@ -46,11 +46,12 @@ const regExpSetMatcher = (string, {
   if (excludes !== undefined && excludes.length > 0) {
     excludesCheck = testRegExpsOnString(excludes, string, true, false);
   }
+
   if (either !== undefined && either.length > 0) {
     eitherCheck = testRegExpsOnString(either, string, false, true);
   }
 
-  return (containsCheck && conditionalCheck && excludesCheck && eitherCheck);
+  return (containsCheck && (conditionalCheck || !conditionalCheck) && excludesCheck && eitherCheck);
 };
 
 const matcher = (string, regExp) => regExp.test(string);
