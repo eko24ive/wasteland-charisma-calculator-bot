@@ -3662,9 +3662,21 @@ bot.on([/bup_(\d*)/, /bdown_(\d*)/], async (msg) => {
     await createSession(msg);
   }
 
+  if (isUp) {
+    [, buttonIndex] = /bup_(\d*)/.exec(msg.text);
+  } else {
+    [, buttonIndex] = /bdown_(\d*)/.exec(msg.text);
+  }
+
+  buttonIndex = Number(buttonIndex);
+
   const { settings } = sessions[msg.from.id];
 
   const isReserved = (index) => {
+    if (settings.buttons[index] === undefined) {
+      return false;
+    }
+
     const { label } = settings.buttons[index];
 
     if (label === buttons.showSettings.label || label === buttons.showEncyclopedia.label) {
@@ -3674,10 +3686,16 @@ bot.on([/bup_(\d*)/, /bdown_(\d*)/], async (msg) => {
     return false;
   };
 
+  if (isReserved(buttonIndex) || !settings.buttons.find(({ index }) => index === buttonIndex)) {
+    return msg.reply.text('Нет такой кнопки, пошол в жопу :3', {
+      asReply: true,
+    });
+  }
+
   if (isUp) {
     [, buttonIndex] = /bup_(\d*)/.exec(msg.text);
     settings.buttons = settings.buttons.map(({ index, state, ...rest }) => {
-      if (index === Number(buttonIndex) && !isReserved(buttonIndex)) {
+      if (index === Number(buttonIndex)) {
         return {
           state: 'true',
           index,
@@ -3694,7 +3712,7 @@ bot.on([/bup_(\d*)/, /bdown_(\d*)/], async (msg) => {
   } else {
     [, buttonIndex] = /bdown_(\d*)/.exec(msg.text);
     settings.buttons = settings.buttons.map(({ index, state, ...rest }) => {
-      if (index === Number(buttonIndex) && !isReserved(buttonIndex)) {
+      if (index === Number(buttonIndex)) {
         return {
           state: 'false',
           index,
