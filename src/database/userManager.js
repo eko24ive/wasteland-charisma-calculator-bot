@@ -245,13 +245,13 @@ const userManager = User => ({
     return new Promise((resolve) => {
       User.findOne({ 'telegram.id': id }).then(async (databaseUser) => {
         if (databaseUser === null) {
-          await this.create({ telegramData, pipData: undefined }).then(({
-            data,
-          }) => resolve({
+          const { data } = await this.create({ telegramData, pipData: undefined });
+
+          return resolve({
             ok: true,
             reason: 'USER_FOUND',
             data: data.settings,
-          }));
+          });
         }
 
         const { settings } = databaseUser.toJSON();

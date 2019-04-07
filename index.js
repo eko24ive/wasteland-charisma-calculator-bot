@@ -2372,7 +2372,11 @@ bot.on(['/leaderboard', '/top'], (msg) => {
   });
 });
 
-bot.on('/mypipstats', (msg) => {
+bot.on('/mypipstats', async (msg) => {
+  await msg.reply.text('Эта фича работает в эксперементальном режиме. Пожалуйста сообщи если столкнёшся с неожиданными проблемами :3', {
+    asReply: true,
+  });
+
   User.findOne({ 'telegram.id': msg.from.id }, (err, person) => {
     if (err) {
       console.log(err);

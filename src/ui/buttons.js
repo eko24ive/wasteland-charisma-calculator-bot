@@ -205,4 +205,8 @@ module.exports = {
     label: '🎛 Количество',
     command: '/show_amount_buttons',
   },
+  showMyPipStats: {
+    label: '📈 Прогресс',
+    command: '/mypipstats',
+  },
 };

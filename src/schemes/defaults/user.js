@@ -89,6 +89,13 @@ module.exports = {
         order: 7,
       },
       {
+        index: 18,
+        label: '📈 Прогресс',
+        command: '/mypipstats',
+        state: true,
+        order: 7.5,
+      },
+      {
         index: 8,
         label: '⚙️Настройки',
         command: '/show_settings',

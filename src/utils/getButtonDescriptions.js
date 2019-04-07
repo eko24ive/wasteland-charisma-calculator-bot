@@ -75,6 +75,10 @@ const descriptions = [
     label: '🔄Команды при лагах',
     description: 'Полезные комманды на случай если игровой бот будет зависать',
   },
+  {
+    label: '📈 Прогресс',
+    description: 'График, на котором отображаеться прогресс твоей прокачки за последние 10 пип-боев',
+  },
 ];
 
 
@@ -83,7 +87,14 @@ const getButtonDescriptions = (buttons, menu) => {
 
   const filteredButtons = buttons.filter(({ state }) => state === buttonsFilter)
     .map(({ label }) => descriptions.find(description => description.label === label))
-    .map(description => `<code>[${description.label}]</code> - ${description.description}`)
+    .map((description) => {
+      if (description) {
+        return `<code>[${description.label}]</code> - ${description.description}`;
+      }
+
+      return null;
+    })
+    .filter(description => description !== null)
     .join('\n\n');
 
   return filteredButtons;
