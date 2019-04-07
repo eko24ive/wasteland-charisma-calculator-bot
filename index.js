@@ -2363,8 +2363,8 @@ bot.on('/mypipstats', async (msg) => {
       });
     }
 
-    if (person === null) {
-      msg.reply.text('Я не могу показать тебе твой график прогресса - ты мне ещё не скидывал своего пип-боя');
+    if (person === null || !person.history) {
+      return msg.reply.text('Я не могу показать тебе твой график прогресса - ты мне ещё не скидывал своего пип-боя');
     }
 
     let pips = person.history.pip.toObject();
