@@ -11,7 +11,10 @@
             "args": [
                 "-D"
             ],
-            "program": "${workspaceFolder}/index.js"
+            "program": "${workspaceFolder}/index.js",
+            "skipFiles": [
+                "<node_internals>/**"
+            ],
         },
         {
             "type": "node",
