@@ -187,7 +187,7 @@ const createSession = async (msg) => {
   const { data } = await userManager.getOrCreateSettings({ id, telegramData });
   const userPip = await userManager.findByTelegramId(id);
 
-  sessions[msg.from.id] = {
+  const sessionObject = {
     pip: userPip.ok ? userPip.data.pip : null,
     state: states.WAIT_FOR_START,
     data: [],
@@ -205,6 +205,10 @@ const createSession = async (msg) => {
     encyclopediaKeyboard: getEncyclopediaKeyboard(data),
     buttonsAmount: data.buttonsAmount,
   };
+
+  sessions[msg.from.id] = sessionObject;
+
+  return sessionObject;
 };
 
 const getToken = () => {
@@ -235,7 +239,7 @@ if (process.env.ENV === 'LOCAL') {
   bot = new TeleBot({
     token: getToken(),
     polling: {
-      interval: 1,
+      interval: 0,
     },
     pluginConfig: {
       namedButtons: {
@@ -2883,20 +2887,24 @@ bot.on(['/cancel', '/journeyforwardcancel', '/force_cancel'], async (msg) => {
   }).catch(e => console.log(e));
 });
 
-bot.on('/delete_accaunt', (msg) => {
+bot.on('/delete_accaunt', async (msg) => {
   if (process.env.ENV === 'STAGING' || process.env.ENV === 'LOCAL') {
-    userManager.delete(msg.from.id).then((result) => {
-      if (!result.ok && result.reason === 'USER_NOT_FOUND') {
-        return msg.reply.text('Я не смог найти твою запись в базе', {
-          asReply: true,
-        }).catch(e => console.log(e));
-      }
+    const result = await userManager.delete(msg.from.id);
 
-      return msg.reply.text('Я удалил твою запись в базе', {
+    if (!result.ok && result.reason === 'USER_NOT_FOUND') {
+      return msg.reply.text('Я не смог найти твою запись в базе', {
         asReply: true,
+        replyMarkup: await defaultKeyboard(msg),
       }).catch(e => console.log(e));
-    });
+    }
+
+    return msg.reply.text('Я удалил твою запись в базе', {
+      asReply: true,
+      replyMarkup: await defaultKeyboard(msg),
+    }).catch(e => console.log(e));
   }
+
+  return null;
 });
 
 bot.on('/delete_beasts', (msg) => {
@@ -3656,10 +3664,20 @@ bot.on([/bup_(\d*)/, /bdown_(\d*)/], async (msg) => {
 
   const { settings } = sessions[msg.from.id];
 
+  const isReserved = (index) => {
+    const { label } = settings.buttons[index];
+
+    if (label === buttons.showSettings.label || label === buttons.showEncyclopedia.label) {
+      return true;
+    }
+
+    return false;
+  };
+
   if (isUp) {
     [, buttonIndex] = /bup_(\d*)/.exec(msg.text);
     settings.buttons = settings.buttons.map(({ index, state, ...rest }) => {
-      if (index === Number(buttonIndex)) {
+      if (index === Number(buttonIndex) && !isReserved(buttonIndex)) {
         return {
           state: 'true',
           index,
@@ -3676,7 +3694,7 @@ bot.on([/bup_(\d*)/, /bdown_(\d*)/], async (msg) => {
   } else {
     [, buttonIndex] = /bdown_(\d*)/.exec(msg.text);
     settings.buttons = settings.buttons.map(({ index, state, ...rest }) => {
-      if (index === Number(buttonIndex)) {
+      if (index === Number(buttonIndex) && !isReserved(buttonIndex)) {
         return {
           state: 'false',
           index,

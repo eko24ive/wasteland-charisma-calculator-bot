@@ -36,11 +36,11 @@ const userManager = User => ({
 
       const newDatabaseUser = await newUser.save();
 
-      return {
+      return resolve({
         ok: true,
         reason: 'USER_CREATED',
         data: newDatabaseUser.toJSON(),
-      };
+      });
     });
   }),
   delete: id => new Promise((resolve) => {
@@ -241,11 +241,11 @@ const userManager = User => ({
       });
     });
   }),
-  getOrCreateSettings: function _getOrCreateSettings({ id, telegramData }) {
+  getOrCreateSettings: async function _getOrCreateSettings({ id, telegramData }) {
     return new Promise((resolve) => {
       User.findOne({ 'telegram.id': id }).then(async (databaseUser) => {
         if (databaseUser === null) {
-          return this.create({ telegramData, pipData: undefined }).then(({
+          await this.create({ telegramData, pipData: undefined }).then(({
             data,
           }) => resolve({
             ok: true,
@@ -266,13 +266,13 @@ const userManager = User => ({
             reason: 'USER_FOUND',
             data: data.settings,
           }));
+        } else {
+          return resolve({
+            ok: true,
+            reason: 'USER_FOUND',
+            data: settings,
+          });
         }
-
-        return resolve({
-          ok: true,
-          reason: 'USER_FOUND',
-          data: settings,
-        });
       });
     });
   },
