@@ -215,33 +215,11 @@ const createSession = async (msg) => {
   return sessionObject;
 };
 
-const getToken = () => {
-  if (program.dev) {
-    console.log('RUNNING IN TEST MODE');
-    return process.env.BOT_TOKEN_TEST;
-  } if (program.prod) {
-    console.log('RUNNING IN PRODUCTION MODE');
-    return process.env.BOT_TOKEN;
-  }
-
-  throw new Error('Please, specify bot token mode "--dev" for development and "--prod" production');
-};
-
-const getUrl = () => {
-  if (process.env.ENV === 'PRODUCTION') {
-    return process.env.URL_PRODUCTION;
-  } if (process.env.ENV === 'STAGING') {
-    return process.env.URL_STAGING;
-  }
-
-  throw new Error('Please, specify bot token mode "--dev" for development and "--prod" production');
-};
-
 let bot;
 
 if (process.env.ENV === 'LOCAL') {
   bot = new TeleBot({
-    token: getToken(),
+    token: process.env.BOT_TOKEN,
     polling: {
       interval: 0,
     },
@@ -254,10 +232,10 @@ if (process.env.ENV === 'LOCAL') {
 
   bot.plug(namedButtons);
 } else {
-  const token = getToken();
+  const token = process.env.BOT_TOKEN;
   const host = '0.0.0.0';
   const port = process.env.PORT;
-  const url = getUrl();
+  const url = process.env.BOT_WEBHOOK_URL;
 
   bot = new TeleBot({
     token,

@@ -1,31 +1,33 @@
 # Wasteland Wars Assistant
-
-This project contains source files for telegram bot called "Assistant"
+Looking for english readme? It's here [README-en.md](https://github.com/eko24ive/wasteland-wars-assistant-bot/blob/master/README_en.md)
+Этот проект содержит исходники для телеграм-бота [@WastelandWarsAssistantBot](https://t.me/WastelandWarsAssistantBot) "Ассистент"
 
 ### Prerequisites
-MongoDB should be installed at your machine
+MongoDB должна быть установленна на вашей машине
 
 ### Setting up the project
-1. Ensure you have the latest NodeJS and NPM installed
-2. Clone this repo
-3. Before running `npm i` install Cairo dependencies ([instruction](https://github.com/Automattic/node-canvas#compiling))
-4. After successfull instalment of Cairo dependencies run `npm i`
+1. Убедитесь что у вас установленна последня версия NodeJS и Yarn
+2. Склонируйте этот репозиторий
+3. Установите Cairo ([instruction](https://github.com/Automattic/node-canvas#compiling))
+4. Выполните команду `yarn`
 
 ### Running the project
-1. Create `.env` file at the root level of the project
-2. Populate it with following text:
+1. Создатей `.env` файл в корневой папке проекта
+2. Скопируйте в неё следующий текст:
 ```
-BOT_TOKEN_TEST=<YOUR_BOT_TOKEN>
-MONGODB_URI=<YOUR_MONGO_DB_ADDRESS>
+BOT_TOKEN=<ТОКЕН ВАШЕГО БОТА>
+MONGODB_URI=<АДРЕС К ВАШЕЙ MONGO БАЗЕ>
 ENV=LOCAL
-VERSION=<CURRENT_WW_VERSION>
-DATA_THRESHOLD=<ACCEPTABLE_AMOUNT_OF_DATA_OF_CURRENT_VERSION>
+VERSION=<ТЕКУЩАЯ ВЕРСИЯ WW>
+DATA_THRESHOLD=<ПРИЕМЛИМОЕ КОЛИЧЕСТВО ДАННЫХ ТЕКУЩЕЙ ВЕРСИИ>
 ```
-3. Visit [@botfater](https://t.me/botfather/) and generate yourself a bot token
-4. Replace `<YOUR_BOT_TOKEN>` with just generated token
-5. Replace `<YOUR_MONGO_DB_ADDRESS>` with your MongoDB address (probably its mongodb://localhost/wwa)
+3. Напишите [@botfater](https://t.me/botfather/) и создайте токен для вашего бота
+4. Замените `<ТОКЕН ВАШЕГО БОТА>` на только что сгенерированный токен
+5. Замените `<АДРЕС К ВАШЕЙ MONGO БАЗЕ>` на адресс к вашей MongoDB (обычно это mongodb://localhost/wwa)
 
-6. Run the project using `node ./index -D` command
+6. Запустите проект используя комманду `node ./index -D`
+
+Если вы хотите запустить бота в режиме WebHook, замените значение `ENV` на `PRODUCTION` также добавьте переменные `PORT` и `BOT_WEBHOOK_URL` с соотвествующими значениями.
 
 ### Debugging
-It is possible to debug this solution using VSCode debug tools. After you put your breakpoints run the debug mode using `Test` configuration.
+Данный проект поддерживает возможность отладки через VSCode. Воспользуйтесь конфигурацией `Dev`.
