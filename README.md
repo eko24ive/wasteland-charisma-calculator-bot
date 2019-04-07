@@ -1,4 +1,4 @@
-# Wasteland Wars Assistant
+# Wasteland Wars Assistant 🇷🇺
 Looking for english readme? It's here [README-en.md](https://github.com/eko24ive/wasteland-wars-assistant-bot/blob/master/README_en.md)
 Этот проект содержит исходники для телеграм-бота [@WastelandWarsAssistantBot](https://t.me/WastelandWarsAssistantBot) "Ассистент"
 

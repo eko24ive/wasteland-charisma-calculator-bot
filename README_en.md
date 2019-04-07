@@ -1,4 +1,4 @@
-# Wasteland Wars Assistant
+# Wasteland Wars Assistant 🇺🇸
 
 This project contains source files for telegram bot called [@WastelandWarsAssistantBot](https://t.me/WastelandWarsAssistantBot) "Assistant"
 
