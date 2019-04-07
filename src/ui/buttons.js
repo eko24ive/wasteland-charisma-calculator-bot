@@ -118,10 +118,10 @@ module.exports = {
     label: '🤘Рейдовые локации',
     command: '/raids_text',
   },
-  showLocations: {
-    icon: '🏜️',
-    label: '🏜️Локации',
-    command: '/locations',
+  showDungeonsLocations: {
+    icon: '📯',
+    label: '📯Входы в подземелья',
+    command: '/dungeon_locations',
   },
   showInGameCommands: {
     icon: '🔄',

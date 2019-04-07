@@ -108,8 +108,8 @@ module.exports = {
         order: 10,
       }, {
         index: 11,
-        label: '🏜️Локации',
-        command: '/locations',
+        label: '📯Входы в подземелья',
+        command: '/dungeon_locations',
         state: false,
         order: 11,
       }, {

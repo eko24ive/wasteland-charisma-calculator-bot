@@ -126,4 +126,9 @@ const locationsMenu = {
   ],
 };
 
-module.exports = locationsMenu;
+module.exports = {
+  locationsMenu,
+  locationsAll,
+  locationsRaid,
+  locationsDungeon,
+};
