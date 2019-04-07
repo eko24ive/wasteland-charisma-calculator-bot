@@ -206,6 +206,7 @@ module.exports = {
     command: '/show_amount_buttons',
   },
   showMyPipStats: {
+    icon: '📈',
     label: '📈 Прогресс',
     command: '/mypipstats',
   },
