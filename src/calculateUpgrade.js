@@ -199,7 +199,7 @@ const getCap = ({
   let skillCap = skillsCap[skillName];
 
   if (toMax) {
-    if (currentDzen === 0) {
+    if (currentDzen === 0 || currentDzen === undefined) {
       return skillCap;
     }
 
