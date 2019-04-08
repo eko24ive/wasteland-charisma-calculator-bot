@@ -24,6 +24,7 @@ const simpleHungerRegExp = /🍗(\d+)%/;
 const simpleHealthRegExp = /❤️\d*\/(\d+)/;
 
 const dzenRegExp = /(🏵(\d+)|🏵+$)/mu;
+const dzenBarsRegExp = /▓|░/g;
 
 const classicPip = {
   contains: [
@@ -116,6 +117,7 @@ const regexps = {
   simpleHungerRegExp,
   simpleHealthRegExp,
   dzenRegExp,
+  dzenBarsRegExp,
 };
 
 module.exports = {

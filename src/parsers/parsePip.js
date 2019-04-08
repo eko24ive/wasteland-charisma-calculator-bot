@@ -22,11 +22,11 @@ const parseClassic = (text) => {
     [, dzens, dzensAmount] = regexps.dzenRegExp.exec(text);
   }
 
-  if (/(\d+)/.test(dzens)) {
+  if (/(\d+)/.test(dzens) && !regexps.dzenBarsRegExp.test(text)) {
     [, dzen] = /(\d+)/.exec(dzens);
     dzen = Number(dzen);
   } else {
-    if (dzensAmount) {
+    if (dzensAmount || regexps.dzenBarsRegExp.test(text)) {
       dzen = Number(dzensAmount - 1);
     }
 
