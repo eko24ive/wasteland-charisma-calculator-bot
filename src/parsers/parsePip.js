@@ -16,20 +16,25 @@ const parseClassic = (text) => {
 
   let dzens;
   let dzensAmount = 1;
+  let dzen = 0;
 
   if (regexps.dzenRegExp.test(text)) {
     [, dzens, dzensAmount] = regexps.dzenRegExp.exec(text);
   }
 
-  let dzen = 0;
+  if (/(\d+)/.test(dzens)) {
+    [, dzen] = /(\d+)/.exec(dzens);
+    dzen = Number(dzen);
+  } else {
+    if (dzensAmount) {
+      dzen = Number(dzensAmount - 1);
+    }
 
-  if (dzensAmount) {
-    dzen = Number(dzensAmount - 1);
+    if (dzens && !dzensAmount) {
+      dzen = dzens.length / 2;
+    }
   }
 
-  if (dzens && !dzensAmount) {
-    dzen = dzens.length / 2;
-  }
 
   const data = {
     version,
@@ -68,14 +73,16 @@ const parseSimple = (text) => {
   const [, faction] = regexps.simpleFactionRegExp.exec(text);
   const [, damage] = regexps.simpleDamageRegExp.exec(text);
   let dzens;
-
-  if (regexps.dzenRegExp.test(text)) {
-    [, dzens] = regexps.dzenRegExp.exec(text);
-  }
-
+  let dzenAmount;
   let dzen = 0;
 
-  if (dzens) {
+  if (regexps.dzenRegExp.test(text)) {
+    [, dzens, dzenAmount] = regexps.dzenRegExp.exec(text);
+  }
+
+  if (dzenAmount) {
+    dzen = Number(dzenAmount);
+  } else if (dzens) {
     dzen = dzens.length / 2;
   }
 

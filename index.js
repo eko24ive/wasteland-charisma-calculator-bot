@@ -3136,11 +3136,14 @@ ${beastsList}
           return `<b>${skillName}</b>: ${result.data.pip[key]}`;
         });
 
+        const dzenText = result.data.pip.dzen > 0 ? `🏵 <b>Дзен</b>: ${result.data.pip.dzen}` : 'Ты ещё не постиг Дзен 🏵';
+
         return bot.sendMessage(msg.from.id, `
 ${skillOMaticText}
 
 Вот что я знаю про твои скилы:
 ${userSkills.join('\n')}
+${dzenText}
 <i>(Если они не акутальные - просто отправь мне свой новый пип-бой)</i>
 
 
