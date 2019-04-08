@@ -408,7 +408,7 @@ const getEffort = async (msg, toMax = false, dzenAmount = 0) => {
 
   sessions[msg.from.id].state = states.WAIT_FOR_RESPONSE;
 
-  sessions[msg.from.id].amountToUpgrade = toMax || msg.text;
+  sessions[msg.from.id].amountToUpgrade = toMax || Number(msg.text);
 
   const effort = calculateUpgrade(sessions[msg.from.id], {
     toMax,

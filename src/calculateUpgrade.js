@@ -211,7 +211,7 @@ const getCap = ({
     upgradeTo = skillCap;
   }
 
-  if (upgradeTo > skillCap && upgradeTo < constants.AVAILABLE_CAP && !dzenAmount) {
+  if (upgradeTo < skillCap && upgradeTo < constants.AVAILABLE_CAP && !dzenAmount) {
     return upgradeTo;
   }
 
