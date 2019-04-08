@@ -215,6 +215,10 @@ const getCap = ({
     return upgradeTo;
   }
 
+  if (upgradeTo > skillCap && upgradeTo < constants.AVAILABLE_CAP) {
+    return upgradeTo;
+  }
+
   return skillCap;
 };
 
