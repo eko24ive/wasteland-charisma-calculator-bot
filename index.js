@@ -2922,7 +2922,7 @@ _Если гиганта нет в списке - значит его ещё н�
     const beastType = type === 'regular' ? 'Regular' : 'DarkZone';
 
     Beast.find({
-      isDungeon: false, subType: 'regular', distanceRange: { $gte: Number(from), $lte: Number(to) }, type: beastType,
+      isDungeon: false, subType: 'regular', 'distanceRange.value': { $gte: Number(from), $lte: Number(to) }, type: beastType,
     }, 'battles.totalDamageReceived name id').then((beasts) => {
       bot.answerCallbackQuery(msg.id);
 
