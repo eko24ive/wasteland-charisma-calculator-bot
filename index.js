@@ -1398,7 +1398,7 @@ bot.on('forward', async (msg) => {
       beastName = data.name;
     }
 
-    const isForwardValid = ({ _dataType, _beastName, _beastType }) => {
+    const isForwardValid = ({ dataType, beastName, beastType }) => {
       let beastValidationTimeScope = beastsToValidate.map((beast, index) => ({ ...beast, index }));
       const beastIndexToRemove = date => beastValidationTimeScope.sort((a, b) => Math.abs(date - a.date) - Math.abs(date - b.date))[0].index;
 
@@ -1420,8 +1420,8 @@ bot.on('forward', async (msg) => {
         return false;
       }
 
-      if (_dataType === 'walkingBeastFaced') {
-        if (beastValidationTimeScope.some(beast => (beast.name.indexOf(_beastName) !== -1))) {
+      if (dataType === 'walkingBeastFaced') {
+        if (beastValidationTimeScope.some(beast => (beast.name.indexOf(beastName) !== -1))) {
           const beastIndex = beastIndexToRemove(msg.forward_date);
           sessions[msg.from.id].beastsToValidate = sessions[msg.from.id].beastsToValidate.filter((beast, index) => index !== beastIndex);
 
@@ -1431,8 +1431,8 @@ bot.on('forward', async (msg) => {
         return null;
       }
 
-      if (_dataType === 'dungeonBeastFaced') {
-        if (beastValidationTimeScope.every(beast => beast.name !== _beastName && beast.name !== '???')) {
+      if (dataType === 'dungeonBeastFaced') {
+        if (beastValidationTimeScope.every(beast => beast.name !== beastName && beast.name !== '???')) {
           return false;
         }
 
@@ -1442,7 +1442,7 @@ bot.on('forward', async (msg) => {
         return true;
       }
 
-      if (beastValidationTimeScope.every(beast => (beast.name !== _beastName && beast.name !== '???') || beast.type !== _beastType)) {
+      if (beastValidationTimeScope.every(beast => (beast.name !== beastName && beast.name !== '???') || beast.type !== beastType)) {
         return false;
       }
 
