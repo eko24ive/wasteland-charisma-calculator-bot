@@ -564,6 +564,22 @@ const actualActualProcessUserData = (msg, reportData, updatesData, options) => {
   }
 
   let userForwardPoints = 0;
+  const forwardTypes = {
+    beast: {
+      wins: 0,
+      loss: 0,
+      flee: {
+        wins: 0,
+        loss: 0,
+      },
+      regular: 0,
+      darkZone: 0,
+      walking: 0,
+      dungeon: 0,
+    },
+    locations: 0,
+    giants: 0,
+  };
   const beastsToValidate = [];
   let dataProcessed = 0;
   const dupes = {
@@ -720,9 +736,31 @@ const actualActualProcessUserData = (msg, reportData, updatesData, options) => {
               dataProcessed += 1;
 
               if (iBeast.type === 'DarkZone') {
+                forwardTypes.beast.darkZone += 1;
                 userForwardPoints += forwardPoints.newMob * forwardPoints.darkZoneBattle;
               } else {
+                forwardTypes.beast.regular += 1;
                 userForwardPoints += forwardPoints.newMob * forwardPoints.regularZoneBattle;
+              }
+
+              if (iBeast.subType) {
+                if (iBeast.subType === 'walking') {
+                  forwardTypes.beast.walking += 1;
+                }
+              }
+
+              if (iBeast.isDungeon) {
+                forwardTypes.beast.dungeon += 1;
+              }
+
+              if (iBeast.flees.length > 0) {
+                iBeast.flees.forEach(({ outcome }) => {
+                  if (outcome === 'lose') {
+                    forwardTypes.beast.flee.loss += 1;
+                  } else {
+                    forwardTypes.beast.flee.wins += 1;
+                  }
+                });
               }
 
               newBeast.save().then(() => next());
@@ -847,7 +885,7 @@ const actualActualProcessUserData = (msg, reportData, updatesData, options) => {
               uniqueBattles.forEach((newBattle) => {
                 if (newBattle.outcome === 'win') {
                   beastPoints += forwardPoints.newBattleWin;
-
+                  forwardTypes.beast.wins += 1;
                   if (iBeast.capsReceived.length > 0) {
                     const capsReceivedForValidation = databaseBeast.capsReceived
                       .filter(({ version }) => (version === VERSION))
@@ -873,6 +911,7 @@ const actualActualProcessUserData = (msg, reportData, updatesData, options) => {
                   }
                 } else {
                   beastPoints += forwardPoints.newBattleLose;
+                  forwardTypes.beast.loss += 1;
                 }
 
                 databaseBeast.battles.push(signEntryWithVersion(newBattle));
@@ -887,8 +926,10 @@ const actualActualProcessUserData = (msg, reportData, updatesData, options) => {
               uniqueFlees.forEach((newFlee) => {
                 if (newFlee.outcome === 'win') {
                   beastPoints += forwardPoints.newFleeWin;
+                  forwardTypes.beast.flee.wins += 1;
                 } else {
                   beastPoints += forwardPoints.newFleeLose;
+                  forwardTypes.beast.flee.loss += 1;
                 }
 
                 databaseBeast.flees.push(signEntryWithVersion(newFlee));
@@ -930,6 +971,8 @@ const actualActualProcessUserData = (msg, reportData, updatesData, options) => {
   const processLocations = () => new Promise((resolve) => {
     if (updatesData.locations.length > 0) {
       async.forEach(updatesData.locations, (iLocation, next) => {
+        forwardTypes.locations += 1;
+
         Location.findOne({
           distance: iLocation.distance,
         }).then((databaseLocation) => {
@@ -1054,7 +1097,9 @@ ${errors}
             username: msg.from.username,
           };
 
-          await userManager.addPoints({ id: msg.from.id, telegramData, points: userForwardPoints });
+          await userManager.addPoints({
+            id: msg.from.id, telegramData, points: userForwardPoints, forwardTypes,
+          });
 
           msg.reply.text(reply, {
             replyMarkup: await defaultKeyboard(msg),
@@ -3647,6 +3692,36 @@ bot.on('/show_amount_buttons', async (msg) => {
     ], {
       resize: true,
     }),
+  });
+});
+
+bot.on('/myforwardstats', async (msg) => {
+  const { data: forwards } = await userManager.getForwardStats({ id: msg.from.id });
+
+  const reply = `Вот собранная статисктика по всёму тому, что ты мне накидал.
+
+<b>Мобы</b>
+
+  ✅ Победы: ${forwards.beast.wins}
+  ☠️ Поражения: ${forwards.beast.loss}
+
+  💀 Из Безопасной Зоны: ${forwards.beast.darkZone}
+  🚷 Из Тёмной Зоны: ${forwards.beast.regular}
+  🚶 Бродячие: ${forwards.beast.walking}
+  📯 Данжевые: ${forwards.beast.dungeon}
+
+  🏃‍♂️ Побеги
+      ✅ Удачные: ${forwards.beast.flee.wins}
+      💔 Неудачные: ${forwards.beast.flee.loss}
+
+<b>🦂 Гиганты</b>: ${forwards.giants}
+
+<b>🏜 Локации</b>: ${forwards.locations}
+`;
+
+  await msg.reply.text(reply, {
+    asReply: true,
+    parseMode: 'html',
   });
 });
 

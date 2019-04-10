@@ -138,7 +138,9 @@ const userManager = User => ({
       });
     });
   }),
-  addPoints({ id, points, telegramData }) {
+  addPoints({
+    id, points, telegramData, forwardTypes,
+  }) {
     return new Promise((resolve) => {
       User.findOne({ 'telegram.id': id }).then((databaseUser) => {
         if (databaseUser === null) {
@@ -156,6 +158,23 @@ const userManager = User => ({
         }
 
         databaseUser.points.score += points;
+
+        databaseUser.points.forwards = {
+          beast: {
+            wins: databaseUser.points.forwards.beast.wins + forwardTypes.beast.wins,
+            loss: databaseUser.points.forwards.beast.loss + forwardTypes.beast.loss,
+            flee: {
+              wins: databaseUser.points.forwards.beast.flee.wins + forwardTypes.beast.flee.wins,
+              loss: databaseUser.points.forwards.beast.flee.loss + forwardTypes.beast.flee.loss,
+            },
+            regular: databaseUser.points.forwards.beast.regular + forwardTypes.beast.regular,
+            darkZone: databaseUser.points.forwards.beast.darkZone + forwardTypes.beast.darkZone,
+            walking: databaseUser.points.forwards.beast.walking + forwardTypes.beast.walking,
+            dungeon: databaseUser.points.forwards.beast.dungeon + forwardTypes.beast.dungeon,
+          },
+          locations: databaseUser.points.forwards.locations + forwardTypes.locations,
+          giants: databaseUser.points.forwards.giants + forwardTypes.giants,
+        };
 
         databaseUser.save().then(databaseUpdatedUser => resolve({
           ok: true,
@@ -293,6 +312,22 @@ const userManager = User => ({
         ok: true,
         reason: 'USER_UPDATED',
         data: updatedDatabaseUser.toJSON(),
+      });
+    });
+  }),
+  getForwardStats: ({ id }) => new Promise((resolve) => {
+    User.findOne({ 'telegram.id': id }).then(async (databaseUser) => {
+      if (databaseUser === null) {
+        return resolve({
+          ok: false,
+          result: 'USER_NOT_FOUND',
+        });
+      }
+
+      return resolve({
+        ok: true,
+        reason: 'USER_UPDATED',
+        data: databaseUser.points.forwards.toJSON(),
       });
     });
   }),

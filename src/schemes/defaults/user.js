@@ -23,7 +23,14 @@ module.exports = {
       beast: {
         wins: 0,
         loss: 0,
-        flee: 0,
+        flee: {
+          wins: 0,
+          loss: 0,
+        },
+        regular: 0,
+        darkZone: 0,
+        walking: 0,
+        dungeon: 0,
       },
       locations: 0,
       giants: 0,
@@ -94,6 +101,13 @@ module.exports = {
         command: '/mypipstats',
         state: true,
         order: 7.5,
+      },
+      {
+        index: 19,
+        label: '📊 Статистика',
+        command: '/myforwardstats',
+        state: true,
+        order: 7.6,
       },
       {
         index: 8,

@@ -45,6 +45,28 @@ const userSchema = Schema({
           default: 0,
         },
         flee: {
+          wins: {
+            type: Number,
+            default: 0,
+          },
+          loss: {
+            type: Number,
+            default: 0,
+          },
+        },
+        regular: {
+          type: Number,
+          default: 0,
+        },
+        darkZone: {
+          type: Number,
+          default: 0,
+        },
+        walking: {
+          type: Number,
+          default: 0,
+        },
+        dungeon: {
           type: Number,
           default: 0,
         },

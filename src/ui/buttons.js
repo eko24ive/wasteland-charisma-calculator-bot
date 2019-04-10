@@ -210,4 +210,9 @@ module.exports = {
     label: '📈 Прогресс',
     command: '/mypipstats',
   },
+  showMyForwardsStats: {
+    icon: '📊',
+    label: '📊 Статистика',
+    command: '/myforwardstats',
+  },
 };
