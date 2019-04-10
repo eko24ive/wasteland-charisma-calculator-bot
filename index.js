@@ -1990,16 +1990,27 @@ bot.on('forward', async (msg) => {
 
         return false;
       }).catch(e => console.log(e));
-    } else if (isRegularBeast || isFlee || isDungeonBeast) {
+    } else if (isFlee) {
+      const data = parseFlee(msg.text);
+      const dataType = 'flee';
+
+      sessions[msg.from.id].data.push({
+        data,
+        dataType,
+        date: msg.forward_date,
+        userId: msg.from.id,
+      });
+
+      await msg.reply.text('Запускаю режим [🏃СкинутьЛог], пожалуйста докинь форвард встречи моба и также свой пип.\nПосле - нажми [🙅‍♂️Стоп]');
+
+      return bot.event('/go', msg, { shouldCreateSession: false });
+    } else if (isRegularBeast || isDungeonBeast) {
       let data;
       let dataType;
 
       await createSession(msg);
 
-      if (isFlee) {
-        data = parseFlee(msg.text);
-        dataType = 'flee';
-      } else if (isRegularBeast) {
+      if (isRegularBeast) {
         data = beastParser.parseRegularBeast(msg.text);
         dataType = 'regularBeast';
       } else if (isDungeonBeast) {
@@ -2141,8 +2152,10 @@ bot.on('/upgradeSkill', (msg) => {
   return getEffort(msg, skillsToMax, 0);
 });
 
-bot.on(['/journeyforwardstart', '/go'], async (msg) => {
-  await createSession(msg);
+bot.on(['/journeyforwardstart', '/go'], async (msg, { shouldCreateSession = true }) => {
+  if (shouldCreateSession) {
+    await createSession(msg);
+  }
 
   const inlineReplyMarkup = bot.inlineKeyboard([
     [
