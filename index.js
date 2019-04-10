@@ -21,6 +21,7 @@ const config = require('./package.json');
 const namedButtons = require('./src/plugins/namedButtons');
 
 const forwardPoints = require('./src/constants/forwardPoints');
+const states = require('./src/constants/states');
 
 const regexps = require('./src/regexp/regexp');
 const PipRegexps = require('./src/regexp/pip');
@@ -56,6 +57,7 @@ const processMenu = require('./src/utils/processMenu');
 const validateForwardDate = require('./src/utils/validateForwardDate');
 const checkPips = require('./src/utils/comparePips');
 const getButtonDescriptions = require('./src/utils/getButtonDescriptions');
+const validateDistanceRange = require('./src/utils/validateDistanceRange');
 
 const routedBeastView = require('./src/views/routedBeastView');
 const routedBattleView = require('./src/views/routedBattleView');
@@ -72,6 +74,8 @@ const achievementsMenu = require('./src/staticMenus/achievementsMenu');
 const dungeonMenu = require('./src/staticMenus/dungeonMenu');
 
 const buttons = require('./src/ui/buttons');
+const getKeyboard = require('./src/ui/getKeyboard');
+const getEncyclopediaKeyboard = require('./src/ui/getEncyclopediaKeyboard');
 const {
   commandsForLag,
 } = require('./src/strings/strings');
@@ -96,75 +100,7 @@ program
   .parse(process.argv);
 
 const sessions = {};
-
-const WAIT_FOR_SKILL = 'WAIT_FOR_SKILL';
-const WAIT_FOR_DISTANCE = 'WAIT_FOR_DISTANCE';
-const WAIT_FOR_LEVELS = 'WAIT_FOR_LEVELS';
-const WAIT_FOR_RESPONSE = 'WAIT_FOR_RESPONSE';
-const WAIT_FOR_FORWARD_END = 'WAIT_FOR_FORWARD_END';
-const WAIT_FOR_START = 'WAIT_FOR_START';
-const WAIT_FOR_PIP_FORWARD = 'WAIT_FOR_PIP_FORWARD';
-const WAIT_FOR_DATA_VALIDATION = 'WAIT_FOR_DATA_VALIDATION';
-const WAIT_FOR_DATA_TO_PROCESS = 'WAIT_FOR_DATA_TO_PROCESS';
-const WAIT_FOR_BUTTONS_AMOUNT = 'WAIT_FOR_BUTTONS_AMOUNT';
-
-const states = {
-  WAIT_FOR_SKILL,
-  WAIT_FOR_DISTANCE,
-  WAIT_FOR_LEVELS,
-  WAIT_FOR_RESPONSE,
-  WAIT_FOR_START,
-  WAIT_FOR_FORWARD_END,
-  WAIT_FOR_PIP_FORWARD,
-  WAIT_FOR_DATA_VALIDATION,
-  WAIT_FOR_DATA_TO_PROCESS,
-  WAIT_FOR_BUTTONS_AMOUNT,
-};
-
-const emojiRegex = /[\u{1f300}-\u{1f5ff}\u{1f900}-\u{1f9ff}\u{1f600}-\u{1f64f}\u{1f680}-\u{1f6ff}\u{2600}-\u{26ff}\u{2700}-\u{27bf}\u{1f1e6}-\u{1f1ff}\u{1f191}-\u{1f251}\u{1f004}\u{1f0cf}\u{1f170}-\u{1f171}\u{1f17e}-\u{1f17f}\u{1f18e}\u{3030}\u{2b50}\u{2b55}\u{2934}-\u{2935}\u{2b05}-\u{2b07}\u{2b1b}-\u{2b1c}\u{3297}\u{3299}\u{303d}\u{00a9}\u{00ae}\u{2122}\u{23f3}\u{24c2}\u{23e9}-\u{23ef}\u{25b6}\u{23f8}-\u{23fa}]/u;
-
-const getKeyboard = (data) => {
-  const filteredButtons = data.buttons.filter(({ label, state }) => label !== buttons.showSettings.label && state === 'true');
-  const sortedButons = _.sortBy(filteredButtons, ({ order }) => order);
-  let labeledButtons = sortedButons.map(({ label }) => label);
-
-  if (data.buttonsIconsMode) {
-    labeledButtons = labeledButtons.map((label) => {
-      const [emoji] = emojiRegex.exec(label);
-
-      return emoji || label;
-    });
-  }
-
-  const keyboard = [
-    ..._.chunk(labeledButtons, data.buttonsAmount),
-    [
-      buttons.showSettings.label,
-    ],
-  ];
-
-  return keyboard;
-};
-
-const getEncyclopediaKeyboard = (data) => {
-  const filteredButtons = data.buttons.filter(({ label, state }) => label !== buttons.showSettings.label && label !== buttons.showEncyclopedia.label && state === 'false');
-  const sortedButons = _.sortBy(filteredButtons, ({ order }) => order);
-  let labeledButtons = sortedButons.map(({ label }) => label);
-
-  if (data.buttonsIconsMode) {
-    labeledButtons = labeledButtons.map((label) => {
-      const [emoji] = emojiRegex.exec(label);
-
-      return emoji || label;
-    });
-  }
-
-  const keyboard = [
-    ..._.chunk(labeledButtons, data.buttonsAmount),
-  ];
-
-  return keyboard;
-};
+let bot;
 
 const updateKeyboard = async (msg) => {
   const { id } = msg.from;
@@ -214,8 +150,6 @@ const createSession = async (msg) => {
 
   return sessionObject;
 };
-
-let bot;
 
 if (process.env.ENV === 'LOCAL') {
   bot = new TeleBot({
@@ -386,7 +320,6 @@ const defaultKeyboard = async (msg) => {
   });
 };
 
-
 const encyclopediaKeyboard = async (msg) => {
   if (sessions[msg.from.id]) {
     if (sessions[msg.from.id].encyclopediaKeyboard) {
@@ -440,7 +373,6 @@ const toSkillOMaticKeyboard = bot.inlineKeyboard([
     bot.inlineButton('Запустить "🎓Скилокачатор"', { callback: 'initialize_skill_upgrade' }),
   ],
 ]);
-
 
 const getBeastKeyboard = beastId => bot.inlineKeyboard([
   [
@@ -3230,11 +3162,6 @@ ${skillOMaticText}
   return false;
 });
 
-const validateRange = (rangeToValidate, _from, _to) => {
-  const from = Number(_from);
-  const to = Number(_to);
-  return rangeToValidate.filter(range => range[0] === from && range[1] === to).length === 1;
-};
 
 bot.on('text', async (msg) => {
   const regularZoneBeastsRequestRegExp = /(\d+)-(\d+)/;
@@ -3279,7 +3206,7 @@ bot.on('text', async (msg) => {
 
     [, from,, to] = rangeRegExp.exec(msg.text);
 
-    if (!validateRange(range, from, to)) {
+    if (!validateDistanceRange(range, from, to)) {
       return msg.reply.text('Да, очень умно с твоей стороны. Начислил тебе <i>нихуя</i> 💎<b>Шмепселей</b> за смекалочку, а теперь иди нахуй и используй кнопки внизу.', {
         parseMode: 'html',
       });
