@@ -5,6 +5,7 @@ process.on('unhandledRejection', (reason) => {
 require('dotenv').config();
 
 const uristring = process.env.MONGODB_URI;
+const { REPORT_CHANNEL_ID } = process.env.REPORT_CHANNEL_ID;
 const DATA_THRESHOLD = Number(process.env.DATA_THRESHOLD);
 const { VERSION } = process.env;
 
@@ -30,6 +31,7 @@ const locationSchema = require('./src/schemes/location');
 const giantScheme = require('./src/schemes/giant');
 const userSchema = require('./src/schemes/user');
 const journeySchema = require('./src/schemes/journey');
+const feedbackSchema = require('./src/schemes/feedback');
 
 const userDefaults = require('./src/schemes/defaults/user');
 
@@ -86,6 +88,7 @@ const Giant = mongoose.model('Giant', giantScheme);
 const Location = mongoose.model('Location', locationSchema);
 const User = mongoose.model('User', userSchema);
 const Journey = mongoose.model('Journey', journeySchema);
+const Feedback = mongoose.model('Feedback', feedbackSchema);
 
 const userManager = UserManager(User);
 
@@ -3735,6 +3738,68 @@ bot.on('/myforwardstats', async (msg) => {
   await msg.reply.text(reply, {
     asReply: true,
     parseMode: 'html',
+  });
+});
+
+bot.on(/#/, async (msg) => {
+  const tagRegExp = /^#\S+/;
+
+  const allowedFeedbackTags = [
+    'баг',
+    'идея',
+    'отзыв',
+    'вопрос',
+    'бомбит',
+    'бля',
+    'помогите',
+    'жалоба',
+    'обнова',
+    'пиздец',
+    'яустал',
+    'фидбек',
+    'ягорю',
+    'хочупомочь',
+  ];
+
+  const isMessageContainTag = allowedFeedbackTags.map(tag => msg.text.indexOf(tag) !== -1).some(result => result === true);
+
+  if (!isMessageContainTag) {
+    return;
+  }
+
+  const [feedbackType] = tagRegExp.exec(msg.text);
+  const message = msg.text.replace(tagRegExp, '');
+
+  const telegramData = {
+    first_name: msg.from.first_name,
+    id: msg.from.id,
+    username: msg.from.username,
+  };
+
+  const timestamp = msg.date;
+
+  const feedback = new Feedback({
+    message,
+    type: feedbackType,
+    telegram: telegramData,
+    timestamp,
+  });
+
+  await feedback.save();
+
+  await bot.sendMessage(REPORT_CHANNEL_ID, `
+From: @${msg.from.username}
+
+Type: ${feedbackType}
+
+Time: ${moment(timestamp * 1000).format('LLLL')}
+
+Message:
+${message}
+`);
+
+  await msg.reply.text('Ну погнали', {
+    asReply: true,
   });
 });
 
