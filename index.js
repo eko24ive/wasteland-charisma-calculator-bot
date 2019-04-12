@@ -5,7 +5,7 @@ process.on('unhandledRejection', (reason) => {
 require('dotenv').config();
 
 const uristring = process.env.MONGODB_URI;
-const { REPORT_CHANNEL_ID } = process.env.REPORT_CHANNEL_ID;
+const { REPORT_CHANNEL_ID } = process.env;
 const DATA_THRESHOLD = Number(process.env.DATA_THRESHOLD);
 const { VERSION } = process.env;
 
@@ -3818,7 +3818,7 @@ Message:
 ${message}
 `);
 
-  await msg.reply.text('Ну погнали', {
+  await msg.reply.text('Я обработал твоё сообщение', {
     asReply: true,
   });
 });
