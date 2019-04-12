@@ -454,7 +454,7 @@ const getBeastKeyboard = beastId => bot.inlineKeyboard([
   ],
 ]);
 
-bot.on(['/start', '/help'], async (msg) => {
+bot.on('/start', async (msg) => {
   await createSession(msg);
 
   const descriptions = getButtonDescriptions(sessions[msg.from.id].settings.buttons, 'start');
@@ -478,6 +478,14 @@ ${descriptions}
       webPreview: false,
     },
   );
+});
+
+bot.on('/help', async (msg) => {
+  await msg.reply.text(`
+Инструкция по Ассистенту: https://teletype.in/@eko24/B1NJpZAYV
+
+Напиши боту сообщение со следующим тегом (#баг, #идея, #отзыв, #вопрос, #бомбит, #бля, #помогите, #жалоба, #обнова, #пиздец, #яустал, #фидбек, #ягорю, #хочупомочь) и свой текст, и создатель бота получит твоё сообщение.
+`);
 });
 
 const getBeastToValidateMessage = (beastsToValidate, beastRequest = false, firstTime = true, failing = false) => {
