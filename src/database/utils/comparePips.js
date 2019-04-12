@@ -10,7 +10,7 @@ const comparePips = (newPip, lastPip) => Object.keys(lastPip).map((key) => {
     const lastPipValue = lastPip[key];
 
     if (_.isNumber(newPipValue) && _.isNumber(lastPipValue)) {
-      return (newPipValue - lastPipValue) > 0;
+      return (newPipValue - lastPipValue) >= 0;
     }
   }
 
