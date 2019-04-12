@@ -1,6 +1,7 @@
 const _ = require('underscore');
 
 const blacklistKeys = [
+  'timeStamp',
   'faction',
   'name',
   'version',
@@ -10,6 +11,9 @@ const blacklistKeys = [
   'precision',
   'charisma',
   'endurance',
+  'squad',
+  'strength',
+  'agility',
 ];
 
 const comparePips = (newPip, lastPip) => Object.keys(lastPip).map((key) => {
