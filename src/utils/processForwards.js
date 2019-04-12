@@ -617,7 +617,7 @@ const processForwards = (inputData, id, processConfig = {
         if (data.distance === reportData.lastBeastSeen.distance) {
           if (nextPip) {
             if ((nextPip.pip.date - date) > 30) {
-              reportData.errors.push(`Ты не предоставил пип для подтверждения побега на ${data.distance} километре. Я не обрабатывал этот побег`);
+              reportData.errors.push(`Твой пип не подходит для валидации побега на ${data.distance} километре - он не вписываеться в рамки "30 секунд". Я не обрабатывал этот побег`);
 
               return;
             }
@@ -634,7 +634,7 @@ const processForwards = (inputData, id, processConfig = {
               return;
             }
             if ((reportData.lastPip.date - date) > 30 || (reportData.lastPip.date - date) < 0) {
-              reportData.errors.push(`Ты не предоставил пип для подтверждения побега на ${data.distance} километре. Я не обрабатывал этот побег`);
+              reportData.errors.push(`Твой пип не подходит для валидации побега на ${data.distance} километре - он не вписываеться в рамки "30 секунд". Я не обрабатывал этот побег`);
 
               return;
             }
