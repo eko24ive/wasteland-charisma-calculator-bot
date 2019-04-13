@@ -699,14 +699,16 @@ const actualActualProcessUserData = (msg, reportData, updatesData, options) => {
                 forwardTypes.beast.dungeon += 1;
               }
 
-              if (iBeast.flees.length > 0) {
-                iBeast.flees.forEach(({ outcome }) => {
-                  if (outcome === 'lose') {
-                    forwardTypes.beast.flee.loss += 1;
-                  } else {
-                    forwardTypes.beast.flee.wins += 1;
-                  }
-                });
+              if (iBeast.flees) {
+                if (iBeast.flees.length > 0) {
+                  iBeast.flees.forEach(({ outcome }) => {
+                    if (outcome === 'lose') {
+                      forwardTypes.beast.flee.loss += 1;
+                    } else {
+                      forwardTypes.beast.flee.wins += 1;
+                    }
+                  });
+                }
               }
 
               newBeast.save().then(() => next());
