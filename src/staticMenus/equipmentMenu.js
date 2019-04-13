@@ -87,8 +87,6 @@ const workbenchText = `
 const workbenchWeapon = `
 *⚔️Оружие на верстаке:*
 ${getWeaponsByPlace(workbench)}
-
-Все оружие, начиная с *💥BFGzzv-4000* не ломается от времени и может использоваться вечно
 `;
 
 const workbenchArmor = `
