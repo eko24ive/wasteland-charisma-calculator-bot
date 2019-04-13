@@ -2567,6 +2567,12 @@ bot.on('/debug', async (msg) => {
 });
 
 bot.on(/^\d+$/, async (msg) => {
+  if (msg.chat) {
+    if (msg.chat.id === Number(REPORT_CHANNEL_ID)) {
+      return;
+    }
+  }
+
   switch (sessions[msg.from.id].state) {
     case states.WAIT_FOR_DISTANCE: {
       const reachableKm = Number(msg.text);
