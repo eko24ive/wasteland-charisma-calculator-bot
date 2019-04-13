@@ -5,6 +5,7 @@ process.on('unhandledRejection', (reason) => {
 require('dotenv').config();
 
 const uristring = process.env.MONGODB_URI;
+const { REPORT_CHANNEL_ID } = process.env;
 const DATA_THRESHOLD = Number(process.env.DATA_THRESHOLD);
 const { VERSION } = process.env;
 
@@ -31,6 +32,7 @@ const locationSchema = require('./src/schemes/location');
 const giantScheme = require('./src/schemes/giant');
 const userSchema = require('./src/schemes/user');
 const journeySchema = require('./src/schemes/journey');
+const feedbackSchema = require('./src/schemes/feedback');
 
 const userDefaults = require('./src/schemes/defaults/user');
 
@@ -90,6 +92,7 @@ const Giant = mongoose.model('Giant', giantScheme);
 const Location = mongoose.model('Location', locationSchema);
 const User = mongoose.model('User', userSchema);
 const Journey = mongoose.model('Journey', journeySchema);
+const Feedback = mongoose.model('Feedback', feedbackSchema);
 
 const userManager = UserManager(User);
 
@@ -383,7 +386,7 @@ const getBeastKeyboard = beastId => bot.inlineKeyboard([
   ],
 ]);
 
-bot.on(['/start', '/help'], async (msg) => {
+bot.on('/start', async (msg) => {
   await createSession(msg);
 
   const descriptions = getButtonDescriptions(sessions[msg.from.id].settings.buttons, 'start');
@@ -407,6 +410,17 @@ ${descriptions}
       webPreview: false,
     },
   );
+});
+
+bot.on('/help', async (msg) => {
+  await msg.reply.text(`
+Инструкция по Ассистенту: https://teletype.in/@eko24/B1NJpZAYV
+
+Напиши боту сообщение со следующим тегом (#баг, #идея, #отзыв, #вопрос, #бомбит, #бля, #помогите, #жалоба, #обнова, #пиздец, #яустал, #фидбек, #ягорю, #хочупомочь) и свой текст, и создатель бота получит твоё сообщение, например:
+<code>#идея не писать столько говнокода</code>
+`, {
+    parseMode: 'html',
+  });
 });
 
 const getBeastToValidateMessage = (beastsToValidate, beastRequest = false, firstTime = true, failing = false) => {
@@ -1144,6 +1158,20 @@ const processUserData = async (msg, options, processConfig = {
     }).catch(e => console.log(e));
   }
 
+  if (reportData.hardPipRequired) {
+    sessions[msg.from.id].state = states.WAIT_FOR_PIP_FORWARD;
+    sessions[msg.from.id].hardPipRequired = true;
+    return msg.reply.text(`Мне нужен твой пип для подтверждения побега что ты скинул. Помни что он не должен быть старше 30 секунд с момента побега.
+
+Если у тебя нет на это времени жми /skippipforward
+Если у тебя нет пипа, или он старше 30 секунд с момента побега - тоже жми /skippipforward
+
+*ВНИМАНИЕ: ПРИ НАЖАТИИ НА /skippipforward - БОТ ПРОИГНОРИРУЕТ ТВОИ БИТВЫ И ПОБЕГИ ОТ МОБОВ И НЕ ЗАПИШЕТ ИХ В БАЗУ*
+  `, {
+      parseMode: 'markdown',
+      replyMarkup: toGameKeyboard,
+    });
+  }
 
   if (updatesData.locations.length === 0 && updatesData.beasts.length === 0) {
     let errors = '';
@@ -1183,13 +1211,13 @@ ${errors}`, {
         if (reportDataWithUserPip.criticalError && reportDataWithUserPip.couldBeUpdated) {
           sessions[msg.from.id].state = states.WAIT_FOR_PIP_FORWARD;
           return msg.reply.text(`
-  Твой пип-бой, который я когда-то сохранил - устарел.
-  Пожалуйста скинь мне свой новый пип-бой.
-  Либо же это форвард с статами, отличными от твоих.
+Твой пип-бой, который я когда-то сохранил - устарел.
+Пожалуйста скинь мне свой новый пип-бой.
+Либо же это форвард с статами, отличными от твоих.
 
-  Если у тебя нет на это времени жми /skippipforward
+Если у тебя нет на это времени жми /skippipforward
 
-  *ВНИМАНИЕ: ПРИ НАЖАТИИ НА /skippipforward - БОТ ПРОИГНОРИРУЕТ ТВОИ БИТВЫ И ПОБЕГИ ОТ МОБОВ И НЕ ЗАПИШЕТ ИХ В БАЗУ*
+*ВНИМАНИЕ: ПРИ НАЖАТИИ НА /skippipforward - БОТ ПРОИГНОРИРУЕТ ТВОИ БИТВЫ И ПОБЕГИ ОТ МОБОВ И НЕ ЗАПИШЕТ ИХ В БАЗУ*
   `, {
             parseMode: 'markdown',
             replyMarkup: toGameKeyboard,
@@ -1933,7 +1961,7 @@ bot.on('forward', async (msg) => {
         userId: msg.from.id,
       });
 
-      await msg.reply.text('Запускаю режим [🏃СкинутьЛог], пожалуйста докинь форвард встречи моба и также свой пип.\nПосле - нажми [🙅‍♂️Стоп]');
+      await msg.reply.text('Вижу форвард побега - Запускаю режим [🏃СкинутьЛог]');
 
       return bot.event('/go', msg, { shouldCreateSession: false });
     } else if (isRegularBeast || isDungeonBeast) {
@@ -2104,6 +2132,12 @@ bot.on(['/journeyforwardstart', '/go'], async (msg, { shouldCreateSession = true
   ], {
     resize: true,
   });
+
+  if (!shouldCreateSession) {
+    return msg.reply.text('Режим [🏃СкинутьЛог] запущен!\n\nПожалуйста докинь форвард встречи моба и также свой пип.\nПосле - нажми [🙅‍♂️Стоп]', {
+      replyMarkup,
+    });
+  }
 
   await msg.reply.text(`
 Хей, вижу ты хочешь поделиться со мной ценной информацией с пустоши - отлично!
@@ -3662,6 +3696,68 @@ bot.on('/myforwardstats', async (msg) => {
   await msg.reply.text(reply, {
     asReply: true,
     parseMode: 'html',
+  });
+});
+
+bot.on(/#/, async (msg) => {
+  const tagRegExp = /^#\S+/;
+
+  const allowedFeedbackTags = [
+    'баг',
+    'идея',
+    'отзыв',
+    'вопрос',
+    'бомбит',
+    'бля',
+    'помогите',
+    'жалоба',
+    'обнова',
+    'пиздец',
+    'яустал',
+    'фидбек',
+    'ягорю',
+    'хочупомочь',
+  ];
+
+  const isMessageContainTag = allowedFeedbackTags.map(tag => msg.text.indexOf(tag) !== -1).some(result => result === true);
+
+  if (!isMessageContainTag) {
+    return;
+  }
+
+  const [feedbackType] = tagRegExp.exec(msg.text);
+  const message = msg.text.replace(tagRegExp, '');
+
+  const telegramData = {
+    first_name: msg.from.first_name,
+    id: msg.from.id,
+    username: msg.from.username,
+  };
+
+  const timestamp = msg.date;
+
+  const feedback = new Feedback({
+    message,
+    type: feedbackType,
+    telegram: telegramData,
+    timestamp,
+  });
+
+  await feedback.save();
+
+  await bot.sendMessage(REPORT_CHANNEL_ID, `
+From: @${msg.from.username}
+
+Type: ${feedbackType}
+
+Time: ${moment(timestamp * 1000).format('LLLL')}
+
+Message:
+${message}
+`);
+
+  await msg.reply.text('Я обработал твоё сообщение', {
+    asReply: true,
   });
 });
 

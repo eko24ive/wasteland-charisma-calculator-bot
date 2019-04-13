@@ -176,6 +176,10 @@ const processForwards = (inputData, id, processConfig = {
     return 0;
   });
 
+  const dataFleesLength = inputData.filter(({
+    dataType,
+  }) => dataType === 'flee').length;
+
   const dataPipsMap = dataPips.map((pip, index) => ({
     pip,
     index,
@@ -591,23 +595,6 @@ const processForwards = (inputData, id, processConfig = {
 
       let nextPip = dataPipsMap.find(pip => pip.index === lastKnownPip.index + 1);
 
-      if (nextPip) {
-        if ((nextPip.pip.date - date) > 30) {
-          reportData.errors.push(`Ты не предоставил пип для подтверждения побега на ${data.distance} километре. Я не обрабатывал этот побег`);
-
-          return;
-        }
-
-        nextPip = nextPip.pip;
-      } else {
-        if ((reportData.lastPip.date - date) > 30 || (reportData.lastPip.date - date) < 0) {
-          reportData.errors.push(`Ты не предоставил пип для подтверждения побега на ${data.distance} километре. Я не обрабатывал этот побег`);
-
-          return;
-        }
-
-        nextPip = reportData.lastPip;
-      }
 
       const subType = reportData.lastBeastSeenSubType;
 
@@ -628,6 +615,33 @@ const processForwards = (inputData, id, processConfig = {
 
       if (reportData.lastBeastSeen) {
         if (data.distance === reportData.lastBeastSeen.distance) {
+          if (nextPip) {
+            if ((nextPip.pip.date - date) > 30) {
+              reportData.errors.push(`Твой пип не подходит для валидации побега на ${data.distance} километре - он не вписываеться в рамки "30 секунд". Я не обрабатывал этот побег`);
+
+              return;
+            }
+
+            nextPip = nextPip.pip;
+          } else {
+            if (!reportData.lastPip) {
+              if (dataFleesLength === 1) {
+                reportData.hardPipRequired = true;
+                return;
+              }
+              reportData.errors.push(`Ты не предоставил пип для подтверждения побега на ${data.distance} километре. Я не обрабатывал этот побег`);
+
+              return;
+            }
+            if ((reportData.lastPip.date - date) > 30 || (reportData.lastPip.date - date) < 0) {
+              reportData.errors.push(`Твой пип не подходит для валидации побега на ${data.distance} километре - он не вписываеться в рамки "30 секунд". Я не обрабатывал этот побег`);
+
+              return;
+            }
+
+            nextPip = reportData.lastPip;
+          }
+
           beastData.name = reportData.lastBeastSeen.name;
           beastData.type = data.type;
 
