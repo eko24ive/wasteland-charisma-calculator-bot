@@ -487,8 +487,8 @@ bot.on('/help', async (msg) => {
 Напиши боту сообщение со следующим тегом (#баг, #идея, #отзыв, #вопрос, #бомбит, #бля, #помогите, #жалоба, #обнова, #пиздец, #яустал, #фидбек, #ягорю, #хочупомочь) и свой текст, и создатель бота получит твоё сообщение, например:
 <code>#идея не писать столько говнокода</code>
 `, {
-  parseMode: 'html'
-});
+    parseMode: 'html',
+  });
 });
 
 const getBeastToValidateMessage = (beastsToValidate, beastRequest = false, firstTime = true, failing = false) => {
