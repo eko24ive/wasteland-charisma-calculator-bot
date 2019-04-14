@@ -1,17 +1,13 @@
-const ChartjsNode = require('chartjs-node');
+const { CanvasRenderService } = require('chartjs-node-canvas');
 
-const chartNode = new ChartjsNode(600, 500);
+const width = 600;
+const height = 600;
 
-const chartGeneration = (config, cb) => {
-  chartNode
-    .drawChart(config)
-    .then(() => chartNode.getImageBuffer('image/png'))
-    .then((buffer) => {
-      cb(buffer);
-    })
-    .then(() => {
-      chartNode.destroy();
-    });
+const chartGeneration = async (config, cb) => {
+  const canvasRenderService = new CanvasRenderService(width, height);
+  const image = await canvasRenderService.renderToBuffer(config);
+
+  cb(image);
 };
 
 module.exports = chartGeneration;
