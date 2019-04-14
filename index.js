@@ -2154,7 +2154,7 @@ bot.on(['/journeyforwardstart', '/go'], async (msg, { shouldCreateSession = true
     parseMode: 'markdown',
   });
 
-  await msg.reply.text(`
+  return msg.reply.text(`
 *Я умею работать с данными только за один круг/вылазку - больше одной вылазки я пока обработать не смогу :с*
 
 Пожалуйста убедись, что ты перешлёшь _все_ сообщения - Телеграм может немного притормаживать.
@@ -2522,7 +2522,7 @@ bot.on('/mypipstats', async (msg) => {
       },
     };
 
-    chartGeneration(chartConfig, buffer => msg.reply.photo(buffer, {
+    return chartGeneration(chartConfig, buffer => msg.reply.photo(buffer, {
       asReply: true,
       caption: 'Получи и распишись!',
     }).catch(e => console.log(e)));
@@ -2610,7 +2610,8 @@ bot.on(/^\d+$/, async (msg) => {
       const newButtonsAmount = Number(msg.text);
 
       if (newButtonsAmount > 6 || newButtonsAmount < 1) {
-        return msg.reply.text('Введи количество от 1 до 6');
+        msg.reply.text('Введи количество от 1 до 6!');
+        return;
       }
 
       const { settings } = sessions[msg.from.id];
@@ -2627,16 +2628,16 @@ bot.on(/^\d+$/, async (msg) => {
       if (updateResult.ok) {
         await updateKeyboard(msg);
         sessions[msg.from.id].state = states.WAIT_FOR_START;
-        return msg.reply.text('Я обновил настройки');
+        msg.reply.text('Я обновил настройки');
+        return;
       }
 
-      return msg.reply.text('Произошла ошибка - я не смог найти тебя в базе. Попробуй нажать /start и повторить ещё раз.');
+      msg.reply.text('Произошла ошибка - я не смог найти тебя в базе. Попробуй нажать /start и повторить ещё раз.');
     }
+      break;
     default:
-      return false;
+      break;
   }
-
-  return false;
 });
 
 bot.on('/show_drones', msg => msg.reply.text(`
