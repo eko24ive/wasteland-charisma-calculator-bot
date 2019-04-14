@@ -276,22 +276,24 @@ const userManager = User => ({
         const { settings } = databaseUser.toJSON();
 
         if (settings === undefined || Object.keys(settings).map(key => settings[key]).some(entry => entry.length === 0)) {
-          await this.update({
+          const updateResult = await this.update({
             telegramData,
             pipData: undefined,
             settings: userDefaults.settings,
-          }).then(({ data }) => resolve({
-            ok: true,
-            reason: 'USER_FOUND',
-            data: data.settings,
-          }));
-        } else {
+          });
+
           return resolve({
             ok: true,
             reason: 'USER_FOUND',
-            data: settings,
+            data: updateResult.data.settings,
           });
         }
+
+        return resolve({
+          ok: true,
+          reason: 'USER_FOUND',
+          data: settings,
+        });
       });
     });
   },
