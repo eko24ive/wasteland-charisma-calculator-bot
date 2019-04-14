@@ -15,7 +15,6 @@ const _ = require('underscore');
 const TeleBot = require('telebot');
 const program = require('commander');
 const moment = require('moment-timezone');
-const objectDeepSearch = require('object-deep-search');
 
 const config = require('./package.json');
 
