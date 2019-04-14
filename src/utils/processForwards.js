@@ -54,6 +54,14 @@ const mergeBeasts = (beastsToMerge) => {
   proofedBeast.forEach((beast) => {
     if (mergedBeasts[beast.name]) {
       const existingBeast = mergedBeasts[beast.name];
+      const [
+        distanceRange,
+        capsReceived,
+        materialsReceived,
+        battles,
+        concussions,
+        flees,
+      ] = beast;
 
       if (
         existingBeast.isDungeon === beast.isDungeon
@@ -62,49 +70,49 @@ const mergeBeasts = (beastsToMerge) => {
       ) {
         if (beast.distanceRange !== undefined && beast.distanceRange.length > 0) {
           if (_.isEmpty(existingBeast.distanceRange)) {
-            existingBeast.distanceRange = beast.distanceRange[0];
+            existingBeast.distanceRange = distanceRange;
           } else {
-            existingBeast.distanceRange.push(beast.distanceRange[0]);
+            existingBeast.distanceRange.push(distanceRange);
           }
         }
 
         if (beast.capsReceived !== undefined && beast.capsReceived.length > 0) {
           if (_.isEmpty(existingBeast.capsReceived)) {
-            existingBeast.capsReceived = beast.capsReceived[0];
+            existingBeast.capsReceived = capsReceived;
           } else {
-            existingBeast.capsReceived.push(beast.capsReceived[0]);
+            existingBeast.capsReceived.push(capsReceived);
           }
         }
 
         if (beast.materialsReceived !== undefined && beast.materialsReceived.length > 0) {
           if (_.isEmpty(existingBeast.materialsReceived)) {
-            existingBeast.materialsReceived = beast.materialsReceived[0];
+            existingBeast.materialsReceived = materialsReceived;
           } else {
-            existingBeast.materialsReceived.push(beast.materialsReceived[0]);
+            existingBeast.materialsReceived.push(materialsReceived);
           }
         }
 
         if (beast.battles !== undefined && beast.battles.length > 0) {
           if (_.isEmpty(existingBeast.battles)) {
-            existingBeast.battles = beast.battles[0];
+            existingBeast.battles = battles;
           } else {
-            existingBeast.battles.push(beast.battles[0]);
+            existingBeast.battles.push(battles);
           }
         }
 
         if (beast.concussions !== undefined && beast.concussions.length > 0) {
           if (_.isEmpty(existingBeast.concussions)) {
-            existingBeast.concussions = beast.concussions[0];
+            existingBeast.concussions = concussions;
           } else {
-            existingBeast.concussions.push(beast.concussions[0]);
+            existingBeast.concussions.push(concussions);
           }
         }
 
         if (beast.flees !== undefined && beast.flees.length > 0) {
           if (_.isEmpty(existingBeast.flees)) {
-            existingBeast.flees = beast.flees[0];
+            existingBeast.flees = flees;
           } else {
-            existingBeast.flees.push(beast.flees[0]);
+            existingBeast.flees.push(flees);
           }
         }
 

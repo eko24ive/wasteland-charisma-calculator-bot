@@ -9,7 +9,6 @@ const Beast = mongoose.model('Beast', beastSchema);
 const sp = {};
 
 let i = 1;
-const total = 0;
 mongoose.connect('mongodb://localhost/wwa');
 
 const wightBeasts = [];

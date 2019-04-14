@@ -14,4 +14,3 @@ const timeToTravel = (stamina, distance) => {
 };
 
 module.exports = timeToTravel;
-

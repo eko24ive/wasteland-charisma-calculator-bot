@@ -1,7 +1,6 @@
 require('dotenv').config({ path: '../../.env' });
 const mongoose = require('mongoose');
 const async = require('async');
-const _ = require('underscore');
 
 const beastSchema = require('../../schemes/beast');
 
