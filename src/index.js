@@ -430,7 +430,7 @@ const getBeastToValidateMessage = (beastsToValidate, beastRequest = false, first
 
   const getHeader = () => {
     const failingMessage = 'Ты скинул мне какую-то хуйню, вот список того что мне нужно:';
-    const beastRequestFirstTime = 'Смотри, тут такое дело - поскольку этот моб/мобы может встречаться на данном километре в данже/БЗ/ТЗ и также быть бродячим. К сожалению, не могу однозначно определить его принадлежность и слезно прошу скинуть форвард встречи :3';
+    const beastRequestFirstTime = 'Смотри, тут такое дело... Поскольку этот моб может встречаться на данном километре в данже, а также еще и в БЗ, и в ТЗ, а то и вовсе быть бродячим, то я, к сожалению, не могу однозначно определить его принадлежность и слезно прошу скинуть форвард встречи :3';
     const beastRequestValidate = 'Слушай, у меня тут есть пару вопросиков по поводу правдивости твоей инфы - давай-ка их обкашляем.';
     const success = 'Отлично, продолжай в том же духе';
 
@@ -1273,7 +1273,7 @@ bot.on('forward', async (msg) => {
     // await createSession(msg);
 
     return msg.reply.text(`
-Форварды принимаються только от @WastelandWarsBot.
+Форварды принимаются только от @WastelandWarsBot.
             `, {
       asReply: true,
       replyMarkup: await defaultKeyboard(msg),
