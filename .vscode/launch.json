@@ -21,6 +21,12 @@
             "request": "launch",
             "name": "Merge",
             "program": "${workspaceFolder}\\src/database/runners/dropDungeons.js"
+        },
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "Debug File",
+            "program": "${file}"
         }
     ]
 }
