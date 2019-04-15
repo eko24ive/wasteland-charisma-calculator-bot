@@ -11,7 +11,7 @@
             "args": [
                 "-D"
             ],
-            "program": "${workspaceFolder}/index.js",
+            "program": "${workspaceFolder}/src/index.js",
             "skipFiles": [
                 "<node_internals>/**"
             ],

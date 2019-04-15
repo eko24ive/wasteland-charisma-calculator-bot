@@ -15,74 +15,75 @@ const _ = require('underscore');
 const TeleBot = require('telebot');
 const program = require('commander');
 const moment = require('moment-timezone');
+const objectDeepSearch = require('object-deep-search');
 
-const config = require('./package.json');
+const config = require('../package.json');
 
-const namedButtons = require('./src/plugins/namedButtons');
+const namedButtons = require('./plugins/namedButtons');
 
-const forwardPoints = require('./src/constants/forwardPoints');
-const states = require('./src/constants/states');
+const forwardPoints = require('./constants/forwardPoints');
+const states = require('./constants/states');
 
-const regexps = require('./src/regexp/regexp');
-const PipRegexps = require('./src/regexp/pip');
+const regexps = require('./regexp/regexp');
+const PipRegexps = require('./regexp/pip');
 
-const beastSchema = require('./src/schemes/beast');
-const locationSchema = require('./src/schemes/location');
-const giantScheme = require('./src/schemes/giant');
-const userSchema = require('./src/schemes/user');
-const journeySchema = require('./src/schemes/journey');
-const feedbackSchema = require('./src/schemes/feedback');
+const beastSchema = require('./schemes/beast');
+const locationSchema = require('./schemes/location');
+const giantScheme = require('./schemes/giant');
+const userSchema = require('./schemes/user');
+const journeySchema = require('./schemes/journey');
+const feedbackSchema = require('./schemes/feedback');
 
-const userDefaults = require('./src/schemes/defaults/user');
+const userDefaults = require('./schemes/defaults/user');
 
-const chartGeneration = require('./src/utils/chartGeneration');
+const chartGeneration = require('./utils/chartGeneration');
 
-const parsePip = require('./src/parsers/parsePip');
-const beastParser = require('./src/parsers/parseBeast');
-const parseLocation = require('./src/parsers/parseLocation');
-const parseFlee = require('./src/parsers/parseFlee');
-const parseDeathMessage = require('./src/parsers/parseDeathMessage');
-const parseBeastFaced = require('./src/parsers/parseBeastFaced');
-const parseGiantFaced = require('./src/parsers/parseGiantFaced');
-const parseGiant = require('./src/parsers/parseGiant');
-const parseGiantOnField = require('./src/parsers/parseGiantOnField');
+const parsePip = require('./parsers/parsePip');
+const beastParser = require('./parsers/parseBeast');
+const parseLocation = require('./parsers/parseLocation');
+const parseFlee = require('./parsers/parseFlee');
+const parseDeathMessage = require('./parsers/parseDeathMessage');
+const parseBeastFaced = require('./parsers/parseBeastFaced');
+const parseGiantFaced = require('./parsers/parseGiantFaced');
+const parseGiant = require('./parsers/parseGiant');
+const parseGiantOnField = require('./parsers/parseGiantOnField');
 
 const {
   regExpSetMatcher,
-} = require('./src/utils/matcher');
-const calculateUpgrade = require('./src/calculateUpgrade');
-const upgradeAmountValidation = require('./src/utils/upgradeAmountValidation');
-const processForwards = require('./src/utils/processForwards');
-const { ranges, dzRanges, dungeonRanges } = require('./src/utils/getRanges');
-const processMenu = require('./src/utils/processMenu');
-const validateForwardDate = require('./src/utils/validateForwardDate');
-const checkPips = require('./src/utils/comparePips');
-const getButtonDescriptions = require('./src/utils/getButtonDescriptions');
-const validateDistanceRange = require('./src/utils/validateDistanceRange');
+} = require('./utils/matcher');
+const calculateUpgrade = require('./calculateUpgrade');
+const upgradeAmountValidation = require('./utils/upgradeAmountValidation');
+const processForwards = require('./utils/processForwards');
+const { ranges, dzRanges, dungeonRanges } = require('./utils/getRanges');
+const processMenu = require('./utils/processMenu');
+const validateForwardDate = require('./utils/validateForwardDate');
+const checkPips = require('./utils/comparePips');
+const getButtonDescriptions = require('./utils/getButtonDescriptions');
+const validateDistanceRange = require('./utils/validateDistanceRange');
 
-const routedBeastView = require('./src/views/routedBeastView');
-const routedBattleView = require('./src/views/routedBattleView');
+const routedBeastView = require('./views/routedBeastView');
+const routedBattleView = require('./views/routedBattleView');
 
-const equipmentMenu = require('./src/staticMenus/equipmentMenu');
+const equipmentMenu = require('./staticMenus/equipmentMenu');
 const {
   locationsMenu,
   locationsAll,
   locationsRaid,
   locationsDungeon,
-} = require('./src/staticMenus/locationsMenu');
-const suppliesMenu = require('./src/staticMenus/suppliesMenu');
-const achievementsMenu = require('./src/staticMenus/achievementsMenu');
-const dungeonMenu = require('./src/staticMenus/dungeonMenu');
+} = require('./staticMenus/locationsMenu');
+const suppliesMenu = require('./staticMenus/suppliesMenu');
+const achievementsMenu = require('./staticMenus/achievementsMenu');
+const dungeonMenu = require('./staticMenus/dungeonMenu');
 
-const buttons = require('./src/ui/buttons');
-const getKeyboard = require('./src/ui/getKeyboard');
-const getEncyclopediaKeyboard = require('./src/ui/getEncyclopediaKeyboard');
+const buttons = require('./ui/buttons');
+const getKeyboard = require('./ui/getKeyboard');
+const getEncyclopediaKeyboard = require('./ui/getEncyclopediaKeyboard');
 const {
   commandsForLag,
-} = require('./src/strings/strings');
-const withBackButton = require('./src/utils/withBackButton');
+} = require('./strings/strings');
+const withBackButton = require('./utils/withBackButton');
 
-const UserManager = require('./src/database/userManager');
+const UserManager = require('./database/userManager');
 
 mongoose.connect(uristring);
 
