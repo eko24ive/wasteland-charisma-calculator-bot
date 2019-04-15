@@ -1,5 +1,6 @@
-# Wasteland Wars Assistant
-Looking for english readme? It's here [README-en.md](https://github.com/eko24ive/wasteland-wars-assistant-bot/blob/master/README_en.md)  
+# Wasteland Wars Assistant[![Build Status](https://travis-ci.com/eko24ive/wasteland-wars-assistant-bot.svg?branch=master)](https://travis-ci.com/eko24ive/wasteland-wars-assistant-bot)
+Looking for english readme? It's here [README-en.md](https://github.com/eko24ive/wasteland-wars-assistant-bot/blob/master/README_en.md)
+
 Этот проект содержит исходники для телеграм-бота [@WastelandWarsAssistantBot](https://t.me/WastelandWarsAssistantBot) "Ассистент"
 
 ### Требования к системе
@@ -33,4 +34,4 @@ DATA_THRESHOLD=<ПРИЕМЛИМОЕ КОЛИЧЕСТВО ДАННЫХ ТЕКУ�
 Данный проект поддерживает возможность отладки через VSCode. Воспользуйтесь конфигурацией `Dev`.
 
 ### Куда задавать вопросы
-Присойденяйтесь в уютный чат [@wwAssistantChat](https://t.me/wwAssistantChat) 
+Присойденяйтесь в уютный чат [@wwAssistantChat](https://t.me/wwAssistantChat)

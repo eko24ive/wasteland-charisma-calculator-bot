@@ -1,4 +1,4 @@
-# Wasteland Wars Assistant
+# Wasteland Wars Assistant [![Build Status](https://travis-ci.com/eko24ive/wasteland-wars-assistant-bot.svg?branch=master)](https://travis-ci.com/eko24ive/wasteland-wars-assistant-bot)
 
 This project contains source files for telegram bot called [@WastelandWarsAssistantBot](https://t.me/WastelandWarsAssistantBot) "Assistant"
 
