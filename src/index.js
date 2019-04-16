@@ -3177,7 +3177,7 @@ ${skillOMaticText}
 Вот что я знаю про твои скилы:
 ${userSkills.join('\n')}
 ${dzenText}
-<i>(Если они не акутальные - просто отправь мне свой новый пип-бой)</i>
+<i>(Если они не актуальные - просто отправь мне свой новый пип-бой)</i>
 
 
 <b>Выбери какой скил ты хочешь прокачать</b>
@@ -3708,7 +3708,13 @@ bot.on('/myforwardstats', async (msg) => {
   });
 });
 
-bot.on(/#/, async (msg) => {
+bot.on(/^#\S+/, async (msg) => {
+  if (msg.chat) {
+    if (msg.chat.id === REPORT_CHANNEL_ID) {
+      return;
+    }
+  }
+
   const tagRegExp = /^#\S+/;
 
   const allowedFeedbackTags = [
