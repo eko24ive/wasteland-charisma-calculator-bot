@@ -1,4 +1,4 @@
-require('dotenv').config({ path: '../../.env' });
+require('dotenv').config();
 const mongoose = require('mongoose');
 const async = require('async');
 
@@ -6,7 +6,7 @@ const userSchema = require('../../schemes/user');
 
 const User = mongoose.model('User', userSchema);
 
-mongoose.connect(process.env.RUNNER_MONGO_DB);
+mongoose.connect(process.env.MONGODB_URI);
 
 let total = 0;
 let processed = 0;
