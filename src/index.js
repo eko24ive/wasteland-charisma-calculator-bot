@@ -2804,10 +2804,7 @@ bot.on(['/show_beasts(regular)', '/show_beasts(darkzone)', '/show_beasts(dungeon
 bot.on(/mob_(.+)/, (msg) => {
   const [, id] = /mob_(.+)/.exec(msg.text);
 
-  const searchParams = process.env.ENV === 'PRODUCTION' ? {
-    _id: id,
-    isDungeon: false,
-  } : {
+  const searchParams = {
     _id: id,
   };
 
