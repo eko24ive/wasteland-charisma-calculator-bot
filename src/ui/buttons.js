@@ -119,8 +119,8 @@ module.exports = {
     command: '/raids_text',
   },
   showDungeonsLocations: {
-    icon: '📯',
-    label: '📯Входы в подземелья',
+    icon: '🌋',
+    label: '🌋Входы в подземелья',
     command: '/dungeon_locations',
   },
   showInGameCommands: {
@@ -172,6 +172,11 @@ module.exports = {
     icon: '🚷',
     label: '🚷Мобы ТЗ',
     command: '/show_beasts(darkzone)',
+  },
+  showDungeonBeasts: {
+    icon: '📯',
+    label: '📯Мобы',
+    command: '/show_beasts(dungeon)',
   },
   cancelAction: {
     label: '↩️Назад',

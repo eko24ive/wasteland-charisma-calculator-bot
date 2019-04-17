@@ -404,6 +404,9 @@ ${descriptions}
 ЧАТ БЫСТРОГО РЕАГИРОВАНИЯ @wwAssistantChat
 
 <i>Учти, что я ещё нахожусь в бета-режиме, и иногда ты можешь наткнуться на большие и маленькие баги.</i>
+
+Напиши боту сообщение со следующим тегом (#баг, #идея, #отзыв, #вопрос, #бомбит, #бля, #помогите, #жалоба, #обнова, #пиздец, #яустал, #фидбек, #ягорю, #хочупомочь) и свой текст, и создатель бота получит твоё сообщение, например:
+<code>#идея не писать столько говнокода</code>
         `, {
       replyMarkup: await defaultKeyboard(msg),
       parseMode: 'html',
@@ -1913,20 +1916,20 @@ bot.on('forward', async (msg) => {
       }, null, {
         env: process.env.ENV,
         VERSION,
-      }).then(({ reply }) => {
+      }).then(({ reply, beast }) => {
         if (reply !== false) {
-          msg.reply.text(`Хей, у меня есть данные про *${oBeast.name}*, но я пока что не умею их выводить, прости :с`, {
-            asReply: true,
-            parseMode: 'markdown',
-          }).catch(e => console.log(e));
-        } else {
-          return msg.reply.text(`Чёрт, я никогда не слышал про *${oBeast.name}*, прости :с`, {
-            asReply: true,
-            parseMode: 'markdown',
+          const beastReplyMarkup = getBeastKeyboard(beast._id.toJSON());
+
+          return msg.reply.text(reply, {
+            replyMarkup: beastReplyMarkup,
+            parseMode: 'html',
           }).catch(e => console.log(e));
         }
 
-        return false;
+        return msg.reply.text(`Чёрт, я никогда не слышал про *${oBeast.name}*, прости :с`, {
+          asReply: true,
+          parseMode: 'markdown',
+        }).catch(e => console.log(e));
       }).catch(e => console.log(e));
     } else if (isHaloDungeonBeastFaced) {
       const oBeast = parseBeastFaced.parseHaloDungeonBeastFaced(msg.text);
@@ -2735,6 +2738,7 @@ const beastRangesDarkZoneKeyboard = withBackButton(bot.keyboard, _.chunk(dzRange
   return `${first}—${last}`;
 }), 5));
 
+const beastRangesDungeonKeyboard = withBackButton(bot.keyboard, _.chunk(dungeonRanges.map(range => `=${range}=`), 5));
 
 bot.on('/show_giants', (msg) => {
   Giant.find({}).then((giants) => {
@@ -2761,20 +2765,36 @@ _Если гиганта нет в списке - значит его ещё н�
   }).catch(e => console.log(e));
 });
 
-bot.on(['/show_beasts(regular)', '/show_beasts(darkzone)'], (msg) => {
+bot.on(['/show_beasts(regular)', '/show_beasts(darkzone)', '/show_beasts(dungeon)'], (msg) => {
+  let keyboard;
+  let prefix = '';
+  let postfix = '';
+
+  if (msg.text === '💀Мобы') {
+    prefix = 'обычных';
+    keyboard = beastRangesKeyboard;
+  }
+  if (msg.text === '🚷Мобы ТЗ') {
+    postfix = 'из 🚷Тёмной Зоны';
+    keyboard = beastRangesDarkZoneKeyboard;
+  }
+  if (msg.text === '📯Мобы') {
+    prefix = 'данжевых';
+    keyboard = beastRangesDungeonKeyboard;
+  }
   const reply = `
-Это каталог всех ${msg.text === '💀Мобы' ? 'обычных' : ''} мобов в Пустоши ${msg.text !== '💀Мобы' ? 'из 🚷Тёмной Зоны' : ''} <i>(не данжевых)</i>
+Это каталог всех ${prefix} мобов в Пустоши ${postfix}
 Каталог наполняется посредством форвардов от игроков (бои, побеги и оглушения)
 
 Выбери интересующий диапазон километров, после вам будет доступен список мобов, которые были замечены на этом километре.
 
-Жмякай по <b>/mob_1234qwerty...</b> под нужным вам мобом, после вам будет доступна "карточка" простомтра моба с вкладками:
+Жмякай по <b>/mob_1234qwerty...</b> под нужным вам мобом, после вам будет доступна "карточка" просмотра моба с вкладками:
 [<code>Инфо</code>], [<code>Лут</code>], [<code>Бой</code>] и [<code>Оглушения</code>]
 
 Гайд тут: https://teletype.in/@eko24/Sy4pCyiRM
 `;
   msg.reply.text(reply, {
-    replyMarkup: msg.text === '💀Мобы' ? beastRangesKeyboard : beastRangesDarkZoneKeyboard,
+    replyMarkup: keyboard,
     parseMode: 'html',
     webPreview: false,
   }).catch(e => console.log(e));
@@ -3217,6 +3237,7 @@ bot.on('text', async (msg) => {
   let to;
   let searchParams;
   let mobMarker;
+  let keyboard;
 
   if (!rangeRegExp.test(msg.text) && !dungeonRegExp.test(msg.text)) {
     return null;
@@ -3241,6 +3262,8 @@ bot.on('text', async (msg) => {
         'distanceRange.value': Number(from),
       };
       mobMarker = '📯';
+      beastType = 'Dungeon';
+      keyboard = beastRangesDungeonKeyboard;
     } else {
       return null;
     }
@@ -3257,6 +3280,7 @@ bot.on('text', async (msg) => {
 
     beastType = regularZoneBeastsRequestRegExp.test(msg.text) ? 'Regular' : 'DarkZone';
     mobMarker = regularZoneBeastsRequestRegExp.test(msg.text) ? '💀' : '🚷';
+    keyboard = regularZoneBeastsRequestRegExp.test(msg.text) ? beastRangesKeyboard : beastRangesDarkZoneKeyboard;
 
     searchParams = {
       isDungeon: false,
@@ -3307,7 +3331,7 @@ ${beastsList}
 `;
 
   return msg.reply.text(reply, {
-    replyMarkup: beastType === 'DarkZone' ? beastRangesDarkZoneKeyboard : beastRangesKeyboard,
+    replyMarkup: keyboard,
     parseMode: 'html',
   }).catch(e => console.log(e));
 });

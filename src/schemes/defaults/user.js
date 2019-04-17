@@ -75,6 +75,13 @@ module.exports = {
         order: 4,
       },
       {
+        index: 18,
+        label: '📯Мобы',
+        command: '/show_beasts(dungeon)',
+        state: true,
+        order: 4.1,
+      },
+      {
         index: 5,
         label: '🦂Гиганты',
         command: '/show_giants',
@@ -129,7 +136,7 @@ module.exports = {
         order: 10,
       }, {
         index: 11,
-        label: '📯Входы в подземелья',
+        label: '🌋Входы в подземелья',
         command: '/dungeon_locations',
         state: false,
         order: 11,

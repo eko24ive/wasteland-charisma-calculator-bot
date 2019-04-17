@@ -13,9 +13,7 @@ const routedBeastView = (Beast, seachParams, route = null, config) => new Promis
 
   Beast.findOne(seachParams).then((fBeast) => {
     if (fBeast !== null) {
-      console.log('==================');
       console.log(`Browsing: ${fBeast._id.toJSON()} `);
-      console.log('==================');
 
       let isRangeDeprecated = INFO_ABSENT;
       let isLootDeprecated = INFO_ABSENT;
