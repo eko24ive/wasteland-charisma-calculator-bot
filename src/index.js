@@ -7,6 +7,7 @@ require('dotenv').config();
 const uristring = process.env.MONGODB_URI;
 const { REPORT_CHANNEL_ID } = process.env;
 const DATA_THRESHOLD = Number(process.env.DATA_THRESHOLD);
+const DATA_THRESHOLD_DUNGEON = Number(process.env.DATA_THRESHOLD_DUNGEON);
 const { VERSION } = process.env;
 
 const async = require('async');
@@ -3239,12 +3240,16 @@ bot.on('text', async (msg) => {
   let mobMarker;
   let keyboard;
 
+  let dataThreshold = DATA_THRESHOLD;
+
   if (!rangeRegExp.test(msg.text) && !dungeonRegExp.test(msg.text)) {
     return null;
   }
 
   if (dungeonRegExp.test(msg.text)) {
     range = dungeonRanges;
+    dataThreshold = DATA_THRESHOLD_DUNGEON;
+
     [, from] = dungeonRegExp.exec(msg.text);
 
     if (dungeonRanges.indexOf(Number(from)) === -1) {
@@ -3307,9 +3312,9 @@ bot.on('text', async (msg) => {
 
     const actualRangesFulfillGiven = actualRanges.every(({ value }) => value >= from && value <= to);
 
-    if (actualRanges.length >= DATA_THRESHOLD) {
+    if (actualRanges.length >= dataThreshold) {
       return actualRangesFulfillGiven;
-    } if (actualRanges.length <= DATA_THRESHOLD && deprecatedRanges.length > 0) {
+    } if (actualRanges.length <= dataThreshold && deprecatedRanges.length > 0) {
       return true;
     }
 
