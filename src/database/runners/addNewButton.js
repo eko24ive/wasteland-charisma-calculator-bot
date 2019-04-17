@@ -18,11 +18,11 @@ User.find().then((users) => {
 
   async.forEach(users, (user, next) => {
     user.settings.buttons.push({
-      index: 19,
-      label: '📊 Статистика',
-      command: '/myforwardstats',
+      index: 18,
+      label: '📯Мобы',
+      command: '/show_beasts(dungeon)',
       state: true,
-      order: 7.6,
+      order: 4.1,
     });
 
     user.save().then(() => {
