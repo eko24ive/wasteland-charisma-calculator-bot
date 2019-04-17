@@ -54,14 +54,14 @@ const mergeBeasts = (beastsToMerge) => {
   proofedBeast.forEach((beast) => {
     if (mergedBeasts[beast.name]) {
       const existingBeast = mergedBeasts[beast.name];
-      const [
+      const {
         distanceRange,
         capsReceived,
         materialsReceived,
         battles,
         concussions,
         flees,
-      ] = beast;
+      } = beast;
 
       if (
         existingBeast.isDungeon === beast.isDungeon
