@@ -1,4 +1,4 @@
-require('dotenv').config({ path: '../../.env' });
+require('dotenv').config();
 const mongoose = require('mongoose');
 const async = require('async');
 
@@ -6,7 +6,7 @@ const userSchema = require('../../schemes/user');
 
 const User = mongoose.model('User', userSchema);
 
-mongoose.connect('mongodb://localhost/wwa');
+mongoose.connect(process.env.RUNNER_URI);
 
 const factions = {};
 
