@@ -6,7 +6,7 @@ const userSchema = require('../../schemes/user');
 
 const User = mongoose.model('User', userSchema);
 
-mongoose.connect(process.env.MONGODB_URI);
+mongoose.connect(process.env.RUNNER_URI);
 
 let total = 0;
 let processed = 0;
@@ -31,7 +31,7 @@ User.find().then((users) => {
   async.forEach(users, (user, next) => {
     if (user.settings) {
       if (user.settings.buttons) {
-        user.settings.buttons = user.settings.buttons.map(({
+        user.settings.buttons = user.toJSON().settings.buttons.map(({
           index,
           label,
           command,

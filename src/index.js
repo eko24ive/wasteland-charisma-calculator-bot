@@ -3244,29 +3244,25 @@ bot.on('text', async (msg) => {
   }
 
   if (dungeonRegExp.test(msg.text)) {
-    if (process.env.ENV === 'STAGING' || process.env.ENV === 'LOCAL') {
-      range = dungeonRanges;
-      [, from] = dungeonRegExp.exec(msg.text);
+    range = dungeonRanges;
+    [, from] = dungeonRegExp.exec(msg.text);
 
-      if (dungeonRanges.indexOf(Number(from)) === -1) {
-        return msg.reply.text('Нет данжа на этом километре', {
-          asReply: true,
-        });
-      }
-
-      to = from;
-
-      searchParams = {
-        isDungeon: true,
-        subType: 'regular',
-        'distanceRange.value': Number(from),
-      };
-      mobMarker = '📯';
-      beastType = 'Dungeon';
-      keyboard = beastRangesDungeonKeyboard;
-    } else {
-      return null;
+    if (dungeonRanges.indexOf(Number(from)) === -1) {
+      return msg.reply.text('Нет данжа на этом километре', {
+        asReply: true,
+      });
     }
+
+    to = from;
+
+    searchParams = {
+      isDungeon: true,
+      subType: 'regular',
+      'distanceRange.value': Number(from),
+    };
+    mobMarker = '📯';
+    beastType = 'Dungeon';
+    keyboard = beastRangesDungeonKeyboard;
   } else {
     range = regularZoneBeastsRequestRegExp.test(msg.text) ? ranges : dzRanges;
 

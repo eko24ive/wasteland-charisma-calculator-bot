@@ -6,7 +6,7 @@ const userSchema = require('../../schemes/user');
 
 const User = mongoose.model('User', userSchema);
 
-mongoose.connect(process.env.MONGODB_URI);
+mongoose.connect(process.env.RUNNER_URI);
 
 let total = 0;
 let processed = 0;
