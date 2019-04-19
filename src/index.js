@@ -62,6 +62,7 @@ const checkPips = require('./utils/comparePips');
 const getButtonDescriptions = require('./utils/getButtonDescriptions');
 const validateDistanceRange = require('./utils/validateDistanceRange');
 
+const compactBeastView = require('./views/compactBeastView');
 const routedBeastView = require('./views/routedBeastView');
 const routedBattleView = require('./views/routedBattleView');
 
@@ -2808,7 +2809,7 @@ bot.on(/mob_(.+)/, (msg) => {
     _id: id,
   };
 
-  routedBeastView(Beast, {
+  compactBeastView(Beast, {
     ...searchParams,
   }, null, {
     env: process.env.ENV,
