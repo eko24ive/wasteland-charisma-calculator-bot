@@ -1716,7 +1716,14 @@ bot.on('forward', async (msg) => {
               username: msg.from.username,
             };
 
-            userManager.addPoints({ id: msg.from.id, telegramData, points: forwardPoints.discoveryGiantData })
+            userManager.addPoints({
+              id: msg.from.id,
+              telegramData,
+              points: forwardPoints.discoveryGiantData,
+              forwardTypes: {
+                giants: 1,
+              },
+            })
               .then(() => msg.reply.text(`Спасибо за форвард! Я добавил <b>${giant.name}</b> в базу!\nНачислил тебе ${forwardPoints.discoveryGiantData} 💎<b>Шмепселей</b>`, {
                 asReply: true,
                 parseMode: 'html',
@@ -1749,7 +1756,14 @@ bot.on('forward', async (msg) => {
               username: msg.from.username,
             };
 
-            userManager.addPoints({ id: msg.from.id, telegramData, points: pointsToAdd })
+            userManager.addPoints({
+              id: msg.from.id,
+              telegramData,
+              points: pointsToAdd,
+              forwardTypes: {
+                giants: 1,
+              },
+            })
               .then(() => msg.reply.text(`Спасибо за форвард! Я обновил <b>${giant.name}</b> в базе!\nНачислил тебе ${pointsToAdd} 💎<b>Шмепселей</b>`, {
                 asReply: true,
                 parseMode: 'html',
@@ -1783,7 +1797,14 @@ bot.on('forward', async (msg) => {
               username: msg.from.username,
             };
 
-            await userManager.addPoints({ id: msg.from.id, telegramData, points: forwardPoints.discoveryGiantData });
+            await userManager.addPoints({
+              id: msg.from.id,
+              telegramData,
+              points: forwardPoints.discoveryGiantData,
+              forwardTypes: {
+                giants: 1,
+              },
+            });
             return msg.reply.text(`Спасибо за форвард! Я добавил <b>${giant.name}</b> в базу!\nНачислил тебе ${forwardPoints.discoveryGiantData} 💎<b>Шмепселей</b>`, {
               asReply: true,
               parseMode: 'html',
@@ -1811,7 +1832,14 @@ bot.on('forward', async (msg) => {
               username: msg.from.username,
             };
 
-            userManager.addPoints({ id: msg.from.id, telegramData, points: pointsToAdd })
+            userManager.addPoints({
+              id: msg.from.id,
+              telegramData,
+              points: pointsToAdd,
+              forwardTypes: {
+                giants: 1,
+              },
+            })
               .then(() => msg.reply.text(`Спасибо за форвард! Я обновил <b>${giant.name}</b> в базе!\nНачислил тебе ${pointsToAdd} 💎<b>Шмепселей</b>`, {
                 asReply: true,
                 parseMode: 'html',
@@ -1826,10 +1854,36 @@ bot.on('forward', async (msg) => {
 
       Giant.findOne({
         name: giant.name,
-      }).then((fGiant) => {
+      }).then(async (fGiant) => {
         const databaseGiant = fGiant;
         if (fGiant === null) {
-          return msg.reply.text(`Прости, я не знаю на каком километре живёт <b>${giant.name}</b>. Ты можешь сначала скинуть локацию с этим боссом, а потом свою битву.`, {
+          const newGiant = new Giant({
+            name: giant.name,
+            health: {
+              current: giant.healthCurrent,
+              cap: giant.healthCap,
+            },
+            forwardStamp: msg.forward_date,
+          });
+
+          await newGiant.save();
+
+          const telegramData = {
+            first_name: msg.from.first_name,
+            id: msg.from.id,
+            username: msg.from.username,
+          };
+
+          await userManager.addPoints({
+            id: msg.from.id,
+            telegramData,
+            points: forwardPoints.discoveryGiantData,
+            forwardTypes: {
+              giants: 1,
+            },
+          });
+
+          return msg.reply.text(`Спасибо за форвард! Я добавил <b>${giant.name}</b> в базу!\nНачислил тебе ${forwardPoints.discoveryGiantData} 💎<b>Шмепселей</b>`, {
             asReply: true,
             parseMode: 'html',
           });
@@ -1856,7 +1910,14 @@ bot.on('forward', async (msg) => {
             username: msg.from.username,
           };
 
-          userManager.addPoints({ id: msg.from.id, telegramData, points: pointsToAdd })
+          userManager.addPoints({
+            id: msg.from.id,
+            telegramData,
+            points: pointsToAdd,
+            forwardTypes: {
+              giants: 1,
+            },
+          })
             .then(() => msg.reply.text(`Спасибо за форвард! Я обновил <b>${giant.name}</b> в базе!\nНачислил тебе ${pointsToAdd} 💎<b>Шмепселей</b>`, {
               asReply: true,
               parseMode: 'html',
@@ -2038,7 +2099,14 @@ bot.on('forward', async (msg) => {
                 username: msg.from.username,
               };
 
-              userManager.addPoints({ id: msg.from.id, telegramData, points: forwardPoints.newGiantData })
+              userManager.addPoints({
+                id: msg.from.id,
+                telegramData,
+                points: forwardPoints.newGiantData,
+                forwardTypes: {
+                  giants: 1,
+                },
+              })
                 .then(() => msg.reply.text(`Спасибо за форвард! Я обновил состояние <b>${databaseGiant.name}</b> в базе!\nНачислил тебе ${forwardPoints.newGiantData} 💎<b>Шмепселей</b>`, {
                   asReply: true,
                   parseMode: 'html',
