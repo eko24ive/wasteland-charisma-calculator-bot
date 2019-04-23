@@ -55,8 +55,8 @@ const giantFacedRegExp = /Твой путь преградил исполинс�
 const giantHealthRegExp = /(.+) \(❤️(\d+|-\d+)\/(\d+)\)/;
 const giantFoughtRegExp = /Ты нанёс \d+ урона гиганту/;
 
-const giantOnField = /Ты сейчас на поле боя с гигантом./;
-const giantNameOnField = /(.+)\n❤️/;
+const giantOnField = /Твое местоположение: Возле гиганта/;
+const giantNameOnField = /Возле гиганта\n(.+)\n❤️/;
 const giantHealthOnField = /❤️(\d+|-\d+)\/(\d+)/;
 
 const altInBattleLocationRegExp = /Твое местоположение: Пустошь/;

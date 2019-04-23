@@ -141,6 +141,26 @@ const userManager = User => ({
   addPoints({
     id, points, telegramData, forwardTypes,
   }) {
+    const filledForwardTypes = {
+      ...{
+        beast: {
+          wins: 0,
+          loss: 0,
+          flee: {
+            wins: 0,
+            loss: 0,
+          },
+          regular: 0,
+          darkZone: 0,
+          walking: 0,
+          dungeon: 0,
+        },
+        locations: 0,
+        giants: 0,
+      },
+      ...forwardTypes,
+    };
+
     return new Promise((resolve) => {
       User.findOne({ 'telegram.id': id }).then((databaseUser) => {
         if (databaseUser === null) {
@@ -161,19 +181,19 @@ const userManager = User => ({
 
         databaseUser.points.forwards = {
           beast: {
-            wins: databaseUser.points.forwards.beast.wins + forwardTypes.beast.wins,
-            loss: databaseUser.points.forwards.beast.loss + forwardTypes.beast.loss,
+            wins: databaseUser.points.forwards.beast.wins + filledForwardTypes.beast.wins,
+            loss: databaseUser.points.forwards.beast.loss + filledForwardTypes.beast.loss,
             flee: {
-              wins: databaseUser.points.forwards.beast.flee.wins + forwardTypes.beast.flee.wins,
-              loss: databaseUser.points.forwards.beast.flee.loss + forwardTypes.beast.flee.loss,
+              wins: databaseUser.points.forwards.beast.flee.wins + filledForwardTypes.beast.flee.wins,
+              loss: databaseUser.points.forwards.beast.flee.loss + filledForwardTypes.beast.flee.loss,
             },
-            regular: databaseUser.points.forwards.beast.regular + forwardTypes.beast.regular,
-            darkZone: databaseUser.points.forwards.beast.darkZone + forwardTypes.beast.darkZone,
-            walking: databaseUser.points.forwards.beast.walking + forwardTypes.beast.walking,
-            dungeon: databaseUser.points.forwards.beast.dungeon + forwardTypes.beast.dungeon,
+            regular: databaseUser.points.forwards.beast.regular + filledForwardTypes.beast.regular,
+            darkZone: databaseUser.points.forwards.beast.darkZone + filledForwardTypes.beast.darkZone,
+            walking: databaseUser.points.forwards.beast.walking + filledForwardTypes.beast.walking,
+            dungeon: databaseUser.points.forwards.beast.dungeon + filledForwardTypes.beast.dungeon,
           },
-          locations: databaseUser.points.forwards.locations + forwardTypes.locations,
-          giants: databaseUser.points.forwards.giants + forwardTypes.giants,
+          locations: databaseUser.points.forwards.locations + filledForwardTypes.locations,
+          giants: databaseUser.points.forwards.giants + filledForwardTypes.giants,
         };
 
         databaseUser.save().then(databaseUpdatedUser => resolve({
