@@ -13,7 +13,7 @@ const compactBeastView = (Beast, seachParams, route = null, config) => new Promi
 
   Beast.findOne(seachParams).then((fBeast) => {
     if (fBeast !== null) {
-      console.log(`Browsing test: ${fBeast._id.toJSON()} `);
+      console.log(`Browsing in compact view: ${fBeast._id.toJSON()} `);
       
       let isRangeDeprecated = INFO_ABSENT;
       let isLootDeprecated = INFO_ABSENT;
@@ -265,15 +265,17 @@ const compactBeastView = (Beast, seachParams, route = null, config) => new Promi
         var wonBattleArmor=[];
         beast.battles.forEach((battle)=>{
             if(battle.outcome==='lost'){
-              lostBattlesReceivedDamage.push(battle.totalDamageReceived);
-              lostBattleArmor.push(battle.stats.armor);
+              
+                lostBattlesReceivedDamage.push(battle.totalDamageReceived);
+                lostBattleArmor.push(battle.stats.armor);
             }else if(battle.outcome==='win'){
-              wonBattlesReceivedDamage.push(battle.totalDamageReceived);
+             
+                wonBattlesReceivedDamage.push(battle.totalDamageReceived);
               wonBattleArmor.push(battle.stats.armor);
-            }
-          })
-
-        return `️ ▫️ 💔(-${minMax(lostBattlesReceivedDamage)}) при 🛡${averageValue(lostBattleArmor)} \n `;
+              }
+      
+            })
+        return `️ ▫️ 💔(-${minMax(lostBattlesReceivedDamage)}) при средней 🛡${averageValue(lostBattleArmor)} \n `;
       }
 
       const getBattlesLong = (battles, trim, small, withLinks = false) => {
@@ -389,6 +391,33 @@ const compactBeastView = (Beast, seachParams, route = null, config) => new Promi
         };
       };
 
+      const getFlees = (beast)=>{
+              let failedFleesAgility = [];
+              let failedFleesDmg = [];
+              let successFleesAgility = [];
+              beast.flees.forEach((flee)=>{
+                if(flee.outcome==='lose'){
+                  
+                  failedFleesAgility.push(flee.stats.agility);
+                  failedFleesDmg.push(flee.damageReceived);
+                   
+                }else if(flee.outcome==='win')
+                  
+                    successFleesAgility.push(flee.stats.agility);
+                  
+                  
+                  return `У этого побега почему-то нет характеристик брони и урона игрока - ничего не могу вывести.`;
+                  
+              })
+              let ind = failedFleesAgility.indexOf(_.max(failedFleesAgility));
+              if(successFleesAgility.length>0){
+
+                return `[Побег] 🏃\n ▫️ ❌ при 🤸‍♀️${_.max(failedFleesAgility)} 💔(-${failedFleesDmg[ind]})\n ▫️ ✅ при 🤸‍♀️${_.min(successFleesAgility)}`;
+              }else{
+                return `[Побег] 🏃\n ▫️ ❌ при 🤸‍♀️${_.max(failedFleesAgility)} 💔(-${failedFleesDmg[ind]})\n ▫️ ✅ удачных побегов еще нету :( 🤸‍♀️`;
+              }
+              
+        }
       const {
         successBattles: successBattlesLong,
         failBattles: failBattlesLong,
@@ -413,21 +442,6 @@ ${failBattlesLong}
 `;
 
 
-      const getFlees = (beast)=>{
-        let failedFleesAgility = [];
-        let failedFleesDmg = [];
-        let successFleesAgility = [];
-        beast.flees.forEach((flee)=>{
-          if(flee.outcome==='lose'){
-            failedFleesAgility.push(flee.stats.agility);
-            failedFleesDmg.push(flee.damageReceived);
-          }else if(flee.outcome==='win')
-          successFleesAgility.push(flee.stats.agility);
-          
-        })
-        let ind = failedFleesAgility.indexOf(_.max(failedFleesAgility));
-        return `[Побег] 🏃\n ▫️ ❌ при 🤸‍♀️${_.max(failedFleesAgility)} 💔(-${failedFleesDmg[ind]})\n ▫️ ✅ при 🤸‍♀️${_.min(successFleesAgility)}`;
-      }
       
       let beastMarker;
 

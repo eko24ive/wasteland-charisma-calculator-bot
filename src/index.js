@@ -107,6 +107,8 @@ program
 const sessions = {};
 let bot;
 
+let view = routedBeastView;
+
 const updateKeyboard = async (msg) => {
   const { id } = msg.from;
   const telegramData = {
@@ -2802,14 +2804,17 @@ bot.on(['/show_beasts(regular)', '/show_beasts(darkzone)', '/show_beasts(dungeon
   }).catch(e => console.log(e));
 });
 
-bot.on(/mob_(.+)/, (msg) => {
+bot.on(/mob_(.+)/,async (msg) => {
+  await createSession(msg);
   const [, id] = /mob_(.+)/.exec(msg.text);
-
+  const settings = sessions[msg.from.id].settings;
+  
   const searchParams = {
     _id: id,
   };
-
-  compactBeastView(Beast, {
+ 
+  view =  settings.beastCompactView ? compactBeastView : routedBeastView;
+  view(Beast, {
     ...searchParams,
   }, null, {
     env: process.env.ENV,
@@ -2909,7 +2914,9 @@ bot.on('/delete_giants', (msg) => {
   }
 });
 
-bot.on('callbackQuery', (msg) => {
+bot.on('callbackQuery', async (msg) => {
+  await createSession(msg);
+  const settings = sessions[msg.from.id].settings;
   const chatId = msg.from.id;
   const messageId = msg.message.message_id;
   const showMobRegExp = /show_beast_(\d+)-(\d+)\+(.+)/;
@@ -3015,8 +3022,10 @@ ${beastsList}
     } : {
       _id: beastId,
     };
-    //routedBeastView was default value !!!!!
-    compactBeastView(Beast, searchParams, route, {
+    
+    view = settings.beastCompactView ? compactBeastView : routedBeastView;
+    
+    view(Beast, searchParams, route, {
       env: process.env.ENV,
       VERSION,
     }).then(({ reply, beast }) => {
@@ -3491,12 +3500,36 @@ bot.on('/help_icons', msg => msg.reply.text(`
 bot.on('/show_settings', async (msg) => {
   msg.reply.text('Здесь ты можешь изменить настройки отображения и персонализировать бота под себя', {
     replyMarkup: withBackButton(bot.keyboard, [
-      [buttons.showSettingsButton.label, buttons.showSettingsAmountButton.label],
+      [buttons.showSettingsButton.label, buttons.showSettingsAmountButton.label,buttons.toggleView.label],
     ], {
       resize: true,
     }),
   });
 });
+
+bot.on('/toggleview',async (msg)=>{
+  if (sessions[msg.from.id] === undefined) {
+    await createSession(msg);
+  }
+
+  const { settings } = sessions[msg.from.id];
+  const { beastCompactView, ...restSettings } = settings;
+
+  const updateResult = await userManager.updateSettings({
+    id: msg.from.id,
+    settings: {
+      beastCompactView: !settings.beastCompactView,
+      ...restSettings,
+    },
+  });
+
+  if (updateResult.ok) {
+    await updateKeyboard(msg);
+    return msg.reply.text('Я изменил отображение мобов');
+  }
+
+  return msg.reply.text('Произошла ошибка - я не смог найти тебя в базе. Попробуй нажать /start и повторить ещё раз.');
+})
 
 bot.on('/show_buttons', async (msg) => {
   const telegramData = {
