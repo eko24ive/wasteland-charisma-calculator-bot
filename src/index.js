@@ -3015,8 +3015,8 @@ ${beastsList}
     } : {
       _id: beastId,
     };
-
-    routedBeastView(Beast, searchParams, route, {
+    //routedBeastView was default value !!!!!
+    compactBeastView(Beast, searchParams, route, {
       env: process.env.ENV,
       VERSION,
     }).then(({ reply, beast }) => {
