@@ -271,11 +271,16 @@ const compactBeastView = (Beast, seachParams, route = null, config) => new Promi
             }else if(battle.outcome==='win'){
              
                 wonBattlesReceivedDamage.push(battle.totalDamageReceived);
-              wonBattleArmor.push(battle.stats.armor);
+                if(battle.stats!==undefined){
+                    wonBattleArmor.push(battle.stats.armor);
+                }
               }
       
             })
-        return `️ ▫️ 💔(-${minMax(lostBattlesReceivedDamage)}) при средней 🛡${averageValue(lostBattleArmor)} \n `;
+            if(wonBattleArmor.length<=0||lostBattleArmor.length<=0){
+                return ` ▫️ Прости, похоже что у меня нет статов`;
+            }else
+            return `️ ▫️ 💔(-${minMax(lostBattlesReceivedDamage)}) при средней 🛡${averageValue(lostBattleArmor)} \n `;
       }
 
       const getBattlesLong = (battles, trim, small, withLinks = false) => {
