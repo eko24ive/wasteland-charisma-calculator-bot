@@ -102,6 +102,7 @@ const userSchema = Schema({
   settings: {
     buttonsAmount: Number,
     buttonsIconsMode: Boolean,
+    beastCompactView: Boolean,
     buttons: [{
       index: Number,
       name: String,

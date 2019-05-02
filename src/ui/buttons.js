@@ -219,5 +219,9 @@ module.exports = {
     icon: '📊',
     label: '📊 Статистика',
     command: '/myforwardstats',
+  },toggleView: {
+    icon: '🕹',
+    label: '🕹 Переключить отображение',
+    command: '/toggleview',
   },
 };

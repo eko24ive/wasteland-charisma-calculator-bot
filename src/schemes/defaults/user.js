@@ -39,6 +39,7 @@ module.exports = {
   settings: {
     buttonsAmount: 3,
     buttonsIconsMode: false,
+    beastCompactView: false,
     buttons: [
       {
         index: 0,
