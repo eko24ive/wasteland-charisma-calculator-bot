@@ -234,6 +234,7 @@ const weapons = [
     characteristic: 29,
     place: workbench,
     rarities: [FIRST, SECOND],
+    requirements: getCharacteristic(STRENGTH, 20),
   },
   {
     icon: '💥',
@@ -242,6 +243,7 @@ const weapons = [
     characteristic: 29,
     place: workbench,
     rarity: getRarityIcon(FIRST),
+    requirements: getCharacteristic(STRENGTH, 20),
   },
   {
     icon: '💥',
@@ -250,6 +252,7 @@ const weapons = [
     characteristic: 37,
     place: workbench,
     rarity: getRarityIcon(SECOND),
+    requirements: getCharacteristic(STRENGTH, 26),
   },
   {
     icon: '💥',
@@ -258,7 +261,7 @@ const weapons = [
     characteristic: 38,
     place: workbench,
     rarities: [FIRST, SECOND],
-    requirements: getCharacteristic(STRENGTH, 21),
+    requirements: getCharacteristic(STRENGTH, 27),
   },
   {
     icon: '💥',
@@ -267,6 +270,7 @@ const weapons = [
     characteristic: 46,
     place: workbench,
     rarity: getRarityIcon(FIRST),
+    requirements: getCharacteristic(STRENGTH, 32),
   },
   {
     icon: '💥',
@@ -275,6 +279,7 @@ const weapons = [
     characteristic: 51,
     place: workbench,
     rarity: getRarityIcon(SECOND),
+    requirements: getCharacteristic(STRENGTH, 36),
   },
   {
     icon: '☄️',
@@ -284,7 +289,7 @@ const weapons = [
     characteristic: 49,
     place: workbench,
     rarities: [FIRST, SECOND],
-    requirements: getCharacteristic(STRENGTH, 28),
+    requirements: getCharacteristic(STRENGTH, 35),
   },
   {
     icon: '☄️',
@@ -294,6 +299,7 @@ const weapons = [
     characteristic: 58,
     place: workbench,
     rarity: getRarityIcon(FIRST),
+    requirements: getCharacteristic(STRENGTH, 41),
   },
   {
     icon: '☄️',
@@ -303,6 +309,7 @@ const weapons = [
     characteristic: 65,
     place: workbench,
     rarity: getRarityIcon(SECOND),
+    requirements: getCharacteristic(STRENGTH, 46),
   },
   {
     icon: '☄️',
@@ -312,7 +319,7 @@ const weapons = [
     characteristic: 56,
     place: workbench,
     rarities: [FIRST, SECOND],
-    requirements: getCharacteristic(STRENGTH, 32),
+    requirements: getCharacteristic(STRENGTH, 40),
   },
   {
     icon: '☄️',
@@ -321,6 +328,8 @@ const weapons = [
     characteristic: 69,
     place: workbench,
     rarity: getRarityIcon(FIRST),
+    requirements: getCharacteristic(STRENGTH, 48),
+    
   },
   {
     icon: '☄️',
@@ -329,6 +338,7 @@ const weapons = [
     characteristic: 76,
     place: workbench,
     rarity: getRarityIcon(SECOND),
+    requirements: getCharacteristic(STRENGTH, 53),
   },
   {
     icon: '🔮',
@@ -338,7 +348,7 @@ const weapons = [
     characteristic: 65,
     place: workbench,
     rarities: [FIRST, SECOND],
-    requirements: getCharacteristic(STRENGTH, 37),
+    requirements: getCharacteristic(STRENGTH, 46),
   },
   {
     icon: '🔮',
@@ -347,6 +357,7 @@ const weapons = [
     characteristic: 78,
     place: workbench,
     rarity: getRarityIcon(FIRST),
+    requirements: getCharacteristic(STRENGTH, 55),
   },
   {
     icon: '🔮',
@@ -355,6 +366,7 @@ const weapons = [
     characteristic: 83,
     place: workbench,
     rarity: getRarityIcon(SECOND),
+    requirements: getCharacteristic(STRENGTH, 61),
   },
   {
     icon: '🌟',
@@ -364,7 +376,7 @@ const weapons = [
     characteristic: 79,
     place: workbench,
     rarities: [FIRST, SECOND],
-    requirements: getCharacteristic(STRENGTH, 45),
+    requirements: getCharacteristic(STRENGTH, 56),
   },
   {
     icon: '🌟',
@@ -373,6 +385,7 @@ const weapons = [
     characteristic: 90,
     place: workbench,
     rarity: getRarityIcon(FIRST),
+    requirements: getCharacteristic(STRENGTH, 63),
   },
   {
     icon: '🌟',
@@ -381,6 +394,7 @@ const weapons = [
     characteristic: 98,
     place: workbench,
     rarity: getRarityIcon(SECOND),
+    requirements: getCharacteristic(STRENGTH, 98),
   },
   {
     icon: '☣️',
@@ -390,7 +404,7 @@ const weapons = [
     characteristic: 92,
     place: engineer,
     rarities: [FIRST, SECOND],
-    requirements: getCharacteristic(STRENGTH, 52),
+    requirements: getCharacteristic(STRENGTH, 65),
   },
   {
     icon: '☣️',
@@ -399,6 +413,7 @@ const weapons = [
     characteristic: 122,
     place: engineer,
     rarity: getRarityIcon(FIRST),
+    requirements: getCharacteristic(STRENGTH, 86),
   },
   {
     icon: '☣️',
@@ -407,6 +422,7 @@ const weapons = [
     characteristic: 141,
     place: engineer,
     rarity: getRarityIcon(SECOND),
+    requirements: getCharacteristic(STRENGTH, 100),
   },
   {
     icon: '☣️',
@@ -416,7 +432,7 @@ const weapons = [
     characteristic: 125,
     place: engineer,
     rarities: [FIRST, SECOND],
-    requirements: getCharacteristic(STRENGTH, 71),
+    requirements: getCharacteristic(STRENGTH, 89),
   },
   {
     icon: '☣️',
@@ -425,6 +441,7 @@ const weapons = [
     characteristic: 155,
     place: engineer,
     rarity: getRarityIcon(FIRST),
+    requirements: getCharacteristic(STRENGTH, 110),
   },
   {
     icon: '☣️',
@@ -433,6 +450,7 @@ const weapons = [
     characteristic: 163,
     place: engineer,
     rarity: getRarityIcon(SECOND),
+    requirements: getCharacteristic(STRENGTH, 115),
   },
   {
     icon: '🌟',
@@ -442,7 +460,7 @@ const weapons = [
     characteristic: 159,
     place: engineer,
     rarities: [FIRST, SECOND],
-    requirements: getCharacteristic(STRENGTH, 90),
+    requirements: getCharacteristic(STRENGTH, 113),
   },
   {
     icon: '🌟',
@@ -452,6 +470,7 @@ const weapons = [
     characteristic: 189,
     place: engineer,
     rarity: getRarityIcon(FIRST),
+    requirements: getCharacteristic(STRENGTH, 134),
   },
   {
     icon: '🌟',
@@ -461,6 +480,7 @@ const weapons = [
     characteristic: 194,
     place: engineer,
     rarity: getRarityIcon(SECOND),
+    requirements: getCharacteristic(STRENGTH, 137),
   },
   {
     icon: '💿',
@@ -470,7 +490,7 @@ const weapons = [
     characteristic: 187,
     place: engineer,
     rarities: [FIRST, SECOND],
-    requirements: getCharacteristic(STRENGTH, 106),
+    requirements: getCharacteristic(STRENGTH, 133),
   },
   {
     icon: '💿',
@@ -479,6 +499,7 @@ const weapons = [
     characteristic: 207,
     place: engineer,
     rarity: getRarityIcon(FIRST),
+    requirements: getCharacteristic(STRENGTH, 146),
   },
   {
     icon: '💿',
@@ -487,6 +508,7 @@ const weapons = [
     characteristic: 214,
     place: engineer,
     rarity: getRarityIcon(SECOND),
+    requirements: getCharacteristic(STRENGTH, 151),
   },
   {
     icon: '♻️',
@@ -496,7 +518,7 @@ const weapons = [
     characteristic: 206,
     place: engineer,
     rarities: [FIRST, SECOND],
-    requirements: getCharacteristic(STRENGTH, 117),
+    requirements: getCharacteristic(STRENGTH, 147),
   },
   {
     icon: '♻️',
@@ -506,6 +528,7 @@ const weapons = [
     characteristic: 231,
     place: engineer,
     rarity: getRarityIcon(FIRST),
+    requirements: getCharacteristic(STRENGTH, 164),
   },
   {
     icon: '♻️',
@@ -515,6 +538,7 @@ const weapons = [
     characteristic: 242,
     place: engineer,
     rarity: getRarityIcon(SECOND),
+    requirements: getCharacteristic(STRENGTH, 171),
   },
   {
     icon: '🐱',
@@ -524,7 +548,7 @@ const weapons = [
     characteristic: 266,
     place: engineer,
     rarities: [FIRST, SECOND],
-    requirements: getCharacteristic(STRENGTH, 152),
+    requirements: getCharacteristic(STRENGTH, 190),
   },
   {
     icon: '🐱',
@@ -534,6 +558,7 @@ const weapons = [
     characteristic: 284,
     place: engineer,
     rarity: getRarityIcon(FIRST),
+    requirements: getCharacteristic(STRENGTH, 201),
   },
   {
     icon: '🐱',
@@ -543,6 +568,7 @@ const weapons = [
     characteristic: 298,
     place: engineer,
     rarity: getRarityIcon(SECOND),
+    requirements: getCharacteristic(STRENGTH, 211),
   },
   {
     icon: '✳️',
@@ -550,7 +576,7 @@ const weapons = [
     price: [getResource(MATERIALS, 359900), getResource(MICROCHIPS, 250), getResource(GENERATORS, 289)],
     characteristic: 278,
     place: core,
-    requirements: getCharacteristic(STRENGTH, 158),
+    requirements: getCharacteristic(STRENGTH, 198),
   },
   {
     icon: '❇️',
@@ -560,7 +586,7 @@ const weapons = [
     characteristic: 334,
     place: core,
     rarities: [FIRST, SECOND],
-    requirements: getCharacteristic(STRENGTH, 190),
+    requirements: getCharacteristic(STRENGTH, 238),
   },
   {
     icon: '❇️',
@@ -569,6 +595,7 @@ const weapons = [
     characteristic: 348,
     place: core,
     rarity: getRarityIcon(FIRST),
+    requirements: getCharacteristic(STRENGTH, 247),
   },
   {
     icon: '❇️',
@@ -577,6 +604,7 @@ const weapons = [
     characteristic: 359,
     place: core,
     rarity: getRarityIcon(SECOND),
+    requirements: getCharacteristic(STRENGTH, 254),
   },
   {
     icon: '💣',
@@ -584,6 +612,7 @@ const weapons = [
     price: false,
     characteristic: 300,
     place: moltenCore,
+    requirements: getCharacteristic(STRENGTH, 213),
   },
   {
     icon: '✝️',
@@ -592,7 +621,7 @@ const weapons = [
       getResource(MICROCHIPS, 358), getResource(IRIDIUM, 245)],
     characteristic: 356,
     place: core,
-    requirements: getCharacteristic(STRENGTH, 203),
+    requirements: getCharacteristic(STRENGTH, 254),
   },
   {
     icon: '💥',
@@ -601,7 +630,7 @@ const weapons = [
       getResource(MICROCHIPS, 435), getResource(IRIDIUM, 329)],
     characteristic: 372,
     place: core,
-    requirements: getCharacteristic(STRENGTH, 212),
+    requirements: getCharacteristic(STRENGTH, 265),
   },
   {
     icon: '💥',
@@ -610,7 +639,7 @@ const weapons = [
       getResource(MICROCHIPS, 500), getResource(IRIDIUM, 395)],
     characteristic: 430,
     place: core,
-    requirements: getCharacteristic(STRENGTH, 245),
+    requirements: getCharacteristic(STRENGTH, 307),
   },
   {
     icon: '🧠',
@@ -618,7 +647,7 @@ const weapons = [
     price: [getResource(MATERIALS, 656900), getResource(CUBONITE, 38990)],
     characteristic: 344,
     place: basement,
-    requirements: getCharacteristic(STRENGTH, 196),
+    requirements: getCharacteristic(STRENGTH, 245),
   },
   {
     icon: '🌡',
@@ -626,7 +655,7 @@ const weapons = [
     price: [getResource(MATERIALS, 957900), getResource(CUBONITE, 54990), getResource(OSMIUM, 30290)],
     characteristic: 416,
     place: basement,
-    requirements: getCharacteristic(STRENGTH, 237),
+    requirements: getCharacteristic(STRENGTH, 297),
   },
   {
     icon: '💢',
@@ -635,7 +664,7 @@ const weapons = [
       getResource(OSMIUM, 40590), getResource(TITANIUM, 13930)],
     characteristic: 456,
     place: basement,
-    requirements: getCharacteristic(STRENGTH, 260),
+    requirements: getCharacteristic(STRENGTH, 325),
   },
   {
     icon: '❇️',
@@ -644,7 +673,7 @@ const weapons = [
       getResource(OSMIUM, 79560), getResource(TITANIUM, 66980)],
     characteristic: 507,
     place: basement,
-    requirements: getCharacteristic(STRENGTH, 289),
+    requirements: getCharacteristic(STRENGTH, 362),
   },
   {
     icon: false,
