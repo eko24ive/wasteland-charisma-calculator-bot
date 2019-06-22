@@ -9,6 +9,7 @@ const { REPORT_CHANNEL_ID } = process.env;
 const DATA_THRESHOLD = Number(process.env.DATA_THRESHOLD);
 const DATA_THRESHOLD_DUNGEON = Number(process.env.DATA_THRESHOLD_DUNGEON);
 const { VERSION } = process.env;
+const botStart = Date.now();
 
 const async = require('async');
 const mongoose = require('mongoose');
@@ -388,6 +389,7 @@ const getBeastKeyboard = beastId => bot.inlineKeyboard([
 ]);
 
 bot.on('/start', async (msg) => {
+  if (botStart > msg.date) { return; }
   await createSession(msg);
 
   const descriptions = getButtonDescriptions(sessions[msg.from.id].settings.buttons, 'start');
@@ -417,6 +419,8 @@ ${descriptions}
 });
 
 bot.on('/help', async (msg) => {
+  if (botStart > msg.date) { return; }
+
   await msg.reply.text(`
 Инструкция по Ассистенту: https://teletype.in/@eko24/B1NJpZAYV
 
@@ -1267,6 +1271,8 @@ ${errors}`, {
 };
 
 bot.on('forward', async (msg) => {
+  if (botStart > msg.date) { return; }
+
   if (sessions[msg.from.id] === undefined) {
     await createSession(msg);
   }
@@ -2135,6 +2141,8 @@ bot.on([
   '/levelUpCharisma',
   '/levelUpAgility',
 ], (msg) => {
+  if (botStart > msg.date) { return; }
+
   sessions[msg.from.id].upgradeSkill = msg.text;
   sessions[msg.from.id].state = states.WAIT_FOR_DISTANCE;
 
@@ -2142,25 +2150,42 @@ bot.on([
 });
 
 bot.on('/reachableKm', (msg) => {
+  if (botStart > msg.date) { return; }
+
   sessions[msg.from.id].reachableKm = msg.text;
   sessions[msg.from.id].state = states.WAIT_FOR_LEVELS;
 
   askAmountOfLevels(msg);
 });
 
-bot.on('/locs_text', msg => msg.reply.text(locationsAll, {
-  parseMode: 'html',
-}));
+bot.on('/locs_text', (msg) => {
+  if (botStart > msg.date) { return; }
 
-bot.on('/raids_text', msg => msg.reply.text(locationsRaid, {
-  parseMode: 'html',
-}));
+  return msg.reply.text(locationsAll, {
+    parseMode: 'html',
+  });
+});
 
-bot.on('/dungeon_locations', msg => msg.reply.text(locationsDungeon, {
-  parseMode: 'html',
-}));
+
+bot.on('/locs_text', (msg) => {
+  if (botStart > msg.date) { return; }
+
+  return msg.reply.text(locationsRaid, {
+    parseMode: 'html',
+  });
+});
+
+bot.on('/dungeon_locations', (msg) => {
+  if (botStart > msg.date) { return; }
+
+  return msg.reply.text(locationsDungeon, {
+    parseMode: 'html',
+  });
+});
 
 bot.on('/upgradeSkill', (msg) => {
+  if (botStart > msg.date) { return; }
+
   const skillsToMax = msg.text === 'МАКСИМАЛОЧКА';
 
   if (regexps.regexps.dzenRegExp.test(msg.text)) {
@@ -2187,6 +2212,8 @@ bot.on('/upgradeSkill', (msg) => {
 });
 
 bot.on(['/journeyforwardstart', '/go'], async (msg, { shouldCreateSession = true }) => {
+  if (botStart > msg.date) { return; }
+
   if (shouldCreateSession) {
     await createSession(msg);
   }
@@ -2254,6 +2281,8 @@ bot.on('/journeyforwardend', async (msg) => {
 });
 
 bot.on('/skippipforward', (msg) => {
+  if (botStart > msg.date) { return; }
+
   msg.reply.text('Окей, сейчас попробую обработать что смогу');
 
   sessions[msg.from.id].processDataConfig.usePip = false;
@@ -2265,6 +2294,8 @@ bot.on('/skippipforward', (msg) => {
 });
 
 bot.on(['/skipbeastforward', '/skipbeastforwards'], async (msg) => {
+  if (botStart > msg.date) { return; }
+
   if (_.isEmpty(sessions)) {
     return msg.reply.text('Слушай, а мне собственно нечего игнорировать. Может меня опять какой-то пидор перезагрузил, не знаешь?', {
       asReply: true,
@@ -2299,6 +2330,8 @@ bot.on(['/skipbeastforward', '/skipbeastforwards'], async (msg) => {
 });
 
 bot.on('/version', (msg) => {
+  if (botStart > msg.date) { return; }
+
   msg.reply.text(`Текущая версия бота - <b>${config.version}</b> [β]`, {
     asReply: true,
     parseMode: 'html',
@@ -2306,6 +2339,8 @@ bot.on('/version', (msg) => {
 });
 
 bot.on('/eqp', (msg) => {
+  if (botStart > msg.date) { return; }
+
   const processMenuButtons = processMenu(equipmentMenu).map(menuItem => bot.inlineButton(menuItem.title, { callback: `equipment_menu-${menuItem.name}` }));
 
   const inlineReplyMarkup = bot.inlineKeyboard(_.chunk(processMenuButtons, 3));
@@ -2317,6 +2352,8 @@ bot.on('/eqp', (msg) => {
 });
 
 bot.on('/locations', (msg) => {
+  if (botStart > msg.date) { return; }
+
   const processMenuButtons = processMenu(locationsMenu).map(menuItem => bot.inlineButton(menuItem.title, { callback: `locations_menu-${menuItem.name}` }));
 
   const inlineReplyMarkup = bot.inlineKeyboard(_.chunk(processMenuButtons, 3));
@@ -2328,6 +2365,8 @@ bot.on('/locations', (msg) => {
 });
 
 bot.on('/sppl', (msg) => {
+  if (botStart > msg.date) { return; }
+
   const processMenuButtons = processMenu(suppliesMenu).map(menuItem => bot.inlineButton(menuItem.title, { callback: `supplies_menu-${menuItem.name}` }));
 
   const inlineReplyMarkup = bot.inlineKeyboard(_.chunk(processMenuButtons, 3));
@@ -2339,6 +2378,8 @@ bot.on('/sppl', (msg) => {
 });
 
 bot.on('/achv', (msg) => {
+  if (botStart > msg.date) { return; }
+
   const processMenuButtons = processMenu(achievementsMenu).map(menuItem => bot.inlineButton(menuItem.title, { callback: `achievements_menu-${menuItem.name}` }));
 
   const inlineReplyMarkup = bot.inlineKeyboard(_.chunk(processMenuButtons, 3));
@@ -2350,6 +2391,8 @@ bot.on('/achv', (msg) => {
 });
 
 bot.on('/dng', (msg) => {
+  if (botStart > msg.date) { return; }
+
   const processMenuButtons = processMenu(dungeonMenu).map(menuItem => bot.inlineButton(menuItem.title, { callback: `dungeons_menu-${menuItem.name}` }));
 
   const inlineReplyMarkup = bot.inlineKeyboard(_.chunk(processMenuButtons, 2));
@@ -2361,11 +2404,17 @@ bot.on('/dng', (msg) => {
   }).catch(e => console.log(e));
 });
 
-bot.on('/commands_for_lag', msg => msg.reply.text(commandsForLag, {
-  parseMode: 'html',
-}).catch(e => console.log(e)));
+bot.on('/commands_for_lag', (msg) => {
+  if (botStart > msg.date) { return; }
+
+  return msg.reply.text(commandsForLag, {
+    parseMode: 'html',
+  }).catch(e => console.log(e));
+});
 
 bot.on('/skill_upgrade', (msg) => {
+  if (botStart > msg.date) { return; }
+
   const skillOMaticText = `
 В «<b>🎓 Скилокачаторе</b>» я могу помочь тебе посчитать финансовые затраты на прокачку твоих скилов.`;
 
@@ -2434,6 +2483,8 @@ ${skillOMaticText}
 });
 
 bot.on(['/leaderboard', '/top'], (msg) => {
+  if (botStart > msg.date) { return; }
+
   userManager.leaderboard(msg.from.id).then((result) => {
     if (result.ok && result.reason === 'LEADERBOARD_GENERATED') {
       return msg.reply.text(`<i>Топ игроков отпраляющих форварды:</i> \n\n${result.data}`, {
@@ -2449,6 +2500,8 @@ bot.on(['/leaderboard', '/top'], (msg) => {
 });
 
 bot.on('/mypipstats', async (msg) => {
+  if (botStart > msg.date) { return; }
+
   await msg.reply.text('Эта фича работает в эксперементальном режиме. Пожалуйста сообщи если столкнёшся с неожиданными проблемами :3', {
     asReply: true,
   });
@@ -2602,6 +2655,8 @@ bot.on('/mypipstats', async (msg) => {
 });
 
 bot.on('/debug', async (msg) => {
+  if (botStart > msg.date) { return; }
+
   await createSession(msg);
 
   const updatesData = {
@@ -2641,6 +2696,8 @@ bot.on('/debug', async (msg) => {
 });
 
 bot.on(/^\d+$/, async (msg) => {
+  if (botStart > msg.date) { return; }
+
   if (msg.chat) {
     if (msg.chat.id === Number(REPORT_CHANNEL_ID)) {
       return;
@@ -2712,7 +2769,10 @@ bot.on(/^\d+$/, async (msg) => {
   }
 });
 
-bot.on('/show_drones', msg => msg.reply.text(`
+bot.on('/show_drones', (msg) => {
+  if (botStart > msg.date) { return; }
+
+  return msg.reply.text(`
 🛰Барахло ⚙️Универсальный
 ⚔️10 🛡50/50 ⚡️6%
 
@@ -2742,12 +2802,16 @@ bot.on('/show_drones', msg => msg.reply.text(`
 ⚔️ - урон дрона
 🛡- прочность, уменьшается при попадании монстров или игроков по дрону.
 ⚡️- шанс вступить в бой.
-`, {
-  parseMode: 'markdown',
-  webPreview: false,
-}));
+    `, {
+    parseMode: 'markdown',
+    webPreview: false,
+  });
+});
 
-bot.on('/show_hall_of_fame', msg => msg.reply.text(`
+bot.on('/show_hall_of_fame', (msg) => {
+  if (botStart > msg.date) { return; }
+
+  return msg.reply.text(`
 <code>Здесь увековечены жители и организации пустоши, оказавшие титаническую помощь на этапе открытой беты, и развития бота ещё как Скилокачатора</code>
 
 Самому харизматичному человеку в Пустоши - Илье (@Rev1veD) Фунту
@@ -2773,10 +2837,11 @@ https://t.me/trust_42/57
 помощь в их устранении, неоднократные контрибьюшены.
 
 Список дополняется...
-`, {
-  parseMode: 'html',
-  webPreview: false,
-}));
+  `, {
+    parseMode: 'html',
+    webPreview: false,
+  });
+});
 
 const giantsKeyboard = bot.inlineKeyboard([
   [
@@ -2810,6 +2875,8 @@ const beastRangesDarkZoneKeyboard = withBackButton(bot.keyboard, _.chunk(dzRange
 const beastRangesDungeonKeyboard = withBackButton(bot.keyboard, _.chunk(dungeonRanges.map(range => `=${range}=`), 5));
 
 bot.on('/show_giants', (msg) => {
+  if (botStart > msg.date) { return; }
+
   Giant.find({}).then((giants) => {
     const giantsReply = _.sortBy(giants, 'distance').map((giant) => {
       const isDead = giant.health.current <= 0;
@@ -2835,6 +2902,8 @@ _Если гиганта нет в списке - значит его ещё н�
 });
 
 bot.on(['/show_beasts(regular)', '/show_beasts(darkzone)', '/show_beasts(dungeon)'], (msg) => {
+  if (botStart > msg.date) { return; }
+
   let keyboard;
   let prefix = '';
   let postfix = '';
@@ -2870,6 +2939,8 @@ bot.on(['/show_beasts(regular)', '/show_beasts(darkzone)', '/show_beasts(dungeon
 });
 
 bot.on(/mob_(.+)/, (msg) => {
+  if (botStart > msg.date) { return; }
+
   const [, id] = /mob_(.+)/.exec(msg.text);
 
   const searchParams = {
@@ -2898,6 +2969,8 @@ bot.on(/mob_(.+)/, (msg) => {
 });
 
 bot.on(['/cancel', '/journeyforwardcancel', '/force_cancel'], async (msg) => {
+  if (botStart > msg.date) { return; }
+
   const backMessage = _.random(0, 100) >= 90 ? 'Ты вернусля в главное меню\n<i>Вернусля - почётный член этого сообщения, не обижайте её</i>' : 'Ты вернусля в главное меню';
 
   if (sessions[msg.from.id] === undefined) {
@@ -2924,6 +2997,8 @@ bot.on(['/cancel', '/journeyforwardcancel', '/force_cancel'], async (msg) => {
 });
 
 bot.on('/delete_accaunt', async (msg) => {
+  if (botStart > msg.date) { return; }
+
   if (process.env.ENV === 'STAGING' || process.env.ENV === 'LOCAL') {
     const result = await userManager.delete(msg.from.id);
 
@@ -2944,6 +3019,8 @@ bot.on('/delete_accaunt', async (msg) => {
 });
 
 bot.on('/delete_beasts', (msg) => {
+  if (botStart > msg.date) { return; }
+
   if (process.env.ENV === 'STAGING' || process.env.ENV === 'LOCAL') {
     Beast.find({ 'battles.stamp': { $regex: `.+${msg.from.id}` } }).then((beasts) => {
       if (beasts.length === 0) {
@@ -2969,6 +3046,8 @@ bot.on('/delete_beasts', (msg) => {
 });
 
 bot.on('/delete_giants', (msg) => {
+  if (botStart > msg.date) { return; }
+
   if (process.env.ENV === 'STAGING') {
     Giant.collection.drop().then(() => msg.reply.text('Я удалил всех гигантов', {
       asReply: true,
@@ -2977,6 +3056,8 @@ bot.on('/delete_giants', (msg) => {
 });
 
 bot.on('callbackQuery', (msg) => {
+  if (botStart > msg.date) { return; }
+
   const chatId = msg.from.id;
   const messageId = msg.message.message_id;
   const showMobRegExp = /show_beast_(\d+)-(\d+)\+(.+)/;
@@ -3293,6 +3374,8 @@ ${skillOMaticText}
 
 
 bot.on('text', async (msg) => {
+  if (botStart > msg.date) { return; }
+
   const regularZoneBeastsRequestRegExp = /(\d+)-(\d+)/;
   const rangeRegExp = /(\d+)(-|—|--)(\d+)/;
   const dungeonRegExp = /=(\d+)=/;
@@ -3403,6 +3486,8 @@ ${beastsList}
 });
 
 bot.on('/show_encyclopedia', async (msg) => {
+  if (botStart > msg.date) { return; }
+
   await createSession(msg);
 
   const descriptions = getButtonDescriptions(sessions[msg.from.id].settings.buttons, 'encyclopedia');
@@ -3419,6 +3504,8 @@ ${descriptions}`, {
 });
 
 bot.on(/\/battle_(.+)/, (msg) => {
+  if (botStart > msg.date) { return; }
+
   if (process.env.ENV === 'PRODUCTION') {
     return msg.reply.text('Ну и хули ты сюда лезешь?)', {
       asReply: true,
@@ -3444,6 +3531,8 @@ bot.on(/\/battle_(.+)/, (msg) => {
 });
 
 bot.on(/\/ignore_(.+)/, async (msg) => {
+  if (botStart > msg.date) { return; }
+
   if (_.isEmpty(sessions)) {
     return msg.reply.text('Слушай, а мне собственно нечего игнорировать. Может меня опять какой-то пидор перезагрузил, не знаешь?', {
       asReply: true,
@@ -3505,12 +3594,16 @@ bot.on(/\/ignore_(.+)/, async (msg) => {
 });
 
 bot.on('/delete_all_beasts', (msg) => {
+  if (botStart > msg.date) { return; }
+
   if (process.env.ENV === 'STAGING' || process.env.ENV === 'LOCAL') {
     mongoose.connection.db.dropCollection('beasts', () => msg.reply.text('Все мобы удалёны'));
   }
 });
 
 bot.on('/state', (msg) => {
+  if (botStart > msg.date) { return; }
+
   if (process.env.ENV === 'STAGING' || process.env.ENV === 'LOCAL') {
     if (sessions[msg.from.id]) {
       if (sessions[msg.from.id].state) {
@@ -3525,6 +3618,8 @@ bot.on('/state', (msg) => {
 });
 
 bot.on('/showBeastsToValidate', (msg) => {
+  if (botStart > msg.date) { return; }
+
   if (!_.isEmpty(sessions)) {
     if (sessions[msg.from.id] !== undefined) {
       if (sessions[msg.from.id].beastsToValidate.length > 0) {
@@ -3539,23 +3634,29 @@ bot.on('/showBeastsToValidate', (msg) => {
   return null;
 });
 
-bot.on('/help_icons', msg => msg.reply.text(`
+bot.on('/help_icons', (msg) => {
+  if (botStart > msg.date) { return; }
+
+  return msg.reply.text(`
 ✅ - Информация собрана <b>только</b> из актуальной версии ВВ
 ⚠️ - Информация собрана из данных актуальной версии ВВ и прошлых версий ВВ
 ‼️ - Информация собрана <b>только</b> из прошлых версий ВВ
 
 Иконки сообщают о "свежести" данных о мобе.
 
-  Что в нашем понимании "свежесть"? Представьте себе моба "🐲Трог (Воин)". Его урон, здоровье, лут и другие характеристики могут отличаться от каждой из версий WW (2.1/2.0/1.8). Раньше Ассистент держал все эти версии условного моба как единую запись, из за этого информация была слишком расплывчата.
+Что в нашем понимании "свежесть"? Представьте себе моба "🐲Трог (Воин)". Его урон, здоровье, лут и другие характеристики могут отличаться от каждой из версий WW (2.1/2.0/1.8). Раньше Ассистент держал все эти версии условного моба как единую запись, из за этого информация была слишком расплывчата.
 
-  Мы же внедрили систему в ассистента которая различает разные версии мобов как раз для поддержания максимального уровня актуальности данных.
+Мы же внедрили систему в ассистента которая различает разные версии мобов как раз для поддержания максимального уровня актуальности данных.
 
-  На случай если Ассистент не сможет предоставить вам актуальную информацию - он постарается найти данные о мобе со старых версий, и конечно же - он вам сообщит когда вы будете просматривать "устаревшую" информацию что бы вы понимали что вы имеете дело с рисковым выбором.`, {
-  parseMode: 'html',
-  asReply: true,
-}));
+На случай если Ассистент не сможет предоставить вам актуальную информацию - он постарается найти данные о мобе со старых версий, и конечно же - он вам сообщит когда вы будете просматривать "устаревшую" информацию что бы вы понимали что вы имеете дело с рисковым выбором.`, {
+    parseMode: 'html',
+    asReply: true,
+  });
+});
 
 bot.on('/show_settings', async (msg) => {
+  if (botStart > msg.date) { return; }
+
   msg.reply.text('Здесь ты можешь изменить настройки отображения и персонализировать бота под себя', {
     replyMarkup: withBackButton(bot.keyboard, [
       [buttons.showSettingsButton.label, buttons.showSettingsAmountButton.label],
@@ -3566,6 +3667,8 @@ bot.on('/show_settings', async (msg) => {
 });
 
 bot.on('/show_buttons', async (msg) => {
+  if (botStart > msg.date) { return; }
+
   const telegramData = {
     first_name: msg.from.first_name,
     id: msg.from.id,
@@ -3605,6 +3708,8 @@ ${encyclopediaKeyboardButtons}
 });
 
 bot.on(['/buttons_set_all', '/buttons_set_default'], async (msg) => {
+  if (botStart > msg.date) { return; }
+
   const isRevertToDefault = msg.text.indexOf('default') !== -1;
   let updateResult;
 
@@ -3645,6 +3750,8 @@ bot.on(['/buttons_set_all', '/buttons_set_default'], async (msg) => {
 });
 
 bot.on('/buttons_toggle_icon', async (msg) => {
+  if (botStart > msg.date) { return; }
+
   if (sessions[msg.from.id] === undefined) {
     await createSession(msg);
   }
@@ -3669,6 +3776,8 @@ bot.on('/buttons_toggle_icon', async (msg) => {
 });
 
 bot.on([/bup_(\d*)/, /bdown_(\d*)/], async (msg) => {
+  if (botStart > msg.date) { return; }
+
   const isUp = msg.text.indexOf('up') !== -1;
   let buttonIndex;
 
@@ -3753,6 +3862,8 @@ bot.on([/bup_(\d*)/, /bdown_(\d*)/], async (msg) => {
 });
 
 bot.on('/show_amount_buttons', async (msg) => {
+  if (botStart > msg.date) { return; }
+
   if (!sessions[msg.from.id]) {
     await createSession(msg);
   }
@@ -3769,6 +3880,8 @@ bot.on('/show_amount_buttons', async (msg) => {
 });
 
 bot.on('/myforwardstats', async (msg) => {
+  if (botStart > msg.date) { return; }
+
   const { data: forwards } = await userManager.getForwardStats({ id: msg.from.id });
 
   const reply = `Вот собранная статисктика по всёму тому, что ты мне накидал.
@@ -3799,6 +3912,8 @@ bot.on('/myforwardstats', async (msg) => {
 });
 
 bot.on(/^#\S+/, async (msg) => {
+  if (botStart > msg.date) { return; }
+
   if (msg.chat) {
     if (msg.chat.id === REPORT_CHANNEL_ID) {
       return;
