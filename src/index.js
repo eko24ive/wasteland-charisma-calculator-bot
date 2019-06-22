@@ -9,7 +9,7 @@ const { REPORT_CHANNEL_ID } = process.env;
 const DATA_THRESHOLD = Number(process.env.DATA_THRESHOLD);
 const DATA_THRESHOLD_DUNGEON = Number(process.env.DATA_THRESHOLD_DUNGEON);
 const { VERSION } = process.env;
-const botStart = Date.now();
+const botStart = Date.now()/1000;
 
 const async = require('async');
 const mongoose = require('mongoose');
