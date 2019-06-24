@@ -4,6 +4,7 @@
   "description": "",
   "main": "index.js",
   "dependencies": {
+    "@sentry/node": "5.4.3",
     "async": "^2.6.0",
     "chart.js": "^2.7.3",
     "chartjs-node-canvas": "^2.2.2",

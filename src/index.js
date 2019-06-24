@@ -9,7 +9,8 @@ const { REPORT_CHANNEL_ID } = process.env;
 const DATA_THRESHOLD = Number(process.env.DATA_THRESHOLD);
 const DATA_THRESHOLD_DUNGEON = Number(process.env.DATA_THRESHOLD_DUNGEON);
 const { VERSION } = process.env;
-const botStart = Date.now()/1000;
+const botStart = Date.now() / 1000;
+const Sentry = require('@sentry/node');
 
 const async = require('async');
 const mongoose = require('mongoose');
@@ -88,6 +89,7 @@ const withBackButton = require('./utils/withBackButton');
 const UserManager = require('./database/userManager');
 
 mongoose.connect(uristring);
+Sentry.init({ dsn: process.env.SENTRY });
 
 const Beast = mongoose.model('Beast', beastSchema);
 const Giant = mongoose.model('Giant', giantScheme);
