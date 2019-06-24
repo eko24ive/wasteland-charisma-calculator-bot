@@ -89,7 +89,11 @@ const withBackButton = require('./utils/withBackButton');
 const UserManager = require('./database/userManager');
 
 mongoose.connect(uristring);
-Sentry.init({ dsn: process.env.SENTRY });
+
+if(process.env.SENTRY) {
+  Sentry.init({ dsn: process.env.SENTRY });
+}
+
 
 const Beast = mongoose.model('Beast', beastSchema);
 const Giant = mongoose.model('Giant', giantScheme);
