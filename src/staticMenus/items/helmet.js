@@ -103,7 +103,7 @@ const helmets = [
       getResource(GENERATORS, 140), getResource(MICROCHIPS, 60)],
     characteristic: 40,
     place: engineer,
-    requirements: getCharacteristic(AGILITY, 21),
+    requirements: getCharacteristic(AGILITY, 25),
   },
   {
     icon: '⚙️',
@@ -112,7 +112,7 @@ const helmets = [
       getResource(MICROCHIPS, 210), getResource(IRIDIUM, 130)],
     characteristic: 68,
     place: engineer,
-    requirements: getCharacteristic(AGILITY, 35),
+    requirements: getCharacteristic(AGILITY, 42),
   },
   {
     icon: '🛠',
@@ -121,7 +121,7 @@ const helmets = [
       getResource(MICROCHIPS, 345), getResource(IRIDIUM, 320)],
     characteristic: 92,
     place: engineer,
-    requirements: getCharacteristic(AGILITY, 35),
+    requirements: getCharacteristic(AGILITY, 57),
   },
   {
     icon: false,
@@ -129,6 +129,7 @@ const helmets = [
     price: false,
     characteristic: 115,
     place: highHrotgar,
+    requirements: getCharacteristic(AGILITY, 71),
   },
   {
     icon: false,
@@ -136,6 +137,7 @@ const helmets = [
     price: false,
     characteristic: 195,
     place: pvpArena,
+    requirements: getCharacteristic(AGILITY, 120),
     comment: 'Этот переходящий трофей можно получить на время, став победилем сезона в Куполе. Сезон закрывается каждую неделю.',
   },
 ];
