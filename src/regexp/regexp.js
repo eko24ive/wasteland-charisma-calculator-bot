@@ -1,8 +1,8 @@
 const locationNameRegExp = /^(.+)\n❤️/;
 const locationRaidPostfixRegExp = / \(.+\)/;
-const healthRegExp = /❤️(-|)(\d+)\/(\d+)/;
+const healthRegExp = /❤️(-|)(\d+)\\(\d+)/;
 const hungerRegExp = /🍗\d+%/;
-const staminaRegExp = /🔋\d+\/\d+/;
+const staminaRegExp = /🔋\d+\\\d+/;
 const campDistanceRegExp = /👣(\d+)км/;
 const receivedCapsAndMaterialsRegExp = /Найдено: 🕳(\d+) и 📦(\d+)/;
 const lostCapsAndMaterialsRegExp = /Потеряно: 🕳(\d+) и 📦(\d+)/;
