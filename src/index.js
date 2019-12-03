@@ -39,7 +39,7 @@ const feedbackSchema = require('./schemes/feedback');
 
 const userDefaults = require('./schemes/defaults/user');
 
-const chartGeneration = require('./utils/chartGeneration');
+// const chartGeneration = require('./utils/chartGeneration');
 
 const parsePip = require('./parsers/parsePip');
 const beastParser = require('./parsers/parseBeast');
@@ -2506,7 +2506,11 @@ bot.on(['/leaderboard', '/top'], (msg) => {
 });
 
 bot.on('/mypipstats', async (msg) => {
-  if (botStart > msg.date) { return; }
+  await msg.reply.text('Функционал временно отключён', {
+    asReply: true,
+  });
+
+  /* if (botStart > msg.date) { return; }
 
   await msg.reply.text('Эта фича работает в эксперементальном режиме. Пожалуйста сообщи если столкнёшся с неожиданными проблемами :3', {
     asReply: true,
@@ -2656,7 +2660,7 @@ bot.on('/mypipstats', async (msg) => {
     return chartGeneration(chartConfig, buffer => msg.reply.photo(buffer, {
       asReply: true,
       caption: 'Получи и распишись!',
-    }).catch(e => console.log(e)));
+    }).catch(e => console.log(e))); */
   });
 });
 
