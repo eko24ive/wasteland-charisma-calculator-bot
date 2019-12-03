@@ -90,7 +90,7 @@ const UserManager = require('./database/userManager');
 
 mongoose.connect(uristring);
 
-if(process.env.SENTRY) {
+if (process.env.SENTRY) {
   Sentry.init({ dsn: process.env.SENTRY });
 }
 
@@ -2660,8 +2660,8 @@ bot.on('/mypipstats', async (msg) => {
     return chartGeneration(chartConfig, buffer => msg.reply.photo(buffer, {
       asReply: true,
       caption: 'Получи и распишись!',
-    }).catch(e => console.log(e))); */
-  });
+    }).catch(e => console.log(e)));
+  }); */
 });
 
 bot.on('/debug', async (msg) => {
