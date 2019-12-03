@@ -1297,7 +1297,7 @@ bot.on('forward', async (msg) => {
   }
 
   if (!validateForwardDate(msg.forward_date)) {
-    return msg.reply.text('❌<b>ЗАМЕЧЕНА КРИТИЧЕСКАЯ ОШИБКА</b>❌\n\nБыл замечен форвард, время которого меньше, чем время последнего обновления Wasteland Wars (19.09.2018)', {
+    return msg.reply.text('❌<b>ЗАМЕЧЕНА КРИТИЧЕСКАЯ ОШИБКА</b>❌\n\nБыл замечен форвард, время которого меньше, чем время последнего обновления Wasteland Wars (03.12.2019)', {
       asReply: true,
       parseMode: 'html',
     });
