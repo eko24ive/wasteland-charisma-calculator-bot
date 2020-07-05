@@ -165,6 +165,7 @@ const armors = [
     characteristic: 35,
     place: workbench,
     rarities: [FIRST, SECOND],
+    requirements: getCharacteristic(AGILITY, 21),
   },
   {
     icon: '⚙️',
@@ -173,6 +174,7 @@ const armors = [
     characteristic: 65,
     place: workbench,
     rarity: getRarityIcon(FIRST),
+    requirements: getCharacteristic(AGILITY, 40),
   },
   {
     icon: '⚙️',
@@ -181,6 +183,7 @@ const armors = [
     characteristic: 71,
     place: workbench,
     rarity: getRarityIcon(SECOND),
+    requirements: getCharacteristic(AGILITY, 44),
   },
   {
     icon: '⚙️',
@@ -189,7 +192,7 @@ const armors = [
     characteristic: 45,
     place: workbench,
     rarities: [FIRST, SECOND],
-    requirements: getCharacteristic(AGILITY, 23),
+    requirements: getCharacteristic(AGILITY, 28),
   },
   {
     icon: '⚙️',
@@ -198,6 +201,7 @@ const armors = [
     characteristic: 70,
     place: workbench,
     rarity: getRarityIcon(FIRST),
+    requirements: getCharacteristic(AGILITY, 43),
   },
   {
     icon: '⚙️',
@@ -206,6 +210,7 @@ const armors = [
     characteristic: 79,
     place: workbench,
     rarity: getRarityIcon(SECOND),
+    requirements: getCharacteristic(AGILITY, 49),
   },
   {
     icon: '⚙️',
@@ -214,7 +219,25 @@ const armors = [
       getResource(MICROCHIPS, 10)],
     characteristic: 55,
     place: workbench,
-    requirements: getCharacteristic(AGILITY, 28),
+    requirements: getCharacteristic(AGILITY, 34),
+  },
+  {
+    icon: '⚙️',
+    title: "Броня 'Тесла'",
+    price: [getResource(TRANSISTOR, 0), getResource(IRONTHING, 0)],
+    characteristic: 76,
+    place: workbench,
+    rarity: getRarityIcon(FIRST),
+    requirements: getCharacteristic(AGILITY, 47),
+  },
+  {
+    icon: '⚙️',
+    title: "Броня 'Тесла'",
+    price: [getResource(TRANSISTOR, 19), getResource(IRONTHING, 20)],
+    characteristic: 85,
+    place: workbench,
+    rarity: getRarityIcon(SECOND),
+    requirements: getCharacteristic(AGILITY, 52),
   },
   {
     icon: '⚙️',
@@ -224,7 +247,7 @@ const armors = [
     characteristic: 66,
     place: workbench,
     rarities: [FIRST, SECOND],
-    requirements: getCharacteristic(AGILITY, 34),
+    requirements: getCharacteristic(AGILITY, 41),
   },
   {
     icon: '⚙️',
@@ -233,6 +256,7 @@ const armors = [
     characteristic: 87,
     place: workbench,
     rarity: getRarityIcon(FIRST),
+    requirements: getCharacteristic(AGILITY, 54),
   },
   {
     icon: '⚙️',
@@ -241,6 +265,7 @@ const armors = [
     characteristic: 96,
     place: workbench,
     rarity: getRarityIcon(SECOND),
+    requirements: getCharacteristic(AGILITY, 59),
   },
   {
     icon: '🦇',
@@ -250,7 +275,7 @@ const armors = [
     characteristic: 76,
     place: engineer,
     rarities: [FIRST, SECOND],
-    requirements: getCharacteristic(AGILITY, 40),
+    requirements: getCharacteristic(AGILITY, 47),
   },
   {
     icon: '🦇',
@@ -259,6 +284,7 @@ const armors = [
     characteristic: 95,
     place: engineer,
     rarity: getRarityIcon(FIRST),
+    requirements: getCharacteristic(AGILITY, 59),
   },
   {
     icon: '🦇',
@@ -267,6 +293,7 @@ const armors = [
     characteristic: 103,
     place: engineer,
     rarity: getRarityIcon(SECOND),
+    requirements: getCharacteristic(AGILITY, 64),
   },
   {
     icon: '⚛️',
@@ -276,7 +303,7 @@ const armors = [
     characteristic: 89,
     place: engineer,
     rarities: [FIRST, SECOND],
-    requirements: getCharacteristic(AGILITY, 46),
+    requirements: getCharacteristic(AGILITY, 55),
   },
   {
     icon: '⚛️',
@@ -286,6 +313,7 @@ const armors = [
     characteristic: 113,
     place: engineer,
     rarity: getRarityIcon(FIRST),
+    requirements: getCharacteristic(AGILITY, 70),
   },
   {
     icon: '⚛️',
@@ -295,6 +323,7 @@ const armors = [
     characteristic: 126,
     place: engineer,
     rarity: getRarityIcon(SECOND),
+    requirements: getCharacteristic(AGILITY, 78),
   },
   {
     icon: '🛠',
@@ -304,7 +333,7 @@ const armors = [
     characteristic: 127,
     place: engineer,
     rarities: [FIRST, SECOND],
-    requirements: getCharacteristic(AGILITY, 66),
+    requirements: getCharacteristic(AGILITY, 79),
   },
   {
     icon: '🛠',
@@ -314,6 +343,7 @@ const armors = [
     characteristic: 157,
     place: engineer,
     rarity: getRarityIcon(FIRST),
+    requirements: getCharacteristic(AGILITY, 97),
   },
   {
     icon: '🛠',
@@ -323,6 +353,7 @@ const armors = [
     characteristic: 168,
     place: engineer,
     rarity: getRarityIcon(SECOND),
+    requirements: getCharacteristic(AGILITY, 104),
   },
   {
     icon: '⚡️',
@@ -332,7 +363,7 @@ const armors = [
     characteristic: 161,
     place: engineer,
     rarities: [FIRST, SECOND],
-    requirements: getCharacteristic(AGILITY, 84),
+    requirements: getCharacteristic(AGILITY, 100),
   },
   {
     icon: '⚡️',
@@ -342,6 +373,7 @@ const armors = [
     characteristic: 187,
     place: { engineer, siencelab },
     rarity: getRarityIcon(FIRST),
+    requirements: getCharacteristic(AGILITY, 116),
   },
   {
     icon: '⚡️',
@@ -351,6 +383,7 @@ const armors = [
     characteristic: 198,
     place: engineer,
     rarity: getRarityIcon(SECOND),
+    requirements: getCharacteristic(AGILITY, 122),
   },
   {
     icon: '☣️',
@@ -359,7 +392,7 @@ const armors = [
       getResource(IRIDIUM, 132), getResource(KIPARIT, 50)],
     characteristic: 190,
     place: engineer,
-    requirements: getCharacteristic(AGILITY, 100),
+    requirements: getCharacteristic(AGILITY, 118),
   },
   {
     icon: '✳️',
@@ -368,7 +401,7 @@ const armors = [
       getResource(IRIDIUM, 189), getResource(KIPARIT, 85)],
     characteristic: 230,
     place: engineer,
-    requirements: getCharacteristic(AGILITY, 121),
+    requirements: getCharacteristic(AGILITY, 143),
   },
   {
     icon: false,
@@ -377,7 +410,7 @@ const armors = [
     characteristic: 58,
     place: madman,
     rarities: [FIRST, SECOND],
-    requirements: getCharacteristic(AGILITY, 26),
+    requirements: getCharacteristic(AGILITY, 36),
   },
   {
     icon: false,
@@ -387,6 +420,7 @@ const armors = [
     characteristic: 75,
     place: madman,
     rarity: getRarityIcon(FIRST),
+    requirements: getCharacteristic(AGILITY, 46),
   },
   {
     icon: false,
@@ -396,6 +430,7 @@ const armors = [
     characteristic: 84,
     place: madman,
     rarity: getRarityIcon(SECOND),
+    requirements: getCharacteristic(AGILITY, 52),
   },
   {
     icon: '⚛️',
@@ -404,6 +439,7 @@ const armors = [
     characteristic: 68,
     place: madman,
     rarities: [FIRST, SECOND],
+    requirements: getCharacteristic(AGILITY, 42),
   },
   {
     icon: '⚛️',
@@ -412,6 +448,7 @@ const armors = [
     characteristic: 89,
     place: madman,
     rarity: getRarityIcon(FIRST),
+    requirements: getCharacteristic(AGILITY, 55),
   },
   {
     icon: '⚛️',
@@ -420,6 +457,7 @@ const armors = [
     characteristic: 95,
     place: madman,
     rarity: getRarityIcon(SECOND),
+    requirements: getCharacteristic(AGILITY, 59),
   },
   {
     icon: '💠',
@@ -427,6 +465,7 @@ const armors = [
     price: false,
     characteristic: 149,
     place: hexagon,
+    requirements: getCharacteristic(AGILITY, 92),
   },
   {
     icon: 'Ⓜ️',
@@ -434,6 +473,7 @@ const armors = [
     price: false,
     characteristic: 149,
     place: hexagon,
+    requirements: getCharacteristic(AGILITY, 92),
   },
 ];
 
